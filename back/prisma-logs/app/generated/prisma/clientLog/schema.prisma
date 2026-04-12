@@ -1,0 +1,81 @@
+generator clientLogs {
+  provider      = "prisma-client-js"
+  output        = "app/generated/prisma/clientLog"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "windows"]
+  engineType    = "client"
+}
+
+datasource logs {
+  provider = "postgresql"
+}
+
+model TtsDailyUsage {
+  id       Int      @id @default(autoincrement())
+  date     DateTime @unique
+  chars    Int      @default(0)
+  requests Int      @default(0)
+}
+
+model TtsWeekVoice {
+  id        Int      @id @default(autoincrement())
+  year      Int
+  week      Int
+  voiceName String
+  createdAt DateTime @default(now())
+
+  @@unique([year, week])
+}
+
+model TtsSettings {
+  id          Int      @id @default(autoincrement())
+  rate        Float    @default(1.0) // velocidade
+  volumeSound Float    @default(0.0)
+  updatedAt   DateTime @updatedAt
+}
+
+model TtsVoiceOverride {
+  id        Int      @id @default(autoincrement())
+  year      Int
+  week      Int
+  voiceName String
+  updatedAt DateTime @updatedAt
+
+  @@unique([year, week])
+}
+
+model NameDictionary {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique // chave normalizada (ex: "graca")
+  value     String // valor correto (ex: "GraÃ§a")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TtsVoiceTest {
+  id          Int      @id @default(autoincrement())
+  cacheKey    String   @unique
+  voiceName   String
+  rate        Float    @default(1.0)
+  text        String
+  audioMp3    Bytes
+  volumeSound Float    @default(0.0)
+  createdAt   DateTime @default(now())
+}
+
+model ttsEvent {
+  eventId      String   @unique
+  audioContent Bytes?
+  createdAt    DateTime @default(now())
+}
+
+model token {
+  tokenHash String   @unique
+  name      String
+  scope     String?
+  expiresAt DateTime @logs.Timestamp(6)
+  revokedAt String?
+  createdAt DateTime @default(now()) @logs.Timestamp(6)
+  Id        BigInt   @id @default(autoincrement())
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
