@@ -18,7 +18,7 @@ return (<>
                       <div className="self-center mt-10 gap-5 flex w-full flex-col content-center">
                             {buttons}
                       </div>
-                      <div onClick={()=>{AtentionSound("play")}} className="cursor-pointer font-extrabold text-white self-start mr-10 bg-red-400 rounded-lg px-5 py-7 hover:bg-slate-400 hover:text-black">
+                      <div onClick={()=>{AtentionSound("play")}} className="cursor-pointer font-extrabold text-white self-start ml-10 bg-red-400 rounded-lg px-5 py-7 hover:bg-slate-400 hover:text-black">
                         Silêncio
                       </div>
   </>)}
