@@ -83,7 +83,6 @@ async function atencaoRoute(fastify) {
             const data = await res.json();
             const audioBuffer = Buffer.from(data.audioContent, 'base64');
             await node_fs_1.default.promises.writeFile(caminhoCompleto, audioBuffer);
-            console.log("audio gerado");
             if (!res.ok || !data.audioContent) {
                 console.error("Erro TTS Google:", data);
                 return reply.status(500).send("Falha ao gerar áudio " + data);
