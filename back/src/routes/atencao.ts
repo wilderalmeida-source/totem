@@ -34,6 +34,7 @@ export async function atencaoRoute(fastify: FastifyInstance) {
       text: z.string(),
     })
     const { text } = createbody.parse(request.body)
+    await PrismaLog.ttsEvent.upsert({where:{eventId:"atencao"},update:{audioContent:text},create:{eventId:"atencao",audioContent:text}});
     const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY
     const pastaPublica = path.resolve(__dirname, '../../public/audios');
     if (!fs.existsSync(pastaPublica)) {
@@ -113,5 +114,9 @@ export async function atencaoRoute(fastify: FastifyInstance) {
       console.error("Erro na rota /api/tts:", e);
       return reply.status(200).send("Erro interno ao gerar áudio")
     }
+  })
+  fastify.get('/clinux/atencao/text', async (request, reply)=>{
+    const textDB=await PrismaLog.ttsEvent.findFirst({where:{eventId:"atencao"}})
+    return reply.status(200).send(textDB)
   })
 }

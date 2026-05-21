@@ -6,7 +6,7 @@ export default async function Home() {
   const services=[{servico:"Agendamento",ID:'D'},{servico:"Atendimento",ID:'B'},{servico:"Entrega de Exames",ID:'C'}]
 return (<>
       <Base key={''} type={'home'} props={<div className="flex w-full h-full flex-col">
-                      <div><h2 className="text-6xl text-center">Olá, seja bem vindo a CRI!</h2>
+                      <div><h2 className="text-6xl text-center">Olá, seja bem vindo a CDI!</h2>
                             <h6 className="text-4xl text-center mt-4">Escolha uma opção abaixo.</h6>
                       </div>
                       {services&&<Servicos servicos={services}/>}

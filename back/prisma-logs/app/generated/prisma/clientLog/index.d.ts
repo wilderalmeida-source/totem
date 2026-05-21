@@ -60,7 +60,9 @@ export type token = $Result.DefaultSelection<Prisma.$tokenPayload>
  * Type-safe database client for TypeScript & Node.js
  * @example
  * ```
- * const prisma = new PrismaClient()
+ * const prisma = new PrismaClient({
+ *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+ * })
  * // Fetch zero or more TtsDailyUsages
  * const ttsDailyUsages = await prisma.ttsDailyUsage.findMany()
  * ```
@@ -81,7 +83,9 @@ export class PrismaClient<
    * Type-safe database client for TypeScript & Node.js
    * @example
    * ```
-   * const prisma = new PrismaClient()
+   * const prisma = new PrismaClient({
+   *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   * })
    * // Fetch zero or more TtsDailyUsages
    * const ttsDailyUsages = await prisma.ttsDailyUsage.findMany()
    * ```
@@ -161,9 +165,9 @@ export class PrismaClient<
    * ])
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
@@ -300,8 +304,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.1.0
-   * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
+   * Prisma Client JS version: 7.8.0
+   * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
    */
   export type PrismaVersion = {
     client: string
@@ -2333,6 +2337,11 @@ export namespace Prisma {
      * Skip the first `n` TtsDailyUsages.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TtsDailyUsages.
+     */
     distinct?: TtsDailyUsageScalarFieldEnum | TtsDailyUsageScalarFieldEnum[]
   }
 
@@ -3370,6 +3379,11 @@ export namespace Prisma {
      * Skip the first `n` TtsWeekVoices.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TtsWeekVoices.
+     */
     distinct?: TtsWeekVoiceScalarFieldEnum | TtsWeekVoiceScalarFieldEnum[]
   }
 
@@ -4394,6 +4408,11 @@ export namespace Prisma {
      * Skip the first `n` TtsSettings.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TtsSettings.
+     */
     distinct?: TtsSettingsScalarFieldEnum | TtsSettingsScalarFieldEnum[]
   }
 
@@ -5431,6 +5450,11 @@ export namespace Prisma {
      * Skip the first `n` TtsVoiceOverrides.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TtsVoiceOverrides.
+     */
     distinct?: TtsVoiceOverrideScalarFieldEnum | TtsVoiceOverrideScalarFieldEnum[]
   }
 
@@ -6460,6 +6484,11 @@ export namespace Prisma {
      * Skip the first `n` NameDictionaries.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of NameDictionaries.
+     */
     distinct?: NameDictionaryScalarFieldEnum | NameDictionaryScalarFieldEnum[]
   }
 
@@ -7536,6 +7565,11 @@ export namespace Prisma {
      * Skip the first `n` TtsVoiceTests.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TtsVoiceTests.
+     */
     distinct?: TtsVoiceTestScalarFieldEnum | TtsVoiceTestScalarFieldEnum[]
   }
 
@@ -7738,13 +7772,13 @@ export namespace Prisma {
 
   export type TtsEventMinAggregateOutputType = {
     eventId: string | null
-    audioContent: Bytes | null
+    audioContent: string | null
     createdAt: Date | null
   }
 
   export type TtsEventMaxAggregateOutputType = {
     eventId: string | null
-    audioContent: Bytes | null
+    audioContent: string | null
     createdAt: Date | null
   }
 
@@ -7849,7 +7883,7 @@ export namespace Prisma {
 
   export type TtsEventGroupByOutputType = {
     eventId: string
-    audioContent: Bytes | null
+    audioContent: string
     createdAt: Date
     _count: TtsEventCountAggregateOutputType | null
     _min: TtsEventMinAggregateOutputType | null
@@ -7901,7 +7935,7 @@ export namespace Prisma {
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       eventId: string
-      audioContent: Prisma.Bytes | null
+      audioContent: string
       createdAt: Date
     }, ExtArgs["result"]["ttsEvent"]>
     composites: {}
@@ -8327,7 +8361,7 @@ export namespace Prisma {
    */
   interface ttsEventFieldRefs {
     readonly eventId: FieldRef<"ttsEvent", 'String'>
-    readonly audioContent: FieldRef<"ttsEvent", 'Bytes'>
+    readonly audioContent: FieldRef<"ttsEvent", 'String'>
     readonly createdAt: FieldRef<"ttsEvent", 'DateTime'>
   }
     
@@ -8505,6 +8539,11 @@ export namespace Prisma {
      * Skip the first `n` ttsEvents.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ttsEvents.
+     */
     distinct?: TtsEventScalarFieldEnum | TtsEventScalarFieldEnum[]
   }
 
@@ -9560,6 +9599,11 @@ export namespace Prisma {
      * Skip the first `n` tokens.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of tokens.
+     */
     distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
   }
 
@@ -10305,13 +10349,13 @@ export namespace Prisma {
     OR?: ttsEventWhereInput[]
     NOT?: ttsEventWhereInput | ttsEventWhereInput[]
     eventId?: StringFilter<"ttsEvent"> | string
-    audioContent?: BytesNullableFilter<"ttsEvent"> | Bytes | null
+    audioContent?: StringFilter<"ttsEvent"> | string
     createdAt?: DateTimeFilter<"ttsEvent"> | Date | string
   }
 
   export type ttsEventOrderByWithRelationInput = {
     eventId?: SortOrder
-    audioContent?: SortOrderInput | SortOrder
+    audioContent?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -10320,13 +10364,13 @@ export namespace Prisma {
     AND?: ttsEventWhereInput | ttsEventWhereInput[]
     OR?: ttsEventWhereInput[]
     NOT?: ttsEventWhereInput | ttsEventWhereInput[]
-    audioContent?: BytesNullableFilter<"ttsEvent"> | Bytes | null
+    audioContent?: StringFilter<"ttsEvent"> | string
     createdAt?: DateTimeFilter<"ttsEvent"> | Date | string
   }, "eventId">
 
   export type ttsEventOrderByWithAggregationInput = {
     eventId?: SortOrder
-    audioContent?: SortOrderInput | SortOrder
+    audioContent?: SortOrder
     createdAt?: SortOrder
     _count?: ttsEventCountOrderByAggregateInput
     _max?: ttsEventMaxOrderByAggregateInput
@@ -10338,7 +10382,7 @@ export namespace Prisma {
     OR?: ttsEventScalarWhereWithAggregatesInput[]
     NOT?: ttsEventScalarWhereWithAggregatesInput | ttsEventScalarWhereWithAggregatesInput[]
     eventId?: StringWithAggregatesFilter<"ttsEvent"> | string
-    audioContent?: BytesNullableWithAggregatesFilter<"ttsEvent"> | Bytes | null
+    audioContent?: StringWithAggregatesFilter<"ttsEvent"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ttsEvent"> | Date | string
   }
 
@@ -10733,43 +10777,43 @@ export namespace Prisma {
 
   export type ttsEventCreateInput = {
     eventId: string
-    audioContent?: Bytes | null
+    audioContent: string
     createdAt?: Date | string
   }
 
   export type ttsEventUncheckedCreateInput = {
     eventId: string
-    audioContent?: Bytes | null
+    audioContent: string
     createdAt?: Date | string
   }
 
   export type ttsEventUpdateInput = {
     eventId?: StringFieldUpdateOperationsInput | string
-    audioContent?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    audioContent?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ttsEventUncheckedUpdateInput = {
     eventId?: StringFieldUpdateOperationsInput | string
-    audioContent?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    audioContent?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ttsEventCreateManyInput = {
     eventId: string
-    audioContent?: Bytes | null
+    audioContent: string
     createdAt?: Date | string
   }
 
   export type ttsEventUpdateManyMutationInput = {
     eventId?: StringFieldUpdateOperationsInput | string
-    audioContent?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    audioContent?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ttsEventUncheckedUpdateManyInput = {
     eventId?: StringFieldUpdateOperationsInput | string
-    audioContent?: NullableBytesFieldUpdateOperationsInput | Bytes | null
+    audioContent?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11197,18 +11241,6 @@ export namespace Prisma {
     _max?: NestedBytesFilter<$PrismaModel>
   }
 
-  export type BytesNullableFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    not?: NestedBytesNullableFilter<$PrismaModel> | Bytes | null
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
   export type ttsEventCountOrderByAggregateInput = {
     eventId?: SortOrder
     audioContent?: SortOrder
@@ -11225,16 +11257,6 @@ export namespace Prisma {
     eventId?: SortOrder
     audioContent?: SortOrder
     createdAt?: SortOrder
-  }
-
-  export type BytesNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    not?: NestedBytesNullableWithAggregatesFilter<$PrismaModel> | Bytes | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedBytesNullableFilter<$PrismaModel>
-    _max?: NestedBytesNullableFilter<$PrismaModel>
   }
 
   export type StringNullableFilter<$PrismaModel = never> = {
@@ -11261,6 +11283,11 @@ export namespace Prisma {
     gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type tokenCountOrderByAggregateInput = {
@@ -11361,10 +11388,6 @@ export namespace Prisma {
 
   export type BytesFieldUpdateOperationsInput = {
     set?: Bytes
-  }
-
-  export type NullableBytesFieldUpdateOperationsInput = {
-    set?: Bytes | null
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -11506,34 +11529,6 @@ export namespace Prisma {
     _max?: NestedBytesFilter<$PrismaModel>
   }
 
-  export type NestedBytesNullableFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    not?: NestedBytesNullableFilter<$PrismaModel> | Bytes | null
-  }
-
-  export type NestedBytesNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
-    not?: NestedBytesNullableWithAggregatesFilter<$PrismaModel> | Bytes | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedBytesNullableFilter<$PrismaModel>
-    _max?: NestedBytesNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11574,6 +11569,17 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {

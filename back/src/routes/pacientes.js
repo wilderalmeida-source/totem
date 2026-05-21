@@ -4,38 +4,136 @@ exports.pacientesRoute = pacientesRoute;
 const zod_1 = require("zod");
 const prismaDB_1 = require("../../config/prismaDB");
 async function pacientesRoute(fastify) {
+    function gerarECompletarDezDatas(datasReaisBanco) {
+        const listaDatasFormata = [];
+        // 1. FORÇA a conversão de todas as datas reais para string ISO e adiciona na lista
+        datasReaisBanco.forEach(data => {
+            if (data) {
+                try {
+                    let dataISO;
+                    // Se já for um objeto Date nativo
+                    if (data instanceof Date) {
+                        dataISO = data.toISOString();
+                    }
+                    // Se for uma string (comum ao trafegar dados ou de certos bancos)
+                    else if (typeof data === 'string') {
+                        dataISO = new Date(data).toISOString();
+                    }
+                    else {
+                        dataISO = new Date(data).toISOString();
+                    }
+                    // Só adiciona se for uma string ISO válida e não estiver duplicada
+                    if (dataISO && !listaDatasFormata.includes(dataISO)) {
+                        listaDatasFormata.push(dataISO);
+                    }
+                }
+                catch (e) {
+                    console.error("Erro crítico ao processar data real do banco:", data, e);
+                }
+            }
+        });
+        // 2. Intervalo de anos para preencher as datas falsas
+        const anoInicio = 1975;
+        const anoFim = 2005;
+        // 3. Preenche até ter exatamente 10 strings de datas distintas
+        while (listaDatasFormata.length < 10) {
+            const ano = Math.floor(Math.random() * (anoFim - anoInicio + 1)) + anoInicio;
+            const mes = Math.floor(Math.random() * 12);
+            const dia = Math.floor(Math.random() * 28) + 1;
+            const dataFalsaUTC = new Date(Date.UTC(ano, mes, dia, 0, 0, 0, 0));
+            const dataFalsaISO = dataFalsaUTC.toISOString();
+            if (!listaDatasFormata.includes(dataFalsaISO)) {
+                listaDatasFormata.push(dataFalsaISO);
+            }
+        }
+        // 4. Embaralha tudo (reais e falsas juntas) usando Fisher-Yates
+        for (let i = listaDatasFormata.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [listaDatasFormata[i], listaDatasFormata[j]] = [listaDatasFormata[j], listaDatasFormata[i]];
+        }
+        // 5. Retorna no formato exato que o seu front-end precisa
+        return listaDatasFormata.map(dataStr => ({
+            dt_nascimento: dataStr
+        }));
+    }
     fastify.get("/clinux/pacientes", async (request, reply) => {
         const bodySchema = zod_1.z.object({
             cd_paciente: zod_1.z.string().trim().optional(),
             ds_paciente: zod_1.z.string().trim().min(1).optional(),
             dt_nascimento: zod_1.z.string().trim().min(1).optional(),
-            ds_cpf: zod_1.z.string().trim().min(1).optional()
+            ds_cpf: zod_1.z.string().trim().min(1).optional(),
+            tipo: zod_1.z.string().trim().min(1).optional(),
         });
         try {
-            const { cd_paciente, ds_paciente, dt_nascimento, ds_cpf } = bodySchema.parse(request.query ?? {});
+            const { cd_paciente, ds_paciente, dt_nascimento, ds_cpf, tipo } = bodySchema.parse(request.query ?? {});
             // Se nada foi enviado, retorne lista vazia
             if (cd_paciente === undefined && ds_paciente === undefined && dt_nascimento === undefined && ds_cpf === undefined) {
                 return reply.send([]);
             }
             // Monta o where somente com os campos presentes
             const where = {};
+            const select = {};
+            if (tipo == "ID") {
+                where.ds_cpf = ds_cpf;
+                where.dt_nascimento = dt_nascimento;
+                select.ds_paciente = true;
+                select.cd_paciente = true;
+                select.dt_nascimento = true;
+            }
             if (typeof cd_paciente === "string") {
                 where.cd_paciente = parseInt(cd_paciente);
+                select.ds_paciente = true;
+                select.cd_paciente = true;
+                select.dt_nascimento = true;
             }
             if (ds_paciente) {
                 where.ds_paciente = { startsWith: ds_paciente, mode: "insensitive" };
+                select.ds_paciente = true;
             }
             if (dt_nascimento) {
                 where.dt_nascimento = dt_nascimento;
+                select.dt_nascimento = true;
             }
             if (ds_cpf) {
                 where.ds_cpf = ds_cpf;
+                select.dt_nascimento = true;
+            }
+            if (tipo == "DATA") {
+                where.dt_nascimento = dt_nascimento;
+                select.ds_paciente = true;
+            }
+            if (tipo == "NOME") {
+                where.ds_paciente = { startsWith: ds_paciente, mode: "insensitive" };
+                select.dt_nascimento = true;
+            }
+            if (tipo == "NOMEDATA") {
+                where.ds_paciente = ds_paciente;
+                where.dt_nascimento = dt_nascimento;
+                select.ds_paciente = true;
+                select.cd_paciente = true;
+                select.dt_nascimento = true;
             }
             const pacientes = await prismaDB_1.prisma.pacientes.findMany({
                 where,
-                select: { ds_paciente: true, dt_nascimento: true, cd_paciente: true },
+                select,
                 orderBy: { ds_paciente: "asc" },
             });
+            if (tipo == "MASK" && pacientes.length > 0 && pacientes.length < 10) {
+                const arrayDAtas = [];
+                for (let i = 0; i < pacientes.length; i++) {
+                    arrayDAtas.push(pacientes[i].dt_nascimento.toString());
+                }
+                const blocoDeDezDatas = gerarECompletarDezDatas(arrayDAtas);
+                return reply.send(blocoDeDezDatas);
+            }
+            if (tipo == "NOME" && pacientes.length > 0 && pacientes.length < 10) {
+                const arrayDAtas = [];
+                for (let i = 0; i < pacientes.length; i++) {
+                    arrayDAtas.push(pacientes[i].dt_nascimento.toString());
+                }
+                const blocoDeDezDatas = gerarECompletarDezDatas(arrayDAtas);
+                return reply.send(blocoDeDezDatas);
+            }
             return reply.send(pacientes);
         }
         catch (err) {

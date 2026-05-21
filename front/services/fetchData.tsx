@@ -77,6 +77,7 @@ export type Paciente = {
   ds_paciente?: string
   ds_nome?: string
   dt_nascimento?: string
+  ds_cpf?:string
 }
 
 export type Modalidade = { cd_modalidade: number; ds_modalidade: string }
@@ -275,19 +276,21 @@ export const buscaPaciente = async ({
   cd_paciente,
   dt_nascimento,
   ds_cpf,
+  tipo
 }: {
   ds_paciente?: string
   cd_paciente?: number
   dt_nascimento?: string
   ds_cpf?: string
+  tipo?: string
 }): Promise<Paciente[]> => {
   const params = new URLSearchParams()
   if (ds_paciente) params.append("ds_paciente", ds_paciente)
   if (cd_paciente) params.append("cd_paciente", cd_paciente.toString())
   if (dt_nascimento) params.append("dt_nascimento", dt_nascimento)
   if (ds_cpf) params.append("ds_cpf", ds_cpf)
-
-  if (!ds_paciente && !cd_paciente && !dt_nascimento && !ds_cpf) return []
+  if (tipo) params.append("tipo", tipo)
+  if (!ds_paciente && !cd_paciente && !dt_nascimento && !ds_cpf && !tipo) return []
 
   const response = await fetch(
     `${API_INTERNA}/clinux/pacientes?${params.toString()}`,
@@ -527,6 +530,17 @@ export const AtentionCreateSound = async (value: string) => {
       Authorization: TOKEN_API_INT
      },
     body: JSON.stringify({text:value}),
+  })
+  if (res.status == 200) {
+    return await res.json()
+  }
+}
+export const AtentionGetText = async () => {
+  const res = await fetch(`${API_INTERNA}/clinux/atencao/text`, {
+    method: "GET",
+    headers: { 'Content-Type': 'application/json',
+      Authorization: TOKEN_API_INT
+     }
   })
   if (res.status == 200) {
     return await res.json()

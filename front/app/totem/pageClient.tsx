@@ -44,7 +44,7 @@ export default function Totem() {
       }
 
       // 1) Busca inicial
-      if (pacientes.length < 1 || tipo == 'ID') {
+      if (pacientes.length < 1) {
         let result: Paciente[] | undefined = [];
 
         if (number.length == 0 && term.length > 4) {
@@ -59,10 +59,7 @@ export default function Totem() {
           }
         } else {
           if (number.length > 8 && tipo == "CPF") {
-            result = await buscaPaciente({ ds_cpf: number });
-          }
-          if (tipo == "ID") {
-            result = await buscaPaciente({ cd_paciente: parseInt(number) });
+            result = await buscaPaciente({ ds_cpf: number, tipo:"MASK" });
           }
           if (number.length == 8 && tipo == "DATA") {
             const day = parseInt(number.substring(0, 2));
@@ -77,26 +74,34 @@ export default function Totem() {
         const normalizados: Paciente[] = (result ?? []).map((r) => ({
           cd_paciente: r.cd_paciente ?? undefined,
           ds_nome: r.ds_nome ?? r.ds_paciente ?? "",
-          dt_nascimento: r.dt_nascimento ?? ""
+          dt_nascimento: r.dt_nascimento ?? "",
+          ds_cpf: r.ds_cpf ?? ""
         }));
         setPacientes(normalizados);
-
         const itens = normalizados.map((p, idx) => (
-          <li className="text-4xl mb-3" key={p.cd_paciente ?? `pac-${idx}`}>
-            <Link
+          <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={()=>{
+            if(tipo=="CPF"){setDados({
+              ds_cpf: number,
+              dt_nascimento: p.dt_nascimento,
+              servico: url.get("servico") ?? "",
+              preferencial: parseInt(url.get("preferencial") ?? "0", 10),
+              tipo: "CPF",
+              });setShowModal(true)}
+          }}>
+          {tipo!="CPF"?
+          <Link
               href={{
                 pathname: "/date",
                 query: {
                   servico: url.get("servico") ?? "",
                   preferencial: url.get("preferencial") ?? "",
-                  nome: tipo == "DATA" ? p.dt_nascimento : p.ds_nome ?? "SEM NOME",
-
+                  nome: tipo == "DATA" ? p.dt_nascimento : tipo==="CPF"?p.cd_paciente:tipo==="NOME"?p.ds_nome:"SEM NOME",
                   tipo: tipo
                 },
               }}
             >
-              {tipo == "DATA" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : p.ds_nome ?? "SEM NOME"}
-            </Link>
+              {tipo == "DATA" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : tipo==="CPF"?moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY"):tipo==="NOME"?p.ds_nome:"SEM NOME"}
+            </Link>:moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY")}
           </li>
         ));
 
@@ -108,7 +113,16 @@ export default function Totem() {
       const itens = pacientes
         .filter((p) => (p.ds_nome ?? "").toUpperCase().includes(term))
         .map((p, idx) => (
-          <li className="text-4xl mb-3" key={p.cd_paciente ?? `pac-${idx}`}>
+          <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={()=>{
+            if(tipo=="CPF"){setDados({
+              ds_cpf: number,
+              dt_nascimento: p.dt_nascimento,
+              servico: url.get("servico") ?? "",
+              preferencial: parseInt(url.get("preferencial") ?? "0", 10),
+              tipo: "CPF",
+              });setShowModal(true)}
+          }}>
+            {tipo!="CPF"?
             <Link
               href={{
                 pathname: "/date",
@@ -120,25 +134,19 @@ export default function Totem() {
               }}
             >
               {p.ds_nome ?? "SEM NOME"}
-            </Link>
+            </Link>:
+            p.ds_nome ?? "SEM NOME"}
           </li>
         ));
 
       setLista(itens);
     },
-    [pacientes, url, tipo] // deps reais
+    [pacientes, url, tipo, setDados, setShowModal] // deps reais
   );
   const pesquisarRef = React.useRef(pesquisar);
   useEffect(() => {
     pesquisarRef.current = pesquisar;
   }, [pesquisar]);
-  useEffect(() => {
-    if (url.get('servico') == "C") {
-      setTipo('ID')
-    } else {
-      setTipo('DATA')
-    }
-  }, [url]);
   const handleChangeTipo = (value: string) => {
     setTipo(value);
     InputRef.current?.focus();
@@ -149,7 +157,7 @@ export default function Totem() {
     setText("")
     setPacientes([])
     setLista([])
-    if (tipo == "DATA" || tipo == "CPF" || tipo == "ID") {
+    if (tipo == "DATA" || tipo == "CPF") {
       keyboardRef.current = new Keyboard({
         onChange: (input) => { setText(input.toUpperCase()); pesquisarRef.current(input.toUpperCase()) },
         layout: {
@@ -294,17 +302,6 @@ export default function Totem() {
                 />
                 CPF
               </label>
-              <label className="flex items-center pr-5 text-2xl font-extrabold gap-2">
-                <input
-                  className="appearance-none h-3 w-3 border-2 border-gray-400 rounded-full checked:border-red-600 checked:bg-red-600 flex items-center justify-center relative"
-                  type="radio"
-                  name="tipo"
-                  value="ID"
-                  checked={tipo === "ID"}
-                  onChange={(e) => { handleChangeTipo(e.target.value) }}
-                />
-                ID
-              </label>
               <label className="flex items-center justify-center pr-5 text-2xl font-extrabold gap-2">
                 <input
                   className="appearance-none h-3 w-3 border-2 border-gray-400 rounded-full checked:border-red-600 checked:bg-red-600 flex items-center justify-center relative"
@@ -322,9 +319,9 @@ export default function Totem() {
                 inputRef={InputRef}
                 mask={tipo === "DATA" ? "00/00/0000" : tipo === "CPF" ? "000.000.000-00" : ""}
                 unmask={true}
-                inputMode={tipo === "DATA" ? "numeric" : tipo === "CPF" ? "numeric" : tipo === "ID" ? "numeric" : "text"}
+                inputMode={tipo === "DATA" ? "numeric" : tipo === "CPF" ? "numeric":undefined}
                 autoFocus
-                placeholder={tipo === "DATA" ? "Digite a Data de Nascimento" : tipo === "CPF" ? "Digite seu CPF" : tipo === "ID" ? "Digite seu ID" : "Digite seu Nome"}
+                placeholder={tipo === "DATA" ? "Digite a Data de Nascimento" : tipo === "CPF" ? "Digite seu CPF" : "Digite seu Nome"}
                 className="h-16 w-full rounded-lg text-4xl px-4 border-black mr-3 border-solid border-2"
                 value={text}
                 onChange={handleChange}

@@ -2,7 +2,6 @@
 
 import React, { createContext, Dispatch, SetStateAction } from "react"
 import PatientModal from "./patientModal"
-import type { Atendimento } from "../../services/fetchData"  // ⬅ unifica o tipo usado no app
 
 interface Paciente {
   ds_paciente?: string
@@ -15,6 +14,8 @@ interface Paciente {
   preferencial: number | null | undefined
   qr?: boolean | undefined
   ds_observacao?: string | undefined
+  ds_cpf?: string | undefined
+  tipo?: string | undefined
 }
 
 // Se você ainda precisar de um tipo local de atendimento para outras telas,
@@ -24,11 +25,10 @@ interface Paciente {
 export const modalContext = createContext<{
   setShowModal: Dispatch<SetStateAction<boolean>>
   setDados: Dispatch<SetStateAction<Paciente | null>>
-  setExames: Dispatch<SetStateAction<Atendimento[] | null>>   // ⬅ agora usa o tipo unificado
+     // ⬅ agora usa o tipo unificado
 }>({
   setShowModal: () => {},
   setDados: () => {},
-  setExames: () => {},
 })
 
 export default function ModalProviders({
@@ -36,10 +36,10 @@ export default function ModalProviders({
 }: Readonly<{ children: React.ReactNode }>) {
   // Certifique-se de que PatientModal retorne setters compatíveis:
   // setExames: Dispatch<SetStateAction<Atendimento[] | null>>
-  const { setShowModal, DialogPatient, setDados, setExames } = PatientModal()
+  const { setShowModal, DialogPatient, setDados } = PatientModal()
 
   return (
-    <modalContext.Provider value={{ setShowModal, setDados, setExames }}>
+    <modalContext.Provider value={{ setShowModal, setDados }}>
       <DialogPatient />
       {children}
     </modalContext.Provider>

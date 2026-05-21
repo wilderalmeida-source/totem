@@ -18,7 +18,6 @@ import Base from "../../components/base";
 import { modalContext } from "@/components/modals/providers";
 import qrcode from "../../assets/icons/qrcode.png";
 import { buscaPaciente,BuscaAtendimentos,Atendimento} from "../../services/fetchData";
-import { EntregaDeExames } from "@/components/functions/lastExames";
 
 // ------------------ Tipagens ------------------
 interface Paciente {
@@ -30,7 +29,7 @@ interface Paciente {
 // ------------------ Componente ------------------
 export default function DataNasc() {
   const url = useSearchParams();
-  const { setShowModal, setDados, setExames } = useContext(modalContext);
+  const {setShowModal, setDados} = useContext(modalContext);
 
   // congela valores da URL
   const nome = useMemo(() => url.get("nome") ?? "", [url]);
@@ -50,35 +49,6 @@ export default function DataNasc() {
 
   // ------------------ Funções ------------------
 
-  const handleDate = useCallback(
-    async (cd_paciente: number | undefined) => {
-      if (servico === "C" && cd_paciente) {
-        const entrega = await EntregaDeExames(cd_paciente);
-        const relatEntrega = entrega.filter((i) => ![1, 5, 6].includes(i.status ?? -999));
-        setExames(relatEntrega);
-      } else if (cd_paciente) {
-        const hoje = new Date()
-        hoje.setHours(0, 0, 0, 0)
-        const listExames: Atendimento[] = await BuscaAtendimentos({
-          cd_paciente,
-          date: { from: hoje },
-        });
-        if (listExames) {
-          const listar = [2, 3, 7]
-          const examesProcedimentos = listExames.filter((i) => {
-            if (i.exames) {
-              if (i.exames.length > 0 && i.ds_status && listar.includes(i.ds_status)) { return i }
-            }
-          })
-          setExames(examesProcedimentos)
-        }
-
-      }
-      setShowModal(true);
-    },
-    [servico, setExames, setShowModal]
-  );
-
   const getData = useCallback(async () => {
     // 1) Primeiro carregamento
     if (info.length === 0) {
@@ -86,7 +56,7 @@ export default function DataNasc() {
         if (tipo == "DATA") {
           const hoje = new Date()
           hoje.setHours(0, 0, 0, 0)
-          const response = await buscaPaciente({ dt_nascimento: nome })
+          const response = await buscaPaciente({ dt_nascimento: nome,tipo})
           const listExames = await BuscaAtendimentos({ dt_nascimento: nome, date: { from: hoje } })
           if (listExames) {
             const listar = [2, 3, 7]
@@ -100,9 +70,6 @@ export default function DataNasc() {
             })
             setAtend(examesProcedimentos);
             const itens: ReactElement[] = lista.map((p) => {
-              const dataFmt = moment(nome)
-                .add(1, "day")
-                .format("DD/MM/YYYY");
               return (
                 <li
                   className="cursor-pointer text-4xl mb-3 text-red-500 font-bold"
@@ -111,11 +78,10 @@ export default function DataNasc() {
                     setDados({
                       ds_paciente: p?.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente,
                       cd_paciente: p?.pacientes_atendimentos_cd_pacienteTopacientes?.cd_paciente,
-                      dt_nascimento: dataFmt,
+                      dt_nascimento: p?.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento,
                       servico,
                       preferencial,
-                    });
-                    handleDate(p?.pacientes_atendimentos_cd_pacienteTopacientes?.cd_paciente);
+                    }); setShowModal(true);
                   }}
                 >
                   {p?.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente}
@@ -126,23 +92,20 @@ export default function DataNasc() {
           }
           const lista: Paciente[] = Array.isArray(response) ? response : [];
           setInfo(lista);
+          let key = 0
           const itens: ReactElement[] = lista.map((p) => {
-            const dataFmt = moment(nome)
-              .add(1, "day")
-              .format("DD/MM/YYYY");
+            key += 1
             return (
               <li
                 className="cursor-pointer text-4xl mb-3"
-                key={p.cd_paciente}
+                key={key}
                 onClick={() => {
                   setDados({
                     ds_paciente: p.ds_paciente,
-                    cd_paciente: p.cd_paciente,
-                    dt_nascimento: dataFmt,
+                    dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  });
-                  handleDate(p.cd_paciente);
+                  });setShowModal(true)
                 }}
               >
                 {p.ds_paciente}
@@ -151,26 +114,26 @@ export default function DataNasc() {
           })
           setList(itens);
         } else {
-          const response = await buscaPaciente({ ds_paciente: nome });
+          const response = await buscaPaciente({ ds_paciente: nome, tipo: "NOME" });
           const lista: Paciente[] = Array.isArray(response) ? response : [];
           setInfo(...[lista]);
+          let key=0
           const itens: ReactElement[] = lista.map((p) => {
             const dataFmt = moment(p.dt_nascimento)
               .add(1, "day")
               .format("DD/MM/YYYY");
+            key += 1
             return (
               <li
                 className="cursor-pointer text-4xl mb-3"
-                key={p.cd_paciente}
+                key={key}
                 onClick={() => {
                   setDados({
                     ds_paciente: p.ds_paciente,
-                    cd_paciente: p.cd_paciente,
-                    dt_nascimento: dataFmt,
+                    dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  });
-                  handleDate(p.cd_paciente);
+                  });setShowModal(true)
                 }}
               >
                 {dataFmt}
@@ -189,9 +152,6 @@ export default function DataNasc() {
     if (tipo == "DATA") {
       const digits = text
       const examesFiltrados: ReactElement[] = atend.map((p) => {
-        const dataFmt = moment(p.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento)
-          .add(1, "day")
-          .format("DD/MM/YYYY");
         if (!digits || !p.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente || p.pacientes_atendimentos_cd_pacienteTopacientes.ds_paciente.includes(digits)) {
           return (
             <li
@@ -201,11 +161,10 @@ export default function DataNasc() {
                 setDados({
                   ds_paciente: p.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente,
                   cd_paciente: p.pacientes_atendimentos_cd_pacienteTopacientes?.cd_paciente,
-                  dt_nascimento: dataFmt,
+                  dt_nascimento: p.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento,
                   servico,
                   preferencial,
-                });
-                handleDate(p.pacientes_atendimentos_cd_pacienteTopacientes?.cd_paciente);
+                });setShowModal(true)
               }}
             >
               {p.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente}
@@ -217,24 +176,21 @@ export default function DataNasc() {
         .filter(Boolean) as ReactElement[];
 
       setListEx(examesFiltrados);
+      let key =0
       const itensFiltrados: ReactElement[] = info.map((p) => {
-        const dataFmt = moment(p.dt_nascimento)
-          .add(1, "day")
-          .format("DD/MM/YYYY");
+        key += 1
         if (!digits || !p.ds_paciente || p.ds_paciente.includes(digits)) {
           return (
             <li
               className="cursor-pointer text-4xl mb-3"
-              key={p.cd_paciente}
+              key={key}
               onClick={() => {
                 setDados({
                   ds_paciente: p.ds_paciente,
-                  cd_paciente: p.cd_paciente,
-                  dt_nascimento: dataFmt,
+                  dt_nascimento: p.dt_nascimento,
                   servico,
                   preferencial,
-                });
-                handleDate(p.cd_paciente);
+                });setShowModal(true)
               }}
             >
               {p.ds_paciente}
@@ -247,26 +203,26 @@ export default function DataNasc() {
 
       setList(itensFiltrados);
     } else {
+      let key = 0
       const digits = text.replace(/\D/g, "");
       const itensFiltrados: ReactElement[] = info
         .map((p) => {
           const dataFmt = moment(p.dt_nascimento)
             .add(1, "day")
             .format("DD/MM/YYYY");
+          key += 1
           if (!digits || dataFmt.replace(/\D/g, "").includes(digits)) {
             return (
               <li
                 className="cursor-pointer text-4xl mb-3"
-                key={p.cd_paciente}
+                key={key}
                 onClick={() => {
                   setDados({
                     ds_paciente: p.ds_paciente,
-                    cd_paciente: p.cd_paciente,
-                    dt_nascimento: dataFmt,
+                    dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  });
-                  handleDate(p.cd_paciente);
+                  });setShowModal(true)
                 }}
               >
                 {dataFmt}
@@ -279,7 +235,7 @@ export default function DataNasc() {
 
       setList(itensFiltrados);
     }
-  }, [info, nome, text, servico, preferencial, setDados, handleDate, atend, tipo]);
+  }, [info, nome, text, servico, preferencial, setDados, atend, tipo, setShowModal]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value.toUpperCase();
@@ -300,7 +256,6 @@ export default function DataNasc() {
       setDados({
         ds_paciente: text,
         dt_nascimento: nome,
-        cd_paciente: undefined,
         servico,
         preferencial,
       })
@@ -308,7 +263,6 @@ export default function DataNasc() {
       setDados({
         ds_paciente: nome,
         dt_nascimento: text,
-        cd_paciente: undefined,
         servico,
         preferencial,
       });

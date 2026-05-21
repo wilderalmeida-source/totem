@@ -35,12 +35,7 @@ const plugin = async (fastify, opts) => {
                     const out = {
                         type: "db",
                         ts: Date.now(),
-                        channel: msg.channel,
-                        op: payload?.op,
-                        schema: payload?.schema,
-                        table: payload?.table,
-                        new: payload?.new ?? null,
-                        old: payload?.old ?? null,
+                        channel: "db_update"
                     };
                     // Reenvia para quem estiver conectado (WS/SSE)
                     fastify.broadcast?.(out);

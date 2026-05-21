@@ -1,15 +1,32 @@
 "use client";
 
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { Save, Settings, Book } from 'lucide-react';
-import { AtentionCreateSound,AtentionSound } from '@/services/fetchData';
+import { AtentionCreateSound,AtentionGetText,AtentionSound } from '@/services/fetchData';
 
 export default function AtencaoPanel() {
   const [text, setText] = useState("Atenção, por favor fazer silêncio na recepção.");
   const [loading, setLoading] = useState(false);
   const [playIcon, setPlayIcon] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    const getTextAudio = async () => {
+      setLoading(true);
+      try {
+        const response = await AtentionGetText();
+        console.log("Texto buscado da API:", response);
+        if (response) {
+          setText(response.audioContent);
+        }
+      } catch (error) {
+        console.error("Buscar texto:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    getTextAudio();
+  }, [])
   const handleApplyAndListen = async () => {
     setLoading(true);
     try {
@@ -20,6 +37,11 @@ export default function AtencaoPanel() {
         // 2. Dispara o broadcast via GET para ouvir no sistema
         await PlayTeste()
         alert("Áudio atualizado e reproduzido com sucesso!");
+        const response = await AtentionGetText();
+        console.log("Texto buscado da API:", response);
+        if (response) {
+          setText(response.audioContent);
+        }
       }
     } catch (error) {
       console.error("Erro ao processar áudio:", error);

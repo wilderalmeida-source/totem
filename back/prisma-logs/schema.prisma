@@ -63,7 +63,7 @@ model TtsVoiceTest {
 
 model ttsEvent {
   eventId      String   @unique
-  audioContent Bytes?
+  audioContent String
   createdAt    DateTime @default(now())
 }
 
