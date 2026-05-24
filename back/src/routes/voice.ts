@@ -23,18 +23,14 @@ export async function voiceRoute(fastify: FastifyInstance) {
     const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY
     const pastaPublica = path.resolve(__dirname, '../../public/audios');
     if (!fs.existsSync(pastaPublica)) {
-    fs.mkdirSync(pastaPublica, { recursive: true });
+      fs.mkdirSync(pastaPublica, { recursive: true });
     }
-     // verificamos se tem audio no cache.
+    // verificamos se tem audio no cache.
     const nomeArquivo = `chamada-${eventId?.replace(/[^a-z0-9]/gi, '_') || 'temp'}.mp3`;
     const caminhoCompleto = path.join(pastaPublica, nomeArquivo);
     const urlRelativa = `/audios/${nomeArquivo}`;
     if (fs.existsSync(caminhoCompleto)) {
-        return reply.status(200).send({audioContent: urlRelativa});
-      }
-    
-    if (!GOOGLE_TTS_KEY) {
-      return reply.status(500).send("GOOGLE_TTS_KEY não configurada")
+      return reply.status(200).send({ audioContent: urlRelativa });
     }
     try {
       if (!text || typeof text !== "string") {
@@ -77,7 +73,9 @@ export async function voiceRoute(fastify: FastifyInstance) {
           speaking_rate: rate,
         },
       };
-
+      if (!GOOGLE_TTS_KEY) {
+        return reply.status(200).send({ errorTTS: formatado })
+      }
       const res = await fetch(
         `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`,
         {
@@ -86,16 +84,23 @@ export async function voiceRoute(fastify: FastifyInstance) {
           body: JSON.stringify(body),
         }
       );
-
+      if (!res.ok) {
+        return reply.status(200).send({ errorTTS: formatado });
+      }
       const data = await res.json();
+      if (!data.audioContent) {
+        return reply.status(200).send({ errorTTS: formatado });
+      }
       const audioBuffer = Buffer.from(data.audioContent, 'base64');
       await fs.promises.writeFile(caminhoCompleto, audioBuffer);
-      if (!res.ok || !data.audioContent) {
-        console.error("Erro TTS Google:", data);
-        return reply.status(500).send("Falha ao gerar áudio " + data);
-      }
+
       // ========= CONTAGEM DE CARACTERES DIÁRIOS =========
       const chars = formatado.length;
+      fastify.broadcast({
+        type: "tts:delta",
+        payload: { date: dateIso, chars, requestsInc: 1 },
+      });
+      reply.status(200).send({ audioContent: urlRelativa })
       await PrismaLog.ttsDailyUsage.upsert({
         where: { date: dateOnly },
         update: {
@@ -108,15 +113,10 @@ export async function voiceRoute(fastify: FastifyInstance) {
           requests: 1,
         },
       });
-      fastify.broadcast({
-        type: "tts:delta",
-        payload: { date: dateIso, chars, requestsInc: 1},
-      });
-      return reply.status(200).send({ audioContent: urlRelativa })
+      return
     }
     catch (e) {
-      console.error("Erro na rota /api/tts:", e);
-      return reply.status(200).send("Erro interno ao gerar áudio")
+      return reply.status(500).send("Erro interno ao gerar áudio")
     }
   })
 
@@ -290,7 +290,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
     const key = normalizeKey(body.key);
     const value = capitalizarNome(body.value.trim());
     const exist = await PrismaLog.nameDictionary.findUnique({
-      where:{key}
+      where: { key }
     })
 
     const row = await PrismaLog.nameDictionary.upsert({
@@ -357,14 +357,14 @@ export async function voiceRoute(fastify: FastifyInstance) {
     });
     const pastaPublica = path.resolve(__dirname, '../../public/audios');
     if (!fs.existsSync(pastaPublica)) {
-    fs.mkdirSync(pastaPublica, { recursive: true });
+      fs.mkdirSync(pastaPublica, { recursive: true });
     }
     const nomeArquivo = `Teste-${cacheKey?.replace(/[^a-z0-9]/gi, '_') || 'temp'}.mp3`;
     const caminhoCompleto = path.join(pastaPublica, nomeArquivo);
     const urlRelativa = `/audios/${nomeArquivo}`;
     if (fs.existsSync(caminhoCompleto)) {
-        return reply.status(200).send({audioContent: urlRelativa});
-      }
+      return reply.status(200).send({ audioContent: urlRelativa });
+    }
     // 6)chama Google
     const chars = text.length;
     const dateOnly = new Date(

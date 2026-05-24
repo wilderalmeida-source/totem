@@ -25,6 +25,9 @@ const autenticate_1 = require("../middleware/autenticate");
 const atencao_1 = require("./routes/atencao");
 async function bootstrap() {
     const fastify = (0, fastify_1.default)({ logger: true, });
+    await fastify.register(async (instance) => {
+        await instance.register(createToken_1.createToken);
+    });
     await fastify.register(painel_1.default);
     await fastify.register(cors_1.default, { origin: true });
     await fastify.addHook('preHandler', autenticate_1.authenticate);
@@ -33,7 +36,6 @@ async function bootstrap() {
         prefix: '/audios/', // Como eles aparecerão na URL
         decorateReply: false // Evita conflitos se você tiver outros statics
     });
-    await fastify.register(createToken_1.createToken);
     await fastify.register(voice_1.voiceRoute);
     await fastify.register(salas_1.salaRoute);
     await fastify.register(medicos_1.medicosRoute);

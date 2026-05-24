@@ -4,19 +4,41 @@ import NowCard from "@/components/NowCard";
 import QueueList, { QueuePerson } from "@/components/QueueList";
 import Video from "@/components/Video";
 
+type TtsBody = { audioContent: string } | { errorTTS: string };
+
 type WsMsg =
   | { type: "tcp"; ts?: number; data: string }
-  | { type: "tts:audio"; ts?: number; payload: { eventId?: string; eventID?: string; audioContent?: string } };
+  | {
+    type: "tts:audio";
+    ts?: number;
+    payload: {
+      eventId?: string;
+      eventID?: string;
+      ttsBody: TtsBody;
+    };
+  };
 
 function isTcpMsg(msg: unknown): msg is Extract<WsMsg, { type: "tcp" }> {
-  return typeof msg === "object" && msg !== null && "type" in msg &&
-    (msg as { type?: unknown }).type === "tcp" && "data" in msg &&
-    typeof (msg as { data?: unknown }).data === "string";
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as { type?: unknown }).type === "tcp" &&
+    "data" in msg &&
+    typeof (msg as { data?: unknown }).data === "string"
+  );
 }
 
-function isTtsAudioMsg(msg: unknown): msg is Extract<WsMsg, { type: "tts:audio" }> {
-  return typeof msg === "object" && msg !== null && "type" in msg &&
-    (msg as { type?: unknown }).type === "tts:audio" && "payload" in msg;
+function isTtsAudioMsg(
+  msg: unknown
+): msg is Extract<WsMsg, { type: "tts:audio" }> {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as { type?: unknown }).type === "tts:audio" &&
+    "payload" in msg
+  );
 }
 
 export default function Page() {
@@ -33,7 +55,6 @@ export default function Page() {
   // ===== Atenção =====
   const [atencaoVisible, setAtencaoVisible] = useState(false);
   const atencaoPlayingRef = useRef(false);
-  // AbortController para desbloquear a Promise se algo externo parar o áudio
   const atencaoAbortRef = useRef<AbortController | null>(null);
 
   const [guiche, setGuiche] = useState("");
@@ -53,14 +74,22 @@ export default function Page() {
     audioRef.current = el;
   }, []);
 
-  useEffect(() => { soundReadyRef.current = soundReady; }, [soundReady]);
+  useEffect(() => {
+    soundReadyRef.current = soundReady;
+  }, [soundReady]);
 
   const enableSound = useCallback(async () => {
     try {
       const el = audioRef.current;
-      if (el) { await el.play(); el.pause(); el.currentTime = 0; }
+      if (el) {
+        await el.play();
+        el.pause();
+        el.currentTime = 0;
+      }
       setSoundReady(true);
-    } catch (e) { console.warn("Falha ao habilitar som:", e); }
+    } catch (e) {
+      console.warn("Falha ao habilitar som:", e);
+    }
   }, []);
 
   useEffect(() => {
@@ -68,126 +97,246 @@ export default function Page() {
     return () => window.clearTimeout(id);
   }, []);
 
-  // ✅ Para o áudio normal (ding + tts comum), MAS NUNCA o áudio de atenção
   const stopAllAudio = useCallback(() => {
     const ding = audioRef.current;
-    if (ding) { ding.pause(); ding.currentTime = 0; }
-
-    // Só para o TTS atual se NÃO for o áudio de atenção em andamento
+    if (ding) {
+      ding.pause();
+      ding.currentTime = 0;
+    }
     if (!atencaoPlayingRef.current) {
       const tts = currentTtsRef.current;
-      if (tts) { tts.pause(); tts.currentTime = 0; }
+      if (tts) {
+        tts.pause();
+        tts.currentTime = 0;
+      }
       currentTtsRef.current = null;
     }
   }, []);
 
-  // Para TUDO, incluindo atenção (usado somente dentro de playAtencaoAudio)
   const stopAllAudioForce = useCallback(() => {
     const ding = audioRef.current;
-    if (ding) { ding.pause(); ding.currentTime = 0; }
+    if (ding) {
+      ding.pause();
+      ding.currentTime = 0;
+    }
     const tts = currentTtsRef.current;
-    if (tts) { tts.pause(); tts.currentTime = 0; }
+    if (tts) {
+      tts.pause();
+      tts.currentTime = 0;
+    }
     currentTtsRef.current = null;
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
   }, []);
 
   const playDing = useCallback((delayMs = 600): Promise<void> => {
     return new Promise((resolve) => {
       const el = audioRef.current;
-      if (!el || !soundReadyRef.current) { resolve(); return; }
+      if (!el || !soundReadyRef.current) {
+        resolve();
+        return;
+      }
       try {
-        el.pause(); el.currentTime = 0;
+        el.pause();
+        el.currentTime = 0;
         el.play().catch(() => resolve());
         window.setTimeout(resolve, delayMs);
-      } catch { resolve(); }
+      } catch {
+        resolve();
+      }
     });
   }, []);
 
-  const playTtsExclusive = useCallback(async (proxyUrl: string) => {
-    stopAllAudio();
-    const audio = new Audio(proxyUrl);
-    audio.preload = "auto";
-    currentTtsRef.current = audio;
-    audio.addEventListener("ended", () => {
+  const playTtsExclusive = useCallback(
+    async (proxyUrl: string) => {
+      stopAllAudio();
+      const audio = new Audio(proxyUrl);
+      audio.preload = "auto";
+      currentTtsRef.current = audio;
+      audio.addEventListener(
+        "ended",
+        () => {
+          if (currentTtsRef.current === audio) currentTtsRef.current = null;
+        },
+        { once: true }
+      );
+      try {
+        await playDing();
+        await audio.play();
+      } catch { }
+    },
+    [stopAllAudio, playDing]
+  );
+
+  // ===== Atenção via MP3 — pré-carrega antes de interromper =====
+  const playAtencaoAudio = useCallback(
+    async (proxyUrl: string) => {
+      if (atencaoPlayingRef.current) {
+        console.log("⏱️ Atenção já em andamento, ignorado.");
+        return;
+      }
+
+      // 1. Pré-carrega o áudio ANTES de parar qualquer coisa
+      const audio = new Audio(proxyUrl);
+      audio.preload = "auto";
+
+      await new Promise<void>((resolve) => {
+        audio.addEventListener("canplaythrough", () => resolve(), { once: true });
+        audio.addEventListener("error", () => resolve(), { once: true });
+        setTimeout(resolve, 3000); // timeout de segurança
+        audio.load();
+      });
+
+      // 2. Buffer pronto — agora sim interrompe tudo e exibe a tela
+      atencaoAbortRef.current?.abort();
+      const controller = new AbortController();
+      atencaoAbortRef.current = controller;
+
+      atencaoPlayingRef.current = true;
+      setAtencaoVisible(true);
+      stopAllAudioForce();
+
+      currentTtsRef.current = audio;
+
+      await new Promise<void>((resolve) => {
+        audio.addEventListener("ended", () => resolve(), { once: true });
+        audio.addEventListener("error", () => resolve(), { once: true });
+        controller.signal.addEventListener("abort", () => resolve(), {
+          once: true,
+        });
+        audio.play().catch(() => resolve());
+      });
+
       if (currentTtsRef.current === audio) currentTtsRef.current = null;
-    }, { once: true });
-    try { await playDing(); await audio.play(); } catch { }
-  }, [stopAllAudio, playDing]);
+      atencaoAbortRef.current = null;
+      setAtencaoVisible(false);
+      atencaoPlayingRef.current = false;
+    },
+    [stopAllAudioForce]
+  );
 
-  // ✅ Atenção: não interrompe se já tocando; usa AbortController para nunca travar
-  const playAtencaoAudio = useCallback(async (proxyUrl: string) => {
-    if (atencaoPlayingRef.current) {
-      console.log("⏱️ Atenção já em andamento, ignorado.");
-      return;
+  // ===== Atenção via Web Speech API (fallback sem MP3) =====
+  const playAtencaoSpeech = useCallback(
+    async (text: string) => {
+      if (atencaoPlayingRef.current) {
+        console.log("⏱️ Atenção já em andamento, ignorado.");
+        return;
+      }
+
+      atencaoPlayingRef.current = true;
+      setAtencaoVisible(true);
+      stopAllAudioForce();
+
+      await new Promise<void>((resolve) => {
+        if (!window.speechSynthesis) {
+          resolve();
+          return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "pt-BR";
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+
+        const trySpeak = () => {
+          const voz = window.speechSynthesis
+            .getVoices()
+            .find((v) => v.lang === "pt-BR");
+          if (voz) utterance.voice = voz;
+          window.speechSynthesis.speak(utterance);
+        };
+
+        if (window.speechSynthesis.getVoices().length > 0) {
+          trySpeak();
+        } else {
+          window.speechSynthesis.onvoiceschanged = trySpeak;
+        }
+      });
+
+      setAtencaoVisible(false);
+      atencaoPlayingRef.current = false;
+    },
+    [stopAllAudioForce]
+  );
+
+  // ===== Web Speech API fallback (chamadas normais) =====
+  const speakWithBrowser = useCallback((text: string) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "pt-BR";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    const trySpeak = () => {
+      const voz = window.speechSynthesis
+        .getVoices()
+        .find((v) => v.lang === "pt-BR");
+      if (voz) utterance.voice = voz;
+      window.speechSynthesis.speak(utterance);
+    };
+
+    if (window.speechSynthesis.getVoices().length > 0) {
+      trySpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = trySpeak;
     }
-
-    // Aborta qualquer atenção anterior que porventura ainda esteja pendente
-    atencaoAbortRef.current?.abort();
-    const controller = new AbortController();
-    atencaoAbortRef.current = controller;
-
-    atencaoPlayingRef.current = true;
-    setAtencaoVisible(true);
-
-    // Para tudo (inclusive ding em andamento), mas não outro TTS normal — já protegido
-    stopAllAudioForce();
-
-    const audio = new Audio(proxyUrl);
-    audio.preload = "auto";
-    currentTtsRef.current = audio;
-
-    await new Promise<void>((resolve) => {
-      // Resolve quando o áudio terminar naturalmente
-      audio.addEventListener("ended", () => resolve(), { once: true });
-      // Resolve se ocorrer erro de reprodução
-      audio.addEventListener("error", () => resolve(), { once: true });
-      // Resolve se o AbortController for acionado externamente
-      controller.signal.addEventListener("abort", () => resolve(), { once: true });
-
-      audio.play().catch(() => resolve());
-    });
-
-    // Limpeza — independente do motivo que resolveu a Promise
-    if (currentTtsRef.current === audio) currentTtsRef.current = null;
-    atencaoAbortRef.current = null;
-    setAtencaoVisible(false);
-    atencaoPlayingRef.current = false;
-  }, [stopAllAudioForce]);
+  }, []);
 
   const prependAndReindex = useCallback(
     (arr: QueuePerson[], novo: Omit<QueuePerson, "id">): QueuePerson[] => {
       const shifted = arr.map((i) => ({ ...i, id: i.id + 1 }));
       return [{ id: 1, active: true, ...novo }, ...shifted];
-    }, []
+    },
+    []
   );
 
   useEffect(() => {
-    const eventSource = new EventSource('/api/events');
+    const eventSource = new EventSource("/api/events");
+
     eventSource.onmessage = (event) => {
       try {
         const bridgePayload = JSON.parse(event.data);
         let msg = bridgePayload.message;
-        if (typeof msg === 'string') msg = JSON.parse(msg);
+        if (typeof msg === "string") msg = JSON.parse(msg);
 
         (async () => {
           const mySeq = ++playSeqRef.current;
 
+          // ===== Mensagem TCP (chamada de guichê) =====
           if (isTcpMsg(msg)) {
-            // ✅ stopAllAudio agora respeita o áudio de atenção
             stopAllAudio();
 
             const raw = msg.data;
-            const parts = raw.split('-').map((p: string) => p.trim());
-            const horaMin = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+            const parts = raw.split("-").map((p: string) => p.trim());
+            const horaMin = new Date().toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
             const guicheAux = parts[3] || "";
             const nomeAux = (parts[5] || "SEM NOME").trim();
 
             if (lastMsgRef.current !== raw.trim()) {
               const prev = lastValuesRef.current;
               if (prev && prev.nome !== nomeAux) {
-                setQueue((q) => prependAndReindex(q, {
-                  name: prev.nome,
-                  instruction: prev.guiche === "00" ? "ENTREGA DE EXAMES" : `GUICHÊ: ${prev.guiche}`,
-                }));
+                setQueue((q) =>
+                  prependAndReindex(q, {
+                    name: prev.nome,
+                    instruction:
+                      prev.guiche === "00"
+                        ? "ENTREGA DE EXAMES"
+                        : `GUICHÊ: ${prev.guiche}`,
+                  })
+                );
               }
             }
 
@@ -197,7 +346,6 @@ export default function Page() {
             setGuiche(guicheAux);
             setHora(horaMin);
 
-            // ✅ Só toca o ding se atenção NÃO estiver em andamento
             if (!atencaoPlayingRef.current) {
               await playDing();
               if (mySeq !== playSeqRef.current) return;
@@ -205,43 +353,93 @@ export default function Page() {
             return;
           }
 
+          // ===== Mensagem TTS =====
           if (isTtsAudioMsg(msg)) {
-            const pathDoNode = msg.payload?.audioContent;
-            if (!pathDoNode) return;
+            const { ttsBody, eventID, eventId } = msg.payload;
+            const id = eventID ?? eventId ?? "";
 
-            const proxyUrl = `/api/voice-proxy?path=${encodeURIComponent(pathDoNode)}`;
-            const eventId = msg.payload?.eventID ?? msg.payload?.eventId ?? "";
+            // ----- audioContent: toca MP3 -----
+            if ("audioContent" in ttsBody) {
+              const proxyUrl = `/api/voice-proxy?path=${encodeURIComponent(
+                ttsBody.audioContent
+              )}`;
 
-            if (eventId === "atencao") {
-              await playAtencaoAudio(proxyUrl);
+              // Atenção com MP3
+              if (id === "atencao") {
+                await playAtencaoAudio(proxyUrl);
+                return;
+              }
+
+              if (atencaoPlayingRef.current) return;
+
+              const key = String(id);
+              const now = Date.now();
+              if (
+                key &&
+                lastPlayedKeyRef.current === key &&
+                now - lastPlayedAtRef.current < 3000
+              ) {
+                console.log("⏱️ Ignorado (cooldown 3s):", key);
+                return;
+              }
+
+              lastPlayedKeyRef.current = key || null;
+              lastPlayedAtRef.current = now;
+              if (id) lastEventIdRef.current = id;
+
+              await playTtsExclusive(proxyUrl);
               return;
             }
 
-            // TTS normal — só executa se atenção não estiver rolando
-            if (atencaoPlayingRef.current) return;
+            // ----- errorTTS: fallback Web Speech API -----
+            if ("errorTTS" in ttsBody) {
+              // Atenção via voz do navegador (sem MP3)
+              if (id === "atencao") {
+                await playAtencaoSpeech(ttsBody.errorTTS);
+                return;
+              }
 
-            const key = String(eventId);
-            const now = Date.now();
-            if (key && lastPlayedKeyRef.current === key && now - lastPlayedAtRef.current < 3000) {
-              console.log("⏱️ Ignorado (cooldown 3s):", key);
+              if (atencaoPlayingRef.current) return;
+
+              const key = String(id);
+              const now = Date.now();
+              if (
+                key &&
+                lastPlayedKeyRef.current === key &&
+                now - lastPlayedAtRef.current < 3000
+              ) {
+                console.log("⏱️ Ignorado fallback (cooldown 3s):", key);
+                return;
+              }
+
+              lastPlayedKeyRef.current = key || null;
+              lastPlayedAtRef.current = now;
+              if (id) lastEventIdRef.current = id;
+
+              await playDing();
+              speakWithBrowser(ttsBody.errorTTS);
               return;
             }
-
-            lastPlayedKeyRef.current = key || null;
-            lastPlayedAtRef.current = now;
-            if (eventId) lastEventIdRef.current = eventId;
-
-            await playTtsExclusive(proxyUrl);
-            return;
           }
         })();
-      } catch { console.log("Erro na mensagem"); }
+      } catch {
+        console.log("Erro na mensagem");
+      }
     };
-  }, [stopAllAudio, playDing, playTtsExclusive, playAtencaoAudio, prependAndReindex]);
+
+    return () => eventSource.close();
+  }, [
+    stopAllAudio,
+    playDing,
+    playTtsExclusive,
+    playAtencaoAudio,
+    playAtencaoSpeech,
+    prependAndReindex,
+    speakWithBrowser,
+  ]);
 
   return (
     <div className="h-dvh w-screen max-w-none mx-auto px-6 pt-8 pb-4 bg-slate-200 bg-cover bg-center bg-no-repeat flex flex-col">
-
       {atencaoVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-600">
           <span
@@ -255,7 +453,10 @@ export default function Page() {
 
       <header className="text-center mb-6">
         {!soundReady && (
-          <button onClick={enableSound} className="mt-3 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold">
+          <button
+            onClick={enableSound}
+            className="mt-3 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold"
+          >
             Habilitar som e voz
           </button>
         )}
@@ -265,7 +466,9 @@ export default function Page() {
         <NowCard
           name={nome}
           calledAt={hora}
-          instruction={guiche === "00" ? "ENTREGA DE EXAMES" : "GUICHÊ: " + guiche}
+          instruction={
+            guiche === "00" ? "ENTREGA DE EXAMES" : "GUICHÊ: " + guiche
+          }
         />
         <Video />
         <QueueList people={queue} />

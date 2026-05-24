@@ -5,72 +5,108 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveEffectiveVoice } from "../../config/googleVoices";
 export async function atencaoRoute(fastify: FastifyInstance) {
-  fastify.get('/clinux/atencao', async (request, reply) => {
-    const createbody = z.object({
-      TorP: z.string(),
-    })
-    const { TorP } = createbody.parse(request.query)
-    const urlRelativa = `/audios/atencao.mp3`;
-    if(TorP=="teste"){
-      return reply.status(200).send({ audioContent: urlRelativa })
-    }
-    else{
-    try{
-     fastify.broadcast({ type: "tcp", ts: Date.now()});
-              fastify.broadcast({
-                type: "tts:audio",
-                ts: Date.now(),
-                payload: { eventID:"atencao", audioContent:urlRelativa  },
-              });
-        } catch (err) {
-          fastify.log.error({ err }, "Erro ao tratar mensagem TCP (inject)");
-          fastify.broadcast({ type: "tcp", ts: Date.now() });
-        }
-    return reply.status(200).send({ audioContent: urlRelativa })
-  }})
+  fastify.get("/clinux/atencao", async (request, reply) => {
+    const createbody = z.object({ TorP: z.string() });
+    const { TorP } = createbody.parse(request.query);
 
- fastify.post('/clinux/atencao', async (request, reply) => {
-    const createbody = z.object({
-      text: z.string(),
-    })
-    const { text } = createbody.parse(request.body)
-    await PrismaLog.ttsEvent.upsert({where:{eventId:"atencao"},update:{audioContent:text},create:{eventId:"atencao",audioContent:text}});
-    const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY
+    // ✅ Mesmo caminho do POST
     const pastaPublica = path.resolve(__dirname, '../../public/audios');
-    if (!fs.existsSync(pastaPublica)) {
-    fs.mkdirSync(pastaPublica, { recursive: true });
+    const nomeArquivo = 'atencao.mp3';
+    const caminhoAbsoluto = path.join(pastaPublica, nomeArquivo);
+    const urlRelativa = `/audios/${nomeArquivo}`;
+    const existe = fs.existsSync(caminhoAbsoluto);
+
+    // ===== MODO TESTE =====
+    if (TorP === "teste") {
+      if (existe) {
+        return reply.status(200).send({ ttsBody: { audioContent: urlRelativa } });
+      }
+      const text = await PrismaLog.ttsEvent.findFirst({
+        where: { eventId: "atencao" },
+        select: { audioContent: true },
+      });
+      return reply.status(200).send({
+        ttsBody: { errorTTS: text?.audioContent ?? "Atenção por favor" },
+      });
     }
-     // Mapeamos o Audio.
+
+    // ===== MODO BROADCAST =====
+    if (existe) {
+      try {
+        fastify.broadcast({ type: "tcp", ts: Date.now() });
+        fastify.broadcast({
+          type: "tts:audio",
+          ts: Date.now(),
+          payload: { eventID: "atencao", ttsBody: { audioContent: urlRelativa } },
+        });
+      } catch (err) {
+        fastify.log.error({ err }, "Erro ao tratar broadcast de atenção (MP3)");
+        fastify.broadcast({ type: "tcp", ts: Date.now() });
+      }
+      return reply.status(200).send({ ttsBody: { audioContent: urlRelativa } });
+    }
+
+    // MP3 não existe — fallback speech
+    const text = await PrismaLog.ttsEvent.findFirst({
+      where: { eventId: "atencao" },
+      select: { audioContent: true },
+    });
+    const errorText = text?.audioContent ?? "Atenção por favor";
+
+    try {
+      fastify.broadcast({ type: "tcp", ts: Date.now() });
+      fastify.broadcast({
+        type: "tts:audio",
+        ts: Date.now(),
+        payload: { eventID: "atencao", ttsBody: { errorTTS: errorText } },
+      });
+    } catch (err) {
+      fastify.log.error({ err }, "Erro ao tratar broadcast de atenção (speech)");
+      fastify.broadcast({ type: "tcp", ts: Date.now() });
+    }
+
+    return reply.status(200).send({ ttsBody: { errorTTS: errorText } });
+  });
+
+  fastify.post('/clinux/atencao', async (request, reply) => {
+    const createbody = z.object({ text: z.string() });
+    const { text } = createbody.parse(request.body);
+
+    await PrismaLog.ttsEvent.upsert({
+      where: { eventId: "atencao" },
+      update: { audioContent: text },
+      create: { eventId: "atencao", audioContent: text },
+    });
+
+    const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY;
+    const pastaPublica = path.resolve(__dirname, '../../public/audios');
+
+    if (!fs.existsSync(pastaPublica)) {
+      fs.mkdirSync(pastaPublica, { recursive: true });
+    }
+
     const nomeArquivo = `atencao.mp3`;
     const caminhoCompleto = path.join(pastaPublica, nomeArquivo);
+    const existe = fs.existsSync(caminhoCompleto);
     const urlRelativa = `/audios/${nomeArquivo}`;
-    
-    if (!GOOGLE_TTS_KEY) {
-      return reply.status(500).send("GOOGLE_TTS_KEY não configurada")
-    }
-    try {
-      if (!text || typeof text !== "string") {
-        return reply.status(400).send("Parâmetro 'text' é obrigatório")
-      }
-      // ========= VOZ DA SEMANA =========
-      const voiceName = "pt-BR-Standard-B";
-      const rate = 1
 
-      // ========= DATA LOCAL (apenas dia, sem hora) =========
+    // Sem chave Google — remove MP3 se existir e retorna fallback
+    if (!GOOGLE_TTS_KEY) {
+      if (existe) fs.unlinkSync(caminhoCompleto);
+      return reply.status(200).send({ errorTTS: text }); // ✅ JSON
+    }
+
+    try {
+      const voiceName = "pt-BR-Standard-B";
+      const rate = 1;
+
       const now = new Date();
-      const dateOnly = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-      );
-      const volume = (await resolveEffectiveVoice(now)).volumeSound
+      const dateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const volume = (await resolveEffectiveVoice(now)).volumeSound;
 
       const body = {
         input: { text },
-        voice: {
-          languageCode: "pt-BR",
-          name: voiceName,
-        },
+        voice: { languageCode: "pt-BR", name: voiceName },
         audioConfig: {
           audioEncoding: "MP3",
           volumeGainDb: volume,
@@ -88,35 +124,35 @@ export async function atencaoRoute(fastify: FastifyInstance) {
       );
 
       const data = await res.json();
-      const audioBuffer = Buffer.from(data.audioContent, 'base64');
-      await fs.promises.writeFile(caminhoCompleto, audioBuffer);
+
       if (!res.ok || !data.audioContent) {
-        console.error("Erro TTS Google:", data);
-        return reply.status(500).send("Falha ao gerar áudio " + data);
+        // Google retornou erro — remove MP3 antigo e usa fallback
+        if (existe) fs.unlinkSync(caminhoCompleto);
+        return reply.status(200).send({ errorTTS: text }); // ✅ JSON
       }
-      // ========= CONTAGEM DE CARACTERES DIÁRIOS =========
+
+      // Salva o MP3
+      const audioBuffer = Buffer.from(data.audioContent, 'base64');
+      await fs.promises.writeFile(caminhoCompleto, audioBuffer); // ✅ removido bloco duplicado após isso
+
+      // Contagem de caracteres
       const chars = text.length;
       await PrismaLog.ttsDailyUsage.upsert({
         where: { date: dateOnly },
-        update: {
-          chars: { increment: chars },
-          requests: { increment: 1 },
-        },
-        create: {
-          date: dateOnly,
-          chars,
-          requests: 1,
-        },
+        update: { chars: { increment: chars }, requests: { increment: 1 } },
+        create: { date: dateOnly, chars, requests: 1 },
       });
-      return reply.status(200).send({ audioContent: urlRelativa })
-    }
-    catch (e) {
+
+      return reply.status(200).send({ audioContent: urlRelativa }); // ✅ sucesso
+
+    } catch (e) {
       console.error("Erro na rota /api/tts:", e);
-      return reply.status(200).send("Erro interno ao gerar áudio")
+      return reply.status(500).send({ error: "Erro interno ao gerar áudio" }); // ✅ JSON
     }
-  })
-  fastify.get('/clinux/atencao/text', async (request, reply)=>{
-    const textDB=await PrismaLog.ttsEvent.findFirst({where:{eventId:"atencao"}})
+  });
+
+  fastify.get('/clinux/atencao/text', async (request, reply) => {
+    const textDB = await PrismaLog.ttsEvent.findFirst({ where: { eventId: "atencao" } })
     return reply.status(200).send(textDB)
   })
 }

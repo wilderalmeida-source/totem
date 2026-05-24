@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const net_1 = __importDefault(require("net"));
-const googleVoices_1 = require("../../config/googleVoices");
 exports.default = (0, fastify_plugin_1.default)(async function painelClinux(fastify) {
     const server = net_1.default.createServer((sock) => {
         sock.on("data", (buf) => {
@@ -85,13 +84,13 @@ exports.default = (0, fastify_plugin_1.default)(async function painelClinux(fast
                     const dateMonth = date.getMonth() + 1;
                     const dateYear = date.getFullYear();
                     const datecomplete = (`${dateday}/${dateMonth}/${dateYear}`);
-                    const textoComDict = await (0, googleVoices_1.applyDictionary)(text());
-                    const eventId = `${textoComDict}-${datecomplete}`;
+                    const eventId = `${text()}-${datecomplete}`;
                     const ttsRes = await fastify.inject({
                         method: "POST",
                         url: "/clinux/voice",
-                        payload: { text: textoComDict, eventId },
-                        headers: { "content-type": "application/json",
+                        payload: { text: text(), eventId },
+                        headers: {
+                            "content-type": "application/json",
                             Authorization: `Bearer ${process.env.TOKENAPIINT}`
                         },
                     });
@@ -99,11 +98,18 @@ exports.default = (0, fastify_plugin_1.default)(async function painelClinux(fast
                     fastify.broadcast({ type: "tcp", ts: Date.now(), data: out });
                     if (ttsRes.statusCode === 200) {
                         const ttsBody = ttsRes.json();
-                        if (ttsBody?.audioContent) {
+                        if ('audioContent' in ttsBody) {
                             fastify.broadcast({
                                 type: "tts:audio",
                                 ts: Date.now(),
-                                payload: { eventId, audioContent: ttsBody.audioContent },
+                                payload: { eventId, ttsBody },
+                            });
+                        }
+                        if ('errorTTS' in ttsBody) {
+                            fastify.broadcast({
+                                type: "tts:audio",
+                                ts: Date.now(),
+                                payload: { eventId, ttsBody },
                             });
                         }
                     }

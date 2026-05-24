@@ -17,7 +17,7 @@ import "simple-keyboard/build/css/index.css";
 import Base from "../../components/base";
 import { modalContext } from "@/components/modals/providers";
 import qrcode from "../../assets/icons/qrcode.png";
-import { buscaPaciente,BuscaAtendimentos,Atendimento} from "../../services/fetchData";
+import { buscaPaciente, BuscaAtendimentos, Atendimento } from "../../services/fetchData";
 
 // ------------------ Tipagens ------------------
 interface Paciente {
@@ -29,7 +29,7 @@ interface Paciente {
 // ------------------ Componente ------------------
 export default function DataNasc() {
   const url = useSearchParams();
-  const {setShowModal, setDados} = useContext(modalContext);
+  const { setShowModal, setDados } = useContext(modalContext);
 
   // congela valores da URL
   const nome = useMemo(() => url.get("nome") ?? "", [url]);
@@ -56,7 +56,7 @@ export default function DataNasc() {
         if (tipo == "DATA") {
           const hoje = new Date()
           hoje.setHours(0, 0, 0, 0)
-          const response = await buscaPaciente({ dt_nascimento: nome,tipo})
+          const response = await buscaPaciente({ dt_nascimento: nome, tipo })
           const listExames = await BuscaAtendimentos({ dt_nascimento: nome, date: { from: hoje } })
           if (listExames) {
             const listar = [2, 3, 7]
@@ -105,7 +105,8 @@ export default function DataNasc() {
                     dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  });setShowModal(true)
+                  });
+                  setShowModal(true)
                 }}
               >
                 {p.ds_paciente}
@@ -117,7 +118,7 @@ export default function DataNasc() {
           const response = await buscaPaciente({ ds_paciente: nome, tipo: "NOME" });
           const lista: Paciente[] = Array.isArray(response) ? response : [];
           setInfo(...[lista]);
-          let key=0
+          let key = 0
           const itens: ReactElement[] = lista.map((p) => {
             const dataFmt = moment(p.dt_nascimento)
               .add(1, "day")
@@ -129,11 +130,11 @@ export default function DataNasc() {
                 key={key}
                 onClick={() => {
                   setDados({
-                    ds_paciente: p.ds_paciente,
+                    ds_paciente: nome,
                     dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  });setShowModal(true)
+                  }); setShowModal(true)
                 }}
               >
                 {dataFmt}
@@ -164,7 +165,7 @@ export default function DataNasc() {
                   dt_nascimento: p.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento,
                   servico,
                   preferencial,
-                });setShowModal(true)
+                }); setShowModal(true)
               }}
             >
               {p.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente}
@@ -176,7 +177,7 @@ export default function DataNasc() {
         .filter(Boolean) as ReactElement[];
 
       setListEx(examesFiltrados);
-      let key =0
+      let key = 0
       const itensFiltrados: ReactElement[] = info.map((p) => {
         key += 1
         if (!digits || !p.ds_paciente || p.ds_paciente.includes(digits)) {
@@ -190,7 +191,7 @@ export default function DataNasc() {
                   dt_nascimento: p.dt_nascimento,
                   servico,
                   preferencial,
-                });setShowModal(true)
+                }); setShowModal(true)
               }}
             >
               {p.ds_paciente}
@@ -218,11 +219,11 @@ export default function DataNasc() {
                 key={key}
                 onClick={() => {
                   setDados({
-                    ds_paciente: p.ds_paciente,
+                    ds_paciente: nome,
                     dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  });setShowModal(true)
+                  }); setShowModal(true)
                 }}
               >
                 {dataFmt}
@@ -256,6 +257,7 @@ export default function DataNasc() {
       setDados({
         ds_paciente: text,
         dt_nascimento: nome,
+        tipo: 'NEW',
         servico,
         preferencial,
       })
@@ -263,6 +265,7 @@ export default function DataNasc() {
       setDados({
         ds_paciente: nome,
         dt_nascimento: text,
+        tipo: 'NEW',
         servico,
         preferencial,
       });

@@ -25,10 +25,10 @@ interface Paciente {
 export const modalContext = createContext<{
   setShowModal: Dispatch<SetStateAction<boolean>>
   setDados: Dispatch<SetStateAction<Paciente | null>>
-     // ⬅ agora usa o tipo unificado
+  // ⬅ agora usa o tipo unificado
 }>({
-  setShowModal: () => {},
-  setDados: () => {},
+  setShowModal: () => { },
+  setDados: () => { },
 })
 
 export default function ModalProviders({

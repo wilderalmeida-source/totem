@@ -5,16 +5,35 @@ services:
     restart: always
     environment:
       POSTGRES_USER: totem
-      POSTGRES_PASSWORD: 123
+      POSTGRES_PASSWORD: PPkvsE1A61vMAF9I
       POSTGRES_DB: totem
-    ports:
-      - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
     networks:
       - totem-net
-
-  # --- BACKEND (NODE.JS) ---
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U totem -d totem" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+  #-------------BANCO DE LOGS-------
+  db_logs:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: logs
+      POSTGRES_USER: usergenuine
+      POSTGRES_PASSWORD: lj8_3oDym7DOBmmmYp
+    volumes:
+      - postgres_logs_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U usergenuine -d logs" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    networks:
+      - totem-net
+  # --- BACKEND (NODE.JS) 
   backend:
     build:
       context: ./back
@@ -22,11 +41,19 @@ services:
     env_file:
       - ./back/.env
     ports:
+      - "5000:5000"
       - "2345:2345"
     volumes:
       - ./public/audios:/app/public/audios
+      - ./back:/app # Compartilha o seu código do Windows com o container
+      - /app/node_modules
     depends_on:
-      - postgres_infra
+      postgres_infra:
+        condition: service_healthy
+      db_logs:
+        condition: service_healthy
+    command: >
+      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!';npx prisma db pull --config=prisma.logs.config.ts;npx prisma generate --config=prisma.logs.config.ts; npm run dev "
     networks:
       - totem-net
 
@@ -48,6 +75,7 @@ services:
 
 volumes:
   pgdata:
+  postgres_logs_data:
 
 networks:
   totem-net:

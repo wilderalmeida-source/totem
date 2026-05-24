@@ -12,7 +12,7 @@ import React, {
 import Image from 'next/image';
 import ok from '../assets/icons/ok.png';
 import atention from '../assets/icons/atention.png';
-import { BuscaSenha, SenhasResponse } from "../services/fetchData";
+import { buscaPaciente, BuscaSenha, SenhasResponse } from "../services/fetchData";
 
 /** ===== Utils ===== **/
 function uniqBy<T>(arr: T[], keyFn: (x: T) => string) {
@@ -29,6 +29,12 @@ export default function Historic() {
   const [dados, setDados] = useState<SenhasResponse>({ senhasnr: [], senhas: [] });
   const [loading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  useEffect(() => {
+    async function reset() {
+      await buscaPaciente({ ds_paciente: "RE", tipo: "RESET" })
+    }
+    reset()
+  }, [])
 
   const fetchData = useCallback(async () => {
     try {
@@ -36,7 +42,7 @@ export default function Historic() {
       const response = await BuscaSenha();
       if (!response) throw new Error(`HTTP ${response}`);
       const listagem: SenhasResponse = response;
-      
+
       // Atualização não-bloqueante da UI (Excelente para totens)
       startTransition(() => setDados(listagem));
     } catch (e) {
@@ -68,7 +74,7 @@ export default function Historic() {
       try {
         const bridgePayload = JSON.parse(event.data);
         const msg = JSON.parse(bridgePayload.message);
-        
+
         if (!msg || (msg.type && !['db', 'tcp'].includes(msg.type))) return;
         if (!aborted) scheduleFetch();
       } catch {
@@ -117,10 +123,10 @@ export default function Historic() {
   const tabela1: (ReactElement | null)[] = useMemo(() => {
     return senhasUnique.map((s) => {
       const pac = s.atendimentos?.[0]?.pacientes_atendimentos_cd_pacienteTopacientes;
-      
+
       // Ajuste na chave estável usando também o código da senha para evitar colisão caso o ID do paciente venha nulo
-      const key = `a-${pac?.cd_paciente ?? 'sem-id'}-${s.cd_senha}-${s.dt_saida ? '1' : '0'}`; 
-      
+      const key = `a-${pac?.cd_paciente ?? 'sem-id'}-${s.cd_senha}-${s.dt_saida ? '1' : '0'}`;
+
       if (!pac) return null; // Retornar null evita trs órfãs e vazias quebrando a tabela
 
       return (
@@ -146,7 +152,7 @@ export default function Historic() {
 
   const tabela2: ReactElement[] = useMemo(() => {
     return senhasnrUnique.map((s) => {
-      const key = `e-${s.ds_paciente}-${s.cd_senha}-${s.dt_saida ? '1' : '0'}`; 
+      const key = `e-${s.ds_paciente}-${s.cd_senha}-${s.dt_saida ? '1' : '0'}`;
       return (
         <tr
           key={key}

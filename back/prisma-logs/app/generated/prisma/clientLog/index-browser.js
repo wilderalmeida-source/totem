@@ -176,13 +176,13 @@ exports.Prisma.TtsEventScalarFieldEnum = {
 };
 
 exports.Prisma.TokenScalarFieldEnum = {
+  Id: 'Id',
   tokenHash: 'tokenHash',
   name: 'name',
   scope: 'scope',
   expiresAt: 'expiresAt',
   revokedAt: 'revokedAt',
-  createdAt: 'createdAt',
-  Id: 'Id'
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {

@@ -77,12 +77,13 @@ export type Paciente = {
   ds_paciente?: string
   ds_nome?: string
   dt_nascimento?: string
-  ds_cpf?:string
+  ds_cpf?: string
+  tentativas?: number | null
 }
 
 export type Modalidade = { cd_modalidade: number; ds_modalidade: string }
 export type ModalidadesResponse = Modalidade[]
-export type SenhasResponse = { senhas: Senha[],senhasnr:Senha[] }
+export type SenhasResponse = { senhas: Senha[], senhasnr: Senha[] }
 export type Documento = {
   cd_documento: number | null
   cd_atendimento: number | null
@@ -154,7 +155,7 @@ export type DictItem = {
   createdAt: string;
   updatedAt: string
 };
-const API_INTERNA= process.env.LINK_API_INTERNA
+const API_INTERNA = process.env.LINK_API_INTERNA
 const TOKEN_API_INT = `Bearer ${process.env.TOKEN_API_INT}`
 /* =======================
    ATENDIMENTOS
@@ -193,9 +194,10 @@ export const BuscaAtendimentos = async ({
       next: { tags: ['agenda'] },
       cache: 'no-cache',
       method: 'GET',
-      headers: { 'Content-Type': 'application/json',
+      headers: {
+        'Content-Type': 'application/json',
         Authorization: TOKEN_API_INT
-       },
+      },
     }
   )
   return response.json() as Promise<Atendimento[]>
@@ -208,9 +210,10 @@ export const CadastraAtendimentos = async ({
     next: { tags: ['agenda'] },
     cache: 'no-cache',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ cd_paciente }),
   })
   return response.json() as Promise<Atendimento[]>
@@ -225,9 +228,10 @@ export const AtualizaAtendimentos = async (
     next: { tags: ['agenda'] },
     cache: 'no-cache',
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ cd_atendimento, cd_senha, ds_senha }),
   })
   return response.json() as Promise<Atendimento[]>
@@ -240,9 +244,10 @@ export const DocumentData = async (cd_atendimento: number): Promise<Documento[]>
     next: { tags: ['agenda'] },
     cache: 'no-cache',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ cd_atendimento }),
   })
   return response.json() as Promise<Documento[]>
@@ -252,19 +257,21 @@ export const DocumentData = async (cd_atendimento: number): Promise<Documento[]>
    Medicos e Salas
 ======================= */
 export const medFetch = async (): Promise<unknown[]> => {
-  const medicos = await fetch(`${API_INTERNA}/clinux/medicos`,{
-    headers: { 'Content-Type': 'application/json',
+  const medicos = await fetch(`${API_INTERNA}/clinux/medicos`, {
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
   })
   return medicos.json() as Promise<unknown[]>
 }
 
 export const salasFetch = async (): Promise<unknown[]> => {
-  const salas = await fetch(`${API_INTERNA}/clinux/salas`,{
-    headers: { 'Content-Type': 'application/json',
+  const salas = await fetch(`${API_INTERNA}/clinux/salas`, {
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
   })
   return salas.json() as Promise<unknown[]>
 }
@@ -294,11 +301,15 @@ export const buscaPaciente = async ({
 
   const response = await fetch(
     `${API_INTERNA}/clinux/pacientes?${params.toString()}`,
-    { next: { tags: ['pacientes'] }, 
-    cache: 'no-cache', 
-    method: 'GET', 
-    headers: { 'Content-Type': 'application/json',
-      Authorization: TOKEN_API_INT } }
+    {
+      next: { tags: ['pacientes'] },
+      cache: 'no-cache',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: TOKEN_API_INT
+      }
+    }
   )
   return response.json() as Promise<Paciente[]>
 }
@@ -310,9 +321,10 @@ export const CadastraPaciente = async ({
     next: { tags: ['agenda'] },
     cache: 'no-cache',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ ds_paciente, dt_nascimento }),
   })
   return response.json() as Promise<Paciente>
@@ -326,9 +338,10 @@ export const CadastraSenha = async (data: Senha): Promise<Senha> => {
     next: { tags: ['agenda'] },
     cache: 'no-cache',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify(data),
   })
   return response.json() as Promise<Senha>
@@ -338,7 +351,8 @@ export const BuscaSenha = async (): Promise<SenhasResponse> => {
     next: { tags: ['pacientes'] },
     cache: 'no-cache',
     method: 'GET',
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
     },
   })
@@ -351,13 +365,15 @@ export const BuscaSenha = async (): Promise<SenhasResponse> => {
 export const BuscaModalidades = async (cd_modalidade: number): Promise<ModalidadesResponse> => {
   const response = await fetch(
     `${API_INTERNA}/clinux/modalidades?cd_modalidade=${cd_modalidade}`,
-    { next: { tags: ['pacientes'] }, 
-    cache: 'no-cache', 
-    method: 'GET', 
-    headers: { 'Content-Type': 'application/json',
-      Authorization: TOKEN_API_INT
-     },
-})
+    {
+      next: { tags: ['pacientes'] },
+      cache: 'no-cache',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: TOKEN_API_INT
+      },
+    })
   return response.json() as Promise<ModalidadesResponse>
 }
 /* =======================
@@ -366,9 +382,10 @@ export const BuscaModalidades = async (cd_modalidade: number): Promise<Modalidad
 export const VoiceGoogle = async (texto: string) => {
   const response = await fetch(`${API_INTERNA}/clinux/voice`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ text: texto }),
   });
   if (!response.ok) {
@@ -380,15 +397,21 @@ export const VoiceGoogle = async (texto: string) => {
    VOZ STATUS
 ======================= */
 export const VoiceStatus = async () => {
-  const res = await fetch(`${API_INTERNA}/clinux/voice/stats`,{headers: { 'Content-Type': 'application/json',
+  const res = await fetch(`${API_INTERNA}/clinux/voice/stats`, {
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },});
+    },
+  });
   return res.json();
 }
 export const VoiceList = async () => {
-  const res = await fetch(`${API_INTERNA}/clinux/voice/voices`,{headers: { 'Content-Type': 'application/json',
+  const res = await fetch(`${API_INTERNA}/clinux/voice/voices`, {
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     }});
+    }
+  });
   return await res.json();
 }
 /* =======================
@@ -397,9 +420,10 @@ export const VoiceList = async () => {
 export const ApplyVoiceOverride = async (year: number, week: number, selectedVoice: string) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/override`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({
       year: year,
       week: week,
@@ -411,18 +435,20 @@ export const ApplyVoiceOverride = async (year: number, week: number, selectedVoi
 export const ClearVoiceOverride = async (year: number, week: number) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/override/${year}/${week}`, {
     method: "DELETE",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
   })
   return await res.json()
 }
 export const SetRate = async (rate: number) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/rate`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ rate }),
   })
   if (!res.ok) {
@@ -433,9 +459,10 @@ export const SetRate = async (rate: number) => {
 export const SetVolume = async (volume: number) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/volume`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ volume }),
   })
   if (!res.ok) {
@@ -448,10 +475,11 @@ export const SetVolume = async (volume: number) => {
 ======================= */
 export const DictionaryList = async (search?: string) => {
   const q = search?.trim() ? `?search=${encodeURIComponent(search.trim())}` : "";
-  const res = await fetch(`${API_INTERNA}/clinux/voice/dictionary${q}`,{
-    headers: { 'Content-Type': 'application/json',
+  const res = await fetch(`${API_INTERNA}/clinux/voice/dictionary${q}`, {
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
   })
   if (res.status == 200) {
     return await res.json()
@@ -460,9 +488,10 @@ export const DictionaryList = async (search?: string) => {
 export const DictionaryUpsert = async (key: string, value: string) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/dictionary`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ key, value }),
   })
   if (res.status == 200) {
@@ -472,9 +501,10 @@ export const DictionaryUpsert = async (key: string, value: string) => {
 export const DictionaryUpdate = async (key: string, value: string) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/dictionary/${encodeURIComponent(key)}`, {
     method: "PUT",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ value }),
   })
   if (res.status == 200) {
@@ -484,9 +514,10 @@ export const DictionaryUpdate = async (key: string, value: string) => {
 export const DictionaryDelete = async (key: string) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/dictionary/${encodeURIComponent(key)}`, {
     method: "DELETE",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
   })
   if (res.status == 200) {
     return await res.json()
@@ -498,9 +529,10 @@ export const DictionaryDelete = async (key: string) => {
 export const PlaySoundTest = async (voiceName: string, rate: number, volume: number) => {
   const res = await fetch(`${API_INTERNA}/clinux/voice/play`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
     body: JSON.stringify({ voiceName, rate, volume }),
   })
   if (res.status == 200) {
@@ -510,11 +542,12 @@ export const PlaySoundTest = async (voiceName: string, rate: number, volume: num
 /* =======================
    INICIA CHAMADA DE ATENÇÂO
 ======================= */
-export const AtentionSound = async (TorP:string) => {
-  const res = await fetch(`${API_INTERNA}/clinux/atencao?TorP=${TorP}`,{
-    headers: { 'Content-Type': 'application/json',
+export const AtentionSound = async (TorP: string) => {
+  const res = await fetch(`${API_INTERNA}/clinux/atencao?TorP=${TorP}`, {
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
+    },
   })
   if (res.status == 200) {
     return await res.json()
@@ -526,10 +559,11 @@ export const AtentionSound = async (TorP:string) => {
 export const AtentionCreateSound = async (value: string) => {
   const res = await fetch(`${API_INTERNA}/clinux/atencao`, {
     method: "POST",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     },
-    body: JSON.stringify({text:value}),
+    },
+    body: JSON.stringify({ text: value }),
   })
   if (res.status == 200) {
     return await res.json()
@@ -538,9 +572,10 @@ export const AtentionCreateSound = async (value: string) => {
 export const AtentionGetText = async () => {
   const res = await fetch(`${API_INTERNA}/clinux/atencao/text`, {
     method: "GET",
-    headers: { 'Content-Type': 'application/json',
+    headers: {
+      'Content-Type': 'application/json',
       Authorization: TOKEN_API_INT
-     }
+    }
   })
   if (res.status == 200) {
     return await res.json()

@@ -77,15 +77,17 @@ export async function agendaRoute(fastify: FastifyInstance) {
     })
     const input = createbody.parse(request.body);
     const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000)
-
+    const MEDICO = process.env.IDMEDICO ? parseInt(process.env.IDMEDICO) : 1
+    const SALA = process.env.IDSALA ? parseInt(process.env.IDSALA) : 1
+    const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1
     const agenda = await prisma.atendimentos.create({
       data: {
-        cd_medico: 12560,
-        cd_sala: 10,
+        cd_medico: MEDICO,
+        cd_sala: SALA,
         cd_paciente: input.cd_paciente,
         dt_data: dateNow,
         //dt_hora: dateNow,
-        cd_funcionario: 50
+        cd_funcionario: FUNCIONARIO
 
         // cria o exame filho ligado a este atendimento
       },
@@ -112,7 +114,7 @@ export async function agendaRoute(fastify: FastifyInstance) {
     });
     const body = schema.parse(request.body);
     const { cd_atendimento, cd_senha, ds_senha } = body;
-    console.log(cd_atendimento,cd_senha,ds_senha)
+    console.log(cd_atendimento, cd_senha, ds_senha)
     const result = await prisma.$transaction(async (tx) => {
       const data: Parameters<typeof prisma.atendimentos.updateMany>[0]["data"] = {};
       if (typeof cd_senha !== "undefined") data.cd_senha = cd_senha, data.cd_funcionario = 50;

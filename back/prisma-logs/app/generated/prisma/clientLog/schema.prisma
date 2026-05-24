@@ -20,7 +20,7 @@ model TtsWeekVoice {
   id        Int      @id @default(autoincrement())
   year      Int
   week      Int
-  voiceName String
+  voiceName String   @logs.VarChar(191)
   createdAt DateTime @default(now())
 
   @@unique([year, week])
@@ -28,33 +28,33 @@ model TtsWeekVoice {
 
 model TtsSettings {
   id          Int      @id @default(autoincrement())
-  rate        Float    @default(1.0) // velocidade
+  rate        Float    @default(1.0)
   volumeSound Float    @default(0.0)
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 }
 
 model TtsVoiceOverride {
   id        Int      @id @default(autoincrement())
   year      Int
   week      Int
-  voiceName String
-  updatedAt DateTime @updatedAt
+  voiceName String   @logs.VarChar(191)
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@unique([year, week])
 }
 
 model NameDictionary {
   id        Int      @id @default(autoincrement())
-  key       String   @unique // chave normalizada (ex: "graca")
-  value     String // valor correto (ex: "GraÃ§a")
+  key       String   @unique @logs.VarChar(191)
+  value     String   @logs.VarChar(191)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model TtsVoiceTest {
   id          Int      @id @default(autoincrement())
-  cacheKey    String   @unique
-  voiceName   String
+  cacheKey    String   @unique @logs.VarChar(191)
+  voiceName   String   @logs.VarChar(191)
   rate        Float    @default(1.0)
   text        String
   audioMp3    Bytes
@@ -63,19 +63,17 @@ model TtsVoiceTest {
 }
 
 model ttsEvent {
-  eventId      String   @unique
-  audioContent String
+  eventId      String   @unique @logs.VarChar(191)
+  audioContent String   @logs.VarChar(191)
   createdAt    DateTime @default(now())
 }
 
 model token {
-  tokenHash String   @unique
-  name      String
-  scope     String?
-  expiresAt DateTime @logs.Timestamp(6)
-  revokedAt String?
-  createdAt DateTime @default(now()) @logs.Timestamp(6)
   Id        BigInt   @id @default(autoincrement())
+  tokenHash String   @unique @logs.VarChar(191)
+  name      String   @logs.VarChar(191)
+  scope     String?  @logs.VarChar(191)
+  expiresAt DateTime @logs.Timestamp(6)
+  revokedAt String?  @logs.VarChar(191)
+  createdAt DateTime @default(now()) @logs.Timestamp(6)
 }
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

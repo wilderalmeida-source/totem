@@ -1,6 +1,10 @@
 import { hashToken } from "../config/token";
 import { PrismaLog } from "../config/prismalog";
+
 export async function authenticate(request: any, reply: any) {
+  // ✅ Pula autenticação se a rota tiver skipAuth
+  if (request.routeOptions?.config?.skipAuth) return;
+
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {

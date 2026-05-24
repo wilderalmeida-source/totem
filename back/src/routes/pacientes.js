@@ -4,6 +4,7 @@ exports.pacientesRoute = pacientesRoute;
 const zod_1 = require("zod");
 const prismaDB_1 = require("../../config/prismaDB");
 async function pacientesRoute(fastify) {
+    let tentativas = 3;
     function gerarECompletarDezDatas(datasReaisBanco) {
         const listaDatasFormata = [];
         // 1. FORÇA a conversão de todas as datas reais para string ISO e adiciona na lista
@@ -59,7 +60,7 @@ async function pacientesRoute(fastify) {
     fastify.get("/clinux/pacientes", async (request, reply) => {
         const bodySchema = zod_1.z.object({
             cd_paciente: zod_1.z.string().trim().optional(),
-            ds_paciente: zod_1.z.string().trim().min(1).optional(),
+            ds_paciente: zod_1.z.string().trim().optional(),
             dt_nascimento: zod_1.z.string().trim().min(1).optional(),
             ds_cpf: zod_1.z.string().trim().min(1).optional(),
             tipo: zod_1.z.string().trim().min(1).optional(),
@@ -67,7 +68,7 @@ async function pacientesRoute(fastify) {
         try {
             const { cd_paciente, ds_paciente, dt_nascimento, ds_cpf, tipo } = bodySchema.parse(request.query ?? {});
             // Se nada foi enviado, retorne lista vazia
-            if (cd_paciente === undefined && ds_paciente === undefined && dt_nascimento === undefined && ds_cpf === undefined) {
+            if (cd_paciente === undefined && ds_paciente === undefined && dt_nascimento === undefined && ds_cpf === undefined && tipo === undefined) {
                 return reply.send([]);
             }
             // Monta o where somente com os campos presentes
@@ -118,6 +119,19 @@ async function pacientesRoute(fastify) {
                 select,
                 orderBy: { ds_paciente: "asc" },
             });
+            if (tipo == "ID" && pacientes.length <= 0) {
+                tentativas -= 1;
+                return reply.send([{ tentativas }]);
+            }
+            if (tipo == "NOMEDATA" && pacientes.length <= 0) {
+                console.log(tentativas);
+                tentativas -= 1;
+                return reply.send([{ tentativas }]);
+            }
+            if (tipo == "RESET") {
+                tentativas = 3;
+                return reply.send([{ tentativas }]);
+            }
             if (tipo == "MASK" && pacientes.length > 0 && pacientes.length < 10) {
                 const arrayDAtas = [];
                 for (let i = 0; i < pacientes.length; i++) {

@@ -4431,7 +4431,7 @@ export namespace Prisma {
     /**
      * The data needed to create a TtsSettings.
      */
-    data: XOR<TtsSettingsCreateInput, TtsSettingsUncheckedCreateInput>
+    data?: XOR<TtsSettingsCreateInput, TtsSettingsUncheckedCreateInput>
   }
 
   /**
@@ -8755,33 +8755,33 @@ export namespace Prisma {
   }
 
   export type TokenMinAggregateOutputType = {
+    Id: bigint | null
     tokenHash: string | null
     name: string | null
     scope: string | null
     expiresAt: Date | null
     revokedAt: string | null
     createdAt: Date | null
-    Id: bigint | null
   }
 
   export type TokenMaxAggregateOutputType = {
+    Id: bigint | null
     tokenHash: string | null
     name: string | null
     scope: string | null
     expiresAt: Date | null
     revokedAt: string | null
     createdAt: Date | null
-    Id: bigint | null
   }
 
   export type TokenCountAggregateOutputType = {
+    Id: number
     tokenHash: number
     name: number
     scope: number
     expiresAt: number
     revokedAt: number
     createdAt: number
-    Id: number
     _all: number
   }
 
@@ -8795,33 +8795,33 @@ export namespace Prisma {
   }
 
   export type TokenMinAggregateInputType = {
+    Id?: true
     tokenHash?: true
     name?: true
     scope?: true
     expiresAt?: true
     revokedAt?: true
     createdAt?: true
-    Id?: true
   }
 
   export type TokenMaxAggregateInputType = {
+    Id?: true
     tokenHash?: true
     name?: true
     scope?: true
     expiresAt?: true
     revokedAt?: true
     createdAt?: true
-    Id?: true
   }
 
   export type TokenCountAggregateInputType = {
+    Id?: true
     tokenHash?: true
     name?: true
     scope?: true
     expiresAt?: true
     revokedAt?: true
     createdAt?: true
-    Id?: true
     _all?: true
   }
 
@@ -8912,13 +8912,13 @@ export namespace Prisma {
   }
 
   export type TokenGroupByOutputType = {
+    Id: bigint
     tokenHash: string
     name: string
     scope: string | null
     expiresAt: Date
     revokedAt: string | null
     createdAt: Date
-    Id: bigint
     _count: TokenCountAggregateOutputType | null
     _avg: TokenAvgAggregateOutputType | null
     _sum: TokenSumAggregateOutputType | null
@@ -8941,58 +8941,58 @@ export namespace Prisma {
 
 
   export type tokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    Id?: boolean
     tokenHash?: boolean
     name?: boolean
     scope?: boolean
     expiresAt?: boolean
     revokedAt?: boolean
     createdAt?: boolean
-    Id?: boolean
   }, ExtArgs["result"]["token"]>
 
   export type tokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    Id?: boolean
     tokenHash?: boolean
     name?: boolean
     scope?: boolean
     expiresAt?: boolean
     revokedAt?: boolean
     createdAt?: boolean
-    Id?: boolean
   }, ExtArgs["result"]["token"]>
 
   export type tokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    Id?: boolean
     tokenHash?: boolean
     name?: boolean
     scope?: boolean
     expiresAt?: boolean
     revokedAt?: boolean
     createdAt?: boolean
-    Id?: boolean
   }, ExtArgs["result"]["token"]>
 
   export type tokenSelectScalar = {
+    Id?: boolean
     tokenHash?: boolean
     name?: boolean
     scope?: boolean
     expiresAt?: boolean
     revokedAt?: boolean
     createdAt?: boolean
-    Id?: boolean
   }
 
-  export type tokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"tokenHash" | "name" | "scope" | "expiresAt" | "revokedAt" | "createdAt" | "Id", ExtArgs["result"]["token"]>
+  export type tokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"Id" | "tokenHash" | "name" | "scope" | "expiresAt" | "revokedAt" | "createdAt", ExtArgs["result"]["token"]>
 
   export type $tokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "token"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
+      Id: bigint
       tokenHash: string
       name: string
       scope: string | null
       expiresAt: Date
       revokedAt: string | null
       createdAt: Date
-      Id: bigint
     }, ExtArgs["result"]["token"]>
     composites: {}
   }
@@ -9076,8 +9076,8 @@ export namespace Prisma {
      * // Get first 10 Tokens
      * const tokens = await prisma.token.findMany({ take: 10 })
      * 
-     * // Only select the `tokenHash`
-     * const tokenWithTokenHashOnly = await prisma.token.findMany({ select: { tokenHash: true } })
+     * // Only select the `Id`
+     * const tokenWithIdOnly = await prisma.token.findMany({ select: { Id: true } })
      * 
      */
     findMany<T extends tokenFindManyArgs>(args?: SelectSubset<T, tokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$tokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -9121,9 +9121,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Create many Tokens and only return the `tokenHash`
-     * const tokenWithTokenHashOnly = await prisma.token.createManyAndReturn({
-     *   select: { tokenHash: true },
+     * // Create many Tokens and only return the `Id`
+     * const tokenWithIdOnly = await prisma.token.createManyAndReturn({
+     *   select: { Id: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -9212,9 +9212,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more Tokens and only return the `tokenHash`
-     * const tokenWithTokenHashOnly = await prisma.token.updateManyAndReturn({
-     *   select: { tokenHash: true },
+     * // Update zero or more Tokens and only return the `Id`
+     * const tokenWithIdOnly = await prisma.token.updateManyAndReturn({
+     *   select: { Id: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -9416,13 +9416,13 @@ export namespace Prisma {
    * Fields of the token model
    */
   interface tokenFieldRefs {
+    readonly Id: FieldRef<"token", 'BigInt'>
     readonly tokenHash: FieldRef<"token", 'String'>
     readonly name: FieldRef<"token", 'String'>
     readonly scope: FieldRef<"token", 'String'>
     readonly expiresAt: FieldRef<"token", 'DateTime'>
     readonly revokedAt: FieldRef<"token", 'String'>
     readonly createdAt: FieldRef<"token", 'DateTime'>
-    readonly Id: FieldRef<"token", 'BigInt'>
   }
     
 
@@ -9885,13 +9885,13 @@ export namespace Prisma {
 
 
   export const TokenScalarFieldEnum: {
+    Id: 'Id',
     tokenHash: 'tokenHash',
     name: 'name',
     scope: 'scope',
     expiresAt: 'expiresAt',
     revokedAt: 'revokedAt',
-    createdAt: 'createdAt',
-    Id: 'Id'
+    createdAt: 'createdAt'
   };
 
   export type TokenScalarFieldEnum = (typeof TokenScalarFieldEnum)[keyof typeof TokenScalarFieldEnum]
@@ -10390,28 +10390,28 @@ export namespace Prisma {
     AND?: tokenWhereInput | tokenWhereInput[]
     OR?: tokenWhereInput[]
     NOT?: tokenWhereInput | tokenWhereInput[]
+    Id?: BigIntFilter<"token"> | bigint | number
     tokenHash?: StringFilter<"token"> | string
     name?: StringFilter<"token"> | string
     scope?: StringNullableFilter<"token"> | string | null
     expiresAt?: DateTimeFilter<"token"> | Date | string
     revokedAt?: StringNullableFilter<"token"> | string | null
     createdAt?: DateTimeFilter<"token"> | Date | string
-    Id?: BigIntFilter<"token"> | bigint | number
   }
 
   export type tokenOrderByWithRelationInput = {
+    Id?: SortOrder
     tokenHash?: SortOrder
     name?: SortOrder
     scope?: SortOrderInput | SortOrder
     expiresAt?: SortOrder
     revokedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
-    Id?: SortOrder
   }
 
   export type tokenWhereUniqueInput = Prisma.AtLeast<{
-    tokenHash?: string
     Id?: bigint | number
+    tokenHash?: string
     AND?: tokenWhereInput | tokenWhereInput[]
     OR?: tokenWhereInput[]
     NOT?: tokenWhereInput | tokenWhereInput[]
@@ -10423,13 +10423,13 @@ export namespace Prisma {
   }, "Id" | "tokenHash">
 
   export type tokenOrderByWithAggregationInput = {
+    Id?: SortOrder
     tokenHash?: SortOrder
     name?: SortOrder
     scope?: SortOrderInput | SortOrder
     expiresAt?: SortOrder
     revokedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
-    Id?: SortOrder
     _count?: tokenCountOrderByAggregateInput
     _avg?: tokenAvgOrderByAggregateInput
     _max?: tokenMaxOrderByAggregateInput
@@ -10441,13 +10441,13 @@ export namespace Prisma {
     AND?: tokenScalarWhereWithAggregatesInput | tokenScalarWhereWithAggregatesInput[]
     OR?: tokenScalarWhereWithAggregatesInput[]
     NOT?: tokenScalarWhereWithAggregatesInput | tokenScalarWhereWithAggregatesInput[]
+    Id?: BigIntWithAggregatesFilter<"token"> | bigint | number
     tokenHash?: StringWithAggregatesFilter<"token"> | string
     name?: StringWithAggregatesFilter<"token"> | string
     scope?: StringNullableWithAggregatesFilter<"token"> | string | null
     expiresAt?: DateTimeWithAggregatesFilter<"token"> | Date | string
     revokedAt?: StringNullableWithAggregatesFilter<"token"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"token"> | Date | string
-    Id?: BigIntWithAggregatesFilter<"token"> | bigint | number
   }
 
   export type TtsDailyUsageCreateInput = {
@@ -10818,73 +10818,73 @@ export namespace Prisma {
   }
 
   export type tokenCreateInput = {
+    Id?: bigint | number
     tokenHash: string
     name: string
     scope?: string | null
     expiresAt: Date | string
     revokedAt?: string | null
     createdAt?: Date | string
-    Id?: bigint | number
   }
 
   export type tokenUncheckedCreateInput = {
+    Id?: bigint | number
     tokenHash: string
     name: string
     scope?: string | null
     expiresAt: Date | string
     revokedAt?: string | null
     createdAt?: Date | string
-    Id?: bigint | number
   }
 
   export type tokenUpdateInput = {
+    Id?: BigIntFieldUpdateOperationsInput | bigint | number
     tokenHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     scope?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    Id?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
   export type tokenUncheckedUpdateInput = {
+    Id?: BigIntFieldUpdateOperationsInput | bigint | number
     tokenHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     scope?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    Id?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
   export type tokenCreateManyInput = {
+    Id?: bigint | number
     tokenHash: string
     name: string
     scope?: string | null
     expiresAt: Date | string
     revokedAt?: string | null
     createdAt?: Date | string
-    Id?: bigint | number
   }
 
   export type tokenUpdateManyMutationInput = {
+    Id?: BigIntFieldUpdateOperationsInput | bigint | number
     tokenHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     scope?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    Id?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
   export type tokenUncheckedUpdateManyInput = {
+    Id?: BigIntFieldUpdateOperationsInput | bigint | number
     tokenHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     scope?: NullableStringFieldUpdateOperationsInput | string | null
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    Id?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -11259,6 +11259,17 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type BigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11274,30 +11285,19 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type BigIntFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
-  }
-
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type tokenCountOrderByAggregateInput = {
+    Id?: SortOrder
     tokenHash?: SortOrder
     name?: SortOrder
     scope?: SortOrder
     expiresAt?: SortOrder
     revokedAt?: SortOrder
     createdAt?: SortOrder
-    Id?: SortOrder
   }
 
   export type tokenAvgOrderByAggregateInput = {
@@ -11305,27 +11305,43 @@ export namespace Prisma {
   }
 
   export type tokenMaxOrderByAggregateInput = {
+    Id?: SortOrder
     tokenHash?: SortOrder
     name?: SortOrder
     scope?: SortOrder
     expiresAt?: SortOrder
     revokedAt?: SortOrder
     createdAt?: SortOrder
-    Id?: SortOrder
   }
 
   export type tokenMinOrderByAggregateInput = {
+    Id?: SortOrder
     tokenHash?: SortOrder
     name?: SortOrder
     scope?: SortOrder
     expiresAt?: SortOrder
     revokedAt?: SortOrder
     createdAt?: SortOrder
-    Id?: SortOrder
   }
 
   export type tokenSumOrderByAggregateInput = {
     Id?: SortOrder
+  }
+
+  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -11344,22 +11360,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedBigIntFilter<$PrismaModel>
-    _min?: NestedBigIntFilter<$PrismaModel>
-    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -11390,16 +11390,16 @@ export namespace Prisma {
     set?: Bytes
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
   export type BigIntFieldUpdateOperationsInput = {
     set?: bigint | number
     increment?: bigint | number
     decrement?: bigint | number
     multiply?: bigint | number
     divide?: bigint | number
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -11529,6 +11529,17 @@ export namespace Prisma {
     _max?: NestedBytesFilter<$PrismaModel>
   }
 
+  export type NestedBigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -11543,7 +11554,7 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedBigIntFilter<$PrismaModel = never> = {
+  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
     notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -11551,7 +11562,12 @@ export namespace Prisma {
     lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -11580,22 +11596,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedBigIntFilter<$PrismaModel>
-    _min?: NestedBigIntFilter<$PrismaModel>
-    _max?: NestedBigIntFilter<$PrismaModel>
   }
 
 

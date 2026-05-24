@@ -12,18 +12,35 @@ type PgNotifyOpts = {
 const plugin: FastifyPluginAsync<PgNotifyOpts> = async (fastify, opts) => {
   const channel = (opts.channel ?? "db_atendimentos_senhas").trim();
 
-  // segurança básica: canal precisa ser um identificador simples
   if (!/^[a-z_][a-z0-9_]*$/i.test(channel)) {
     throw new Error(`Invalid LISTEN channel name: ${channel}`);
   }
 
   const connStr = opts.connectionString ?? process.env.DATABASE_URL;
-  if (!connStr) {
-    throw new Error("DATABASE_URL (connectionString) não definido");
-  }
-
   let client: Client | null = null;
   let stop = false;
+  let isConnected = false; // Controle para saber se o banco está ativo
+
+  // Função padrão para gerar o payload do broadcast
+  const sendFallbackBroadcast = () => {
+    const out = {
+      type: "db",
+      ts: Date.now(),
+      channel: "db_update",
+      fallback: true // Flag opcional, só para você saber no front que veio do fallback
+    };
+    try {
+      fastify.broadcast?.(out);
+    } catch { }
+  };
+
+  // Loop que roda a cada 30s mandando o broadcast caso o banco esteja fora
+  const fallbackInterval = setInterval(() => {
+    if (!isConnected && !stop) {
+      fastify.log.debug("Sem conexão com PG. Enviando broadcast de fallback (30s)...");
+      sendFallbackBroadcast();
+    }
+  }, 30000);
 
   async function connectWithRetry(attempt = 0) {
     if (stop) return;
@@ -31,38 +48,39 @@ const plugin: FastifyPluginAsync<PgNotifyOpts> = async (fastify, opts) => {
       client = new Client({ connectionString: connStr });
       await client.connect();
       await client.query(`LISTEN ${channel}`);
+
+      isConnected = true; // Conectado com sucesso!
       fastify.log.info({ channel }, "PG LISTEN conectado");
+
       client.on("notification", (msg) => {
         try {
           const payload = msg.payload ? JSON.parse(msg.payload) : null;
           if (opts.logRawPayload) fastify.log.debug({ payload }, "pg notify payload");
 
-          // Estrutura sugerida para front
           const out = {
             type: "db",
             ts: Date.now(),
-            channel:"db_update"
+            channel: "db_update"
           };
 
-          // Reenvia para quem estiver conectado (WS/SSE)
           fastify.broadcast?.(out);
         } catch (e) {
-          fastify.log.error({ err: e }, "Erro ao processar notification");
+          fastify.log.debug({ err: e }, "Erro ao processar notification (ignorado)");
         }
       });
 
       client.on("error", (err) => {
-        fastify.log.error({ err }, "PG client error");
+        isConnected = false; // Caiu a conexão
+        fastify.log.debug({ err }, "PG client error silencioso");
       });
 
       client.on("end", () => {
-        fastify.log.warn("PG client end (desconectado)");
-        // tenta reconectar
+        isConnected = false; // Desconectado
         if (!stop) void reconnect();
       });
     } catch (err) {
-      fastify.log.error({ err, attempt }, "Falha ao conectar PG LISTEN");
-      const delay = Math.min(30000, 1000 * 2 ** attempt); // backoff exponencial até 30s
+      isConnected = false; // Falhou o connect inicial/retry
+      const delay = Math.min(30000, 1000 * 2 ** attempt);
       await new Promise((r) => setTimeout(r, delay));
       if (!stop) return connectWithRetry(attempt + 1);
     }
@@ -78,23 +96,23 @@ const plugin: FastifyPluginAsync<PgNotifyOpts> = async (fastify, opts) => {
     await connectWithRetry(0);
   }
 
-  await connectWithRetry(0);
+  // Inicia a tentativa de conexão em segundo plano
+  void connectWithRetry(0);
 
   // encerra junto com o servidor
   fastify.addHook("onClose", async (_inst) => {
     stop = true;
+    clearInterval(fallbackInterval); // Limpa o intervalo para não vazar memória
     try {
       if (client) {
         try { await client.query(`UNLISTEN ${channel}`); } catch { }
         await client.end();
         client = null;
       }
-    } catch {
-      /* log se quiser */
-    }
+    } catch { }
   });
 
-  // (Opcional) exponha uma rota SSE simples em /events
+  // Rota SSE
   fastify.get("/events", async (req, reply) => {
     reply
       .raw.writeHead(200, {
@@ -108,16 +126,9 @@ const plugin: FastifyPluginAsync<PgNotifyOpts> = async (fastify, opts) => {
       reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
-    // se você já tem fastify.broadcast, podemos “inscrever” este cliente:
-    const listener = (data: unknown) => write(data);
-
-    // Garanta que fastify.broadcast exista:
     if (!fastify.broadcast) {
-      // cria um micro-broadcaster local só para SSE desta rota
       (fastify as any).broadcast = (d: unknown) => write(d);
     } else {
-      // Caso você tenha um sistema de pub/sub, substitua pelo subscribe real
-      // Aqui vamos "monkey patch": encadear broadcast para também mandar para este reply
       const old = fastify.broadcast.bind(fastify);
       (reply as any)._restoreBroadcast = () => (fastify.broadcast = old);
       fastify.broadcast = (d: unknown) => {
@@ -126,12 +137,10 @@ const plugin: FastifyPluginAsync<PgNotifyOpts> = async (fastify, opts) => {
       };
     }
 
-    // ping a cada 15s
     const ping = setInterval(() => reply.raw.write(`event: ping\ndata: ${Date.now()}\n\n`), 15000);
 
     req.raw.on("close", () => {
       clearInterval(ping);
-      // restaura broadcast original se foi alterado
       if ((reply as any)._restoreBroadcast) (reply as any)._restoreBroadcast();
       try { reply.raw.end(); } catch { }
     });

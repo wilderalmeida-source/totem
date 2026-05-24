@@ -4,6 +4,9 @@ exports.authenticate = authenticate;
 const token_1 = require("../config/token");
 const prismalog_1 = require("../config/prismalog");
 async function authenticate(request, reply) {
+    // ✅ Pula autenticação se a rota tiver skipAuth
+    if (request.routeOptions?.config?.skipAuth)
+        return;
     const authHeader = request.headers.authorization;
     if (!authHeader) {
         return reply.code(401).send({ error: "Token ausente" });

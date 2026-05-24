@@ -129,4 +129,63 @@ async function senhaRoute(fastify) {
         // Retorno limpo e em conformidade total com a LGPD
         return reply.send({ senhasnr, senhas });
     });
+    fastify.post('/clinux/senhas', async (request, reply) => {
+        const createbody = zod_1.z.object({
+            nr_senha: zod_1.z.number().optional(),
+            sn_preferencial: zod_1.z.boolean(),
+            ds_opcao: zod_1.z.string(),
+            nr_modalidade: zod_1.z.number(),
+            ds_local: zod_1.z.string(),
+            ds_fila: zod_1.z.string(),
+            method: zod_1.z.string(),
+            sn_especial: zod_1.z.boolean(),
+            nr_controle: zod_1.z.number().optional()
+        });
+        const { ds_opcao, nr_modalidade, nr_senha, sn_preferencial, ds_fila, ds_local, nr_controle, sn_especial, method, } = createbody.parse(request.body);
+        // Ajuste simples de fuso (UTC-3)
+        const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000);
+        const IP_PAINEL = process.env.IPPAINEL;
+        const EMPRESA = process.env.IDEMPRESA ? parseInt(process.env.IDEMPRESA) : 0;
+        const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1;
+        if (method === "C") {
+            const nr_senhaNew = nr_controle ? nr_controle % 10000 : null;
+            const senhas = await prismaDB_1.prisma.atendimentos_senhas.create({
+                data: {
+                    dt_entrada: dateNow,
+                    ds_opcao,
+                    nr_empresa: EMPRESA,
+                    nr_modalidade,
+                    nr_senha: nr_senhaNew,
+                    nr_controle,
+                    sn_preferencial,
+                    sn_especial,
+                    sn_preparo: false,
+                    ds_painel: IP_PAINEL,
+                    ds_local,
+                    ds_fila,
+                    cd_funcionario: FUNCIONARIO
+                },
+            });
+            return reply.send(senhas);
+        }
+        else {
+            const senhas = await prismaDB_1.prisma.atendimentos_senhas.create({
+                data: {
+                    dt_entrada: dateNow,
+                    ds_opcao,
+                    nr_empresa: EMPRESA,
+                    nr_modalidade,
+                    nr_senha,
+                    sn_preferencial,
+                    sn_especial,
+                    sn_preparo: false,
+                    ds_painel: IP_PAINEL,
+                    ds_local,
+                    ds_fila,
+                    cd_funcionario: FUNCIONARIO
+                },
+            });
+            return reply.send(senhas);
+        }
+    });
 }

@@ -2,50 +2,51 @@ import { getInternalSocket } from '@/lib/node-socket';
 
 export async function GET() {
   const socket = getInternalSocket();
-  
+
+  let cleanupFn: ((closeController?: boolean) => void) | null = null;
+
   const stream = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
-      let isClosed = false; // Flag para controlar o estado da stream
+      let isClosed = false;
 
-      // 1. Definimos a função de callback
       const onMessage = (data: string) => {
-        if (isClosed) return; // Se fechou, não faz nada
-
+        if (isClosed) return;
         try {
           const payload = JSON.stringify({
             message: data.toString(),
             timestamp: new Date().toISOString()
           });
-          
           controller.enqueue(encoder.encode(`data: ${payload}\n\n`));
         } catch (_err) {
           console.error("Erro ao enviar dados para o browser:", _err);
-          cleanup();
+          cleanup(false);
         }
       };
-
-      // 2. Função de limpeza
-      const cleanup = () => {
-        if (!isClosed) {
-          isClosed = true;
-          socket.off('message', onMessage); // REMOVE o ouvinte do socket
-          try { controller.close(); } catch (_e) {console.log(_e)} // Fecha o controller se possível
-          console.log("--- Conexão SSE encerrada e limpa ---");
+      // ✅ closeController=true só quando a gente fecha ativamente
+      // ✅ closeController=false quando o browser já fechou (cancel)
+      const cleanup = (closeController = true) => {
+        if (isClosed) return;
+        isClosed = true;
+        socket.off('message', onMessage);
+        socket.off('close', cleanup);
+        socket.off('error', cleanup);
+        if (closeController) {
+          try { controller.close(); } catch (_e) { console.log(`Conexão fechada: ${_e}`) }
         }
+        console.log("--- Conexão SSE encerrada e limpa ---");
       };
 
-      // 3. Registra o evento no socket
+      cleanupFn = cleanup;
+
       socket.on('message', onMessage);
-
-      // 4. Se o socket principal fechar, limpamos aqui também
       socket.on('close', cleanup);
       socket.on('error', cleanup);
     },
+
     cancel(reason) {
-      // Esse método é chamado automaticamente pelo Next quando o cliente desconecta
       console.log("Cliente desconectou do SSE:", reason);
-      // Aqui a lógica de limpeza (socket.off) deve ser acionada
+      cleanupFn?.(false); // ✅ não tenta fechar o controller — browser já fechou
     }
   });
 

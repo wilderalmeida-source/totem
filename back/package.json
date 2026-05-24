@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "db:push": "npx prisma db push --config=prisma.logs.config.ts",
+    "docker:start": "npm run db:push && npm run start"
   },
   "author": "",
   "license": "ISC",

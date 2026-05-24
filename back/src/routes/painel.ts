@@ -1,7 +1,8 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance } from "fastify";
-import net from "net";
-import { applyDictionary } from "../../config/googleVoices";
+import net from "net"; type TtsBody =
+  | { audioContent: string }
+  | { errorTTS: string };
 export default fp(async function painelClinux(fastify: FastifyInstance) {
   const server = net.createServer((sock) => {
     sock.on("data", (buf) => {
@@ -20,7 +21,7 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
           const res = await fastify.inject({
             method: "GET",
             url: `/clinux/senhas?filtroControle=${encodeURIComponent(tail)}`,
-             headers:{
+            headers: {
               Authorization: `Bearer ${process.env.TOKENAPIINT}`
             }
           });
@@ -31,14 +32,14 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
           // Ex.: quando você usa include { atendimentos { select { pacientes... } } }
           let dsPaciente: string | undefined;
 
-          if (Array.isArray(body.senhasnr) && body.senhasnr.length > 0) {
+          if (Array.isArray(body.senhasRawQuery) && body.senhasRawQuery.length > 0) {
             // dois formatos comuns — ajuste conforme o shape que sua rota devolve
             // A) shape “normalizado” vindo do $queryRaw:
             if (body.senhasnr[0]?.ds_paciente) {
-              dsPaciente = body.senhasnr.find((r: any) => r.ds_paciente)?.ds_paciente;
+              dsPaciente = body.senhasRawQuery.find((r: any) => r.ds_paciente)?.ds_paciente;
             }
             // B) shape do findMany com include atendimentos:
-            else if (body.senhasnr[0]?.atendimentos) {
+            else if (body.senhasRawQuery[0]?.atendimentos) {
               for (const row of body) {
                 const at = row.atendimentos?.[0];
                 const pac = at?.pacientes_atendimentos_cd_pacienteTopacientes;
@@ -86,28 +87,35 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
           const dateday = date.getDate()
           const dateMonth = date.getMonth() + 1
           const dateYear = date.getFullYear()
-          const datecomplete = (`${dateday}/${dateMonth}/${dateYear}`)
-          const textoComDict = await applyDictionary(text());
+          const datecomplete = (`${dateday}/${dateMonth}/${dateYear}`);
 
-          const eventId = `${textoComDict}-${datecomplete}`;
+          const eventId = `${text()}-${datecomplete}`;
           const ttsRes = await fastify.inject({
             method: "POST",
             url: "/clinux/voice",
-            payload: { text: textoComDict, eventId },
-            headers: { "content-type": "application/json",
+            payload: { text: text(), eventId },
+            headers: {
+              "content-type": "application/json",
               Authorization: `Bearer ${process.env.TOKENAPIINT}`
-             },
+            },
           });
 
           // 4) broadcast
           fastify.broadcast({ type: "tcp", ts: Date.now(), data: out });
           if (ttsRes.statusCode === 200) {
-            const ttsBody = ttsRes.json() as any;
-            if (ttsBody?.audioContent) {
+            const ttsBody = ttsRes.json() as TtsBody;
+            if ('audioContent' in ttsBody) {
               fastify.broadcast({
                 type: "tts:audio",
                 ts: Date.now(),
-                payload: { eventId, audioContent: ttsBody.audioContent },
+                payload: { eventId, ttsBody },
+              });
+            }
+            if ('errorTTS' in ttsBody) {
+              fastify.broadcast({
+                type: "tts:audio",
+                ts: Date.now(),
+                payload: { eventId, ttsBody },
               });
             }
           }

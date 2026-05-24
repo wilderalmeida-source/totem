@@ -38,9 +38,6 @@ async function voiceRoute(fastify) {
         if (node_fs_1.default.existsSync(caminhoCompleto)) {
             return reply.status(200).send({ audioContent: urlRelativa });
         }
-        if (!GOOGLE_TTS_KEY) {
-            return reply.status(500).send("GOOGLE_TTS_KEY não configurada");
-        }
         try {
             if (!text || typeof text !== "string") {
                 return reply.status(400).send("Parâmetro 'text' é obrigatório");
@@ -75,20 +72,30 @@ async function voiceRoute(fastify) {
                     speaking_rate: rate,
                 },
             };
+            if (!GOOGLE_TTS_KEY) {
+                return reply.status(200).send({ errorTTS: formatado });
+            }
             const res = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
             });
+            if (!res.ok) {
+                return reply.status(200).send({ errorTTS: formatado });
+            }
             const data = await res.json();
+            if (!data.audioContent) {
+                return reply.status(200).send({ errorTTS: formatado });
+            }
             const audioBuffer = Buffer.from(data.audioContent, 'base64');
             await node_fs_1.default.promises.writeFile(caminhoCompleto, audioBuffer);
-            if (!res.ok || !data.audioContent) {
-                console.error("Erro TTS Google:", data);
-                return reply.status(500).send("Falha ao gerar áudio " + data);
-            }
             // ========= CONTAGEM DE CARACTERES DIÁRIOS =========
             const chars = formatado.length;
+            fastify.broadcast({
+                type: "tts:delta",
+                payload: { date: dateIso, chars, requestsInc: 1 },
+            });
+            reply.status(200).send({ audioContent: urlRelativa });
             await prismalog_1.PrismaLog.ttsDailyUsage.upsert({
                 where: { date: dateOnly },
                 update: {
@@ -101,15 +108,10 @@ async function voiceRoute(fastify) {
                     requests: 1,
                 },
             });
-            fastify.broadcast({
-                type: "tts:delta",
-                payload: { date: dateIso, chars, requestsInc: 1 },
-            });
-            return reply.status(200).send({ audioContent: urlRelativa });
+            return;
         }
         catch (e) {
-            console.error("Erro na rota /api/tts:", e);
-            return reply.status(200).send("Erro interno ao gerar áudio");
+            return reply.status(500).send("Erro interno ao gerar áudio");
         }
     });
     fastify.get("/clinux/voice/stats", async (request, reply) => {

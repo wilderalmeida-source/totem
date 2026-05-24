@@ -77,14 +77,17 @@ async function agendaRoute(fastify) {
         });
         const input = createbody.parse(request.body);
         const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000);
+        const MEDICO = process.env.IDMEDICO ? parseInt(process.env.IDMEDICO) : 1;
+        const SALA = process.env.IDSALA ? parseInt(process.env.IDSALA) : 1;
+        const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1;
         const agenda = await prismaDB_1.prisma.atendimentos.create({
             data: {
-                cd_medico: 12560,
-                cd_sala: 10,
+                cd_medico: MEDICO,
+                cd_sala: SALA,
                 cd_paciente: input.cd_paciente,
                 dt_data: dateNow,
                 //dt_hora: dateNow,
-                cd_funcionario: 50
+                cd_funcionario: FUNCIONARIO
                 // cria o exame filho ligado a este atendimento
             },
             select: {

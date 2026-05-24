@@ -14,7 +14,7 @@ import Link from "next/link";
 import Keyboard from "simple-keyboard";
 import "simple-keyboard/build/css/index.css"
 import Image from "next/image";
-import qrcode from "../../assets/icons/qrcode.png";
+import qrcode from "@/assets/icons/qrcode.png";
 import { buscaPaciente, Paciente } from "../../services/fetchData";
 import { modalContext } from "@/components/modals/providers";
 import { IMaskInput } from "react-imask";
@@ -58,8 +58,8 @@ export default function Totem() {
             return;
           }
         } else {
-          if (number.length > 8 && tipo == "CPF") {
-            result = await buscaPaciente({ ds_cpf: number, tipo:"MASK" });
+          if (number.length > 10 && tipo == "CPF") {
+            result = await buscaPaciente({ ds_cpf: number, tipo: "MASK" });
           }
           if (number.length == 8 && tipo == "DATA") {
             const day = parseInt(number.substring(0, 2));
@@ -79,29 +79,32 @@ export default function Totem() {
         }));
         setPacientes(normalizados);
         const itens = normalizados.map((p, idx) => (
-          <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={()=>{
-            if(tipo=="CPF"){setDados({
-              ds_cpf: number,
-              dt_nascimento: p.dt_nascimento,
-              servico: url.get("servico") ?? "",
-              preferencial: parseInt(url.get("preferencial") ?? "0", 10),
-              tipo: "CPF",
-              });setShowModal(true)}
+          <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={() => {
+            if (tipo == "CPF") {
+              setDados({
+                ds_cpf: number,
+                dt_nascimento: p.dt_nascimento,
+                servico: url.get("servico") ?? "",
+                preferencial: parseInt(url.get("preferencial") ?? "0", 10),
+                tipo: "CPF",
+              });
+              setShowModal(true)
+            }
           }}>
-          {tipo!="CPF"?
-          <Link
-              href={{
-                pathname: "/date",
-                query: {
-                  servico: url.get("servico") ?? "",
-                  preferencial: url.get("preferencial") ?? "",
-                  nome: tipo == "DATA" ? p.dt_nascimento : tipo==="CPF"?p.cd_paciente:tipo==="NOME"?p.ds_nome:"SEM NOME",
-                  tipo: tipo
-                },
-              }}
-            >
-              {tipo == "DATA" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : tipo==="CPF"?moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY"):tipo==="NOME"?p.ds_nome:"SEM NOME"}
-            </Link>:moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY")}
+            {tipo != "CPF" ?
+              <Link
+                href={{
+                  pathname: "/date",
+                  query: {
+                    servico: url.get("servico") ?? "",
+                    preferencial: url.get("preferencial") ?? "",
+                    nome: tipo == "DATA" ? p.dt_nascimento : tipo === "CPF" ? p.cd_paciente : tipo === "NOME" ? p.ds_nome : "SEM NOME",
+                    tipo: tipo
+                  },
+                }}
+              >
+                {tipo == "DATA" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : tipo === "CPF" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : tipo === "NOME" ? p.ds_nome : "SEM NOME"}
+              </Link> : moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY")}
           </li>
         ));
 
@@ -113,29 +116,31 @@ export default function Totem() {
       const itens = pacientes
         .filter((p) => (p.ds_nome ?? "").toUpperCase().includes(term))
         .map((p, idx) => (
-          <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={()=>{
-            if(tipo=="CPF"){setDados({
-              ds_cpf: number,
-              dt_nascimento: p.dt_nascimento,
-              servico: url.get("servico") ?? "",
-              preferencial: parseInt(url.get("preferencial") ?? "0", 10),
-              tipo: "CPF",
-              });setShowModal(true)}
+          <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={() => {
+            if (tipo == "CPF") {
+              setDados({
+                ds_cpf: number,
+                dt_nascimento: p.dt_nascimento,
+                servico: url.get("servico") ?? "",
+                preferencial: parseInt(url.get("preferencial") ?? "0", 10),
+                tipo: "CPF",
+              }); setShowModal(true)
+            }
           }}>
-            {tipo!="CPF"?
-            <Link
-              href={{
-                pathname: "/date",
-                query: {
-                  servico: url.get("servico") ?? "",
-                  preferencial: url.get("preferencial") ?? "",
-                  nome: p.ds_nome ?? "",
-                },
-              }}
-            >
-              {p.ds_nome ?? "SEM NOME"}
-            </Link>:
-            p.ds_nome ?? "SEM NOME"}
+            {tipo != "CPF" ?
+              <Link
+                href={{
+                  pathname: "/date",
+                  query: {
+                    servico: url.get("servico") ?? "",
+                    preferencial: url.get("preferencial") ?? "",
+                    nome: p.ds_nome ?? "",
+                  },
+                }}
+              >
+                {p.ds_nome ?? "SEM NOME"}
+              </Link> :
+              p.ds_nome ?? "SEM NOME"}
           </li>
         ));
 
@@ -226,7 +231,7 @@ export default function Totem() {
       setDados({
         ds_paciente: text,
         dt_nascimento: undefined,
-        cd_paciente: undefined,
+        tipo: 'NEW',
         servico: url.get("servico"),
         preferencial: parseInt(preferencial, 10),
       });
@@ -319,7 +324,7 @@ export default function Totem() {
                 inputRef={InputRef}
                 mask={tipo === "DATA" ? "00/00/0000" : tipo === "CPF" ? "000.000.000-00" : ""}
                 unmask={true}
-                inputMode={tipo === "DATA" ? "numeric" : tipo === "CPF" ? "numeric":undefined}
+                inputMode={tipo === "DATA" ? "numeric" : tipo === "CPF" ? "numeric" : undefined}
                 autoFocus
                 placeholder={tipo === "DATA" ? "Digite a Data de Nascimento" : tipo === "CPF" ? "Digite seu CPF" : "Digite seu Nome"}
                 className="h-16 w-full rounded-lg text-4xl px-4 border-black mr-3 border-solid border-2"
