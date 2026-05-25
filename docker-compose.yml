@@ -53,7 +53,7 @@ services:
       db_logs:
         condition: service_healthy
     command: >
-      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!';npx prisma db pull --config=prisma.logs.config.ts;npx prisma generate --config=prisma.logs.config.ts; npm run dev "
+      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!';npx prisma db pull --config=prisma.logs.config.ts;npx prisma generate --config=prisma.logs.config.ts; npm run start"
     networks:
       - totem-net
 
