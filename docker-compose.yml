@@ -39,7 +39,7 @@ services:
     container_name: totem-backend
     restart: always
     env_file:
-      - ./back/.env
+      - .env.backend
     ports:
       - "5000:5000"
       - "2345:2345"
@@ -60,7 +60,7 @@ services:
     container_name: totem-frontend
     restart: always
     env_file:
-      - ./front/.env
+      - .env.frontend
     ports:
       - "3000:3000"
     depends_on:
