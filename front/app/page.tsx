@@ -4,7 +4,7 @@ import Servicos from '../components/servicos'
 import Historic from '../components/historic'
 export default async function Home() {
       const services = [{ servico: "Agendamento", ID: 'D' }, { servico: "Atendimento", ID: 'B' }, { servico: "Entrega de Exames", ID: 'C' }]
-      const empresa = process.env.NEXT_PUBLIC_EMPRESA = "CDI"
+      const empresa = process.env.NEXT_PUBLIC_EMPRESA
       return (<>
             <Base key={''} type={'home'} props={<div className="flex w-full h-full flex-col">
                   <div><h2 className="text-6xl text-center">Olá, seja bem vindo a {empresa}!</h2>

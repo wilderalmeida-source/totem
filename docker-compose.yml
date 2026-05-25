@@ -57,7 +57,7 @@ services:
   # --- FRONTEND (NEXT.JS) ---
   frontend:
     image: images.cepmg.com.br/totem-frontend:v1.4.6
-    container_name: totem-backend
+    container_name: totem-frontend
     restart: always
     env_file:
       - ./front/.env
