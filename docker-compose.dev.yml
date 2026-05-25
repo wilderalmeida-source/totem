@@ -35,9 +35,9 @@ services:
       - totem-net
   # --- BACKEND (NODE.JS) 
   backend:
-    image: images.cepmg.com.br/totem-backend:v1.4.6
-    container_name: totem-backend
-    restart: always
+    build:
+      context: ./back
+      dockerfile: Dockerfile
     env_file:
       - ./back/.env
     ports:
@@ -45,20 +45,23 @@ services:
       - "2345:2345"
     volumes:
       - ./public/audios:/app/public/audios
+      - ./back:/app # Compartilha o seu código do Windows com o container
+      - /app/node_modules
     depends_on:
       postgres_infra:
         condition: service_healthy
       db_logs:
         condition: service_healthy
     command: >
-      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!'; echo 'Sincronizando as tabelas do banco...'; npx prisma db push --config=prisma.config.ts --skip-generate; npx prisma db push --config=prisma.logs.config.ts --skip-generate; echo 'Iniciando o servidor backend...'; npm run start"
+      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!';npx prisma db pull --config=prisma.logs.config.ts;npx prisma generate --config=prisma.logs.config.ts; npm run start"
     networks:
       - totem-net
+
   # --- FRONTEND (NEXT.JS) ---
   frontend:
-    image: images.cepmg.com.br/totem-frontend:v1.4.6
-    container_name: totem-backend
-    restart: always
+    build:
+      context: ./front
+      dockerfile: Dockerfile
     env_file:
       - ./front/.env
     ports:

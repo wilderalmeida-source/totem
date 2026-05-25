@@ -9,23 +9,26 @@ WORKDIR /app
 # Copia os arquivos de dependência e a pasta do Prisma
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
-
+COPY prisma-logs ./prisma-logs/
+COPY prisma.config.ts ./prisma.config.ts
+COPY prisma.logs.config.ts ./prisma.logs.config.ts
 # Instala TUDO para poder rodar ferramentas de desenvolvimento (como TypeScript e Prisma CLI)
 RUN npm install
 
 # Copia o código-fonte (o seu .dockerignore vai filtrar o que não precisa)
-COPY . .
+COPY src ./src
 
 # Executa o build do TypeScript (se o seu projeto tiver essa etapa)
 # RUN npm run build
 
 # Executa a geração do cliente do Prisma de forma otimizada
-RUN npx prisma generate
-
+RUN LOGS_DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate --config=prisma.logs.config.ts
+RUN DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate --config=prisma.config.ts
 # Remove as ferramentas de desenvolvimento e reinstala APENAS os pacotes de produção
-RUN rm -rf node_modules && npm ci --only=production && npx prisma generate
-
-
+RUN rm -rf node_modules && \
+    npm install --omit=dev && \
+    LOGS_DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate --config=prisma.logs.config.ts && \
+    DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate --config=prisma.config.ts
 # ---------------------------------------------------------
 # ETAPA 2: Imagem Final de Produção (Ultra-Leve)
 # ---------------------------------------------------------
@@ -39,8 +42,10 @@ WORKDIR /app
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app .
-
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/prisma-logs ./prisma-logs/
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/prisma.logs.config.ts ./prisma.logs.config.ts
 ENV NODE_ENV=production
 EXPOSE 5000
 
