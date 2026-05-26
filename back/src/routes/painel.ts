@@ -80,6 +80,7 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
               case "06": return `${nomeAux}, guichê 6.`;
               case "07": return `${nomeAux}, guichê 7.`;
               case "08": return `${nomeAux}, guichê 8.`;
+              case "09": return `${nomeAux}, guichê 9.`;
               default: return `${nomeAux}, guichê ${guicheAux}.`;
             }
           }
