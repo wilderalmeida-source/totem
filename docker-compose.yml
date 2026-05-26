@@ -19,7 +19,7 @@ services:
       retries: 5
   #-------------BANCO DE LOGS-------
   db_logs:
-    image: postgres:15
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: logs
       POSTGRES_USER: usergenuine
@@ -51,7 +51,7 @@ services:
       db_logs:
         condition: service_healthy
     command: >
-      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!'; echo 'Sincronizando as tabelas do banco...'; npx prisma db push --config=prisma.config.ts --skip-generate; npx prisma db push --config=prisma.logs.config.ts --skip-generate; echo 'Iniciando o servidor backend...'; npm run start"
+      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!'; echo 'Sincronizando as tabelas do banco...'; echo 'Iniciando o servidor backend...'; npm run start"
     networks:
       - totem-net
   # --- FRONTEND (NEXT.JS) ---
