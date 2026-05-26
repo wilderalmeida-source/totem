@@ -62,7 +62,7 @@ services:
     env_file:
       - .env.frontend
     environment:
-      - EMPRESA_NOME=value
+      - EMPRESA_NOME=CRI
     ports:
       - "3000:3000"
     depends_on:
