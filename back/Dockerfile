@@ -17,6 +17,8 @@ RUN npm install
 
 # Copia o código-fonte (o seu .dockerignore vai filtrar o que não precisa)
 COPY src ./src
+COPY config ./config
+COPY middleware ./middleware
 
 # Executa o build do TypeScript (se o seu projeto tiver essa etapa)
 # RUN npm run build
@@ -46,6 +48,8 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma-logs ./prisma-logs/
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/prisma.logs.config.ts ./prisma.logs.config.ts
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/middleware ./middleware
 ENV NODE_ENV=production
 EXPOSE 5000
 
