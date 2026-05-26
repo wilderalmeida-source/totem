@@ -362,7 +362,7 @@ export const BuscaSenha = async (): Promise<SenhasResponse> => {
 /* =======================
    MODALIDADES
 ======================= */
-export const BuscaModalidades = async (cd_modalidade: number): Promise<ModalidadesResponse> => {
+export const BuscaModalidades = async (cd_modalidade: number|null=null): Promise<ModalidadesResponse> => {
   const response = await fetch(
     `${API_INTERNA}/clinux/modalidades?cd_modalidade=${cd_modalidade}`,
     {

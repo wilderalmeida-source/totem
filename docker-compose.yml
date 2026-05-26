@@ -35,7 +35,7 @@ services:
       - totem-net
   # --- BACKEND (NODE.JS) 
   backend:
-    image: images.cepmg.com.br/totem-backend:v1.4.6
+    image: wilderalmeida123/totem-backend:v1.4.7
     container_name: totem-backend
     restart: always
     env_file:
@@ -56,11 +56,13 @@ services:
       - totem-net
   # --- FRONTEND (NEXT.JS) ---
   frontend:
-    image: images.cepmg.com.br/totem-frontend:v1.4.6
+    image: wilderalmeida123/totem-frontend:v1.4.7
     container_name: totem-frontend
     restart: always
     env_file:
       - .env.frontend
+    environment:
+      - EMPRESA_NOME=value
     ports:
       - "3000:3000"
     depends_on:

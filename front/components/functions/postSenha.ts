@@ -35,8 +35,9 @@ export async function GerarSenha({
     const atendimentos = await EntregaDeExames(cd_paciente);
     let nrControle: number | undefined = undefined
     let cd_modalidade: number | undefined = 0
+    const modalidade_totem = await BuscaModalidades()
     if (atendimentos.length > 0) { //exame que existe
-      const atendimentosNew = atendimentos.filter((i) => (i.nr_controle && i.salas.cd_modalidade != 11)); //______FILTRA OS ATENDIDOS
+      const atendimentosNew = atendimentos.filter((i) => (i.nr_controle && i.salas.cd_modalidade != modalidade_totem[0].cd_modalidade)); //______FILTRA OS ATENDIDOS
       if (atendimentosNew.length < 1) { //________SE NENHUM TIVER O NR_CONTROLE
         const newAtendimentos = await CadastraAtendimentos({ cd_paciente });
         nrControle = newAtendimentos[newAtendimentos.length - 1].cd_atendimento
