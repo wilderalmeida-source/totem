@@ -2,7 +2,7 @@ import React from 'react'
 import Base from '../components/base'
 import Servicos from '../components/servicos'
 import Historic from '../components/historic'
-export default function Home() {
+export default async function Home() {
       const services = [{ servico: "Agendamento", ID: 'D' }, { servico: "Atendimento", ID: 'B' }, { servico: "Entrega de Exames", ID: 'C' }]
       const empresa = process.env.EMPRESA_NOME
       return (<>
