@@ -1,56 +1,63 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
+
+type MediaType = "video" | "image" | null;
 
 export default function Video() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoFailed, setVideoFailed] = useState(false);
+  const [mediaType, setMediaType] = useState<MediaType>(null);
+  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
 
-  // Caminho base do arquivo (como todos têm o mesmo nome)
-  const basePath = "/videos/propaganda";
+  useEffect(() => {
+    async function detectType() {
+      try {
+        const res = await fetch("/api/media", { method: "HEAD", cache: "no-store" });
+
+        if (!res.ok) {
+          setMediaType(null);
+          return;
+        }
+
+        const contentType = res.headers.get("Content-Type") ?? "";
+        if (contentType.startsWith("video/")) setMediaType("video");
+        else if (contentType.startsWith("image/")) setMediaType("image");
+        else setMediaType(null);
+
+        setCacheBuster(Date.now());
+      } catch (err) {
+        console.error("Erro ao detectar mídia:", err);
+        setMediaType(null);
+      }
+    }
+
+    detectType();
+  }, []);
+
+  if (!mediaType) {
+    return <div className="w-full h-full bg-gray-100 rounded-lg" />;
+  }
+
+  const src = `/api/media?t=${cacheBuster}`;
 
   return (
     <aside className="bg-white rounded-2xl shadow-soft row-span-2 h-full flex flex-col">
-      {/* Cabeçalho fixo */}
-      {/* Vídeo/Imagem ocupa todo restante do aside */}
       <div className="flex-1 min-h-0 w-full h-full">
-        {!videoFailed ? (
+        {mediaType === "video" ? (
           <video
-            ref={videoRef}
+            key={src}
             className="w-full h-full object-cover rounded-lg"
             autoPlay
             muted
             loop
             playsInline
-            // Se o último source falhar, ativa o fallback de imagem
-            onError={() => setVideoFailed(true)} 
           >
-            {/* 1º Busca WebM */}
-            <source src={`${basePath}.webm`} type="video/webm" />
-            {/* 2º Se não houver WebM, o navegador busca o MP4 */}
-            <source src={`${basePath}.mp4`} type="video/mp4" />
-            
-            {/* Fallback caso o navegador não suporte a tag video de forma alguma */}
-            <picture className="w-full h-full">
-              <source srcSet={`${basePath}.jpeg`} type="image/jpeg" />
-              <img 
-                src={`${basePath}.png`} 
-                alt="Propaganda" 
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </picture>
+            <source src={src} />
           </video>
         ) : (
-          /* 3º e 4º Caso os arquivos de vídeo não existam ou quebrem */
-          <picture className="w-full h-full">
-            {/* Busca JPEG primeiro */}
-            <source srcSet={`${basePath}.jpeg`} type="image/jpeg" />
-            {/* Se não houver JPEG, renderiza o PNG por padrão */}
-            <img 
-              src={`${basePath}.png`} 
-              alt="Propaganda" 
-              className="w-full h-full object-cover rounded-lg"
-            />
-          </picture>
+          <img
+            src={src}
+            alt="Propaganda"
+            className="w-full h-full object-cover rounded-lg"
+          />
         )}
       </div>
     </aside>
