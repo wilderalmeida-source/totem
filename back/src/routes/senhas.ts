@@ -161,73 +161,90 @@ export async function senhaRoute(fastify: FastifyInstance) {
     return reply.send({ senhasnr, senhas, senhasRawQuery })
   })
   fastify.post('/clinux/senhas', async (request, reply) => {
-    const createbody = z.object({
-      nr_senha: z.number().optional(),
-      sn_preferencial: z.boolean(),
-      ds_opcao: z.string(),
-      nr_modalidade: z.number(),
-      ds_local: z.string(),
-      ds_fila: z.string(),
-      method: z.string(),
-      sn_especial: z.boolean(),
-      nr_controle: z.number().optional()
-
-    })
-    const {
-      ds_opcao,
-      nr_modalidade,
-      nr_senha,
-      sn_preferencial,
-      ds_fila,
-      ds_local,
-      nr_controle,
-      sn_especial,
-      method,
-    } = createbody.parse(request.body)
-
-    // Ajuste simples de fuso (UTC-3)
-    const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000)
-    const IP_PAINEL = process.env.IPPAINEL
-    const EMPRESA = process.env.IDEMPRESA ? parseInt(process.env.IDEMPRESA) : 0
-    const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1
-    if (method === "C") {
-      const nr_senhaNew = nr_controle ? nr_controle % 10000 : null
-      const senhas = await prisma.atendimentos_senhas.create({
-        data: {
-          dt_entrada: dateNow,
-          ds_opcao,
-          nr_empresa: EMPRESA,
-          nr_modalidade,
-          nr_senha: nr_senhaNew,
-          nr_controle,
-          sn_preferencial,
-          sn_especial,
-          sn_preparo: false,
-          ds_painel: IP_PAINEL,
-          ds_local,
-          ds_fila,
-          cd_funcionario: FUNCIONARIO
-        },
-      })
-      return reply.send(senhas)
-    } else {
-      const senhas = await prisma.atendimentos_senhas.create({
-        data: {
-          dt_entrada: dateNow,
-          ds_opcao,
-          nr_empresa: EMPRESA,
-          nr_modalidade,
-          nr_senha,
-          sn_preferencial,
-          sn_especial,
-          sn_preparo: false,
-          ds_painel: IP_PAINEL,
-          ds_local,
-          ds_fila,
-          cd_funcionario: FUNCIONARIO
-        },
-      })
-      return reply.send(senhas)
-    }
+  const createbody = z.object({
+    nr_senha: z.number().optional(),
+    sn_preferencial: z.boolean(),
+    ds_opcao: z.string(),
+    nr_modalidade: z.number(),
+    ds_local: z.string(),
+    ds_fila: z.string(),
+    method: z.string(),
+    sn_especial: z.boolean(),
+    nr_controle: z.number().optional()
   })
-}
+
+  const {
+    ds_opcao, nr_modalidade, nr_senha,
+    sn_preferencial, ds_fila, ds_local,
+    nr_controle, sn_especial, method,
+  } = createbody.parse(request.body)
+
+  const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000)
+  const IP_PAINEL = process.env.IPPAINEL
+  const EMPRESA = process.env.IDEMPRESA ? parseInt(process.env.IDEMPRESA) : 0
+  const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1
+
+  // função reutilizável para buscar próximo ID
+
+
+  let senhas = null
+  let tentativas = 0
+
+  while (tentativas < 3) {
+    try {
+
+      if (method === "C") {
+        const nr_senhaNew = nr_controle ? nr_controle % 10000 : null
+        senhas = await prisma.atendimentos_senhas.create({
+          data: {
+            dt_entrada: dateNow,
+            ds_opcao,
+            nr_empresa: EMPRESA,
+            nr_modalidade,
+            nr_senha: nr_senhaNew,
+            nr_controle,
+            sn_preferencial,
+            sn_especial,
+            sn_preparo: false,
+            ds_painel: IP_PAINEL,
+            ds_local,
+            ds_fila,
+            cd_funcionario: FUNCIONARIO
+          },
+        })
+      } else {
+        senhas = await prisma.atendimentos_senhas.create({
+          data: {
+            dt_entrada: dateNow,
+            ds_opcao,
+            nr_empresa: EMPRESA,
+            nr_modalidade,
+            nr_senha,
+            sn_preferencial,
+            sn_especial,
+            sn_preparo: false,
+            ds_painel: IP_PAINEL,
+            ds_local,
+            ds_fila,
+            cd_funcionario: FUNCIONARIO
+          },
+        })
+      }
+
+      break // sucesso, sai do while
+
+    } catch (e:any) {
+      if (e.code === 'P2002') { // chave duplicada
+        tentativas++
+      } else {
+        throw e
+      }
+    }
+  }
+
+  if (!senhas) {
+    return reply.code(500).send({ error: 'Não foi possível gerar um ID único' })
+  }
+
+  return reply.send(senhas)
+})}

@@ -80,29 +80,52 @@ async function agendaRoute(fastify) {
         const MEDICO = process.env.IDMEDICO ? parseInt(process.env.IDMEDICO) : 1;
         const SALA = process.env.IDSALA ? parseInt(process.env.IDSALA) : 1;
         const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1;
-        const agenda = await prismaDB_1.prisma.atendimentos.create({
-            data: {
-                cd_medico: MEDICO,
-                cd_sala: SALA,
-                cd_paciente: input.cd_paciente,
-                dt_data: dateNow,
-                //dt_hora: dateNow,
-                cd_funcionario: FUNCIONARIO
-                // cria o exame filho ligado a este atendimento
-            },
-            select: {
-                cd_atendimento: true, dt_data: true, dt_hora: true, cd_lancamento: true,
-                pacientes_atendimentos_cd_pacienteTopacientes: { select: { ds_paciente: true, cd_paciente: true, dt_nascimento: true, ds_sexo: true, ds_telefone: true, ds_celular: true, ds_celular_web: true } },
-                medicos_atendimentos_cd_medicoTomedicos: { select: { cd_medico: true, ds_medico: true } },
-                salas: { select: { ds_sala: true, cd_modalidade: true } },
-                exames: { select: { procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } }, cd_exame: true, } }, ds_status: true, ds_senha: true, dt_hora_senha: true
-            },
-        });
-        const nr = await prismaDB_1.prisma.atendimentos.update({
-            data: { nr_controle: agenda.cd_atendimento, cd_funcionario: 50 },
+        let agenda = null;
+        let tentativas = 0;
+        while (tentativas < 3) {
+            try {
+                const ultimo = await prismaDB_1.prisma.atendimentos.findFirst({
+                    orderBy: { cd_atendimento: 'desc' },
+                    select: { cd_atendimento: true }
+                });
+                const novoid = (ultimo?.cd_atendimento ?? 0) + 1;
+                agenda = await prismaDB_1.prisma.atendimentos.create({
+                    data: {
+                        cd_atendimento: novoid,
+                        cd_medico: MEDICO,
+                        cd_sala: SALA,
+                        cd_paciente: input.cd_paciente,
+                        dt_data: dateNow,
+                        dt_hora: dateNow,
+                        cd_funcionario: FUNCIONARIO
+                    },
+                    select: {
+                        cd_atendimento: true, dt_data: true, dt_hora: true, cd_lancamento: true,
+                        pacientes_atendimentos_cd_pacienteTopacientes: { select: { ds_paciente: true, cd_paciente: true, dt_nascimento: true, ds_sexo: true, ds_telefone: true, ds_celular: true, ds_celular_web: true } },
+                        medicos_atendimentos_cd_medicoTomedicos: { select: { cd_medico: true, ds_medico: true } },
+                        salas: { select: { ds_sala: true, cd_modalidade: true } },
+                        exames: { select: { procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } }, cd_exame: true } },
+                        ds_status: true, ds_senha: true, dt_hora_senha: true
+                    },
+                });
+                break; // saiu sem erro, encerra o while
+            }
+            catch (e) {
+                if (e.code === 'P2002') { // chave duplicada
+                    tentativas++;
+                }
+                else {
+                    throw e; // outro erro, lança normalmente
+                }
+            }
+        }
+        if (!agenda) {
+            return reply.code(500).send({ error: 'Não foi possível gerar um ID único' });
+        }
+        await prismaDB_1.prisma.atendimentos.update({
+            data: { nr_controle: agenda.cd_atendimento, cd_funcionario: FUNCIONARIO },
             where: { cd_atendimento: agenda.cd_atendimento }
         });
-        nr;
         return reply.code(201).send([agenda]);
     });
     fastify.patch("/clinux/agenda", async (request, reply) => {
@@ -115,11 +138,12 @@ async function agendaRoute(fastify) {
         const { cd_atendimento, cd_senha, ds_senha } = body;
         console.log(cd_atendimento, cd_senha, ds_senha);
         const result = await prismaDB_1.prisma.$transaction(async (tx) => {
+            const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1;
             const data = {};
             if (typeof cd_senha !== "undefined")
-                data.cd_senha = cd_senha, data.cd_funcionario = 50;
+                data.cd_senha = cd_senha, data.cd_funcionario = FUNCIONARIO;
             if (typeof ds_senha !== "undefined")
-                data.ds_senha = ds_senha, data.cd_funcionario = 50;
+                data.ds_senha = ds_senha, data.cd_funcionario = FUNCIONARIO;
             await tx.atendimentos.updateMany({
                 data,
                 where: { cd_atendimento: { in: cd_atendimento } },

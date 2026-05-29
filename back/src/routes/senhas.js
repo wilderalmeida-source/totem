@@ -29,6 +29,7 @@ async function senhaRoute(fastify) {
         // Ajuste de fuso horário local para o início do dia
         const dateInitial = new Date();
         dateInitial.setHours(-3, 0, 0, 0);
+        console.log(dateInitial);
         const { filtroControle } = createbody.parse(request.query);
         // 1. QUERY BASE VIA PRISMA ORM
         const senhasRawORM = await prismaDB_1.prisma.atendimentos_senhas.findMany({
@@ -127,7 +128,7 @@ async function senhaRoute(fastify) {
             return objetoTratado;
         });
         // Retorno limpo e em conformidade total com a LGPD
-        return reply.send({ senhasnr, senhas });
+        return reply.send({ senhasnr, senhas, senhasRawQuery });
     });
     fastify.post('/clinux/senhas', async (request, reply) => {
         const createbody = zod_1.z.object({
@@ -142,50 +143,77 @@ async function senhaRoute(fastify) {
             nr_controle: zod_1.z.number().optional()
         });
         const { ds_opcao, nr_modalidade, nr_senha, sn_preferencial, ds_fila, ds_local, nr_controle, sn_especial, method, } = createbody.parse(request.body);
-        // Ajuste simples de fuso (UTC-3)
         const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000);
         const IP_PAINEL = process.env.IPPAINEL;
         const EMPRESA = process.env.IDEMPRESA ? parseInt(process.env.IDEMPRESA) : 0;
         const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1;
-        if (method === "C") {
-            const nr_senhaNew = nr_controle ? nr_controle % 10000 : null;
-            const senhas = await prismaDB_1.prisma.atendimentos_senhas.create({
-                data: {
-                    dt_entrada: dateNow,
-                    ds_opcao,
-                    nr_empresa: EMPRESA,
-                    nr_modalidade,
-                    nr_senha: nr_senhaNew,
-                    nr_controle,
-                    sn_preferencial,
-                    sn_especial,
-                    sn_preparo: false,
-                    ds_painel: IP_PAINEL,
-                    ds_local,
-                    ds_fila,
-                    cd_funcionario: FUNCIONARIO
-                },
+        // função reutilizável para buscar próximo ID
+        async function gerarNovoId() {
+            const ultimo = await prismaDB_1.prisma.atendimentos_senhas.findFirst({
+                orderBy: { cd_senha: 'desc' },
+                select: { cd_senha: true }
             });
-            return reply.send(senhas);
+            return (ultimo?.cd_senha ?? 0) + 1;
         }
-        else {
-            const senhas = await prismaDB_1.prisma.atendimentos_senhas.create({
-                data: {
-                    dt_entrada: dateNow,
-                    ds_opcao,
-                    nr_empresa: EMPRESA,
-                    nr_modalidade,
-                    nr_senha,
-                    sn_preferencial,
-                    sn_especial,
-                    sn_preparo: false,
-                    ds_painel: IP_PAINEL,
-                    ds_local,
-                    ds_fila,
-                    cd_funcionario: FUNCIONARIO
-                },
-            });
-            return reply.send(senhas);
+        let senhas = null;
+        let tentativas = 0;
+        while (tentativas < 3) {
+            try {
+                const novoId = await gerarNovoId();
+                if (method === "C") {
+                    const nr_senhaNew = nr_controle ? nr_controle % 10000 : null;
+                    senhas = await prismaDB_1.prisma.atendimentos_senhas.create({
+                        data: {
+                            cd_senha: novoId,
+                            dt_entrada: dateNow,
+                            ds_opcao,
+                            nr_empresa: EMPRESA,
+                            nr_modalidade,
+                            nr_senha: nr_senhaNew,
+                            nr_controle,
+                            sn_preferencial,
+                            sn_especial,
+                            sn_preparo: false,
+                            ds_painel: IP_PAINEL,
+                            ds_local,
+                            ds_fila,
+                            cd_funcionario: FUNCIONARIO
+                        },
+                    });
+                }
+                else {
+                    senhas = await prismaDB_1.prisma.atendimentos_senhas.create({
+                        data: {
+                            cd_senha: novoId,
+                            dt_entrada: dateNow,
+                            ds_opcao,
+                            nr_empresa: EMPRESA,
+                            nr_modalidade,
+                            nr_senha,
+                            sn_preferencial,
+                            sn_especial,
+                            sn_preparo: false,
+                            ds_painel: IP_PAINEL,
+                            ds_local,
+                            ds_fila,
+                            cd_funcionario: FUNCIONARIO
+                        },
+                    });
+                }
+                break; // sucesso, sai do while
+            }
+            catch (e) {
+                if (e.code === 'P2002') { // chave duplicada
+                    tentativas++;
+                }
+                else {
+                    throw e;
+                }
+            }
         }
+        if (!senhas) {
+            return reply.code(500).send({ error: 'Não foi possível gerar um ID único' });
+        }
+        return reply.send(senhas);
     });
 }

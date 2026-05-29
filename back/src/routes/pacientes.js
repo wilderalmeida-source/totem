@@ -74,9 +74,9 @@ async function pacientesRoute(fastify) {
             // Monta o where somente com os campos presentes
             const where = {};
             const select = {};
-            if (tipo == "ID") {
+            if (tipo == "ID" && dt_nascimento && ds_cpf) {
                 where.ds_cpf = ds_cpf;
-                where.dt_nascimento = dt_nascimento;
+                where.dt_nascimento = new Date(dt_nascimento);
                 select.ds_paciente = true;
                 select.cd_paciente = true;
                 select.dt_nascimento = true;
@@ -107,9 +107,9 @@ async function pacientesRoute(fastify) {
                 where.ds_paciente = { startsWith: ds_paciente, mode: "insensitive" };
                 select.dt_nascimento = true;
             }
-            if (tipo == "NOMEDATA") {
+            if (tipo == "NOMEDATA" && dt_nascimento && ds_paciente) {
                 where.ds_paciente = ds_paciente;
-                where.dt_nascimento = dt_nascimento;
+                where.dt_nascimento = new Date(dt_nascimento);
                 select.ds_paciente = true;
                 select.cd_paciente = true;
                 select.dt_nascimento = true;
@@ -165,14 +165,41 @@ async function pacientesRoute(fastify) {
         });
         try {
             const { ds_paciente, dt_nascimento } = bodySchema.parse(request.body ?? {});
-            const pacientes = await prismaDB_1.prisma.pacientes.create({
-                data: { ds_paciente: ds_paciente.toUpperCase(), dt_nascimento, cd_funcionario: 50 },
-                select: { ds_paciente: true, dt_nascimento: true, cd_paciente: true },
-            });
+            let pacientes = null;
+            let tentativas = 0;
+            while (tentativas < 3) {
+                try {
+                    const ultimo = await prismaDB_1.prisma.pacientes.findFirst({
+                        orderBy: { cd_paciente: 'desc' },
+                        select: { cd_paciente: true }
+                    });
+                    const novoId = (ultimo?.cd_paciente ?? 0) + 1;
+                    pacientes = await prismaDB_1.prisma.pacientes.create({
+                        data: {
+                            cd_paciente: novoId,
+                            ds_paciente: ds_paciente.toUpperCase(),
+                            dt_nascimento,
+                            cd_funcionario: 50
+                        },
+                        select: { ds_paciente: true, dt_nascimento: true, cd_paciente: true },
+                    });
+                    break;
+                }
+                catch (e) {
+                    if (e.code === 'P2002') {
+                        tentativas++;
+                    }
+                    else {
+                        throw e;
+                    }
+                }
+            }
+            if (!pacientes) {
+                return reply.status(500).send({ error: 'Não foi possível gerar um ID único' });
+            }
             return reply.send(pacientes);
         }
         catch (err) {
-            // Erros de validação do Zod ou outros
             return reply.status(400).send({
                 error: "Requisição inválida",
                 details: err?.errors ?? String(err),

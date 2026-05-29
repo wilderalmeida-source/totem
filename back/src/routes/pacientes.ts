@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { OK, z } from "zod"
+import { z } from "zod"
 import { prisma } from '../../config/prismaDB'
 export async function pacientesRoute(fastify: FastifyInstance) {
   let tentativas: number = 3
@@ -166,28 +166,51 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     }
   });
   fastify.post("/clinux/pacientes", async (request, reply) => {
-    const bodySchema = z.object({
-      ds_paciente: z.string(),
-      dt_nascimento: z.string().trim().min(1).optional()
-    });
-
-    try {
-      const { ds_paciente, dt_nascimento } = bodySchema.parse(request.body ?? {});
-      const pacientes = await prisma.pacientes.create({
-        data: { ds_paciente: ds_paciente.toUpperCase(), dt_nascimento, cd_funcionario: 50 },
-        select: { ds_paciente: true, dt_nascimento: true, cd_paciente: true },
-      });
-
-      return reply.send(pacientes);
-    } catch (err: any) {
-      // Erros de validação do Zod ou outros
-      return reply.status(400).send({
-        error: "Requisição inválida",
-        details: err?.errors ?? String(err),
-      });
-    }
+  const bodySchema = z.object({
+    ds_paciente: z.string(),
+    dt_nascimento: z.string().trim().min(1).optional()
   });
+  try {
+    const { ds_paciente, dt_nascimento } = bodySchema.parse(request.body ?? {});
 
+    let pacientes = null
+    let tentativas = 0
+
+    while (tentativas < 3) {
+      try {
+        pacientes = await prisma.pacientes.create({
+          data: {
+            ds_paciente: ds_paciente.toUpperCase(),
+            dt_nascimento,
+            cd_funcionario: 50
+          },
+          select: { ds_paciente: true, dt_nascimento: true, cd_paciente: true },
+        })
+
+        break
+
+      } catch (e: any) {
+        if (e.code === 'P2002') {
+          tentativas++
+        } else {
+          throw e
+        }
+      }
+    }
+
+    if (!pacientes) {
+      return reply.status(500).send({ error: 'Não foi possível gerar um ID único' })
+    }
+
+    return reply.send(pacientes);
+
+  } catch (err: any) {
+    return reply.status(400).send({
+      error: "Requisição inválida",
+      details: err?.errors ?? String(err),
+    });
+  }
+});
 
 
 

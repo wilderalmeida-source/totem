@@ -35,7 +35,7 @@ services:
       - totem-net
   # --- BACKEND (NODE.JS) 
   backend:
-    image: wilderalmeida123/totem-backend:v1.4.7
+    image: wilderalmeida123/totem-backend:v1.4.8
     container_name: totem-backend
     restart: always
     env_file:
@@ -56,7 +56,7 @@ services:
       - totem-net
   # --- FRONTEND (NEXT.JS) ---
   frontend:
-    image: wilderalmeida123/totem-frontend:v1.4.7
+    image: wilderalmeida123/totem-frontend:v1.4.8
     container_name: totem-frontend
     restart: always
     env_file:

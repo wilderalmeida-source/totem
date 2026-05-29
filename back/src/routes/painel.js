@@ -31,14 +31,14 @@ exports.default = (0, fastify_plugin_1.default)(async function painelClinux(fast
                     // Se sua rota retorna lista, pegue o primeiro com paciente:
                     // Ex.: quando você usa include { atendimentos { select { pacientes... } } }
                     let dsPaciente;
-                    if (Array.isArray(body.senhasnr) && body.senhasnr.length > 0) {
+                    if (Array.isArray(body.senhasRawQuery) && body.senhasRawQuery.length > 0) {
                         // dois formatos comuns — ajuste conforme o shape que sua rota devolve
                         // A) shape “normalizado” vindo do $queryRaw:
                         if (body.senhasnr[0]?.ds_paciente) {
-                            dsPaciente = body.senhasnr.find((r) => r.ds_paciente)?.ds_paciente;
+                            dsPaciente = body.senhasRawQuery.find((r) => r.ds_paciente)?.ds_paciente;
                         }
                         // B) shape do findMany com include atendimentos:
-                        else if (body.senhasnr[0]?.atendimentos) {
+                        else if (body.senhasRawQuery[0]?.atendimentos) {
                             for (const row of body) {
                                 const at = row.atendimentos?.[0];
                                 const pac = at?.pacientes_atendimentos_cd_pacienteTopacientes;
@@ -76,6 +76,7 @@ exports.default = (0, fastify_plugin_1.default)(async function painelClinux(fast
                             case "06": return `${nomeAux}, guichê 6.`;
                             case "07": return `${nomeAux}, guichê 7.`;
                             case "08": return `${nomeAux}, guichê 8.`;
+                            case "09": return `${nomeAux}, guichê 9.`;
                             default: return `${nomeAux}, guichê ${guicheAux}.`;
                         }
                     };
