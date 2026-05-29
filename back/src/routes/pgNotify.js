@@ -11,38 +11,28 @@ const plugin = async (fastify, opts) => {
     if (!/^[a-z_][a-z0-9_]*$/i.test(channel)) {
         throw new Error(`Invalid LISTEN channel name: ${channel}`);
     }
-    const connStr = opts.connectionString ?? process.env.DATABASE;
-    if (!connStr) {
-        fastify.log.warn("PG LISTEN desativado: DATABASE_URL não definida.");
-        return;
-    }
+    const connStr = opts.connectionString ?? process.env.DATABASE_URL;
     let client = null;
     let stop = false;
-    let isConnected = false;
-    // ✅ Set centralizado de todos os clientes SSE conectados
-    const clients = new Set();
-    // ✅ Broadcast centralizado — funciona independente de clientes SSE
-    const broadcast = (data) => {
-        const payload = `data: ${JSON.stringify(data)}\n\n`;
-        for (const write of clients) {
-            try {
-                write(payload);
-            }
-            catch { }
+    let isConnected = false; // Controle para saber se o banco está ativo
+    // Função padrão para gerar o payload do broadcast
+    const sendFallbackBroadcast = () => {
+        const out = {
+            type: "db",
+            ts: Date.now(),
+            channel: "db_update",
+            fallback: true // Flag opcional, só para você saber no front que veio do fallback
+        };
+        try {
+            fastify.broadcast?.(out);
         }
+        catch { }
     };
-    // ✅ Expõe o broadcast para outros plugins se necessário
-    fastify.decorate("broadcast", broadcast);
-    // ✅ Fallback a cada 30s — agora usa o broadcast local
+    // Loop que roda a cada 30s mandando o broadcast caso o banco esteja fora
     const fallbackInterval = setInterval(() => {
-        if (!isConnected && !stop && clients.size > 0) {
+        if (!isConnected && !stop) {
             fastify.log.debug("Sem conexão com PG. Enviando broadcast de fallback (30s)...");
-            broadcast({
-                type: "db",
-                ts: Date.now(),
-                channel: "db_update",
-                fallback: true,
-            });
+            sendFallbackBroadcast();
         }
     }, 30000);
     async function connectWithRetry(attempt = 0) {
@@ -52,32 +42,36 @@ const plugin = async (fastify, opts) => {
             client = new pg_1.Client({ connectionString: connStr });
             await client.connect();
             await client.query(`LISTEN ${channel}`);
-            isConnected = true;
+            isConnected = true; // Conectado com sucesso!
             fastify.log.info({ channel }, "PG LISTEN conectado");
             client.on("notification", (msg) => {
                 try {
                     const payload = msg.payload ? JSON.parse(msg.payload) : null;
                     if (opts.logRawPayload)
                         fastify.log.debug({ payload }, "pg notify payload");
-                    broadcast({ type: "db", ts: Date.now(), channel: "db_update" });
+                    const out = {
+                        type: "db",
+                        ts: Date.now(),
+                        channel: "db_update"
+                    };
+                    fastify.broadcast?.(out);
                 }
                 catch (e) {
                     fastify.log.debug({ err: e }, "Erro ao processar notification (ignorado)");
                 }
             });
             client.on("error", (err) => {
-                isConnected = false;
+                isConnected = false; // Caiu a conexão
                 fastify.log.debug({ err }, "PG client error silencioso");
             });
             client.on("end", () => {
-                isConnected = false;
+                isConnected = false; // Desconectado
                 if (!stop)
                     void reconnect();
             });
         }
         catch (err) {
-            isConnected = false;
-            fastify.log.warn({ attempt }, "Falha ao conectar PG LISTEN (tentando novamente em background...)");
+            isConnected = false; // Falhou o connect inicial/retry
             const delay = Math.min(30000, 1000 * 2 ** attempt);
             await new Promise((r) => setTimeout(r, delay));
             if (!stop)
@@ -97,10 +91,12 @@ const plugin = async (fastify, opts) => {
         catch { }
         await connectWithRetry(0);
     }
+    // Inicia a tentativa de conexão em segundo plano
     void connectWithRetry(0);
-    fastify.addHook("onClose", async () => {
+    // encerra junto com o servidor
+    fastify.addHook("onClose", async (_inst) => {
         stop = true;
-        clearInterval(fallbackInterval);
+        clearInterval(fallbackInterval); // Limpa o intervalo para não vazar memória
         try {
             if (client) {
                 try {
@@ -113,22 +109,40 @@ const plugin = async (fastify, opts) => {
         }
         catch { }
     });
-    // ✅ Rota SSE — apenas gerencia entrada/saída do Set de clientes
+    // Rota SSE
     fastify.get("/events", async (req, reply) => {
-        reply.raw.writeHead(200, {
+        reply
+            .raw.writeHead(200, {
             "Content-Type": "text/event-stream",
             "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Connection": "keep-alive",
+            Connection: "keep-alive",
             "X-Accel-Buffering": "no",
         });
-        const write = (payload) => reply.raw.write(payload);
-        clients.add(write); // ✅ registra este cliente
-        fastify.log.debug({ total: clients.size }, "Cliente SSE conectado");
+        const write = (data) => {
+            reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
+        };
+        if (!fastify.broadcast) {
+            fastify.broadcast = (d) => write(d);
+        }
+        else {
+            const old = fastify.broadcast.bind(fastify);
+            reply._restoreBroadcast = () => (fastify.broadcast = old);
+            fastify.broadcast = (d) => {
+                try {
+                    old(d);
+                }
+                catch { }
+                try {
+                    write(d);
+                }
+                catch { }
+            };
+        }
         const ping = setInterval(() => reply.raw.write(`event: ping\ndata: ${Date.now()}\n\n`), 15000);
         req.raw.on("close", () => {
-            clients.delete(write); // ✅ remove ao desconectar
             clearInterval(ping);
-            fastify.log.debug({ total: clients.size }, "Cliente SSE desconectado");
+            if (reply._restoreBroadcast)
+                reply._restoreBroadcast();
             try {
                 reply.raw.end();
             }

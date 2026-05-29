@@ -18,10 +18,11 @@ RUN npm install
 # Copia o código-fonte (o seu .dockerignore vai filtrar o que não precisa)
 COPY src ./src
 COPY config ./config
+COPY tsconfig.json ./
 COPY middleware ./middleware
 
 # Executa o build do TypeScript (se o seu projeto tiver essa etapa)
-# RUN npm run build
+RUN npm run build
 
 # Executa a geração do cliente do Prisma de forma otimizada
 RUN LOGS_DATABASE_URL="postgresql://fake:fake@localhost:5432/fake" npx prisma generate --config=prisma.logs.config.ts
