@@ -121,7 +121,7 @@ export default function DataNasc() {
           let key = 0
           const itens: ReactElement[] = lista.map((p) => {
             const dataFmt = moment(p.dt_nascimento)
-              .add(1, "day")
+              .utc()
               .format("DD/MM/YYYY");
             key += 1
             return (
@@ -209,7 +209,7 @@ export default function DataNasc() {
       const itensFiltrados: ReactElement[] = info
         .map((p) => {
           const dataFmt = moment(p.dt_nascimento)
-            .add(1, "day")
+            .utc()
             .format("DD/MM/YYYY");
           key += 1
           if (!digits || dataFmt.replace(/\D/g, "").includes(digits)) {
@@ -358,7 +358,7 @@ export default function DataNasc() {
         props={
           <>
             <div className="px-3 flex w-full h-full flex-col justify-start">
-              <h2 className="mb-3 content-center text-4xl">{tipo == "DATA" ? moment(nome).add(1, "day").format("DD/MM/YYYY") : nome}</h2>
+              <h2 className="mb-3 content-center text-4xl">{tipo == "DATA" ? moment(nome).utc().format("DD/MM/YYYY") : nome}</h2>
               <div className="flex">
                 <IMaskInput
                   mask={tipo == "DATA" ? "" : "00/00/0000"}

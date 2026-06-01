@@ -35,13 +35,12 @@ services:
       - totem-net
   # --- BACKEND (NODE.JS) 
   backend:
-    image: wilderalmeida123/totem-backend:v1.4.8
+    image: wilderalmeida123/totem-backend:v1.4.9
     container_name: totem-backend
     restart: always
     env_file:
       - .env.backend
     ports:
-      - "5000:5000"
       - "2345:2345"
     volumes:
       - ./public/audios:/app/public/audios
@@ -56,7 +55,7 @@ services:
       - totem-net
   # --- FRONTEND (NEXT.JS) ---
   frontend:
-    image: wilderalmeida123/totem-frontend:v1.4.8
+    image: wilderalmeida123/totem-frontend:v1.4.9
     container_name: totem-frontend
     restart: always
     env_file:

@@ -35,6 +35,7 @@ export async function GerarSenha({
     const atendimentos = await EntregaDeExames(cd_paciente);
     let nrControle: number | undefined = undefined
     let cd_modalidade: number | undefined = 0
+    let ds_modalidade: string | undefined = "";
     const modalidade_totem = await BuscaModalidades()
     if (atendimentos.length > 0) { //exame que existe
       const atendimentosNew = atendimentos.filter((i) => (i.nr_controle && i.salas.cd_modalidade != modalidade_totem[0].cd_modalidade)); //______FILTRA OS ATENDIDOS
@@ -42,21 +43,27 @@ export async function GerarSenha({
         const newAtendimentos = await CadastraAtendimentos({ cd_paciente });
         nrControle = newAtendimentos[newAtendimentos.length - 1].cd_atendimento
         cd_modalidade = newAtendimentos[newAtendimentos.length - 1].salas.cd_modalidade;
+        const modalidades = await BuscaModalidades(cd_modalidade)
+        ds_modalidade = modalidades[0]?.ds_modalidade ?? ""
       } else {
         nrControle = atendimentosNew[atendimentosNew.length - 1].nr_controle
         cd_modalidade = atendimentosNew[atendimentosNew.length - 1].salas.cd_modalidade;
+        const modalidades = await BuscaModalidades(cd_modalidade)
+        ds_modalidade = modalidades[0]?.ds_modalidade ?? ""
       }
     } else { //_________SE NAO TIVER NENHUM ATENDIMENTO
       const newAtendimentos = await CadastraAtendimentos({ cd_paciente });
       nrControle = newAtendimentos[newAtendimentos.length - 1].cd_atendimento
-      cd_modalidade = newAtendimentos[newAtendimentos.length - 1].salas.cd_modalidade;
-    }//_____PEGA A MODALIDADE DO PRIMEIRO ATENDIMENTO
+      cd_modalidade = newAtendimentos[newAtendimentos.length - 1].salas.cd_modalidade;//_______SEPARAMOS O CODIGO DA MODALIDADE DO PRIMEIRO ATENDIMENTO_________
+      const modalidades = await BuscaModalidades(cd_modalidade); //_______BUSCAMOS A MODALIDADE___________
+      ds_modalidade = modalidades[0]?.ds_modalidade ?? ""
+    }
     await CadastraSenha({ //_____CADASTRAMOS A SENHA PARA A ENTREGA DE RESULTADOS, QUANDO ACHADO UM PROCEDIMENTO_______
       nr_modalidade: cd_modalidade,
       nr_senha: nrControle ? nrControle % 10000 : undefined,
       sn_preferencial: preferencial !== 0,
       ds_opcao: "C",
-      ds_local: "RESULTADO",
+      ds_local: ds_modalidade,
       ds_fila: "R",
       method: "C",
       sn_especial: preferencial === 2,
