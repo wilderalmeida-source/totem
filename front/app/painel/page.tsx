@@ -4,6 +4,10 @@ import NowCard from "@/components/NowCard";
 import QueueList, { QueuePerson } from "@/components/QueueList";
 import Video from "@/components/Video";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 type TtsBody = { audioContent: string } | { errorTTS: string };
 
 type WsMsg =
@@ -41,31 +45,79 @@ function isTtsAudioMsg(
   );
 }
 
+// ---------------------------------------------------------------------------
+// Audio Queue Types
+// ---------------------------------------------------------------------------
+
+type QueueItem =
+  | {
+    kind: "atencao-mp3";
+    proxyUrl: string;
+    key: string;
+  }
+  | {
+    kind: "atencao-speech";
+    text: string;
+    key: string;
+  }
+  | {
+    kind: "tcp";
+    raw: string;
+    guiche: string;
+    nome: string;
+    hora: string;
+    key: string;
+  }
+  | {
+    kind: "tts-mp3";
+    proxyUrl: string;
+    key: string;
+    enqueuedAt: number;
+  }
+  | {
+    kind: "tts-speech";
+    text: string;
+    key: string;
+    enqueuedAt: number;
+  };
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export default function Page() {
-  const lastMsgRef = useRef<string | null>(null);
-  const lastValuesRef = useRef<{ nome: string; guiche: string } | null>(null);
-
-  const playSeqRef = useRef(0);
-  const currentTtsRef = useRef<HTMLAudioElement | null>(null);
-
-  const lastEventIdRef = useRef<string | null>(null);
-  const lastPlayedKeyRef = useRef<string | null>(null);
-  const lastPlayedAtRef = useRef<number>(0);
-
-  // ===== Atenção =====
+  // --- UI State ---
   const [atencaoVisible, setAtencaoVisible] = useState(false);
-  const atencaoPlayingRef = useRef(false);
-  const atencaoAbortRef = useRef<AbortController | null>(null);
-
   const [guiche, setGuiche] = useState("");
   const [nome, setNome] = useState("SEM NOME");
   const [hora, setHora] = useState("");
   const [queue, setQueue] = useState<QueuePerson[]>([]);
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [soundReady, setSoundReady] = useState(false);
-  const soundReadyRef = useRef(false);
 
+  // --- Refs ---
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const soundReadyRef = useRef(false);
+  const currentTtsRef = useRef<HTMLAudioElement | null>(null);
+
+  // Refs para o worker acessar os valores atuais da tela sem closure stale
+  const nomeRef = useRef<string>("SEM NOME");
+  const guicheRef = useRef<string>("");
+
+  const playQueueRef = useRef<QueueItem[]>([]);
+  const workerRunningRef = useRef(false);
+  const pendingKeyRef = useRef<string | null>(null);
+  const lastPlayedRef = useRef<{ key: string; finishedAt: number } | null>(null);
+
+  // Mantém nome/guiche sincronizados nos refs para o worker
+  useEffect(() => {
+    nomeRef.current = nome;
+  }, [nome]);
+
+  useEffect(() => {
+    guicheRef.current = guiche;
+  }, [guiche]);
+
+  // --- Sound setup ---
   useEffect(() => {
     const el = new Audio("/music/notification.mp3");
     el.preload = "auto";
@@ -77,6 +129,12 @@ export default function Page() {
   useEffect(() => {
     soundReadyRef.current = soundReady;
   }, [soundReady]);
+
+  // Fallback: auto-enable sound after 10 s
+  useEffect(() => {
+    const id = window.setTimeout(() => setSoundReady(true), 10000);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const enableSound = useCallback(async () => {
     try {
@@ -92,43 +150,9 @@ export default function Page() {
     }
   }, []);
 
-  useEffect(() => {
-    const id = window.setTimeout(() => setSoundReady(true), 10000);
-    return () => window.clearTimeout(id);
-  }, []);
-
-  const stopAllAudio = useCallback(() => {
-    const ding = audioRef.current;
-    if (ding) {
-      ding.pause();
-      ding.currentTime = 0;
-    }
-    if (!atencaoPlayingRef.current) {
-      const tts = currentTtsRef.current;
-      if (tts) {
-        tts.pause();
-        tts.currentTime = 0;
-      }
-      currentTtsRef.current = null;
-    }
-  }, []);
-
-  const stopAllAudioForce = useCallback(() => {
-    const ding = audioRef.current;
-    if (ding) {
-      ding.pause();
-      ding.currentTime = 0;
-    }
-    const tts = currentTtsRef.current;
-    if (tts) {
-      tts.pause();
-      tts.currentTime = 0;
-    }
-    currentTtsRef.current = null;
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-  }, []);
+  // ---------------------------------------------------------------------------
+  // Low-level audio helpers
+  // ---------------------------------------------------------------------------
 
   const playDing = useCallback((delayMs = 600): Promise<void> => {
     return new Promise((resolve) => {
@@ -148,149 +172,53 @@ export default function Page() {
     });
   }, []);
 
-  const playTtsExclusive = useCallback(
-    async (proxyUrl: string) => {
-      stopAllAudio();
+  const playAudioUrl = useCallback((proxyUrl: string): Promise<void> => {
+    return new Promise((resolve) => {
       const audio = new Audio(proxyUrl);
       audio.preload = "auto";
       currentTtsRef.current = audio;
-      audio.addEventListener(
-        "ended",
-        () => {
-          if (currentTtsRef.current === audio) currentTtsRef.current = null;
-        },
-        { once: true }
-      );
-      try {
-        await playDing();
-        await audio.play();
-      } catch { }
-    },
-    [stopAllAudio, playDing]
-  );
-
-  // ===== Atenção via MP3 — pré-carrega antes de interromper =====
-  const playAtencaoAudio = useCallback(
-    async (proxyUrl: string) => {
-      if (atencaoPlayingRef.current) {
-        console.log("⏱️ Atenção já em andamento, ignorado.");
-        return;
-      }
-
-      // 1. Pré-carrega o áudio ANTES de parar qualquer coisa
-      const audio = new Audio(proxyUrl);
-      audio.preload = "auto";
-
-      await new Promise<void>((resolve) => {
-        audio.addEventListener("canplaythrough", () => resolve(), { once: true });
-        audio.addEventListener("error", () => resolve(), { once: true });
-        setTimeout(resolve, 3000); // timeout de segurança
-        audio.load();
-      });
-
-      // 2. Buffer pronto — agora sim interrompe tudo e exibe a tela
-      atencaoAbortRef.current?.abort();
-      const controller = new AbortController();
-      atencaoAbortRef.current = controller;
-
-      atencaoPlayingRef.current = true;
-      setAtencaoVisible(true);
-      stopAllAudioForce();
-
-      currentTtsRef.current = audio;
-
-      await new Promise<void>((resolve) => {
-        audio.addEventListener("ended", () => resolve(), { once: true });
-        audio.addEventListener("error", () => resolve(), { once: true });
-        controller.signal.addEventListener("abort", () => resolve(), {
-          once: true,
-        });
-        audio.play().catch(() => resolve());
-      });
-
-      if (currentTtsRef.current === audio) currentTtsRef.current = null;
-      atencaoAbortRef.current = null;
-      setAtencaoVisible(false);
-      atencaoPlayingRef.current = false;
-    },
-    [stopAllAudioForce]
-  );
-
-  // ===== Atenção via Web Speech API (fallback sem MP3) =====
-  const playAtencaoSpeech = useCallback(
-    async (text: string) => {
-      if (atencaoPlayingRef.current) {
-        console.log("⏱️ Atenção já em andamento, ignorado.");
-        return;
-      }
-
-      atencaoPlayingRef.current = true;
-      setAtencaoVisible(true);
-      stopAllAudioForce();
-
-      await new Promise<void>((resolve) => {
-        if (!window.speechSynthesis) {
-          resolve();
-          return;
-        }
-
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "pt-BR";
-        utterance.rate = 1;
-        utterance.pitch = 1;
-        utterance.volume = 1;
-
-        utterance.onend = () => resolve();
-        utterance.onerror = () => resolve();
-
-        const trySpeak = () => {
-          const voz = window.speechSynthesis
-            .getVoices()
-            .find((v) => v.lang === "pt-BR");
-          if (voz) utterance.voice = voz;
-          window.speechSynthesis.speak(utterance);
-        };
-
-        if (window.speechSynthesis.getVoices().length > 0) {
-          trySpeak();
-        } else {
-          window.speechSynthesis.onvoiceschanged = trySpeak;
-        }
-      });
-
-      setAtencaoVisible(false);
-      atencaoPlayingRef.current = false;
-    },
-    [stopAllAudioForce]
-  );
-
-  // ===== Web Speech API fallback (chamadas normais) =====
-  const speakWithBrowser = useCallback((text: string) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR";
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    const trySpeak = () => {
-      const voz = window.speechSynthesis
-        .getVoices()
-        .find((v) => v.lang === "pt-BR");
-      if (voz) utterance.voice = voz;
-      window.speechSynthesis.speak(utterance);
-    };
-
-    if (window.speechSynthesis.getVoices().length > 0) {
-      trySpeak();
-    } else {
-      window.speechSynthesis.onvoiceschanged = trySpeak;
-    }
+      const done = () => {
+        if (currentTtsRef.current === audio) currentTtsRef.current = null;
+        resolve();
+      };
+      audio.addEventListener("ended", done, { once: true });
+      audio.addEventListener("error", done, { once: true });
+      audio.play().catch(done);
+    });
   }, []);
+
+  const speakText = useCallback((text: string): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!window.speechSynthesis) {
+        resolve();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "pt-BR";
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.onend = () => resolve();
+      utterance.onerror = () => resolve();
+      const trySpeak = () => {
+        const voz = window.speechSynthesis
+          .getVoices()
+          .find((v) => v.lang === "pt-BR");
+        if (voz) utterance.voice = voz;
+        window.speechSynthesis.speak(utterance);
+      };
+      if (window.speechSynthesis.getVoices().length > 0) {
+        trySpeak();
+      } else {
+        window.speechSynthesis.onvoiceschanged = trySpeak;
+      }
+    });
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // Queue helpers
+  // ---------------------------------------------------------------------------
 
   const prependAndReindex = useCallback(
     (arr: QueuePerson[], novo: Omit<QueuePerson, "id">): QueuePerson[] => {
@@ -299,6 +227,165 @@ export default function Page() {
     },
     []
   );
+
+  // ---------------------------------------------------------------------------
+  // Worker — consome playQueueRef um item por vez
+  // ---------------------------------------------------------------------------
+
+  const REREAD_DELAY_MS = 4000;
+
+  const runWorker = useCallback(async () => {
+    if (workerRunningRef.current) return;
+    workerRunningRef.current = true;
+
+    while (playQueueRef.current.length > 0) {
+      const item = playQueueRef.current[0];
+
+      // Re-read delay
+      if (
+        item.kind !== "atencao-mp3" &&
+        item.kind !== "atencao-speech" &&
+        lastPlayedRef.current?.key === item.key
+      ) {
+        const elapsed = Date.now() - lastPlayedRef.current.finishedAt;
+        const remaining = REREAD_DELAY_MS - elapsed;
+        if (remaining > 0) {
+          await new Promise<void>((r) => setTimeout(r, remaining));
+        }
+      }
+
+      // ------------------------------------------------------------------
+      // Play item
+      // ------------------------------------------------------------------
+      try {
+        if (item.kind === "atencao-mp3") {
+          setAtencaoVisible(true);
+
+          if (currentTtsRef.current) {
+            currentTtsRef.current.pause();
+            currentTtsRef.current.currentTime = 0;
+            currentTtsRef.current = null;
+          }
+
+          const audio = new Audio(item.proxyUrl);
+          audio.preload = "auto";
+          await new Promise<void>((resolve) => {
+            audio.addEventListener("canplaythrough", () => resolve(), { once: true });
+            audio.addEventListener("error", () => resolve(), { once: true });
+            setTimeout(resolve, 3000);
+            audio.load();
+          });
+
+          currentTtsRef.current = audio;
+          await new Promise<void>((resolve) => {
+            audio.addEventListener("ended", () => resolve(), { once: true });
+            audio.addEventListener("error", () => resolve(), { once: true });
+            audio.play().catch(() => resolve());
+          });
+          if (currentTtsRef.current === audio) currentTtsRef.current = null;
+
+          setAtencaoVisible(false);
+        } else if (item.kind === "atencao-speech") {
+          setAtencaoVisible(true);
+          if (currentTtsRef.current) {
+            currentTtsRef.current.pause();
+            currentTtsRef.current.currentTime = 0;
+            currentTtsRef.current = null;
+          }
+          await speakText(item.text);
+          setAtencaoVisible(false);
+        } else if (item.kind === "tcp") {
+          // ----------------------------------------------------------------
+          // Antes de trocar o nome na tela, empurra o nome ATUAL para a fila
+          // visual. Isso garante que a queue só cresce 1 item por vez,
+          // sincronizado com o worker — não com a chegada das mensagens SSE.
+          // ----------------------------------------------------------------
+          const prevNome = nomeRef.current;
+          const prevGuiche = guicheRef.current;
+
+          if (prevNome && prevNome !== "SEM NOME") {
+            setQueue((q) =>
+              prependAndReindex(q, {
+                name: prevNome,
+                instruction:
+                  prevGuiche === "00"
+                    ? "ENTREGA DE EXAMES"
+                    : `GUICHÊ: ${prevGuiche}`,
+              })
+            );
+          }
+
+          setNome(item.nome);
+          setGuiche(item.guiche);
+          setHora(item.hora);
+
+          await playDing();
+        } else if (item.kind === "tts-mp3") {
+          await playDing();
+          await playAudioUrl(item.proxyUrl);
+        } else if (item.kind === "tts-speech") {
+          await playDing();
+          await speakText(item.text);
+        }
+      } catch (err) {
+        console.warn("Audio queue item error:", err);
+      }
+
+      lastPlayedRef.current = { key: item.key, finishedAt: Date.now() };
+      playQueueRef.current.shift();
+
+      pendingKeyRef.current =
+        playQueueRef.current.length > 0
+          ? playQueueRef.current[0].key
+          : null;
+
+      if (playQueueRef.current.length > 0) {
+        await new Promise<void>((r) => setTimeout(r, 300));
+      }
+    }
+
+    workerRunningRef.current = false;
+  }, [playDing, playAudioUrl, speakText, prependAndReindex]);
+
+  // ---------------------------------------------------------------------------
+  // Enqueue helpers
+  // ---------------------------------------------------------------------------
+
+  const enqueue = useCallback(
+    (item: QueueItem) => {
+      const isAtencao =
+        item.kind === "atencao-mp3" || item.kind === "atencao-speech";
+
+      if (isAtencao) {
+        const hasPendingAtencao = playQueueRef.current.some(
+          (i) => i.kind === "atencao-mp3" || i.kind === "atencao-speech"
+        );
+        if (!hasPendingAtencao) {
+          const insertAt = workerRunningRef.current ? 1 : 0;
+          playQueueRef.current.splice(insertAt, 0, item);
+        }
+        runWorker();
+        return;
+      }
+
+      const alreadyPending = playQueueRef.current.some(
+        (i) => i.key === item.key
+      );
+      if (alreadyPending) {
+        console.log("⏱️ Descartado (já na fila):", item.key);
+        return;
+      }
+
+      playQueueRef.current.push(item);
+      pendingKeyRef.current = pendingKeyRef.current ?? item.key;
+      runWorker();
+    },
+    [runWorker]
+  );
+
+  // ---------------------------------------------------------------------------
+  // SSE handler
+  // ---------------------------------------------------------------------------
 
   useEffect(() => {
     const eventSource = new EventSource("/api/events");
@@ -309,134 +396,85 @@ export default function Page() {
         let msg = bridgePayload.message;
         if (typeof msg === "string") msg = JSON.parse(msg);
 
-        (async () => {
-          const mySeq = ++playSeqRef.current;
+        // ===== TCP (chamada de guichê) =====
+        if (isTcpMsg(msg)) {
+          const raw = msg.data;
+          const parts = raw.split("-").map((p: string) => p.trim());
+          const horaMin = new Date().toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const guicheAux = parts[3] || "";
+          const nomeAux = (parts[5] || "SEM NOME").trim();
+          const key = raw.trim();
 
-          // ===== Mensagem TCP (chamada de guichê) =====
-          if (isTcpMsg(msg)) {
-            stopAllAudio();
+          // Apenas enfileira — a atualização da queue visual
+          // acontece no worker, quando cada item é de fato tocado.
+          enqueue({
+            kind: "tcp",
+            raw,
+            guiche: guicheAux,
+            nome: nomeAux,
+            hora: horaMin,
+            key,
+          });
+          return;
+        }
 
-            const raw = msg.data;
-            const parts = raw.split("-").map((p: string) => p.trim());
-            const horaMin = new Date().toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
+        // ===== TTS =====
+        if (isTtsAudioMsg(msg)) {
+          const { ttsBody, eventID, eventId } = msg.payload;
+          const id = eventID ?? eventId ?? "";
+
+          if ("audioContent" in ttsBody) {
+            const proxyUrl = `/api/voice-proxy?path=${encodeURIComponent(
+              ttsBody.audioContent
+            )}`;
+
+            if (id === "atencao") {
+              enqueue({ kind: "atencao-mp3", proxyUrl, key: "atencao" });
+              return;
+            }
+
+            enqueue({
+              kind: "tts-mp3",
+              proxyUrl,
+              key: String(id) || proxyUrl,
+              enqueuedAt: Date.now(),
             });
-            const guicheAux = parts[3] || "";
-            const nomeAux = (parts[5] || "SEM NOME").trim();
-
-            if (lastMsgRef.current !== raw.trim()) {
-              const prev = lastValuesRef.current;
-              if (prev && prev.nome !== nomeAux) {
-                setQueue((q) =>
-                  prependAndReindex(q, {
-                    name: prev.nome,
-                    instruction:
-                      prev.guiche === "00"
-                        ? "ENTREGA DE EXAMES"
-                        : `GUICHÊ: ${prev.guiche}`,
-                  })
-                );
-              }
-            }
-
-            lastMsgRef.current = raw.trim();
-            lastValuesRef.current = { nome: nomeAux, guiche: guicheAux };
-            setNome(nomeAux);
-            setGuiche(guicheAux);
-            setHora(horaMin);
-
-            if (!atencaoPlayingRef.current) {
-              await playDing();
-              if (mySeq !== playSeqRef.current) return;
-            }
             return;
           }
 
-          // ===== Mensagem TTS =====
-          if (isTtsAudioMsg(msg)) {
-            const { ttsBody, eventID, eventId } = msg.payload;
-            const id = eventID ?? eventId ?? "";
-
-            // ----- audioContent: toca MP3 -----
-            if ("audioContent" in ttsBody) {
-              const proxyUrl = `/api/voice-proxy?path=${encodeURIComponent(
-                ttsBody.audioContent
-              )}`;
-
-              // Atenção com MP3
-              if (id === "atencao") {
-                await playAtencaoAudio(proxyUrl);
-                return;
-              }
-
-              if (atencaoPlayingRef.current) return;
-
-              const key = String(id);
-              const now = Date.now();
-              if (
-                key &&
-                lastPlayedKeyRef.current === key &&
-                now - lastPlayedAtRef.current < 3000
-              ) {
-                console.log("⏱️ Ignorado (cooldown 3s):", key);
-                return;
-              }
-
-              lastPlayedKeyRef.current = key || null;
-              lastPlayedAtRef.current = now;
-              if (id) lastEventIdRef.current = id;
-
-              await playTtsExclusive(proxyUrl);
+          if ("errorTTS" in ttsBody) {
+            if (id === "atencao") {
+              enqueue({
+                kind: "atencao-speech",
+                text: ttsBody.errorTTS,
+                key: "atencao",
+              });
               return;
             }
 
-            // ----- errorTTS: fallback Web Speech API -----
-            if ("errorTTS" in ttsBody) {
-              // Atenção via voz do navegador (sem MP3)
-              if (id === "atencao") {
-                await playAtencaoSpeech(ttsBody.errorTTS);
-                return;
-              }
-
-              if (atencaoPlayingRef.current) return;
-
-              const key = String(id);
-              const now = Date.now();
-              if (
-                key &&
-                lastPlayedKeyRef.current === key &&
-                now - lastPlayedAtRef.current < 3000
-              ) {
-                console.log("⏱️ Ignorado fallback (cooldown 3s):", key);
-                return;
-              }
-
-              lastPlayedKeyRef.current = key || null;
-              lastPlayedAtRef.current = now;
-              if (id) lastEventIdRef.current = id;
-
-              await playDing();
-              speakWithBrowser(ttsBody.errorTTS);
-              return;
-            }
+            enqueue({
+              kind: "tts-speech",
+              text: ttsBody.errorTTS,
+              key: String(id) || ttsBody.errorTTS,
+              enqueuedAt: Date.now(),
+            });
+            return;
           }
-        })();
+        }
       } catch {
         console.log("Erro na mensagem");
       }
     };
 
     return () => eventSource.close();
-  }, [
-    stopAllAudio,
-    playDing,
-    playTtsExclusive,
-    playAtencaoAudio,
-    playAtencaoSpeech,
-    prependAndReindex,
-    speakWithBrowser,
-  ]);
+  }, [enqueue]);
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
 
   return (
     <div className="h-dvh w-screen max-w-none mx-auto px-6 pt-8 pb-4 bg-slate-200 bg-cover bg-center bg-no-repeat flex flex-col">

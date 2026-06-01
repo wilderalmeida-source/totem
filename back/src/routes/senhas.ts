@@ -33,13 +33,16 @@ export async function senhaRoute(fastify: FastifyInstance) {
 
     // Ajuste de fuso horário local para o início do dia
     const dateInitial = new Date()
-    dateInitial.setHours(-3, 0, 0, 0)
-    console.log(dateInitial)
+    dateInitial.setUTCHours(dateInitial.getUTCHours() - 3)
+    dateInitial.setHours(0, 1, 0, 0)
+    const dateFinal = new Date()
+    dateFinal.setUTCHours(dateFinal.getUTCHours() - 3)
+    dateFinal.setHours(23, 59, 59, 999)
     const { filtroControle } = createbody.parse(request.query)
 
     // 1. QUERY BASE VIA PRISMA ORM
     const senhasRawORM = await prisma.atendimentos_senhas.findMany({
-      where: { dt_entrada: { gte: dateInitial } },
+      where: { dt_entrada: { gte: dateInitial, lte: dateFinal, } },
       orderBy: { dt_entrada: 'desc' },
       include: {
         atendimentos: {
@@ -56,7 +59,6 @@ export async function senhaRoute(fastify: FastifyInstance) {
         },
       },
     })
-
     // Normaliza o filtro (somente dígitos)
     const tail = (filtroControle ?? "").replace(/\D/g, "")
 
@@ -161,90 +163,91 @@ export async function senhaRoute(fastify: FastifyInstance) {
     return reply.send({ senhasnr, senhas, senhasRawQuery })
   })
   fastify.post('/clinux/senhas', async (request, reply) => {
-  const createbody = z.object({
-    nr_senha: z.number().optional(),
-    sn_preferencial: z.boolean(),
-    ds_opcao: z.string(),
-    nr_modalidade: z.number(),
-    ds_local: z.string(),
-    ds_fila: z.string(),
-    method: z.string(),
-    sn_especial: z.boolean(),
-    nr_controle: z.number().optional()
-  })
+    const createbody = z.object({
+      nr_senha: z.number().optional(),
+      sn_preferencial: z.boolean(),
+      ds_opcao: z.string(),
+      nr_modalidade: z.number(),
+      ds_local: z.string(),
+      ds_fila: z.string(),
+      method: z.string(),
+      sn_especial: z.boolean(),
+      nr_controle: z.number().optional()
+    })
 
-  const {
-    ds_opcao, nr_modalidade, nr_senha,
-    sn_preferencial, ds_fila, ds_local,
-    nr_controle, sn_especial, method,
-  } = createbody.parse(request.body)
+    const {
+      ds_opcao, nr_modalidade, nr_senha,
+      sn_preferencial, ds_fila, ds_local,
+      nr_controle, sn_especial, method,
+    } = createbody.parse(request.body)
 
-  const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000)
-  const IP_PAINEL = process.env.IPPAINEL
-  const EMPRESA = process.env.IDEMPRESA ? parseInt(process.env.IDEMPRESA) : 0
-  const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1
+    const dateNow = new Date(Date.now() - 3 * 60 * 60 * 1000)
+    const IP_PAINEL = process.env.IPPAINEL
+    const EMPRESA = process.env.IDEMPRESA ? parseInt(process.env.IDEMPRESA) : 0
+    const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1
 
-  // função reutilizável para buscar próximo ID
+    // função reutilizável para buscar próximo ID
 
 
-  let senhas = null
-  let tentativas = 0
+    let senhas = null
+    let tentativas = 0
 
-  while (tentativas < 3) {
-    try {
+    while (tentativas < 3) {
+      try {
 
-      if (method === "C") {
-        const nr_senhaNew = nr_controle ? nr_controle % 10000 : null
-        senhas = await prisma.atendimentos_senhas.create({
-          data: {
-            dt_entrada: dateNow,
-            ds_opcao,
-            nr_empresa: EMPRESA,
-            nr_modalidade,
-            nr_senha: nr_senhaNew,
-            nr_controle,
-            sn_preferencial,
-            sn_especial,
-            sn_preparo: false,
-            ds_painel: IP_PAINEL,
-            ds_local,
-            ds_fila,
-            cd_funcionario: FUNCIONARIO
-          },
-        })
-      } else {
-        senhas = await prisma.atendimentos_senhas.create({
-          data: {
-            dt_entrada: dateNow,
-            ds_opcao,
-            nr_empresa: EMPRESA,
-            nr_modalidade,
-            nr_senha,
-            sn_preferencial,
-            sn_especial,
-            sn_preparo: false,
-            ds_painel: IP_PAINEL,
-            ds_local,
-            ds_fila,
-            cd_funcionario: FUNCIONARIO
-          },
-        })
-      }
+        if (method === "C") {
+          const nr_senhaNew = nr_controle ? nr_controle % 10000 : null
+          senhas = await prisma.atendimentos_senhas.create({
+            data: {
+              dt_entrada: dateNow,
+              ds_opcao,
+              nr_empresa: EMPRESA,
+              nr_modalidade,
+              nr_senha: nr_senhaNew,
+              nr_controle,
+              sn_preferencial,
+              sn_especial,
+              sn_preparo: false,
+              ds_painel: IP_PAINEL,
+              ds_local,
+              ds_fila,
+              cd_funcionario: FUNCIONARIO
+            },
+          })
+        } else {
+          senhas = await prisma.atendimentos_senhas.create({
+            data: {
+              dt_entrada: dateNow,
+              ds_opcao,
+              nr_empresa: EMPRESA,
+              nr_modalidade,
+              nr_senha,
+              sn_preferencial,
+              sn_especial,
+              sn_preparo: false,
+              ds_painel: IP_PAINEL,
+              ds_local,
+              ds_fila,
+              cd_funcionario: FUNCIONARIO
+            },
+          })
+        }
 
-      break // sucesso, sai do while
+        break // sucesso, sai do while
 
-    } catch (e:any) {
-      if (e.code === 'P2002') { // chave duplicada
-        tentativas++
-      } else {
-        throw e
+      } catch (e: any) {
+        if (e.code === 'P2002') { // chave duplicada
+          tentativas++
+        } else {
+          throw e
+        }
       }
     }
-  }
 
-  if (!senhas) {
-    return reply.code(500).send({ error: 'Não foi possível gerar um ID único' })
-  }
+    if (!senhas) {
+      return reply.code(500).send({ error: 'Não foi possível gerar um ID único' })
+    }
 
-  return reply.send(senhas)
-})}
+    return reply.send(senhas)
+  })
+}

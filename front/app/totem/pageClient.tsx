@@ -103,8 +103,8 @@ export default function Totem() {
                   },
                 }}
               >
-                {tipo == "DATA" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : tipo === "CPF" ? moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY") : tipo === "NOME" ? p.ds_nome : "SEM NOME"}
-              </Link> : moment(p.dt_nascimento).add(1, "day").format("DD/MM/YYYY")}
+                {tipo == "DATA" ? moment(p.dt_nascimento).utc().format("DD/MM/YYYY") : tipo === "CPF" ? moment(p.dt_nascimento).utc().format("DD/MM/YYYY") : tipo === "NOME" ? p.ds_nome : "SEM NOME"}
+              </Link> : moment(p.dt_nascimento).utc().format("DD/MM/YYYY")}
           </li>
         ));
 

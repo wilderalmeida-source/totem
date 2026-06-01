@@ -49,7 +49,6 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados }: {
               setTentativas(listpaciente[0].tentativas)
             }
           } else {
-            listpaciente[0].dt_nascimento = moment(listpaciente[0].dt_nascimento).add(1, "day").format("DD/MM/YYYY");
             const newDados = {
               ...listpaciente[0],
               dt_nascimento: listpaciente[0].dt_nascimento,
@@ -73,7 +72,6 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados }: {
               if (listpaciente[0].tentativas) { setTentativas(listpaciente[0].tentativas) }
             }
             else {
-              listpaciente[0].dt_nascimento = moment(listpaciente[0].dt_nascimento).add(1, "day").format("DD/MM/YYYY");
               const newDados = {
                 ...listpaciente[0],
                 dt_nascimento: listpaciente[0].dt_nascimento,
@@ -87,10 +85,9 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados }: {
           if (dados && dados.cd_paciente) { return };
           if (dados) {
             if (dados.dt_nascimento) {
-              const data_fmt = dados.dt_nascimento = moment(dados.dt_nascimento).add(1, "day").format("DD/MM/YYYY");
               const newDados = {
                 ds_paciente: dados.ds_paciente,
-                dt_nascimento: data_fmt,
+                dt_nascimento: dados.dt_nascimento,
                 servico: dados.servico,
                 preferencial: dados.preferencial
               };
@@ -104,20 +101,16 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados }: {
       }
 
     }
-    if (showModal) {
-      if (dados && dados.qr) {
-        return
-      } else {
-        rodarBuscaCPF();
-      }
+    if (dados && dados.qr) {
+      return
+    } else {
+      rodarBuscaCPF();
     }
-
   }, [dados, showModal, setDados, setShowModal]);
   async function Senha(valor: string | null = null) {
     if (dados?.qr && valor) {
       const listpaciente = await buscaPaciente({ cd_paciente: parseInt(valor) })
       if (listpaciente && listpaciente.length > 0) {
-        listpaciente[0].dt_nascimento = moment(listpaciente[0].dt_nascimento).add(1, "day").format("DD/MM/YYYY");
         const newDados = { ...listpaciente[0], servico: dados.servico, preferencial: dados.preferencial };
         setDados(newDados)
       } else {
@@ -154,7 +147,7 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados }: {
           <h2 className="font-bold text-xl">{dados?.ds_celular_web && `Celular 2: ${dados?.ds_celular_web}`}</h2>
           {dados?.ds_observacao && <div><h2 className="font-bold text-xl">Obs.:</h2><p>{dados?.ds_observacao}</p></div>}
           <h2 className="font-bold text-xl">{dados?.cd_paciente && `ID Paciente: ${dados?.cd_paciente}`}</h2>
-          <h2 className="font-bold text-xl">{dados?.dt_nascimento && `Data de Nascimeto: ${dados?.dt_nascimento}`}</h2>
+          <h2 className="font-bold text-xl">{dados?.dt_nascimento && `Data de Nascimeto: ${moment(dados.dt_nascimento).utc().format("DD/MM/YYYY")}`}</h2>
         </div>}
         {dados?.qr && <form className="opacity-0" onSubmit={(e) => {
           e.preventDefault(); // impede reload da página
