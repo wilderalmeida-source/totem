@@ -52,6 +52,7 @@ export type AtendimentoFiltro = {
   date?: DateRange
   cd_paciente?: number
   dt_nascimento?: string
+  tipo?:string
 }
 
 export type Senha = {
@@ -168,6 +169,7 @@ export const BuscaAtendimentos = async ({
   date,
   cd_paciente,
   dt_nascimento,
+  tipo,
 }: AtendimentoFiltro): Promise<Atendimento[]> => {
   let newBuscaMedic: number | undefined
   let newBuscasala: number | undefined
@@ -187,7 +189,7 @@ export const BuscaAtendimentos = async ({
   if (toDate) params.append("data_final", toDate.toString())
   if (cd_paciente) params.append("cd_paciente", String(cd_paciente))
   if (dt_nascimento) params.append("dt_nascimento", String(dt_nascimento))
-
+  if (tipo) params.append("tipo", String(tipo))
   const response = await fetch(
     `${API_INTERNA}/clinux/agenda?${params.toString()}`,
     {

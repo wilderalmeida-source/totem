@@ -114,12 +114,18 @@ export async function pacientesRoute(fastify: FastifyInstance) {
         where.ds_paciente = { startsWith: ds_paciente, mode: "insensitive" };
         select.dt_nascimento = true;
       }
+
       if (tipo == "NOMEDATA" && dt_nascimento && ds_paciente) {
-        where.ds_paciente = ds_paciente;
-        where.dt_nascimento = new Date(dt_nascimento);
-        select.ds_paciente = true;
-        select.cd_paciente = true;
-        select.dt_nascimento = true;
+      where.OR = [
+        { ds_paciente: " " + ds_paciente },
+        { ds_paciente: ds_paciente },
+        { ds_paciente: " " + ds_paciente + " " },
+        { ds_paciente: ds_paciente + " " }
+    ];
+      where.dt_nascimento = dt_nascimento;
+      select.ds_paciente = true;
+      select.cd_paciente = true;
+      select.dt_nascimento = true;
       }
       const pacientes = await prisma.pacientes.findMany({
         where,
@@ -131,7 +137,6 @@ export async function pacientesRoute(fastify: FastifyInstance) {
         return reply.send([{ tentativas }])
       }
       if (tipo == "NOMEDATA" && pacientes.length <= 0) {
-        console.log(tentativas)
         tentativas -= 1
         return reply.send([{ tentativas }])
       }

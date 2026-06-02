@@ -28,7 +28,7 @@ export default function Totem() {
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [lista, setLista] = useState<ReactElement[]>([]);
   const [tipo, setTipo] = useState("DATA");
-  const { setShowModal, setDados } = useContext(modalContext);
+  const { setShowModal, setDados, setExames} = useContext(modalContext);
   const InputRef = useRef<HTMLInputElement | null>(null);
   const keyboardRef = useRef<InstanceType<typeof Keyboard> | null>(null)
   // --------- PESQUISAR (useCallback para deps estáveis) ----------
@@ -88,7 +88,7 @@ export default function Totem() {
                 preferencial: parseInt(url.get("preferencial") ?? "0", 10),
                 tipo: "CPF",
               });
-              setShowModal(true)
+              setShowModal(true);setExames(null)
             }
           }}>
             {tipo != "CPF" ?
@@ -124,7 +124,7 @@ export default function Totem() {
                 servico: url.get("servico") ?? "",
                 preferencial: parseInt(url.get("preferencial") ?? "0", 10),
                 tipo: "CPF",
-              }); setShowModal(true)
+              }); setShowModal(true);setExames(null)
             }
           }}>
             {tipo != "CPF" ?
@@ -146,7 +146,7 @@ export default function Totem() {
 
       setLista(itens);
     },
-    [pacientes, url, tipo, setDados, setShowModal] // deps reais
+    [pacientes, url, tipo, setDados, setShowModal,setExames] // deps reais
   );
   const pesquisarRef = React.useRef(pesquisar);
   useEffect(() => {
@@ -236,7 +236,7 @@ export default function Totem() {
         preferencial: parseInt(preferencial, 10),
       });
     }
-    setShowModal(true);
+    setShowModal(true);setExames(null);
   }
 
   function Qrcode() {
@@ -249,7 +249,7 @@ export default function Totem() {
         preferencial: parseInt(preferencial, 10),
       });
     }
-    setShowModal(true);
+    setShowModal(true);setExames(null)
   }
 
   // --------- RENDER ---------

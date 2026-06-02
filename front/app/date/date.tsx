@@ -18,7 +18,6 @@ import Base from "../../components/base";
 import { modalContext } from "@/components/modals/providers";
 import qrcode from "../../assets/icons/qrcode.png";
 import { buscaPaciente, BuscaAtendimentos, Atendimento } from "../../services/fetchData";
-
 // ------------------ Tipagens ------------------
 interface Paciente {
   dt_nascimento?: string | undefined;
@@ -29,7 +28,7 @@ interface Paciente {
 // ------------------ Componente ------------------
 export default function DataNasc() {
   const url = useSearchParams();
-  const { setShowModal, setDados } = useContext(modalContext);
+  const { setShowModal, setDados,setExames } = useContext(modalContext);
 
   // congela valores da URL
   const nome = useMemo(() => url.get("nome") ?? "", [url]);
@@ -77,11 +76,10 @@ export default function DataNasc() {
                   onClick={() => {
                     setDados({
                       ds_paciente: p?.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente,
-                      cd_paciente: p?.pacientes_atendimentos_cd_pacienteTopacientes?.cd_paciente,
                       dt_nascimento: p?.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento,
                       servico,
                       preferencial,
-                    }); setShowModal(true);
+                    }); setShowModal(true);setExames(null)
                   }}
                 >
                   {p?.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente}
@@ -106,7 +104,7 @@ export default function DataNasc() {
                     servico,
                     preferencial,
                   });
-                  setShowModal(true)
+                  setShowModal(true);setExames(null);
                 }}
               >
                 {p.ds_paciente}
@@ -134,7 +132,7 @@ export default function DataNasc() {
                     dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  }); setShowModal(true)
+                  }); setShowModal(true);setExames(null);
                 }}
               >
                 {dataFmt}
@@ -165,7 +163,7 @@ export default function DataNasc() {
                   dt_nascimento: p.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento,
                   servico,
                   preferencial,
-                }); setShowModal(true)
+                }); setShowModal(true);setExames(null);
               }}
             >
               {p.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente}
@@ -191,7 +189,7 @@ export default function DataNasc() {
                   dt_nascimento: p.dt_nascimento,
                   servico,
                   preferencial,
-                }); setShowModal(true)
+                }); setShowModal(true);setExames(null);
               }}
             >
               {p.ds_paciente}
@@ -223,7 +221,7 @@ export default function DataNasc() {
                     dt_nascimento: p.dt_nascimento,
                     servico,
                     preferencial,
-                  }); setShowModal(true)
+                  }); setShowModal(true);setExames(null);
                 }}
               >
                 {dataFmt}

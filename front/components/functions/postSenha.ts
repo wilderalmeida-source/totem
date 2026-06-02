@@ -33,32 +33,36 @@ export async function GerarSenha({
   }
   if (servico === "C") {//______________ VERIFICAMOS O SERVIÇO SE É ENTREGA OU ATENDIMENTO/AGENDAMENTO___________-
     const atendimentos = await EntregaDeExames(cd_paciente);
+    const exameAtendimento: Atendimento[] = []
     let nrControle: number | undefined = undefined
     let cd_modalidade: number | undefined = 0
     let ds_modalidade: string | undefined = "";
     const modalidade_totem = await BuscaModalidades()
     if (atendimentos.length > 0) { //exame que existe
       const atendimentosNew = atendimentos.filter((i) => (i.nr_controle && i.salas.cd_modalidade != modalidade_totem[0].cd_modalidade)); //______FILTRA OS ATENDIDOS
-      if (atendimentosNew.length < 1) { //________SE NENHUM TIVER O NR_CONTROLE
+      if (atendimentosNew.length < 1) { //________SE NENHUM TIVER O NR_CONTROLE OU FOR DA MODALIDADE TOTEM.
         const newAtendimentos = await CadastraAtendimentos({ cd_paciente });
-        nrControle = newAtendimentos[newAtendimentos.length - 1].cd_atendimento
-        cd_modalidade = newAtendimentos[newAtendimentos.length - 1].salas.cd_modalidade;
+        exameAtendimento.push(newAtendimentos[0])
+        nrControle = newAtendimentos[0].cd_atendimento
+        cd_modalidade = newAtendimentos[0].salas.cd_modalidade;
         const modalidades = await BuscaModalidades(cd_modalidade)
         ds_modalidade = modalidades[0]?.ds_modalidade ?? ""
       } else {
-        nrControle = atendimentosNew[atendimentosNew.length - 1].nr_controle
-        cd_modalidade = atendimentosNew[atendimentosNew.length - 1].salas.cd_modalidade;
+        exameAtendimento.push(atendimentos[0])
+        nrControle = atendimentosNew[0].nr_controle
+        cd_modalidade = atendimentosNew[0].salas.cd_modalidade;
         const modalidades = await BuscaModalidades(cd_modalidade)
         ds_modalidade = modalidades[0]?.ds_modalidade ?? ""
       }
     } else { //_________SE NAO TIVER NENHUM ATENDIMENTO
       const newAtendimentos = await CadastraAtendimentos({ cd_paciente });
-      nrControle = newAtendimentos[newAtendimentos.length - 1].cd_atendimento
-      cd_modalidade = newAtendimentos[newAtendimentos.length - 1].salas.cd_modalidade;//_______SEPARAMOS O CODIGO DA MODALIDADE DO PRIMEIRO ATENDIMENTO_________
+      exameAtendimento.push(newAtendimentos[0])
+      nrControle = newAtendimentos[0].cd_atendimento
+      cd_modalidade = newAtendimentos[0].salas.cd_modalidade;//_______SEPARAMOS O CODIGO DA MODALIDADE DO PRIMEIRO ATENDIMENTO_________
       const modalidades = await BuscaModalidades(cd_modalidade); //_______BUSCAMOS A MODALIDADE___________
       ds_modalidade = modalidades[0]?.ds_modalidade ?? ""
     }
-    await CadastraSenha({ //_____CADASTRAMOS A SENHA PARA A ENTREGA DE RESULTADOS, QUANDO ACHADO UM PROCEDIMENTO_______
+    const criarSenha = await CadastraSenha({ //_____CADASTRAMOS A SENHA PARA A ENTREGA DE RESULTADOS, QUANDO ACHADO UM PROCEDIMENTO_______
       nr_modalidade: cd_modalidade,
       nr_senha: nrControle ? nrControle % 10000 : undefined,
       sn_preferencial: preferencial !== 0,
@@ -69,6 +73,13 @@ export async function GerarSenha({
       sn_especial: preferencial === 2,
       nr_controle: nrControle
     });
+    const fila="R"
+    const arrayAtualiza = ArrayID(exameAtendimento);
+    const senha = criarSenha;
+    const cd_senha = senha.cd_senha
+    const nr_senha = criarSenha.nr_senha//________________PEGAMOS O CODIGO DA SENHA___________
+    const ds_senha = `${preferencial !== 0 ? "P" : "F"}${fila}-${nr_senha}`
+    await AtualizaAtendimentos(arrayAtualiza,ds_senha, cd_senha);
   } else { //________________CASO NÃO SEJA ENTREGA DE RESULTADOS____________________
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0)

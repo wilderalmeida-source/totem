@@ -14,6 +14,8 @@ export async function EntregaDeExames(cd_paciente: number): Promise<Atendimento[
   const atendimentos: Atendimento[] = await BuscaAtendimentos({
     cd_paciente,
     date: { from: tresMesesAtras, to: hoje },
+    buscaStatus:"5",
+    tipo:'entrega'
   });
 
   if (atendimentos && atendimentos.length > 0) {

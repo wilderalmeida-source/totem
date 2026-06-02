@@ -13,10 +13,12 @@ export async function agendaRoute(fastify: FastifyInstance) {
       data_inicial: z.string(),
       data_final: z.string(),
       lote: z.string().optional().transform(value => value || undefined),
+      tipo: z.string().optional().transform(value => value || undefined),
     })
 
-    const { data_inicial, data_final, medico, sala, status, busca, lote, cd_paciente, dt_nascimento } = createbody.parse(request.query)
+    const { data_inicial, data_final, medico, sala, status, busca, lote, cd_paciente, dt_nascimento,tipo } = createbody.parse(request.query)
     const where: any = {};
+    let orderBy: any = [];
     if (typeof medico === "string") {
       where.cd_medico = parseInt(medico);
     }
@@ -28,6 +30,12 @@ export async function agendaRoute(fastify: FastifyInstance) {
     }
     if (typeof lote === "string") {
       where.cd_lancamento = parseInt(lote);
+    }
+    if (typeof tipo === "string") {
+      orderBy=[{ dt_data: 'desc' }];
+    }
+    if (typeof tipo != "string") {
+      orderBy=[{ dt_data: 'asc' }, { dt_hora: 'asc' }];
     }
     if (typeof cd_paciente === "string") {
       where.cd_paciente = parseInt(cd_paciente);
@@ -56,7 +64,7 @@ export async function agendaRoute(fastify: FastifyInstance) {
         salas: { select: { ds_sala: true, cd_sala: true, cd_modalidade: true } },
         exames: { select: { procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } }, cd_exame: true, dt_assinado: true, dt_laudo: true, procedimentos_exames_cd_procedimento_laudoToprocedimentos: true } }, ds_status: true, ds_senha: true, dt_hora_senha: true,
       },
-      orderBy: [{ dt_data: 'asc' }, { dt_hora: 'asc' }]
+      orderBy
     })
     /*status
     5:Finalizado
@@ -65,7 +73,6 @@ export async function agendaRoute(fastify: FastifyInstance) {
     3:Confirmado
     11:Recepcao
     6:Entrege*/
-
     if (agenda.length < 1) {
       return reply.send(null)
     }
