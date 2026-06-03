@@ -1,0 +1,79 @@
+generator clientLogs {
+  provider      = "prisma-client-js"
+  output        = "app/generated/prisma/clientLog"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "windows"]
+  engineType    = "client"
+}
+
+datasource logs {
+  provider = "postgresql"
+}
+
+model TtsDailyUsage {
+  id       Int      @id @default(autoincrement())
+  date     DateTime @unique
+  chars    Int      @default(0)
+  requests Int      @default(0)
+}
+
+model TtsWeekVoice {
+  id        Int      @id @default(autoincrement())
+  year      Int
+  week      Int
+  voiceName String   @logs.VarChar(191)
+  createdAt DateTime @default(now())
+
+  @@unique([year, week])
+}
+
+model TtsSettings {
+  id          Int      @id @default(autoincrement())
+  rate        Float    @default(1.0)
+  volumeSound Float    @default(0.0)
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model TtsVoiceOverride {
+  id        Int      @id @default(autoincrement())
+  year      Int
+  week      Int
+  voiceName String   @logs.VarChar(191)
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([year, week])
+}
+
+model NameDictionary {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique @logs.VarChar(191)
+  value     String   @logs.VarChar(191)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model TtsVoiceTest {
+  id          Int      @id @default(autoincrement())
+  cacheKey    String   @unique @logs.VarChar(191)
+  voiceName   String   @logs.VarChar(191)
+  rate        Float    @default(1.0)
+  text        String
+  audioMp3    Bytes
+  volumeSound Float    @default(0.0)
+  createdAt   DateTime @default(now())
+}
+
+model ttsEvent {
+  eventId      String   @unique @logs.VarChar(191)
+  audioContent String   @logs.VarChar(191)
+  createdAt    DateTime @default(now())
+}
+
+model token {
+  Id        BigInt   @id @default(autoincrement())
+  tokenHash String   @unique @logs.VarChar(191)
+  name      String   @logs.VarChar(191)
+  scope     String?  @logs.VarChar(191)
+  expiresAt DateTime @logs.Timestamp(6)
+  revokedAt String?  @logs.VarChar(191)
+  createdAt DateTime @default(now()) @logs.Timestamp(6)
+}

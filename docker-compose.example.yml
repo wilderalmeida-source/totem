@@ -1,0 +1,80 @@
+services:
+  # --- BANCO DE DADOS ---
+  postgres_infra:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: totem
+      POSTGRES_PASSWORD: youpassword
+      POSTGRES_DB: totem
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    networks:
+      - totem-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U totem -d totem" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+  #-------------BANCO DE LOGS-------
+  db_logs:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: logs
+      POSTGRES_USER: usergenuine
+      POSTGRES_PASSWORD: youpassword
+    volumes:
+      - postgres_logs_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U usergenuine -d logs" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    networks:
+      - totem-net
+  # --- BACKEND (NODE.JS) 
+  backend:
+    image: youimage
+    container_name: totem-backend
+    restart: always
+    env_file:
+      - .env.backend
+    ports:
+      - "2345:2345"
+    volumes:
+      - ./public/audios:/app/public/audios
+    depends_on:
+      postgres_infra:
+        condition: service_healthy
+      db_logs:
+        condition: service_healthy
+    command: >
+      sh -c " echo 'Aguardando portas dos bancos de dados responderem...'; while ! nc -z postgres_infra 5432; do sleep 0.5; done; while ! nc -z db_logs 5432; do sleep 0.5; done; echo 'Bancos de dados 100% online!'; echo 'Sincronizando as tabelas do banco...'; echo 'Iniciando o servidor backend...'; npm run start"
+    networks:
+      - totem-net
+  # --- FRONTEND (NEXT.JS) ---
+  frontend:
+    image: youimage
+    container_name: totem-frontend
+    restart: always
+    env_file:
+      - .env.frontend
+    environment:
+      - EMPRESA_NOME=CRI
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - totem-net
+    volumes:
+      - ./public/videos:/app/public/videos
+
+volumes:
+  pgdata:
+  postgres_logs_data:
+
+networks:
+  totem-net:
+    driver: bridge

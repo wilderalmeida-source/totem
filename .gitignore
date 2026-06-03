@@ -1,0 +1,6 @@
+node_modules/
+.env.*
+docker-compose.dev.yml
+docker-compose.yml
+public/
+/back/prisma/app/generated/
