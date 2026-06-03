@@ -19,7 +19,7 @@ import { buscaPaciente, Paciente } from "../../services/fetchData";
 import { modalContext } from "@/components/modals/providers";
 import { IMaskInput } from "react-imask";
 import moment from "moment";
-
+import { useListPacienteCPF } from "@/components/functions/buscaCPF";
 export default function Totem() {
   const url = useSearchParams();
   const router = useRouter();
@@ -28,10 +28,10 @@ export default function Totem() {
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [lista, setLista] = useState<ReactElement[]>([]);
   const [tipo, setTipo] = useState("DATA");
-  const { setShowModal, setDados, setExames} = useContext(modalContext);
   const InputRef = useRef<HTMLInputElement | null>(null);
   const keyboardRef = useRef<InstanceType<typeof Keyboard> | null>(null)
-  // --------- PESQUISAR (useCallback para deps estáveis) ----------
+  const { setShowModal, setDados, setExames} = useContext(modalContext);
+  setShowModal(false)  // --------- PESQUISAR (useCallback para deps estáveis) ----------
   const pesquisar = useCallback(
     async (digitos: string) => {
       const term = (digitos ?? "").toUpperCase().trim();
@@ -78,18 +78,12 @@ export default function Totem() {
           ds_cpf: r.ds_cpf ?? ""
         }));
         setPacientes(normalizados);
+        const servico= url.get("servico") ?? ""
+        const preferencial= parseInt(url.get("preferencial") ?? "")
+        
         const itens = normalizados.map((p, idx) => (
           <li className="text-4xl mb-3" key={`pac-${idx}`} onClick={() => {
-            if (tipo == "CPF") {
-              setDados({
-                ds_cpf: number,
-                dt_nascimento: p.dt_nascimento,
-                servico: url.get("servico") ?? "",
-                preferencial: parseInt(url.get("preferencial") ?? "0", 10),
-                tipo: "CPF",
-              });
-              setShowModal(true);setExames(null)
-            }
+            if (tipo == "CPF" && p.ds_cpf && p.dt_nascimento) {useListPacienteCPF(p.ds_cpf,p.dt_nascimento,servico,preferencial)}
           }}>
             {tipo != "CPF" ?
               <Link

@@ -1,9 +1,9 @@
 "use client"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { Button } from "../ui/button"
 import { SendClinux } from "@/components/functions/sendClinux"
-import { buscaPaciente, type Atendimento, BuscaAtendimentos } from "../../services/fetchData"
+import { buscaPaciente, type Atendimento } from "../../services/fetchData"
 import Image from 'next/image';
 import ok from "../../assets/icons/ok.png"
 import atention from "../../assets/icons/atention.png"
@@ -27,121 +27,23 @@ interface paciente {
 }
 
 
-export function DialogPatient({ showModal, setShowModal, dados, setDados, setExames, exames }: {
+export function DialogPatient({ showModal, setShowModal, dados, setDados, setExames, exames, setLoading,loading,tentativas,invalido }: {
   setExames: Dispatch<SetStateAction<Atendimento[] | null>>,
   exames: Atendimento[] | null,
   setShowModal: Dispatch<SetStateAction<boolean>>,
   setDados: Dispatch<SetStateAction<paciente | null>>,
   dados: paciente | null
   showModal: boolean
+  loading: boolean
+  setLoading:Dispatch<SetStateAction<boolean>>,
+  setTentativas:Dispatch<SetStateAction<number | null>>,
+  tentativas:number | null
+  setInvalido:Dispatch<SetStateAction<string | null>>
+  invalido:string | null
   
 }) {
-  const [loading, setLoading] = useState(false)
   const imageOK = <Image className="mx-auto" width={20} height={20} src={ok} alt="OK" />
   const imageAtention = <Image className="mx-auto" width={20} height={20} src={atention} alt="Caution" />
-  const [invalido, setIvalido] = useState<string | null>(null)
-  const [tentativas, setTentativas] = useState<number>(0)
-  useEffect(() => {
-    async function rodarBuscaCPF() {
-      if (dados?.tipo === "CPF" && dados?.ds_cpf) {
-        if (dados.cd_paciente) { return };
-        const listpaciente = await buscaPaciente({
-          ds_cpf: dados.ds_cpf,
-          dt_nascimento: dados.dt_nascimento,
-          tipo: "ID"
-        });
-        if (listpaciente && listpaciente.length > 0) {
-          if (!listpaciente[0].cd_paciente) {
-            setIvalido("Dados Invalidos!")
-            if (listpaciente[0].tentativas) {
-              setTentativas(listpaciente[0].tentativas)
-            }
-          } else {
-            const newDados = {
-              ...listpaciente[0],
-              dt_nascimento: listpaciente[0].dt_nascimento,
-              servico: dados.servico,
-              preferencial: dados.preferencial
-            }; 
-            setDados(newDados);
-          }
-        }
-      } else {
-        if (dados && dados.tipo != 'NEW') {
-          if (dados.cd_paciente) {return};
-          const listpaciente = await buscaPaciente({
-            ds_paciente: dados.ds_paciente,
-            dt_nascimento: dados.dt_nascimento,
-            tipo: "NOMEDATA"
-          });
-            if (listpaciente && listpaciente.length > 0) {
-              if (!listpaciente[0].cd_paciente) {
-                setIvalido("Dados Invalidos!")
-              if (listpaciente[0].tentativas) { setTentativas(listpaciente[0].tentativas) }
-            }
-            else {
-              const newDados = {
-                ...listpaciente[0],
-                dt_nascimento: listpaciente[0].dt_nascimento,
-                servico: dados.servico,
-                preferencial: dados.preferencial
-              };
-              setDados(newDados);
-            }
-          }
-        } else {
-          if (dados) {
-            if (dados.dt_nascimento) {
-              const newDados = {
-                ds_paciente: dados.ds_paciente,
-                dt_nascimento: dados.dt_nascimento,
-                servico: dados.servico,
-                preferencial: dados.preferencial
-              };
-              setDados(newDados);
-            }
-            if (!dados.ds_paciente) {
-              setShowModal(false)
-            }
-          }
-        }
-      }
-    }
-    const listarExames= async (cd_paciente:number)=>{
-      if(exames){
-        return
-      }
-       const hoje = new Date()
-          hoje.setHours(0, 0, 0, 0)
-          if (dados?.servico === "C") {
-          const entrega = await EntregaDeExames(cd_paciente);
-          console.log("entrega: "+entrega)
-          if(entrega && entrega.length>0){
-          const relatEntrega = entrega.slice(0, 10);
-            setExames(relatEntrega)
-          }else{
-            setExames([])
-          }
-          }else{
-              const atendimentos = await BuscaAtendimentos({cd_paciente:cd_paciente,date:{from:hoje}})
-              if(atendimentos && atendimentos.length>0){
-              const listar = [2, 3, 7]
-              const examesProcedimentos = atendimentos.filter((i) => { if (i.exames && i.exames.length > 0 && i.ds_status && listar.includes(i.ds_status)) { return i } })
-              setExames(examesProcedimentos)}
-              else(setExames([]))
-          }
-    }
-    if (dados && dados.qr) {
-      return
-    } else if(dados && dados.cd_paciente && dados.cd_paciente){
-      listarExames(dados.cd_paciente);
-    }
-    else {
-      rodarBuscaCPF();
-    }
-  }, [dados, showModal, setDados, setShowModal,setExames,exames]);
-
-
   async function Senha(valor: string | null = null) {
     if (dados?.qr && valor) {
       const listpaciente = await buscaPaciente({ cd_paciente: parseInt(valor) })
@@ -173,6 +75,8 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados, setExa
   async function reset() {
     setTimeout(() => { setLoading(false); window.location.href = "/" }, 600)
   }
+
+
   const element = []
   let key = 1
   if (exames) {
@@ -229,7 +133,7 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados, setExa
             {loading ? <OrbitProgress /> : "OK"}
           </Button>}
         <Button
-          variant='outline' className="bg-red-400" onClick={() => { if (tentativas && tentativas > 0) { setShowModal(false) } else if (tentativas <= 0 && !dados?.cd_paciente && !dados?.qr && dados?.tipo != 'NEW') { reset() } else (setShowModal(false)) }}>
+          variant='outline' className="bg-red-400" onClick={() => { if (tentativas && tentativas > 0) { setShowModal(false) } else if (tentativas&&tentativas <= 0 && !dados?.cd_paciente && !dados?.qr && dados?.tipo != 'NEW') { reset() } else (setShowModal(false)) }}>
           Cancelar
         </Button>
       </DialogContent>
@@ -241,6 +145,10 @@ export default function PatientModal() {
   const [showModal, setShowModal] = useState(false)
   const [dados, setDados] = useState<paciente | null>(null);
   const [exames, setExames] = useState<Atendimento[] | null>(null);
+  const [tentativas, setTentativas] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [invalido, setInvalido] = useState<string | null>(null);
+
   const dataDialog = () => {
     return (<DialogPatient
       showModal={showModal}
@@ -249,6 +157,12 @@ export default function PatientModal() {
       dados={dados}
       setExames={setExames}
       exames={exames}
+      setLoading={setLoading}
+      loading={loading}
+      setTentativas={setTentativas}
+      tentativas={tentativas}
+      setInvalido={setInvalido}
+      invalido={invalido}
     />)
   }
   return {
@@ -256,5 +170,8 @@ export default function PatientModal() {
     DialogPatient: dataDialog,
     setDados,
     setExames,
+    setLoading,
+    setTentativas,
+    setInvalido,
   }
 }
