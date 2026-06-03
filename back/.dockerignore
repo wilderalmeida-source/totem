@@ -1,7 +1,0 @@
-node_modules
-.venv
-venv
-.git
-.env
-dist
-public/audios
