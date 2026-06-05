@@ -8,10 +8,16 @@ export async function modalidadesRoute(fastify: FastifyInstance) {
       cd_modalidade: z.string().optional(),
     })
     const { cd_modalidade } = createbody.parse(request.query)
+    const where: any = {};
     if (cd_modalidade && cd_modalidade != null && cd_modalidade != 'null') {
       const int_modalidade = parseInt(cd_modalidade)
+      if (int_modalidade == 10000) {
+        where.NOT = { OR: [{ ds_modalidade: { contains: 'totem', mode: 'insensitive' } }, { ds_modalidade: { contains: 'migracao', mode: 'insensitive' } }] };
+      } else {
+        where.cd_modalidade = int_modalidade
+      }
       const modalidades = await prisma.modalidades.findMany({
-        where: { cd_modalidade: int_modalidade }
+        where
       })
       if (modalidades.length < 1) {
         return reply.send([{ cd_modalidade: process.env.IDMODALIDADE }])

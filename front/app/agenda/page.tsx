@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Table } from "./tabela";
-import { medFetch, salasFetch } from "../../services/fetchData";
+import { buscaMedicos, buscaSalas } from "@/services/api";
 import { ReactElement, Suspense } from "react";
 import ModalProviders from "@/components/modals/providers";
 
@@ -16,8 +16,8 @@ interface Sala {
 
 export default async function Home() {
   // As APIs retornam unknown[], então fazemos o narrowing aqui
-  const medicosData = (await medFetch()) as Medico[];
-  const salasData = (await salasFetch()) as Sala[];
+  const medicosData = (await buscaMedicos()) as Medico[];
+  const salasData = (await buscaSalas()) as Sala[];
 
   const selectMedic: ReactElement[] = medicosData.map((medico) => (
     <option key={medico.cd_medico} value={medico.cd_medico}>

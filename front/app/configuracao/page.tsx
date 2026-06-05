@@ -1,15 +1,15 @@
 "use client";
 import {
   StatsResponse,
-  VoiceList,
-  VoiceStatus,
+  buscaVoiceList,
+  buscaVoiceStatus,
   VoiceItem,
-  ApplyVoiceOverride,
-  ClearVoiceOverride,
-  SetRate,
-  PlaySoundTest,
-  SetVolume,
-} from "../../services/fetchData";
+  applyVoiceOverride,
+  clearVoiceOverride,
+  setVoiceRate,
+  playVoiceTest,
+  setVoiceVolume,
+} from "@/services/api";
 import { Button } from "@/components/ui/button";
 import OrbitProgress from "react-loading-indicator";
 import Link from "next/link";
@@ -45,7 +45,7 @@ export default function VoiceStatsPage() {
 
   // ✅ refreshAll estável
   const refreshAll = useCallback(async () => {
-    const [s, v] = await Promise.all([VoiceStatus(), VoiceList()]);
+    const [s, v] = await Promise.all([buscaVoiceStatus(), buscaVoiceList()]);
 
     setStats(s);
     setRate(s.rate ?? 1.0);
@@ -118,7 +118,7 @@ export default function VoiceStatsPage() {
         audioRef.current = null;
       }
 
-      const audio64 = await PlaySoundTest(selectedVoice, testRate, volumeTest);
+      const audio64 = await playVoiceTest(selectedVoice, testRate, volumeTest);
       const proxyUrl = `/api/voice-proxy?path=${encodeURIComponent(audio64.audioContent)}`
       const audio = new Audio(proxyUrl);
       audio.preload = "auto";
@@ -148,7 +148,7 @@ export default function VoiceStatsPage() {
     if (!stats) return;
     setBusy("override");
     try {
-      await ApplyVoiceOverride(stats.currentWeek.year, stats.currentWeek.week, selectedVoice);
+      await applyVoiceOverride(stats.currentWeek.year, stats.currentWeek.week, selectedVoice);
       await refreshAll()
     } finally {
       window.alert(`Voz ${selectedVoice} selecionada e ativada.`)
@@ -160,7 +160,7 @@ export default function VoiceStatsPage() {
     if (!stats) return;
     setBusy("clearOverride");
     try {
-      await ClearVoiceOverride(stats.currentWeek.year, stats.currentWeek.week);
+      await clearVoiceOverride(stats.currentWeek.year, stats.currentWeek.week);
       await refreshAll()
     } finally {
       window.alert("Modo automatico ativado.")
@@ -171,7 +171,7 @@ export default function VoiceStatsPage() {
   async function saveRate(r: number) {
     setBusy("rate");
     try {
-      await SetRate(r);
+      await setVoiceRate(r);
       await refreshAll();
     } finally {
       setBusy(null);
@@ -180,7 +180,7 @@ export default function VoiceStatsPage() {
   async function saveVolume(r: number) {
     setBusy("volume");
     try {
-      await SetVolume(r);
+      await setVoiceVolume(r);
       await refreshAll();
     } finally {
       setBusy(null);

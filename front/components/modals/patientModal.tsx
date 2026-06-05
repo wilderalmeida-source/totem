@@ -1,139 +1,203 @@
-"use client"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
-import { Dispatch, SetStateAction, useState } from "react"
-import { Button } from "../ui/button"
-import { SendClinux } from "@/components/functions/sendClinux"
-import { buscaPaciente, type Atendimento } from "../../services/fetchData"
-import Image from 'next/image';
-import ok from "../../assets/icons/ok.png"
-import atention from "../../assets/icons/atention.png"
-import moment from "moment"
-import { EntregaDeExames } from "../functions/lastExames"
-import OrbitProgress from "react-loading-indicator"
+'use client'
 
-interface paciente {
-  ds_paciente?: string,
-  ds_telefone?: string | undefined
-  ds_celular?: string | undefined
-  ds_celular_web?: string | undefined
-  cd_paciente?: number | undefined
-  dt_nascimento?: string | undefined
+import { Dispatch, SetStateAction, useState } from 'react'
+import Image from 'next/image'
+import moment from 'moment'
+import OrbitProgress from 'react-loading-indicator'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { sendClinux } from '@/services/sendClinux'
+import { buscaPaciente, type Atendimento } from '@/services/api'
+import { entregaDeExames } from '@/services/entregadeexames'
+import ok from '@/assets/icons/ok.png'
+import atention from '@/assets/icons/atention.png'
+
+// ─── Tipos ────────────────────────────────────────────────────────────────────
+export interface DadosPaciente {
+  ds_paciente?: string
+  ds_telefone?: string
+  ds_celular?: string
+  ds_celular_web?: string
+  cd_paciente?: number
+  dt_nascimento?: string
   servico: string | null
   preferencial: number | undefined | null
-  qr?: boolean | undefined
-  ds_cpf?: string | undefined
-  ds_observacao?: string | undefined
-  tipo?: string | undefined
+  qr?: boolean
+  ds_cpf?: string
+  ds_observacao?: string
+  tipo?: string
 }
 
-
-export function DialogPatient({ showModal, setShowModal, dados, setDados, setExames, exames, setLoading,loading,tentativas,invalido }: {
-  setExames: Dispatch<SetStateAction<Atendimento[] | null>>,
-  exames: Atendimento[] | null,
-  setShowModal: Dispatch<SetStateAction<boolean>>,
-  setDados: Dispatch<SetStateAction<paciente | null>>,
-  dados: paciente | null
+interface DialogPatientProps {
   showModal: boolean
+  setShowModal: Dispatch<SetStateAction<boolean>>
+  dados: DadosPaciente | null
+  setDados: Dispatch<SetStateAction<DadosPaciente | null>>
+  exames: Atendimento[] | null
+  setExames: Dispatch<SetStateAction<Atendimento[] | null>>
   loading: boolean
-  setLoading:Dispatch<SetStateAction<boolean>>,
-  setTentativas:Dispatch<SetStateAction<number | null>>,
-  tentativas:number | null
-  setInvalido:Dispatch<SetStateAction<string | null>>
-  invalido:string | null
-  
-}) {
-  const imageOK = <Image className="mx-auto" width={20} height={20} src={ok} alt="OK" />
-  const imageAtention = <Image className="mx-auto" width={20} height={20} src={atention} alt="Caution" />
-  async function Senha(valor: string | null = null) {
-    if (dados?.qr && valor) {
-      const listpaciente = await buscaPaciente({ cd_paciente: parseInt(valor) })
-      if (listpaciente && listpaciente.length > 0) {
-        const newDados = { ...listpaciente[0], servico: dados.servico, preferencial: dados.preferencial };
-        if (dados.servico === "C" && listpaciente[0].cd_paciente) {
-          const entrega = await EntregaDeExames(listpaciente[0].cd_paciente);
-          const relatEntrega = entrega.filter((i) => [5].includes(i.status ?? -999)).slice(0, 10);
-          setExames(relatEntrega)
-          
-        }
-        setDados(newDados)
-      } else {
-        window.alert("PACIENTE NÂO ENCONTRADO")
-        return
+  setLoading: Dispatch<SetStateAction<boolean>>
+  tentativas: number | null
+  setTentativas: Dispatch<SetStateAction<number | null>>
+  invalido: string | null
+  setInvalido: Dispatch<SetStateAction<string | null>>
+}
+
+// ─── Sub-componente: ícone de status ─────────────────────────────────────────
+function StatusIcon({ done }: { done: boolean }) {
+  return done
+    ? <Image className="mx-auto" width={20} height={20} src={ok} alt="OK" />
+    : <Image className="mx-auto" width={20} height={20} src={atention} alt="Caution" />
+}
+
+// ─── Sub-componente: label de serviço ────────────────────────────────────────
+const SERVICO_LABEL: Record<string, string> = {
+  C: 'Entrega de Exames',
+  D: 'Agendamento',
+}
+
+// ─── DialogPatient ────────────────────────────────────────────────────────────
+export function DialogPatient({
+  showModal, setShowModal,
+  dados, setDados,
+  exames, setExames,
+  loading, setLoading,
+  tentativas,
+  invalido,
+}: DialogPatientProps) {
+
+  const irParaInicio = () => {
+    setTimeout(() => { setLoading(false); window.location.href = '/' }, 600)
+  }
+
+  const gerarSenha = async (valorQR: string | null = null) => {
+    // Fluxo QR
+    if (dados?.qr) {
+      if (!valorQR) { window.alert('PACIENTE NÃO ENCONTRADO'); return }
+
+      const listpaciente = await buscaPaciente({ cd_paciente: parseInt(valorQR) })
+      if (!listpaciente?.length) { window.alert('PACIENTE NÃO ENCONTRADO'); return }
+
+      const newDados = { ...listpaciente[0], servico: dados.servico, preferencial: dados.preferencial }
+
+      if (dados.servico === 'C' && listpaciente[0].cd_paciente) {
+        const entrega = await entregaDeExames(listpaciente[0].cd_paciente)
+        setExames(entrega.filter((i) => [5].includes(i.status ?? -999)).slice(0, 10))
       }
-    } else if (dados?.qr && !valor) {
-      window.alert("PACIENTE NÂO ENCONTRADO")
+
+      setDados(newDados)
       return
     }
-    else {
-      if (dados) {
-        setLoading(true)
-        await SendClinux({ cd_paciente: dados.cd_paciente, ds_paciente: dados.ds_paciente, dt_nascimento: dados.dt_nascimento, preferencial: dados.preferencial, servico: dados.servico })
-        setTimeout(() => { setLoading(false); window.location.href = "/" }, 600)
-      }
-    }
-  }
-  async function reset() {
-    setTimeout(() => { setLoading(false); window.location.href = "/" }, 600)
+
+    // Fluxo normal
+    if (!dados) return
+    setLoading(true)
+    await sendClinux({
+      cd_paciente: dados.cd_paciente,
+      ds_paciente: dados.ds_paciente,
+      dt_nascimento: dados.dt_nascimento,
+      preferencial: dados.preferencial,
+      servico: dados.servico,
+    })
+    irParaInicio()
   }
 
-
-  const element = []
-  let key = 1
-  if (exames) {
-    for (const i of exames) {
-      if (i.exames) {
-        for (const j of i.exames) {
-          element.push(<tr key={key}><td>{j.procedimentos_exames_cd_procedimentoToprocedimentos?.ds_procedimento}</td><td>{j.dt_assinado ? imageOK : imageAtention}</td></tr>)
-          key++
-        }
-      }
+  const handleCancelar = () => {
+    const semPacienteNovo = !dados?.cd_paciente && !dados?.qr && dados?.tipo !== 'NEW'
+    if (tentativas && tentativas <= 0 && semPacienteNovo) {
+      irParaInicio()
+    } else {
+      setShowModal(false)
     }
   }
+
   return (
     <Dialog open={showModal} onOpenChange={setShowModal}>
       <DialogContent>
-        {invalido ? <DialogHeader></DialogHeader> :
+        {/* Header */}
+        {!invalido && (
           <DialogHeader>
-            <DialogTitle className="text-xl font-normal">{dados?.servico == "C" ? "Entrega de Exames" : dados?.servico == "D" ? "Agendamento" : "Atendimento"}</DialogTitle>
-            {dados?.qr ? <DialogDescription className="text-3xl font-bold text-black">{dados?.ds_paciente}</DialogDescription> : <DialogDescription className="text-3xl font-bold text-black">NOME: {dados?.ds_paciente}</DialogDescription>}
-          </DialogHeader>}
-        {invalido ? <div><h2 className="font-bold text-xl">{invalido}</h2><p>Você tem {tentativas} tentativas restantes!</p></div> : <div>
-          <h2 className="font-bold text-xl">{dados?.ds_telefone && `Telefone: ${dados?.ds_telefone}`}</h2>
-          <h2 className="font-bold text-xl">{dados?.ds_celular && `Celular: ${dados?.ds_celular}`}</h2>
-          <h2 className="font-bold text-xl">{dados?.ds_celular_web && `Celular 2: ${dados?.ds_celular_web}`}</h2>
-          {dados?.ds_observacao && <div><h2 className="font-bold text-xl">Obs.:</h2><p>{dados?.ds_observacao}</p></div>}
-          <h2 className="font-bold text-xl">{dados?.cd_paciente && `ID Paciente: ${dados?.cd_paciente}`}</h2>
-          <h2 className="font-bold text-xl">{dados?.dt_nascimento && `Data de Nascimeto: ${moment(dados.dt_nascimento).utc().format("DD/MM/YYYY")}`}</h2>
-        </div>}
-        {invalido?<div></div>:exames&&exames.length>0&&<div>
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 h-4">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-300 dark:bg-gray-700 dark:text-gray-400 sticky top-0 bg-primary">
+            <DialogTitle className="text-xl font-normal">
+              {SERVICO_LABEL[dados?.servico ?? ''] ?? 'Atendimento'}
+            </DialogTitle>
+            <DialogDescription className="text-3xl font-bold text-black">
+              {dados?.qr ? dados.ds_paciente : `NOME: ${dados?.ds_paciente}`}
+            </DialogDescription>
+          </DialogHeader>
+        )}
+
+        {/* Conteúdo principal */}
+        {invalido ? (
+          <div>
+            <h2 className="font-bold text-xl">{invalido}</h2>
+            <p>Você tem {tentativas} tentativas restantes!</p>
+          </div>
+        ) : (
+          <div>
+            {dados?.ds_telefone && <h2 className="font-bold text-xl">Telefone: {dados.ds_telefone}</h2>}
+            {dados?.ds_celular && <h2 className="font-bold text-xl">Celular: {dados.ds_celular}</h2>}
+            {dados?.ds_celular_web && <h2 className="font-bold text-xl">Celular 2: {dados.ds_celular_web}</h2>}
+            {dados?.ds_observacao && (
+              <div>
+                <h2 className="font-bold text-xl">Obs.:</h2>
+                <p>{dados.ds_observacao}</p>
+              </div>
+            )}
+            {dados?.cd_paciente && <h2 className="font-bold text-xl">ID Paciente: {dados.cd_paciente}</h2>}
+            {dados?.dt_nascimento && (
+              <h2 className="font-bold text-xl">
+                Data de Nascimento: {moment(dados.dt_nascimento).utc().format('DD/MM/YYYY')}
+              </h2>
+            )}
+          </div>
+        )}
+
+        {/* Tabela de exames */}
+        {!invalido && exames && exames.length > 0 && (
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase sticky top-0">
               <tr>
-                <th scope="col" className="px-6 py-3 w-64 bg-slate-300">Exame</th>
-                <th scope="col" className="px-6 py-3 w-1/5 bg-slate-300">Laudado</th>
+                <th className="px-6 py-3 w-64 bg-slate-300">Exame</th>
+                <th className="px-6 py-3 w-1/5 bg-slate-300">Laudado</th>
               </tr>
             </thead>
-            <tbody className="h-4 bg-ternary">
-              {element}
+            <tbody>
+              {exames.flatMap((atend, ai) =>
+                (atend.exames ?? []).map((exame, ei) => (
+                  <tr key={`${ai}-${ei}`}>
+                    <td>{exame.procedimentos_exames_cd_procedimentoToprocedimentos?.ds_procedimento}</td>
+                    <td><StatusIcon done={!!exame.dt_assinado} /></td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-        </div>
-        }
-        {dados?.qr && <form className="opacity-0" onSubmit={(e) => {
-          e.preventDefault(); // impede reload da página
-          const valor = (e.currentTarget.elements.namedItem("ID") as HTMLInputElement).value;
-          Senha(valor); // a função que você quer chamar
-        }}>
-          <input type="text" name="ID" autoFocus={true} />
-          <button type="submit">enviar</button>
-        </form>}
-        {!dados?.qr && dados?.servico != "" && !invalido &&
-          <Button
-            variant='outline' className="bg-green-400" onClick={() => { Senha() }} disabled={loading}>
-            {loading ? <OrbitProgress /> : "OK"}
-          </Button>}
-        <Button
-          variant='outline' className="bg-red-400" onClick={() => { if (tentativas && tentativas > 0) { setShowModal(false) } else if (tentativas&&tentativas <= 0 && !dados?.cd_paciente && !dados?.qr && dados?.tipo != 'NEW') { reset() } else (setShowModal(false)) }}>
+        )}
+
+        {/* Form QR oculto */}
+        {dados?.qr && (
+          <form
+            className="opacity-0"
+            onSubmit={(e) => {
+              e.preventDefault()
+              const valor = (e.currentTarget.elements.namedItem('ID') as HTMLInputElement).value
+              void gerarSenha(valor)
+            }}
+          >
+            <input type="text" name="ID" autoFocus />
+            <button type="submit">enviar</button>
+          </form>
+        )}
+
+        {/* Botão OK */}
+        {!dados?.qr && dados?.servico !== '' && !invalido && (
+          <Button variant="outline" className="bg-green-400" onClick={() => void gerarSenha()} disabled={loading}>
+            {loading ? <OrbitProgress /> : 'OK'}
+          </Button>
+        )}
+
+        {/* Botão Cancelar */}
+        <Button variant="outline" className="bg-red-400" onClick={handleCancelar}>
           Cancelar
         </Button>
       </DialogContent>
@@ -141,37 +205,25 @@ export function DialogPatient({ showModal, setShowModal, dados, setDados, setExa
   )
 }
 
+// ─── PatientModal (wrapper com estado) ───────────────────────────────────────
 export default function PatientModal() {
   const [showModal, setShowModal] = useState(false)
-  const [dados, setDados] = useState<paciente | null>(null);
-  const [exames, setExames] = useState<Atendimento[] | null>(null);
-  const [tentativas, setTentativas] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [invalido, setInvalido] = useState<string | null>(null);
+  const [dados, setDados] = useState<DadosPaciente | null>(null)
+  const [exames, setExames] = useState<Atendimento[] | null>(null)
+  const [tentativas, setTentativas] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [invalido, setInvalido] = useState<string | null>(null)
 
-  const dataDialog = () => {
-    return (<DialogPatient
-      showModal={showModal}
-      setShowModal={setShowModal}
-      setDados={setDados}
-      dados={dados}
-      setExames={setExames}
-      exames={exames}
-      setLoading={setLoading}
-      loading={loading}
-      setTentativas={setTentativas}
-      tentativas={tentativas}
-      setInvalido={setInvalido}
-      invalido={invalido}
-    />)
-  }
-  return {
-    setShowModal,
-    DialogPatient: dataDialog,
-    setDados,
-    setExames,
-    setLoading,
-    setTentativas,
-    setInvalido,
-  }
+  const Modal = () => (
+    <DialogPatient
+      showModal={showModal} setShowModal={setShowModal}
+      dados={dados} setDados={setDados}
+      exames={exames} setExames={setExames}
+      loading={loading} setLoading={setLoading}
+      tentativas={tentativas} setTentativas={setTentativas}
+      invalido={invalido} setInvalido={setInvalido}
+    />
+  )
+
+  return { setShowModal, DialogPatient: Modal, setDados, setExames, setLoading, setTentativas, setInvalido }
 }

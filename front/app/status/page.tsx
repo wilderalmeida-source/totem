@@ -1,5 +1,5 @@
 "use client";
-import { StatsResponse, VoiceStatus, DailyUsage} from "../../services/fetchData";
+import { StatsResponse, buscaVoiceStatus, DailyUsage } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -9,54 +9,55 @@ type WsEvent =
 export default function VoiceStatsPage() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   function isWsEvent(msg: unknown): msg is WsEvent { // FORÇA A TIPAGEM DE EVENTOS
-  if (!msg || typeof msg !== "object") return false;
-  if (!("type" in msg)) return false;
-  const t = (msg as { type?: unknown }).type;
-  return t === "tts:delta" || t === "tts:stats";
-}
+    if (!msg || typeof msg !== "object") return false;
+    if (!("type" in msg)) return false;
+    const t = (msg as { type?: unknown }).type;
+    return t === "tts:delta" || t === "tts:stats";
+  }
   useEffect(() => { //WEBSOCKETS
-  const eventSource = new EventSource('/api/events');
-  eventSource.onmessage = (event) => {
-    if (!isWsEvent(event)) return;
+    const eventSource = new EventSource('/api/events');
+    eventSource.onmessage = (event) => {
+      if (!isWsEvent(event)) return;
       try {
         // A ponte envia um JSON com { message: "...", timestamp: "..." }
         const bridgePayload = JSON.parse(event.data);
         // O dado real vindo do Node.js está em bridgePayload.message
         const msg = JSON.parse(bridgePayload.message);
-    if (msg.type === "tts:delta") {
-      const { date, chars, requestsInc } = msg.payload;
-      setStats((prev) => {
-        if (!prev) return prev;
+        if (msg.type === "tts:delta") {
+          const { date, chars, requestsInc } = msg.payload;
+          setStats((prev) => {
+            if (!prev) return prev;
 
-        const list = [...prev.dailyUsage];
-        const idx = list.findIndex((x) => x.date === date);
+            const list = [...prev.dailyUsage];
+            const idx = list.findIndex((x) => x.date === date);
 
-        if (idx >= 0) {
-          list[idx] = {
-            ...list[idx],
-            chars: list[idx].chars + chars,
-            requests: list[idx].requests + requestsInc,
-          };
-        } else {
-          list.unshift({ date, chars: chars, requests: requestsInc });
+            if (idx >= 0) {
+              list[idx] = {
+                ...list[idx],
+                chars: list[idx].chars + chars,
+                requests: list[idx].requests + requestsInc,
+              };
+            } else {
+              list.unshift({ date, chars: chars, requests: requestsInc });
+            }
+
+            return { ...prev, dailyUsage: list };
+          });
         }
 
-        return { ...prev, dailyUsage: list };
-      });
-    }
+        if (msg.type === "tts:stats") {
+          setStats((prev) => (prev ? { ...prev, dailyUsage: msg.payload.dailyUsage } : prev));
+        }
+      } catch { }
+    };
 
-    if (msg.type === "tts:stats") {
-      setStats((prev) => (prev ? { ...prev, dailyUsage: msg.payload.dailyUsage } : prev));
-    }
-  }catch{}};
-
-}, [setStats]);
+  }, [setStats]);
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await VoiceStatus();
+        const res = await buscaVoiceStatus();
         const data = await res
         setStats(data);
       } catch (e) {
@@ -65,12 +66,12 @@ export default function VoiceStatsPage() {
         setLoading(false);
       }
     }
-    if(loading===true){
-    fetchStats();
+    if (loading === true) {
+      fetchStats();
     }
-  }, [loading,stats]);
-  
-  
+  }, [loading, stats]);
+
+
   if (loading) {
     return <div className="p-6">Carregando...</div>;
   }
@@ -81,8 +82,8 @@ export default function VoiceStatsPage() {
 
   return (
     <div className="p-6 space-y-8">
-         <Link href="/configuracao"><Button>Configurações</Button></Link>
-         <Link href="/dic" className="ml-3"><Button>Dicionário</Button></Link>
+      <Link href="/configuracao"><Button>Configurações</Button></Link>
+      <Link href="/dic" className="ml-3"><Button>Dicionário</Button></Link>
       {/* Card voz da semana */}
       <div className="border rounded-xl p-4 shadow-sm bg-white">
         <h1 className="text-2xl font-bold mb-2">Voz da semana</h1>
@@ -94,31 +95,31 @@ export default function VoiceStatsPage() {
         </p>
       </div>
 
-        {/*Mostra se a voz é automatica ou não*/}
-       <div className="text-sm border rounded-2xl p-5 shadow-sm bg-white space-y-3">
-          <div className=" flex flex-1 flex-row gap-8">
-            <div>
-              <span className="text-gray-500">Voz automática:</span>{" "}
-              <span className="font-medium">{stats.currentWeek.autoVoice}</span>
-            </div>
-            <div>
-              <span className="text-gray-500">Voz Velocidade:</span>{" "}
-              <span className="font-medium">{stats.rate}</span>
-            </div>
+      {/*Mostra se a voz é automatica ou não*/}
+      <div className="text-sm border rounded-2xl p-5 shadow-sm bg-white space-y-3">
+        <div className=" flex flex-1 flex-row gap-8">
+          <div>
+            <span className="text-gray-500">Voz automática:</span>{" "}
+            <span className="font-medium">{stats.currentWeek.autoVoice}</span>
           </div>
           <div>
-            <span className="text-gray-500">Override:</span>{" "}
-            <span className="font-medium">{stats.currentWeek.overrideVoice ?? "—"}</span>
-          </div>
-          <div>
-            <span className="text-gray-500">Env forçada:</span>{" "}
-            <span className="font-medium">{stats.currentWeek.envForced ?? "—"}</span>
-          </div>
-          <div>
-            <span className="text-gray-500">Voz em uso:</span>{" "}
-            <span className="text-lg font-semibold">{stats.currentWeek.voiceName}</span>
+            <span className="text-gray-500">Voz Velocidade:</span>{" "}
+            <span className="font-medium">{stats.rate}</span>
           </div>
         </div>
+        <div>
+          <span className="text-gray-500">Override:</span>{" "}
+          <span className="font-medium">{stats.currentWeek.overrideVoice ?? "—"}</span>
+        </div>
+        <div>
+          <span className="text-gray-500">Env forçada:</span>{" "}
+          <span className="font-medium">{stats.currentWeek.envForced ?? "—"}</span>
+        </div>
+        <div>
+          <span className="text-gray-500">Voz em uso:</span>{" "}
+          <span className="text-lg font-semibold">{stats.currentWeek.voiceName}</span>
+        </div>
+      </div>
 
       {/* Uso diário */}
       <div className="border rounded-xl p-4 shadow-sm bg-white">

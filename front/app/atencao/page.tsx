@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Save, Settings, Book } from 'lucide-react';
-import { AtentionCreateSound, AtentionGetText, AtentionSound } from '@/services/fetchData';
+import { gravaAtencao, buscaTextoAtencao, tocaAtencao } from '@/services/api/';
 
 export default function AtencaoPanel() {
   const [text, setText] = useState("Atenção, por favor fazer silêncio na recepção.");
@@ -13,7 +13,7 @@ export default function AtencaoPanel() {
     const getTextAudio = async () => {
       setLoading(true);
       try {
-        const response = await AtentionGetText();
+        const response = await buscaTextoAtencao();
         if (response) {
           setText(response.audioContent);
         }
@@ -54,18 +54,18 @@ export default function AtencaoPanel() {
     setLoading(true);
     try {
       // 1. Gera o áudio via POST
-      const response = await AtentionCreateSound(text);
+      const response = await gravaAtencao(text);
       if (response.audioContent) {
         await PlayTeste()
         alert("Áudio atualizado e reproduzido com sucesso!");
-        const responseText = await AtentionGetText();
+        const responseText = await buscaTextoAtencao();
         if (responseText) {
           setText(responseText.audioContent);
         }
       } else if (response.errorTTS) {
         speakWithBrowser(response.errorTTS)
         alert("Áudio atualizado e reproduzido com sucesso!");
-        const responseText = await AtentionGetText();
+        const responseText = await buscaTextoAtencao();
         if (responseText) {
           setText(responseText.audioContent);
         }
@@ -101,7 +101,7 @@ export default function AtencaoPanel() {
         audioRef.current = null;
       }
 
-      const audio64 = await AtentionSound("teste");
+      const audio64 = await tocaAtencao("teste");
       const ttsBody = audio64.ttsBody
       if (ttsBody.errorTTS) {
         speakWithBrowser(ttsBody.errorTTS);

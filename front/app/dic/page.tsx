@@ -1,10 +1,10 @@
 "use client";
 import {
-  DictionaryDelete,
-  DictionaryList,
-  DictionaryUpsert,
+  deletaDicionario,
+  buscaDicionario,
+  upsertDicionario,
   DictItem,
-} from "../../services/fetchData";
+} from "@/services/api";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -18,7 +18,7 @@ export default function VoiceStatsPage() {
   const [newValue, setNewValue] = useState("");
 
   const refreshAll = useCallback(async () => {
-    const d = await DictionaryList(search);
+    const d = await buscaDicionario(search);
     setDict(d.items);
   }, [search]);
 
@@ -41,7 +41,7 @@ export default function VoiceStatsPage() {
 
     const t = setTimeout(async () => {
       try {
-        const d = await DictionaryList(search);
+        const d = await buscaDicionario(search);
         setDict(d.items);
       } catch (e) {
         console.error(e);
@@ -58,7 +58,7 @@ export default function VoiceStatsPage() {
 
     setBusy("dictAdd");
     try {
-      await DictionaryUpsert(k, v);
+      await upsertDicionario(k, v);
       setNewKey("");
       setNewValue("");
       await refreshAll(); // ✅ usa o refreshAll
@@ -70,7 +70,7 @@ export default function VoiceStatsPage() {
   async function removeDict(key: string) {
     setBusy(`dictDel:${key}`);
     try {
-      await DictionaryDelete(key);
+      await deletaDicionario(key);
       await refreshAll(); // ✅ usa o refreshAll
     } finally {
       setBusy(null);

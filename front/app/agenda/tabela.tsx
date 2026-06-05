@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ptBR } from "date-fns/locale"
-import { BuscaAtendimentos, type Atendimento, type AtendimentoFiltro } from "../../services/fetchData"
+import { buscaAtendimentos, type Atendimento, type AtendimentoFiltro } from "@/services/api"
 import { modalContext } from "@/components/modals/providers"
 
 interface SelectProps {
@@ -44,7 +44,7 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
     setSem(null)
 
     const filtros: AtendimentoFiltro = { buscaMedic, buscaSala, buscaPaciente, buscaStatus, date }
-    const dados: Atendimento[] = await BuscaAtendimentos(filtros)
+    const dados: Atendimento[] = await buscaAtendimentos(filtros)
 
     if (!dados || dados.length < 1) {
       setSem('Não possui agenda')
@@ -65,7 +65,7 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
         case 2: status = 'Reservado'; color = "text-[color:red]"; countA++; break
         case 3: status = 'Confirmado'; color = "text-[color:blue]"; countA++; break
         case 5: status = 'Finalizado'; color = "text-[color:black]"; countF++; break
-        case 6: status = 'Entrege';   color = "text-green-500";    countF++; break
+        case 6: status = 'Entrege'; color = "text-green-500"; countF++; break
         case 11: status = 'Recepcao'; color = "text-[color:purple]"; countA++; break
       }
 
@@ -89,10 +89,10 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
                 ds_paciente: procedimeto.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente ?? "",
                 ds_telefone: procedimeto.pacientes_atendimentos_cd_pacienteTopacientes?.ds_telefone ?? "",
                 ds_celular: procedimeto.pacientes_atendimentos_cd_pacienteTopacientes?.ds_celular ?? "",
-                ds_celular_web:procedimeto.pacientes_atendimentos_cd_pacienteTopacientes?.ds_celular_web??"",
-                ds_observacao: procedimeto?.ds_observacao??"",
+                ds_celular_web: procedimeto.pacientes_atendimentos_cd_pacienteTopacientes?.ds_celular_web ?? "",
+                ds_observacao: procedimeto?.ds_observacao ?? "",
                 servico: "", preferencial: 0,
-                
+
               })
             }}
           >
@@ -216,7 +216,7 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
               name="modalidade"
               id="modalidade"
               className="border-1 border-gray-400"
-              onChange={(e) => { setBuscaSala(e.target.value)}}
+              onChange={(e) => { setBuscaSala(e.target.value) }}
             >
               <option key='0' value={undefined}>TODOS</option>
               {ListSalas}
@@ -241,26 +241,26 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
       {semAgenda
         ? <div>{semAgenda}</div>
         : <div>
-            <table className="w-full text-sm text-left rtl:text-right h-4">
-              <thead className="text-xs uppercase bg-gray-300 dark:bg-gray-100 sticky top-0">
-                <tr>
-                  <th className="pl-3 py-3">Data</th>
-                  <th className="pl-3 py-3">Hora</th>
-                  <th className="pl-3 py-3">Paciente</th>
-                  <th className="pl-3 py-3">Medico</th>
-                  <th className="pl-3 py-3">Procedimento</th>
-                  <th className="pl-3 py-3">Sala</th>
-                  <th className="pl-3 py-3">Status</th>
-                  <th className="pl-3 py-3">Senha</th>
-                  <th className="pl-3 py-3">Hora Senha</th>
-                  <th className="pl-3 py-3">Açoes</th>
-                </tr>
-              </thead>
-              <tbody className="h-4 bg-gray-200">
-                {tr}
-              </tbody>
-            </table>
-          </div>
+          <table className="w-full text-sm text-left rtl:text-right h-4">
+            <thead className="text-xs uppercase bg-gray-300 dark:bg-gray-100 sticky top-0">
+              <tr>
+                <th className="pl-3 py-3">Data</th>
+                <th className="pl-3 py-3">Hora</th>
+                <th className="pl-3 py-3">Paciente</th>
+                <th className="pl-3 py-3">Medico</th>
+                <th className="pl-3 py-3">Procedimento</th>
+                <th className="pl-3 py-3">Sala</th>
+                <th className="pl-3 py-3">Status</th>
+                <th className="pl-3 py-3">Senha</th>
+                <th className="pl-3 py-3">Hora Senha</th>
+                <th className="pl-3 py-3">Açoes</th>
+              </tr>
+            </thead>
+            <tbody className="h-4 bg-gray-200">
+              {tr}
+            </tbody>
+          </table>
+        </div>
       }
     </>
   )

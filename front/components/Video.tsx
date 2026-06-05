@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type MediaType = "video" | "image" | null;
 
@@ -53,7 +54,7 @@ export default function Video() {
             <source src={src} />
           </video>
         ) : (
-          <img
+          <Image
             src={src}
             alt="Propaganda"
             className="w-full h-full object-cover rounded-lg"
