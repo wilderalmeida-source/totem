@@ -98,6 +98,7 @@ export function DialogPatient({
       dt_nascimento: dados.dt_nascimento,
       preferencial: dados.preferencial,
       servico: dados.servico,
+      cd_modalidade:undefined
     })
     irParaInicio()
   }

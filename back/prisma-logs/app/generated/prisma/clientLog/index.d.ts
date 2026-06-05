@@ -53,6 +53,11 @@ export type ttsEvent = $Result.DefaultSelection<Prisma.$ttsEventPayload>
  * 
  */
 export type token = $Result.DefaultSelection<Prisma.$tokenPayload>
+/**
+ * Model ConfiguracaoPainel
+ * 
+ */
+export type ConfiguracaoPainel = $Result.DefaultSelection<Prisma.$ConfiguracaoPainelPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -254,6 +259,16 @@ export class PrismaClient<
     * ```
     */
   get token(): Prisma.tokenDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.configuracaoPainel`: Exposes CRUD operations for the **ConfiguracaoPainel** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ConfiguracaoPainels
+    * const configuracaoPainels = await prisma.configuracaoPainel.findMany()
+    * ```
+    */
+  get configuracaoPainel(): Prisma.ConfiguracaoPainelDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -695,7 +710,8 @@ export namespace Prisma {
     NameDictionary: 'NameDictionary',
     TtsVoiceTest: 'TtsVoiceTest',
     ttsEvent: 'ttsEvent',
-    token: 'token'
+    token: 'token',
+    ConfiguracaoPainel: 'ConfiguracaoPainel'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -711,7 +727,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token"
+      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracaoPainel"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1307,6 +1323,80 @@ export namespace Prisma {
           }
         }
       }
+      ConfiguracaoPainel: {
+        payload: Prisma.$ConfiguracaoPainelPayload<ExtArgs>
+        fields: Prisma.ConfiguracaoPainelFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ConfiguracaoPainelFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ConfiguracaoPainelFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>
+          }
+          findFirst: {
+            args: Prisma.ConfiguracaoPainelFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ConfiguracaoPainelFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>
+          }
+          findMany: {
+            args: Prisma.ConfiguracaoPainelFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>[]
+          }
+          create: {
+            args: Prisma.ConfiguracaoPainelCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>
+          }
+          createMany: {
+            args: Prisma.ConfiguracaoPainelCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ConfiguracaoPainelCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>[]
+          }
+          delete: {
+            args: Prisma.ConfiguracaoPainelDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>
+          }
+          update: {
+            args: Prisma.ConfiguracaoPainelUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>
+          }
+          deleteMany: {
+            args: Prisma.ConfiguracaoPainelDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ConfiguracaoPainelUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ConfiguracaoPainelUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>[]
+          }
+          upsert: {
+            args: Prisma.ConfiguracaoPainelUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracaoPainelPayload>
+          }
+          aggregate: {
+            args: Prisma.ConfiguracaoPainelAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConfiguracaoPainel>
+          }
+          groupBy: {
+            args: Prisma.ConfiguracaoPainelGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ConfiguracaoPainelGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ConfiguracaoPainelCountArgs<ExtArgs>
+            result: $Utils.Optional<ConfiguracaoPainelCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1423,6 +1513,7 @@ export namespace Prisma {
     ttsVoiceTest?: TtsVoiceTestOmit
     ttsEvent?: ttsEventOmit
     token?: tokenOmit
+    configuracaoPainel?: ConfiguracaoPainelOmit
   }
 
   /* Types for Logging */
@@ -9795,6 +9886,1036 @@ export namespace Prisma {
 
 
   /**
+   * Model ConfiguracaoPainel
+   */
+
+  export type AggregateConfiguracaoPainel = {
+    _count: ConfiguracaoPainelCountAggregateOutputType | null
+    _avg: ConfiguracaoPainelAvgAggregateOutputType | null
+    _sum: ConfiguracaoPainelSumAggregateOutputType | null
+    _min: ConfiguracaoPainelMinAggregateOutputType | null
+    _max: ConfiguracaoPainelMaxAggregateOutputType | null
+  }
+
+  export type ConfiguracaoPainelAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type ConfiguracaoPainelSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type ConfiguracaoPainelMinAggregateOutputType = {
+    id: number | null
+    ativo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ConfiguracaoPainelMaxAggregateOutputType = {
+    id: number | null
+    ativo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ConfiguracaoPainelCountAggregateOutputType = {
+    id: number
+    ativo: number
+    paineis: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ConfiguracaoPainelAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type ConfiguracaoPainelSumAggregateInputType = {
+    id?: true
+  }
+
+  export type ConfiguracaoPainelMinAggregateInputType = {
+    id?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ConfiguracaoPainelMaxAggregateInputType = {
+    id?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ConfiguracaoPainelCountAggregateInputType = {
+    id?: true
+    ativo?: true
+    paineis?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ConfiguracaoPainelAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConfiguracaoPainel to aggregate.
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracaoPainels to fetch.
+     */
+    orderBy?: ConfiguracaoPainelOrderByWithRelationInput | ConfiguracaoPainelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ConfiguracaoPainelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracaoPainels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracaoPainels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ConfiguracaoPainels
+    **/
+    _count?: true | ConfiguracaoPainelCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ConfiguracaoPainelAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ConfiguracaoPainelSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ConfiguracaoPainelMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ConfiguracaoPainelMaxAggregateInputType
+  }
+
+  export type GetConfiguracaoPainelAggregateType<T extends ConfiguracaoPainelAggregateArgs> = {
+        [P in keyof T & keyof AggregateConfiguracaoPainel]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConfiguracaoPainel[P]>
+      : GetScalarType<T[P], AggregateConfiguracaoPainel[P]>
+  }
+
+
+
+
+  export type ConfiguracaoPainelGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConfiguracaoPainelWhereInput
+    orderBy?: ConfiguracaoPainelOrderByWithAggregationInput | ConfiguracaoPainelOrderByWithAggregationInput[]
+    by: ConfiguracaoPainelScalarFieldEnum[] | ConfiguracaoPainelScalarFieldEnum
+    having?: ConfiguracaoPainelScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ConfiguracaoPainelCountAggregateInputType | true
+    _avg?: ConfiguracaoPainelAvgAggregateInputType
+    _sum?: ConfiguracaoPainelSumAggregateInputType
+    _min?: ConfiguracaoPainelMinAggregateInputType
+    _max?: ConfiguracaoPainelMaxAggregateInputType
+  }
+
+  export type ConfiguracaoPainelGroupByOutputType = {
+    id: number
+    ativo: boolean
+    paineis: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: ConfiguracaoPainelCountAggregateOutputType | null
+    _avg: ConfiguracaoPainelAvgAggregateOutputType | null
+    _sum: ConfiguracaoPainelSumAggregateOutputType | null
+    _min: ConfiguracaoPainelMinAggregateOutputType | null
+    _max: ConfiguracaoPainelMaxAggregateOutputType | null
+  }
+
+  type GetConfiguracaoPainelGroupByPayload<T extends ConfiguracaoPainelGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ConfiguracaoPainelGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ConfiguracaoPainelGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ConfiguracaoPainelGroupByOutputType[P]>
+            : GetScalarType<T[P], ConfiguracaoPainelGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ConfiguracaoPainelSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ativo?: boolean
+    paineis?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracaoPainel"]>
+
+  export type ConfiguracaoPainelSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ativo?: boolean
+    paineis?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracaoPainel"]>
+
+  export type ConfiguracaoPainelSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ativo?: boolean
+    paineis?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracaoPainel"]>
+
+  export type ConfiguracaoPainelSelectScalar = {
+    id?: boolean
+    ativo?: boolean
+    paineis?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ConfiguracaoPainelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ativo" | "paineis" | "createdAt" | "updatedAt", ExtArgs["result"]["configuracaoPainel"]>
+
+  export type $ConfiguracaoPainelPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ConfiguracaoPainel"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      ativo: boolean
+      paineis: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["configuracaoPainel"]>
+    composites: {}
+  }
+
+  type ConfiguracaoPainelGetPayload<S extends boolean | null | undefined | ConfiguracaoPainelDefaultArgs> = $Result.GetResult<Prisma.$ConfiguracaoPainelPayload, S>
+
+  type ConfiguracaoPainelCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ConfiguracaoPainelFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ConfiguracaoPainelCountAggregateInputType | true
+    }
+
+  export interface ConfiguracaoPainelDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ConfiguracaoPainel'], meta: { name: 'ConfiguracaoPainel' } }
+    /**
+     * Find zero or one ConfiguracaoPainel that matches the filter.
+     * @param {ConfiguracaoPainelFindUniqueArgs} args - Arguments to find a ConfiguracaoPainel
+     * @example
+     * // Get one ConfiguracaoPainel
+     * const configuracaoPainel = await prisma.configuracaoPainel.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ConfiguracaoPainelFindUniqueArgs>(args: SelectSubset<T, ConfiguracaoPainelFindUniqueArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ConfiguracaoPainel that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ConfiguracaoPainelFindUniqueOrThrowArgs} args - Arguments to find a ConfiguracaoPainel
+     * @example
+     * // Get one ConfiguracaoPainel
+     * const configuracaoPainel = await prisma.configuracaoPainel.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ConfiguracaoPainelFindUniqueOrThrowArgs>(args: SelectSubset<T, ConfiguracaoPainelFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConfiguracaoPainel that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelFindFirstArgs} args - Arguments to find a ConfiguracaoPainel
+     * @example
+     * // Get one ConfiguracaoPainel
+     * const configuracaoPainel = await prisma.configuracaoPainel.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ConfiguracaoPainelFindFirstArgs>(args?: SelectSubset<T, ConfiguracaoPainelFindFirstArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConfiguracaoPainel that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelFindFirstOrThrowArgs} args - Arguments to find a ConfiguracaoPainel
+     * @example
+     * // Get one ConfiguracaoPainel
+     * const configuracaoPainel = await prisma.configuracaoPainel.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ConfiguracaoPainelFindFirstOrThrowArgs>(args?: SelectSubset<T, ConfiguracaoPainelFindFirstOrThrowArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ConfiguracaoPainels that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ConfiguracaoPainels
+     * const configuracaoPainels = await prisma.configuracaoPainel.findMany()
+     * 
+     * // Get first 10 ConfiguracaoPainels
+     * const configuracaoPainels = await prisma.configuracaoPainel.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const configuracaoPainelWithIdOnly = await prisma.configuracaoPainel.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ConfiguracaoPainelFindManyArgs>(args?: SelectSubset<T, ConfiguracaoPainelFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ConfiguracaoPainel.
+     * @param {ConfiguracaoPainelCreateArgs} args - Arguments to create a ConfiguracaoPainel.
+     * @example
+     * // Create one ConfiguracaoPainel
+     * const ConfiguracaoPainel = await prisma.configuracaoPainel.create({
+     *   data: {
+     *     // ... data to create a ConfiguracaoPainel
+     *   }
+     * })
+     * 
+     */
+    create<T extends ConfiguracaoPainelCreateArgs>(args: SelectSubset<T, ConfiguracaoPainelCreateArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ConfiguracaoPainels.
+     * @param {ConfiguracaoPainelCreateManyArgs} args - Arguments to create many ConfiguracaoPainels.
+     * @example
+     * // Create many ConfiguracaoPainels
+     * const configuracaoPainel = await prisma.configuracaoPainel.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ConfiguracaoPainelCreateManyArgs>(args?: SelectSubset<T, ConfiguracaoPainelCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ConfiguracaoPainels and returns the data saved in the database.
+     * @param {ConfiguracaoPainelCreateManyAndReturnArgs} args - Arguments to create many ConfiguracaoPainels.
+     * @example
+     * // Create many ConfiguracaoPainels
+     * const configuracaoPainel = await prisma.configuracaoPainel.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ConfiguracaoPainels and only return the `id`
+     * const configuracaoPainelWithIdOnly = await prisma.configuracaoPainel.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ConfiguracaoPainelCreateManyAndReturnArgs>(args?: SelectSubset<T, ConfiguracaoPainelCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ConfiguracaoPainel.
+     * @param {ConfiguracaoPainelDeleteArgs} args - Arguments to delete one ConfiguracaoPainel.
+     * @example
+     * // Delete one ConfiguracaoPainel
+     * const ConfiguracaoPainel = await prisma.configuracaoPainel.delete({
+     *   where: {
+     *     // ... filter to delete one ConfiguracaoPainel
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ConfiguracaoPainelDeleteArgs>(args: SelectSubset<T, ConfiguracaoPainelDeleteArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ConfiguracaoPainel.
+     * @param {ConfiguracaoPainelUpdateArgs} args - Arguments to update one ConfiguracaoPainel.
+     * @example
+     * // Update one ConfiguracaoPainel
+     * const configuracaoPainel = await prisma.configuracaoPainel.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ConfiguracaoPainelUpdateArgs>(args: SelectSubset<T, ConfiguracaoPainelUpdateArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ConfiguracaoPainels.
+     * @param {ConfiguracaoPainelDeleteManyArgs} args - Arguments to filter ConfiguracaoPainels to delete.
+     * @example
+     * // Delete a few ConfiguracaoPainels
+     * const { count } = await prisma.configuracaoPainel.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ConfiguracaoPainelDeleteManyArgs>(args?: SelectSubset<T, ConfiguracaoPainelDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConfiguracaoPainels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ConfiguracaoPainels
+     * const configuracaoPainel = await prisma.configuracaoPainel.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ConfiguracaoPainelUpdateManyArgs>(args: SelectSubset<T, ConfiguracaoPainelUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConfiguracaoPainels and returns the data updated in the database.
+     * @param {ConfiguracaoPainelUpdateManyAndReturnArgs} args - Arguments to update many ConfiguracaoPainels.
+     * @example
+     * // Update many ConfiguracaoPainels
+     * const configuracaoPainel = await prisma.configuracaoPainel.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ConfiguracaoPainels and only return the `id`
+     * const configuracaoPainelWithIdOnly = await prisma.configuracaoPainel.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ConfiguracaoPainelUpdateManyAndReturnArgs>(args: SelectSubset<T, ConfiguracaoPainelUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ConfiguracaoPainel.
+     * @param {ConfiguracaoPainelUpsertArgs} args - Arguments to update or create a ConfiguracaoPainel.
+     * @example
+     * // Update or create a ConfiguracaoPainel
+     * const configuracaoPainel = await prisma.configuracaoPainel.upsert({
+     *   create: {
+     *     // ... data to create a ConfiguracaoPainel
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ConfiguracaoPainel we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ConfiguracaoPainelUpsertArgs>(args: SelectSubset<T, ConfiguracaoPainelUpsertArgs<ExtArgs>>): Prisma__ConfiguracaoPainelClient<$Result.GetResult<Prisma.$ConfiguracaoPainelPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ConfiguracaoPainels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelCountArgs} args - Arguments to filter ConfiguracaoPainels to count.
+     * @example
+     * // Count the number of ConfiguracaoPainels
+     * const count = await prisma.configuracaoPainel.count({
+     *   where: {
+     *     // ... the filter for the ConfiguracaoPainels we want to count
+     *   }
+     * })
+    **/
+    count<T extends ConfiguracaoPainelCountArgs>(
+      args?: Subset<T, ConfiguracaoPainelCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ConfiguracaoPainelCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ConfiguracaoPainel.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ConfiguracaoPainelAggregateArgs>(args: Subset<T, ConfiguracaoPainelAggregateArgs>): Prisma.PrismaPromise<GetConfiguracaoPainelAggregateType<T>>
+
+    /**
+     * Group by ConfiguracaoPainel.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracaoPainelGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ConfiguracaoPainelGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ConfiguracaoPainelGroupByArgs['orderBy'] }
+        : { orderBy?: ConfiguracaoPainelGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ConfiguracaoPainelGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConfiguracaoPainelGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ConfiguracaoPainel model
+   */
+  readonly fields: ConfiguracaoPainelFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ConfiguracaoPainel.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ConfiguracaoPainelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ConfiguracaoPainel model
+   */
+  interface ConfiguracaoPainelFieldRefs {
+    readonly id: FieldRef<"ConfiguracaoPainel", 'Int'>
+    readonly ativo: FieldRef<"ConfiguracaoPainel", 'Boolean'>
+    readonly paineis: FieldRef<"ConfiguracaoPainel", 'Json'>
+    readonly createdAt: FieldRef<"ConfiguracaoPainel", 'DateTime'>
+    readonly updatedAt: FieldRef<"ConfiguracaoPainel", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ConfiguracaoPainel findUnique
+   */
+  export type ConfiguracaoPainelFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracaoPainel to fetch.
+     */
+    where: ConfiguracaoPainelWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracaoPainel findUniqueOrThrow
+   */
+  export type ConfiguracaoPainelFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracaoPainel to fetch.
+     */
+    where: ConfiguracaoPainelWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracaoPainel findFirst
+   */
+  export type ConfiguracaoPainelFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracaoPainel to fetch.
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracaoPainels to fetch.
+     */
+    orderBy?: ConfiguracaoPainelOrderByWithRelationInput | ConfiguracaoPainelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConfiguracaoPainels.
+     */
+    cursor?: ConfiguracaoPainelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracaoPainels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracaoPainels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfiguracaoPainels.
+     */
+    distinct?: ConfiguracaoPainelScalarFieldEnum | ConfiguracaoPainelScalarFieldEnum[]
+  }
+
+  /**
+   * ConfiguracaoPainel findFirstOrThrow
+   */
+  export type ConfiguracaoPainelFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracaoPainel to fetch.
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracaoPainels to fetch.
+     */
+    orderBy?: ConfiguracaoPainelOrderByWithRelationInput | ConfiguracaoPainelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConfiguracaoPainels.
+     */
+    cursor?: ConfiguracaoPainelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracaoPainels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracaoPainels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfiguracaoPainels.
+     */
+    distinct?: ConfiguracaoPainelScalarFieldEnum | ConfiguracaoPainelScalarFieldEnum[]
+  }
+
+  /**
+   * ConfiguracaoPainel findMany
+   */
+  export type ConfiguracaoPainelFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracaoPainels to fetch.
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracaoPainels to fetch.
+     */
+    orderBy?: ConfiguracaoPainelOrderByWithRelationInput | ConfiguracaoPainelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ConfiguracaoPainels.
+     */
+    cursor?: ConfiguracaoPainelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracaoPainels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracaoPainels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfiguracaoPainels.
+     */
+    distinct?: ConfiguracaoPainelScalarFieldEnum | ConfiguracaoPainelScalarFieldEnum[]
+  }
+
+  /**
+   * ConfiguracaoPainel create
+   */
+  export type ConfiguracaoPainelCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ConfiguracaoPainel.
+     */
+    data: XOR<ConfiguracaoPainelCreateInput, ConfiguracaoPainelUncheckedCreateInput>
+  }
+
+  /**
+   * ConfiguracaoPainel createMany
+   */
+  export type ConfiguracaoPainelCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ConfiguracaoPainels.
+     */
+    data: ConfiguracaoPainelCreateManyInput | ConfiguracaoPainelCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ConfiguracaoPainel createManyAndReturn
+   */
+  export type ConfiguracaoPainelCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * The data used to create many ConfiguracaoPainels.
+     */
+    data: ConfiguracaoPainelCreateManyInput | ConfiguracaoPainelCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ConfiguracaoPainel update
+   */
+  export type ConfiguracaoPainelUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ConfiguracaoPainel.
+     */
+    data: XOR<ConfiguracaoPainelUpdateInput, ConfiguracaoPainelUncheckedUpdateInput>
+    /**
+     * Choose, which ConfiguracaoPainel to update.
+     */
+    where: ConfiguracaoPainelWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracaoPainel updateMany
+   */
+  export type ConfiguracaoPainelUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ConfiguracaoPainels.
+     */
+    data: XOR<ConfiguracaoPainelUpdateManyMutationInput, ConfiguracaoPainelUncheckedUpdateManyInput>
+    /**
+     * Filter which ConfiguracaoPainels to update
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * Limit how many ConfiguracaoPainels to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfiguracaoPainel updateManyAndReturn
+   */
+  export type ConfiguracaoPainelUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * The data used to update ConfiguracaoPainels.
+     */
+    data: XOR<ConfiguracaoPainelUpdateManyMutationInput, ConfiguracaoPainelUncheckedUpdateManyInput>
+    /**
+     * Filter which ConfiguracaoPainels to update
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * Limit how many ConfiguracaoPainels to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfiguracaoPainel upsert
+   */
+  export type ConfiguracaoPainelUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ConfiguracaoPainel to update in case it exists.
+     */
+    where: ConfiguracaoPainelWhereUniqueInput
+    /**
+     * In case the ConfiguracaoPainel found by the `where` argument doesn't exist, create a new ConfiguracaoPainel with this data.
+     */
+    create: XOR<ConfiguracaoPainelCreateInput, ConfiguracaoPainelUncheckedCreateInput>
+    /**
+     * In case the ConfiguracaoPainel was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ConfiguracaoPainelUpdateInput, ConfiguracaoPainelUncheckedUpdateInput>
+  }
+
+  /**
+   * ConfiguracaoPainel delete
+   */
+  export type ConfiguracaoPainelDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+    /**
+     * Filter which ConfiguracaoPainel to delete.
+     */
+    where: ConfiguracaoPainelWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracaoPainel deleteMany
+   */
+  export type ConfiguracaoPainelDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConfiguracaoPainels to delete
+     */
+    where?: ConfiguracaoPainelWhereInput
+    /**
+     * Limit how many ConfiguracaoPainels to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfiguracaoPainel without action
+   */
+  export type ConfiguracaoPainelDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracaoPainel
+     */
+    select?: ConfiguracaoPainelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracaoPainel
+     */
+    omit?: ConfiguracaoPainelOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -9897,12 +11018,30 @@ export namespace Prisma {
   export type TokenScalarFieldEnum = (typeof TokenScalarFieldEnum)[keyof typeof TokenScalarFieldEnum]
 
 
+  export const ConfiguracaoPainelScalarFieldEnum: {
+    id: 'id',
+    ativo: 'ativo',
+    paineis: 'paineis',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ConfiguracaoPainelScalarFieldEnum = (typeof ConfiguracaoPainelScalarFieldEnum)[keyof typeof ConfiguracaoPainelScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -9919,6 +11058,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -10007,6 +11155,27 @@ export namespace Prisma {
    * Reference to a field of type 'BigInt[]'
    */
   export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
   /**
    * Deep Input Types
@@ -10450,6 +11619,60 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"token"> | Date | string
   }
 
+  export type ConfiguracaoPainelWhereInput = {
+    AND?: ConfiguracaoPainelWhereInput | ConfiguracaoPainelWhereInput[]
+    OR?: ConfiguracaoPainelWhereInput[]
+    NOT?: ConfiguracaoPainelWhereInput | ConfiguracaoPainelWhereInput[]
+    id?: IntFilter<"ConfiguracaoPainel"> | number
+    ativo?: BoolFilter<"ConfiguracaoPainel"> | boolean
+    paineis?: JsonFilter<"ConfiguracaoPainel">
+    createdAt?: DateTimeFilter<"ConfiguracaoPainel"> | Date | string
+    updatedAt?: DateTimeFilter<"ConfiguracaoPainel"> | Date | string
+  }
+
+  export type ConfiguracaoPainelOrderByWithRelationInput = {
+    id?: SortOrder
+    ativo?: SortOrder
+    paineis?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ConfiguracaoPainelWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: ConfiguracaoPainelWhereInput | ConfiguracaoPainelWhereInput[]
+    OR?: ConfiguracaoPainelWhereInput[]
+    NOT?: ConfiguracaoPainelWhereInput | ConfiguracaoPainelWhereInput[]
+    ativo?: BoolFilter<"ConfiguracaoPainel"> | boolean
+    paineis?: JsonFilter<"ConfiguracaoPainel">
+    createdAt?: DateTimeFilter<"ConfiguracaoPainel"> | Date | string
+    updatedAt?: DateTimeFilter<"ConfiguracaoPainel"> | Date | string
+  }, "id">
+
+  export type ConfiguracaoPainelOrderByWithAggregationInput = {
+    id?: SortOrder
+    ativo?: SortOrder
+    paineis?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ConfiguracaoPainelCountOrderByAggregateInput
+    _avg?: ConfiguracaoPainelAvgOrderByAggregateInput
+    _max?: ConfiguracaoPainelMaxOrderByAggregateInput
+    _min?: ConfiguracaoPainelMinOrderByAggregateInput
+    _sum?: ConfiguracaoPainelSumOrderByAggregateInput
+  }
+
+  export type ConfiguracaoPainelScalarWhereWithAggregatesInput = {
+    AND?: ConfiguracaoPainelScalarWhereWithAggregatesInput | ConfiguracaoPainelScalarWhereWithAggregatesInput[]
+    OR?: ConfiguracaoPainelScalarWhereWithAggregatesInput[]
+    NOT?: ConfiguracaoPainelScalarWhereWithAggregatesInput | ConfiguracaoPainelScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ConfiguracaoPainel"> | number
+    ativo?: BoolWithAggregatesFilter<"ConfiguracaoPainel"> | boolean
+    paineis?: JsonWithAggregatesFilter<"ConfiguracaoPainel">
+    createdAt?: DateTimeWithAggregatesFilter<"ConfiguracaoPainel"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ConfiguracaoPainel"> | Date | string
+  }
+
   export type TtsDailyUsageCreateInput = {
     date: Date | string
     chars?: number
@@ -10885,6 +12108,62 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracaoPainelCreateInput = {
+    id?: number
+    ativo?: boolean
+    paineis: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ConfiguracaoPainelUncheckedCreateInput = {
+    id?: number
+    ativo?: boolean
+    paineis: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ConfiguracaoPainelUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    paineis?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracaoPainelUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    paineis?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracaoPainelCreateManyInput = {
+    id?: number
+    ativo?: boolean
+    paineis: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ConfiguracaoPainelUpdateManyMutationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    paineis?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracaoPainelUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    paineis?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -11362,6 +12641,98 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type ConfiguracaoPainelCountOrderByAggregateInput = {
+    id?: SortOrder
+    ativo?: SortOrder
+    paineis?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ConfiguracaoPainelAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type ConfiguracaoPainelMaxOrderByAggregateInput = {
+    id?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ConfiguracaoPainelMinOrderByAggregateInput = {
+    id?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ConfiguracaoPainelSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -11400,6 +12771,10 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -11596,6 +12971,42 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
 
