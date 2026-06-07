@@ -1,6 +1,7 @@
 'use server'
 
-import { cadastraPaciente, cadastraSenha, Paciente } from "@/services/api"
+import { cadastraPaciente, Paciente } from "@/services/api"
+import { gerarSenha } from "@/services/gerarsenha"
 import { parseBRDate } from "@/lib/createDate"
 
 type Props = {
@@ -9,7 +10,6 @@ type Props = {
   dt_nascimento?: string
   preferencial: number | null | undefined
   servico: string | null
-  cd_modalidade: number | null | undefined
 }
 
 export async function sendClinux({
@@ -18,17 +18,18 @@ export async function sendClinux({
   dt_nascimento,
   preferencial,
   servico,
-  cd_modalidade
 }: Props) {
-  if (!cd_paciente) {
+  let pacienteId = cd_paciente
+
+  if (!pacienteId) {
     const dt = dt_nascimento
       ? parseBRDate(dt_nascimento) ?? new Date(0).toISOString()
       : new Date(0).toISOString()
 
     const paciente: Paciente = await cadastraPaciente({ ds_paciente, dt_nascimento: dt })
-    cd_paciente = paciente.cd_paciente
+    pacienteId = paciente.cd_paciente
   }
-  if (cd_paciente) {
-    await cadastraSenha({cd_paciente,servico,preferencial,cd_modalidade,})
+  if (pacienteId) {
+    await gerarSenha({ cd_paciente: pacienteId, preferencial, servico })
   }
 }
