@@ -1,5 +1,5 @@
 import { prisma } from '../../../config/prismaDB'
-import { GerarSenhaBody } from './senha.types'
+import { GerarSenhaBody } from './senhas.types'
 import {
   getAgoraBrasil,
   getHojeBrasil,

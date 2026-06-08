@@ -1,5 +1,5 @@
 import { prisma } from '../../../config/prismaDB'
-import { GerarSenhaBody } from './senha.types'
+import { GerarSenhaBody } from './senhas.types'
 import {
   getAgoraBrasil,
   novoAtendimentoTotem,
@@ -14,7 +14,6 @@ export async function gerarSenhaEntrega({
 }: GerarSenhaBody) {
   const dateNow = getAgoraBrasil()
 
-  const IP_PADRAO = process.env.IPPAINEL ?? ''
   const EMPRESA = process.env.IDEMPRESA ? Number(process.env.IDEMPRESA) : 0
   const FUNCIONARIO = process.env.IDFUNCIONARIO
     ? Number(process.env.IDFUNCIONARIO)
