@@ -10,6 +10,7 @@ type Props = {
   dt_nascimento?: string
   preferencial: number | null | undefined
   servico: string | null
+  cd_modalidade: number | null |undefined
 }
 
 export async function sendClinux({
