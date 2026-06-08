@@ -1,4 +1,5 @@
 import { prisma } from '../../../config/prismaDB'
+import { PrismaLog } from '../../../config/prismalog'
 
 export function getAgoraBrasil() {
   return new Date(Date.now() - 3 * 60 * 60 * 1000)
@@ -48,4 +49,48 @@ export async function novoAtendimentoTotem(cd_paciente: number) {
       exames: true,
     },
   })
+}
+type ServicoPainel = 'atendimento' | 'marcacao' | 'resultado'
+
+function servicoParaConfig(servico: string): ServicoPainel {
+  if (servico === 'C') return 'resultado'
+  if (servico === 'D') return 'marcacao'
+  return 'atendimento'
+}
+
+export async function resolverIpPainelPorModalidade(
+  servico: string,
+  nr_modalidade: number
+) {
+  const IP_PADRAO = process.env.IPPAINEL ?? ''
+
+  const config = await PrismaLog.configuracao_painel.findUnique({
+    where: { id: 1 },
+  })
+
+  if (!config?.ativo) {
+    return IP_PADRAO
+  }
+
+  const paineis = (config.paineis as any[]) ?? []
+  const servicoConfig = servicoParaConfig(servico)
+
+  const painelUniversal = paineis.find(
+    (painel) =>
+      painel.ativo &&
+      painel.universal?.[servicoConfig] === true
+  )
+
+  if (painelUniversal?.ip) {
+    return painelUniversal.ip
+  }
+
+  const painelPorModalidade = paineis.find(
+    (painel) =>
+      painel.ativo &&
+      Array.isArray(painel[servicoConfig]) &&
+      painel[servicoConfig].includes(nr_modalidade)
+  )
+
+  return painelPorModalidade?.ip ?? IP_PADRAO
 }

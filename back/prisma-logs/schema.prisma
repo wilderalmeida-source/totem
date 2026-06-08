@@ -77,7 +77,7 @@ model token {
   revokedAt String?  @logs.VarChar(191)
   createdAt DateTime @default(now()) @logs.Timestamp(6)
 }
-model ConfiguracaoPainel {
+model configuracao_painel {
   id        Int      @id @default(1)
   ativo     Boolean  @default(false)
   paineis   Json

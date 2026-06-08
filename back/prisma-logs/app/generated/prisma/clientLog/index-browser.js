@@ -185,7 +185,7 @@ exports.Prisma.TokenScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.ConfiguracaoPainelScalarFieldEnum = {
+exports.Prisma.Configuracao_painelScalarFieldEnum = {
   id: 'id',
   ativo: 'ativo',
   paineis: 'paineis',
@@ -228,7 +228,7 @@ exports.Prisma.ModelName = {
   TtsVoiceTest: 'TtsVoiceTest',
   ttsEvent: 'ttsEvent',
   token: 'token',
-  ConfiguracaoPainel: 'ConfiguracaoPainel'
+  configuracao_painel: 'configuracao_painel'
 };
 
 /**

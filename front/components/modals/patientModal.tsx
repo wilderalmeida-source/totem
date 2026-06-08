@@ -26,7 +26,9 @@ export interface DadosPaciente {
   ds_cpf?: string
   ds_observacao?: string
   tipo?: string
-}
+  cd_modalidade?: number
+  ds_modalidade?: string
+  modalidade?: number}
 
 interface DialogPatientProps {
   showModal: boolean
@@ -78,7 +80,7 @@ export function DialogPatient({
       const listpaciente = await buscaPaciente({ cd_paciente: parseInt(valorQR) })
       if (!listpaciente?.length) { window.alert('PACIENTE NÃO ENCONTRADO'); return }
 
-      const newDados = { ...listpaciente[0], servico: dados.servico, preferencial: dados.preferencial }
+      const newDados = { ...listpaciente[0], servico: dados.servico, preferencial: dados.preferencial, cd_modalidade: dados.cd_modalidade ?? dados.modalidade }
 
       if (dados.servico === 'C' && listpaciente[0].cd_paciente) {
         const entrega = await entregaDeExames(listpaciente[0].cd_paciente)
@@ -98,7 +100,7 @@ export function DialogPatient({
       dt_nascimento: dados.dt_nascimento,
       preferencial: dados.preferencial,
       servico: dados.servico,
-      cd_modalidade:undefined
+      cd_modalidade: dados.cd_modalidade ?? dados.modalidade
     })
     irParaInicio()
   }

@@ -6,6 +6,7 @@ import {
   montarDsSenha,
   novoAtendimentoTotem,
   resolveModalidade,
+  resolverIpPainelPorModalidade,
 } from './senha.helpers'
 
 export async function gerarSenhaAtendimento({
@@ -17,7 +18,6 @@ export async function gerarSenhaAtendimento({
   const dateNow = getAgoraBrasil()
   const hoje = getHojeBrasil()
 
-  const IP_PAINEL = process.env.IPPAINEL
   const EMPRESA = process.env.IDEMPRESA ? Number(process.env.IDEMPRESA) : 0
   const FUNCIONARIO = process.env.IDFUNCIONARIO
     ? Number(process.env.IDFUNCIONARIO)
@@ -58,7 +58,10 @@ export async function gerarSenhaAtendimento({
     cd_modalidade ?? atendimento.salas?.cd_modalidade ?? 0
 
   let dsModalidade = await resolveModalidade(modalidadeSenha)
-
+   const IP_PAINEL = await resolverIpPainelPorModalidade(
+  servico,
+  modalidadeSenha
+)
   if (novoAtendimento && servico === 'A') {
     dsModalidade = 'ATENDIMENTO PRÉ'
   }

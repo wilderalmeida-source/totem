@@ -10,10 +10,22 @@ import { SearchTypeSelector } from "@/components/totem/searchTypeSelector";
 import { TotemHeader } from "@/components/totem/totemHeader";
 import { VirtualKeyboard } from "@/components/totem/virtualKeyboard";
 import { usePatientSearch } from "@/hooks/usePatientSearch";
-import { Paciente } from "@/services/api";
+import { buscarConfiguracaoPaineis, Paciente } from "@/services/api";
 import { onlyNumbers, TipoBusca } from "@/lib/patientUtils";
 import { buscarPacienteCPF } from "@/services/buscaCPF";
-
+interface PainelConfig {
+  painel: number
+  ativo: boolean
+  ip: string
+  atendimento: number[]
+  marcacao: number[]
+  resultado: number[]
+  universal: {
+    atendimento: boolean
+    marcacao: boolean
+    resultado: boolean
+  }
+}
 export default function Totem() {
   const url = useSearchParams();
   const { setShowModal, setDados, setExames, setInvalido, setLoading, setTentativas } = useContext(modalContext);
@@ -43,8 +55,9 @@ export default function Totem() {
     [pesquisar]
   );
   async function handleCPFPatientClick(paciente: Paciente) {
-    setLoading(true);
+  setLoading(true);
 
+  try {
     const result = await buscarPacienteCPF(
       onlyNumbers(text),
       paciente.dt_nascimento ?? "",
@@ -52,14 +65,46 @@ export default function Totem() {
       preferencial
     );
 
+    const configPainel = await buscarConfiguracaoPaineis();
+
+    const paineisAtivos =
+      configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? [];
+
+    const temSelecaoModalidadeAtiva =
+      configPainel?.ativo === true && paineisAtivos.length >= 2;
+
+    const naoTemExames = !result.exames || result.exames.length === 0;
+
+    if (tipo === "CPF" && temSelecaoModalidadeAtiva && naoTemExames && result.dados) {
+      sessionStorage.setItem(
+        "pacienteModalidade",
+        JSON.stringify({
+          dados: result.dados,
+          exames: result.exames,
+          tentativas: result.tentativas,
+          invalido: result.invalido,
+        })
+      );
+
+      router.replace(
+        `/modalidades?servico=${servico}&preferencial=${preferencial}`
+      );
+
+      return;
+    }
+
     setDados(result.dados);
     setExames(result.exames);
     setTentativas(result.tentativas);
     setInvalido(result.invalido);
-
-    setLoading(false);
     setShowModal(true);
+  } catch (error) {
+    console.error(error);
+    window.alert("Erro ao buscar paciente.");
+  } finally {
+    setLoading(false);
   }
+}
   function handleChangeTipo(nextTipo: TipoBusca) {
     setTipo(nextTipo);
     setText("");
