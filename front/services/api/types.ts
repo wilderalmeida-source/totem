@@ -54,10 +54,6 @@ export type AtendimentoFiltro = {
    SENHAS
 ======================= */
 export type Senha = {
-  cd_paciente?:number
-  servico?:string | null
-  preferencial?:number | null | undefined
-  cd_modalidade?:number | null 
   cd_senha?: number
   nr_senha?: number
   nr_modalidade?: number

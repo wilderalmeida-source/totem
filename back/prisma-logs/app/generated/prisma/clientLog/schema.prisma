@@ -77,6 +77,7 @@ model token {
   revokedAt String?  @logs.VarChar(191)
   createdAt DateTime @default(now()) @logs.Timestamp(6)
 }
+<<<<<<< HEAD
 
 model configuracao_painel {
   id        Int      @id @default(1)
@@ -85,3 +86,5 @@ model configuracao_painel {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+=======
+>>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0

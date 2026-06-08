@@ -124,7 +124,6 @@ export default function Historic() {
       setLoading(true)
 
       const response = await buscaSenhas()
-      console.log('SENHAS ENTREGA:', response.senhasnr)
 
       startTransition(() => {
         setDados(response)

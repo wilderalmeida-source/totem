@@ -100,7 +100,10 @@ export function DialogPatient({
       dt_nascimento: dados.dt_nascimento,
       preferencial: dados.preferencial,
       servico: dados.servico,
+<<<<<<< HEAD
       cd_modalidade: dados.cd_modalidade ?? dados.modalidade
+=======
+>>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
     })
     irParaInicio()
   }

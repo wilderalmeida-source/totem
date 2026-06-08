@@ -185,6 +185,7 @@ exports.Prisma.TokenScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+<<<<<<< HEAD
 exports.Prisma.Configuracao_painelScalarFieldEnum = {
   id: 'id',
   ativo: 'ativo',
@@ -193,13 +194,11 @@ exports.Prisma.Configuracao_painelScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+=======
+>>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
-};
-
-exports.Prisma.JsonNullValueInput = {
-  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -212,12 +211,6 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-};
-
 
 exports.Prisma.ModelName = {
   TtsDailyUsage: 'TtsDailyUsage',
@@ -227,8 +220,12 @@ exports.Prisma.ModelName = {
   NameDictionary: 'NameDictionary',
   TtsVoiceTest: 'TtsVoiceTest',
   ttsEvent: 'ttsEvent',
+<<<<<<< HEAD
   token: 'token',
   configuracao_painel: 'configuracao_painel'
+=======
+  token: 'token'
+>>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
 };
 
 /**
