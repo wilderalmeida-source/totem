@@ -69,6 +69,10 @@ export type Senha = {
   dt_sala?: string
   ds_paciente?: string
   atendimentos?: Atendimento[]
+  cd_paciente?: number
+  servico?: string | null
+  cd_modalidade?: number | null
+  preferencial?: number | null
 }
 
 export type SenhasResponse = {

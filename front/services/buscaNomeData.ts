@@ -53,10 +53,12 @@ export async function buscarPacienteNomeData({
   let exames: Atendimento[] | null = null
 
   if (servico === 'C') {
+
     const entrega = await entregaDeExames(paciente.cd_paciente)
     exames = entrega
-      ? entrega.filter((item) => [5].includes(item.status ?? -999)).slice(0, 10)
+      ? entrega.slice(0, 10)
       : []
+    console.log('Exames de entrega:', exames)
   } else {
     const hoje = new Date()
     hoje.setHours(0, 0, 0, 0)
@@ -68,12 +70,12 @@ export async function buscarPacienteNomeData({
 
     exames = atendimento
       ? atendimento.filter(
-          (item) =>
-            item.exames &&
-            item.exames.length > 0 &&
-            item.ds_status &&
-            STATUS_VALIDOS.includes(item.ds_status)
-        )
+        (item) =>
+          item.exames &&
+          item.exames.length > 0 &&
+          item.ds_status &&
+          STATUS_VALIDOS.includes(item.ds_status)
+      )
       : []
   }
 

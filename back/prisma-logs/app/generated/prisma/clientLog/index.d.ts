@@ -53,14 +53,11 @@ export type ttsEvent = $Result.DefaultSelection<Prisma.$ttsEventPayload>
  * 
  */
 export type token = $Result.DefaultSelection<Prisma.$tokenPayload>
-<<<<<<< HEAD
 /**
  * Model configuracao_painel
  * 
  */
 export type configuracao_painel = $Result.DefaultSelection<Prisma.$configuracao_painelPayload>
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
 
 /**
  * ##  Prisma Client ʲˢ
@@ -262,7 +259,6 @@ export class PrismaClient<
     * ```
     */
   get token(): Prisma.tokenDelegate<ExtArgs, ClientOptions>;
-<<<<<<< HEAD
 
   /**
    * `prisma.configuracao_painel`: Exposes CRUD operations for the **configuracao_painel** model.
@@ -273,8 +269,6 @@ export class PrismaClient<
     * ```
     */
   get configuracao_painel(): Prisma.configuracao_painelDelegate<ExtArgs, ClientOptions>;
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
 }
 
 export namespace Prisma {
@@ -716,12 +710,8 @@ export namespace Prisma {
     NameDictionary: 'NameDictionary',
     TtsVoiceTest: 'TtsVoiceTest',
     ttsEvent: 'ttsEvent',
-<<<<<<< HEAD
     token: 'token',
     configuracao_painel: 'configuracao_painel'
-=======
-    token: 'token'
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -737,11 +727,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-<<<<<<< HEAD
       modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel"
-=======
-      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token"
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1337,7 +1323,6 @@ export namespace Prisma {
           }
         }
       }
-<<<<<<< HEAD
       configuracao_painel: {
         payload: Prisma.$configuracao_painelPayload<ExtArgs>
         fields: Prisma.configuracao_painelFieldRefs
@@ -1412,8 +1397,6 @@ export namespace Prisma {
           }
         }
       }
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
     }
   } & {
     other: {
@@ -1530,10 +1513,7 @@ export namespace Prisma {
     ttsVoiceTest?: TtsVoiceTestOmit
     ttsEvent?: ttsEventOmit
     token?: tokenOmit
-<<<<<<< HEAD
     configuracao_painel?: configuracao_painelOmit
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
   }
 
   /* Types for Logging */
@@ -9906,7 +9886,6 @@ export namespace Prisma {
 
 
   /**
-<<<<<<< HEAD
    * Model configuracao_painel
    */
 
@@ -10937,8 +10916,6 @@ export namespace Prisma {
 
 
   /**
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
    * Enums
    */
 
@@ -11041,7 +11018,6 @@ export namespace Prisma {
   export type TokenScalarFieldEnum = (typeof TokenScalarFieldEnum)[keyof typeof TokenScalarFieldEnum]
 
 
-<<<<<<< HEAD
   export const Configuracao_painelScalarFieldEnum: {
     id: 'id',
     ativo: 'ativo',
@@ -11053,14 +11029,19 @@ export namespace Prisma {
   export type Configuracao_painelScalarFieldEnum = (typeof Configuracao_painelScalarFieldEnum)[keyof typeof Configuracao_painelScalarFieldEnum]
 
 
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -11077,6 +11058,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -11165,6 +11155,27 @@ export namespace Prisma {
    * Reference to a field of type 'BigInt[]'
    */
   export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
   /**
    * Deep Input Types
@@ -11608,7 +11619,6 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"token"> | Date | string
   }
 
-<<<<<<< HEAD
   export type configuracao_painelWhereInput = {
     AND?: configuracao_painelWhereInput | configuracao_painelWhereInput[]
     OR?: configuracao_painelWhereInput[]
@@ -11663,8 +11673,6 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"configuracao_painel"> | Date | string
   }
 
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
   export type TtsDailyUsageCreateInput = {
     date: Date | string
     chars?: number
@@ -12102,7 +12110,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-<<<<<<< HEAD
   export type configuracao_painelCreateInput = {
     id?: number
     ativo?: boolean
@@ -12159,8 +12166,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -12636,7 +12641,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-<<<<<<< HEAD
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -12729,8 +12733,6 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
-=======
->>>>>>> 409fa717eec048efe872f91dd129dabf1e3face0
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -12769,6 +12771,10 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -12965,6 +12971,42 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
 

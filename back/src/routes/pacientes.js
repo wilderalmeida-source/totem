@@ -108,8 +108,13 @@ async function pacientesRoute(fastify) {
                 select.dt_nascimento = true;
             }
             if (tipo == "NOMEDATA" && dt_nascimento && ds_paciente) {
-                where.ds_paciente = ds_paciente;
-                where.dt_nascimento = new Date(dt_nascimento);
+                where.OR = [
+                    { ds_paciente: " " + ds_paciente },
+                    { ds_paciente: ds_paciente },
+                    { ds_paciente: " " + ds_paciente + " " },
+                    { ds_paciente: ds_paciente + " " }
+                ];
+                where.dt_nascimento = dt_nascimento;
                 select.ds_paciente = true;
                 select.cd_paciente = true;
                 select.dt_nascimento = true;
@@ -124,7 +129,6 @@ async function pacientesRoute(fastify) {
                 return reply.send([{ tentativas }]);
             }
             if (tipo == "NOMEDATA" && pacientes.length <= 0) {
-                console.log(tentativas);
                 tentativas -= 1;
                 return reply.send([{ tentativas }]);
             }
@@ -169,14 +173,8 @@ async function pacientesRoute(fastify) {
             let tentativas = 0;
             while (tentativas < 3) {
                 try {
-                    const ultimo = await prismaDB_1.prisma.pacientes.findFirst({
-                        orderBy: { cd_paciente: 'desc' },
-                        select: { cd_paciente: true }
-                    });
-                    const novoId = (ultimo?.cd_paciente ?? 0) + 1;
                     pacientes = await prismaDB_1.prisma.pacientes.create({
                         data: {
-                            cd_paciente: novoId,
                             ds_paciente: ds_paciente.toUpperCase(),
                             dt_nascimento,
                             cd_funcionario: 50

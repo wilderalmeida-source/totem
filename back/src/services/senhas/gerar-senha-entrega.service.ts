@@ -1,5 +1,5 @@
 import { prisma } from '../../../config/prismaDB'
-import { GerarSenhaBody } from './senhas.types'
+import { GerarSenhaBody } from './senha.types'
 import {
   getAgoraBrasil,
   novoAtendimentoTotem,
@@ -33,18 +33,18 @@ export async function gerarSenhaEntrega({
   if (!atendimento) {
     atendimento = await novoAtendimentoTotem(cd_paciente)
   }
- 
+
   const nrControle =
     atendimento.nr_controle ?? atendimento.cd_atendimento
 
- 
+
   const modalidadeSenha =
     cd_modalidade ?? atendimento.salas?.cd_modalidade ?? 0
-  
-    const IP_PAINEL = await resolverIpPainelPorModalidade(
-  'C',
-  modalidadeSenha
-   )
+
+  const IP_PAINEL = await resolverIpPainelPorModalidade(
+    'C',
+    modalidadeSenha
+  )
   const dsModalidade = await resolveModalidade(modalidadeSenha)
 
   return prisma.atendimentos_senhas.create({

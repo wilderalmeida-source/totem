@@ -1,5 +1,5 @@
 import { prisma } from '../../../config/prismaDB'
-import { GerarSenhaBody } from './senhas.types'
+import { GerarSenhaBody } from './senha.types'
 import {
   getAgoraBrasil,
   getHojeBrasil,
@@ -58,10 +58,10 @@ export async function gerarSenhaAtendimento({
     cd_modalidade ?? atendimento.salas?.cd_modalidade ?? 0
 
   let dsModalidade = await resolveModalidade(modalidadeSenha)
-   const IP_PAINEL = await resolverIpPainelPorModalidade(
-  servico,
-  modalidadeSenha
-)
+  const IP_PAINEL = await resolverIpPainelPorModalidade(
+    servico,
+    modalidadeSenha
+  )
   if (novoAtendimento && servico === 'A') {
     dsModalidade = 'ATENDIMENTO PRÉ'
   }

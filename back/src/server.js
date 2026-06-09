@@ -23,6 +23,7 @@ const voice_1 = require("./routes/voice");
 const createToken_1 = require("./routes/createToken");
 const autenticate_1 = require("../middleware/autenticate");
 const atencao_1 = require("./routes/atencao");
+const paineis_config_1 = require("./routes/paineis-config");
 async function bootstrap() {
     const fastify = (0, fastify_1.default)({ logger: true, });
     await fastify.register(async (instance) => {
@@ -47,6 +48,7 @@ async function bootstrap() {
     await fastify.register(modalidades_1.modalidadesRoute);
     await fastify.register(procedimentos_1.procedimentosRoute);
     await fastify.register(atencao_1.atencaoRoute);
+    await fastify.register(paineis_config_1.configuracaoPaineisRoutes);
     await fastify.register(websocket_1.default);
     await fastify.register(pgNotify_1.default, { channel: "db_atendimentos_senhas", logRawPayload: false, });
     fastify.listen({ port: 5000, host: '0.0.0.0' }, (err, address) => {

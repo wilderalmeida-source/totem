@@ -69,7 +69,18 @@ CREATE TABLE IF NOT EXISTS "token" (
   "revokedAt" VARCHAR(191),
   "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS "configuracao_painel" (
+  "id"        INTEGER PRIMARY KEY DEFAULT 1,
+  "ativo"     BOOLEAN NOT NULL DEFAULT false,
+  "paineis"   JSONB NOT NULL DEFAULT '[]'::jsonb,
+  "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+  CONSTRAINT "configuracao_painel_id_unico" CHECK ("id" = 1)
+);
+INSERT INTO "configuracao_painel" ("id", "ativo", "paineis")
+VALUES (1, false, '[]'::jsonb)
+ON CONFLICT ("id") DO NOTHING;
 -- ============================================================
 -- SEED - NameDictionary
 -- ============================================================
