@@ -1,6 +1,8 @@
 import { prisma } from '../../../config/prismaDB'
 import { PrismaLog } from '../../../config/prismalog'
-
+const FUNCIONARIO = process.env.IDFUNCIONARIO
+    ? Number(process.env.IDFUNCIONARIO)
+    : 1
 export function getAgoraBrasil() {
   return new Date(Date.now() - 3 * 60 * 60 * 1000)
 }
@@ -49,6 +51,7 @@ export async function novoAtendimentoTotem(cd_paciente: number) {
         cd_medico: cdMedicoTotem,
         dt_data: getHojeBrasil(),
         ds_status: 2,
+        cd_funcionario: FUNCIONARIO
       },
       include: {
         salas: true,
@@ -62,6 +65,7 @@ export async function novoAtendimentoTotem(cd_paciente: number) {
       },
       data: {
         nr_controle: atendimento.cd_atendimento,
+        cd_funcionario: FUNCIONARIO
       },
     })
 

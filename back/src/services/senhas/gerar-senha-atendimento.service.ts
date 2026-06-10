@@ -125,6 +125,7 @@ export async function gerarSenhaAtendimento({
       ds_senha: dsSenha,
       cd_senha: senha.cd_senha,
       dt_hora_senha: dateNow,
+      cd_funcionario: FUNCIONARIO
     },
   })
 
