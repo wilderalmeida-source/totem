@@ -10,6 +10,9 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
     const FUNCIONARIO = process.env.IDFUNCIONARIO
         ? Number(process.env.IDFUNCIONARIO)
         : 1;
+    const modalidadeTotem = process.env.IDMODALIDADE
+        ? Number(process.env.IDMODALIDADE)
+        : 0;
     const atendimentos = await prismaDB_1.prisma.atendimentos.findMany({
         where: {
             cd_paciente,
@@ -26,14 +29,25 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
         item.ds_status != null &&
         statusValidos.includes(item.ds_status));
     let novoAtendimento = false;
-    if (exameAtendimento.length === 0) {
+    console.log('Atendimentos encontrados para paciente:', cd_paciente, exameAtendimento);
+    if (exameAtendimento.length === 0 || !exameAtendimento) {
+        console.log('INICIANDO NOVO ATENDIMENTO TOTEM:');
         const novo = await (0, senha_helpers_1.novoAtendimentoTotem)(cd_paciente);
+        console.log('NOVO ATENDIMENTO TOTEM:', novo);
         exameAtendimento = [novo];
         novoAtendimento = true;
     }
     const atendimento = exameAtendimento[0];
-    const modalidadeSenha = cd_modalidade ?? atendimento.salas?.cd_modalidade ?? 0;
+    const modalidadeSenha = cd_modalidade ??
+        atendimento.salas?.cd_modalidade ??
+        modalidadeTotem;
+    if (!modalidadeSenha) {
+        throw new Error('IDMODALIDADE não configurado no .env');
+    }
     let dsModalidade = await (0, senha_helpers_1.resolveModalidade)(modalidadeSenha);
+    if (!dsModalidade) {
+        throw new Error(`Modalidade ${modalidadeSenha} não encontrada`);
+    }
     const IP_PAINEL = await (0, senha_helpers_1.resolverIpPainelPorModalidade)(servico, modalidadeSenha);
     if (novoAtendimento && servico === 'A') {
         dsModalidade = 'ATENDIMENTO PRÉ';

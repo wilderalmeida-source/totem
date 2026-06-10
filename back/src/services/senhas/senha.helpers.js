@@ -27,23 +27,41 @@ async function resolveModalidade(cd_modalidade) {
     return modalidade?.ds_modalidade ?? '';
 }
 async function novoAtendimentoTotem(cd_paciente) {
-    const cdSalaTotem = process.env.IDSALA
-        ? Number(process.env.IDSALA)
-        : null;
+    console.log('Criando novo atendimento para paciente:', cd_paciente);
+    const cdSalaTotem = Number(process.env.IDSALA);
+    const cdMedicoTotem = Number(process.env.IDMEDICO);
     if (!cdSalaTotem) {
         throw new Error('IDSALA não configurado no .env');
     }
-    return prismaDB_1.prisma.atendimentos.create({
-        data: {
-            cd_paciente,
-            cd_sala: cdSalaTotem,
-            dt_data: getHojeBrasil(),
-            ds_status: 2,
-        },
-        include: {
-            salas: true,
-            exames: true,
-        },
+    if (!cdMedicoTotem) {
+        throw new Error('IDMEDICO não configurado no .env');
+    }
+    return prismaDB_1.prisma.$transaction(async (tx) => {
+        const atendimento = await tx.atendimentos.create({
+            data: {
+                cd_paciente,
+                cd_sala: cdSalaTotem,
+                cd_medico: cdMedicoTotem,
+                dt_data: getHojeBrasil(),
+                ds_status: 2,
+            },
+            include: {
+                salas: true,
+                exames: true,
+            },
+        });
+        await tx.atendimentos.update({
+            where: {
+                cd_atendimento: atendimento.cd_atendimento,
+            },
+            data: {
+                nr_controle: atendimento.cd_atendimento,
+            },
+        });
+        return {
+            ...atendimento,
+            nr_controle: atendimento.cd_atendimento,
+        };
     });
 }
 function servicoParaConfig(servico) {
