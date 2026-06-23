@@ -2645,7 +2645,6 @@ model exames {
   cd_regiao                                                     Int?
   bb_laudo_revisao                                              Bytes?
   sn_laudo_revisao                                              Boolean?
-  sn_worklist_wtt                                               Boolean?                    @default(false)
   erros                                                         erros[]
   planos                                                        planos?                     @relation(fields: [cd_plano], references: [cd_plano], onDelete: NoAction, onUpdate: NoAction, map: "$1")
   lancamentos_exames_cd_particularTolancamentos                 lancamentos?                @relation("exames_cd_particularTolancamentos", fields: [cd_particular], references: [cd_lancamento], onDelete: NoAction, onUpdate: NoAction, map: "$3")
@@ -7467,8 +7466,6 @@ model salas {
   cd_nfe_centro                                    Int?
   ds_tiss_regime                                   String?                   @db.VarChar(2)
   sn_duplicar                                      Boolean?
-  ds_workcell                                      String?                   @db.VarChar(30)
-  cd_sala_protocolo                                Int?
   ds_painel_vip                                    String?                   @db.Char(1)
   sn_doctime                                       Boolean?
   anotacoes                                        anotacoes[]

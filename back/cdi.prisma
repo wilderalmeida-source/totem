@@ -1,0 +1,355 @@
+--------------------------COfuChJW4Mvt6GnXUxbUOF
+Content-Disposition: form-data; name="file"; filename="schema-cliente.prisma"
+Content-Type: application/octet-stream
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "app/generated/prisma/client"
+  previewFeatures = ["partialIndexes"]
+  binaryTargets   = ["native", "debian-openssl-3.0.x", "windows"]
+  engineType      = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model agendas {
+  cd_agenda      Int             @id @default(autoincrement())
+  ds_agenda      String?         @db.VarChar(64)
+  ds_logradouro  String?         @db.VarChar(64)
+  ds_numero      String?         @db.VarChar(8)
+  ds_complemento String?         @db.VarChar(32)
+  ds_telefone    String?         @db.VarChar(16)
+  ds_celular     String?         @db.VarChar(16)
+  ds_contato     String?         @db.VarChar(16)
+  ds_email       String?         @db.VarChar(64)
+  cd_grupo       Int?
+  ds_observacao  String?         @db.VarChar(64)
+  ds_cep         String?         @db.VarChar(8)
+  ds_bairro      String?         @db.VarChar(64)
+  ds_cidade      String?         @db.VarChar(64)
+  ds_estado      String?         @db.VarChar(2)
+  ds_telefone01  String?         @db.VarChar(16)
+  ds_telefone02  String?         @db.VarChar(16)
+  ds_telefone03  String?         @db.VarChar(16)
+  cd_funcionario Int?
+  ds_skype       String?         @db.VarChar(64)
+  ds_msn         String?         @db.VarChar(64)
+  ds_ibge        String?         @db.VarChar(8)
+  agendas_grupos agendas_grupos? @relation(fields: [cd_grupo], references: [cd_grupo], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+}
+
+model agendas_grupos {
+  cd_grupo       Int       @id @default(autoincrement())
+  ds_grupo       String?   @db.VarChar(64)
+  cd_funcionario Int?
+  agendas        agendas[]
+}
+
+model anotacoes {
+  cd_anotacao             Int           @id @default(autoincrement())
+  cd_sala                 Int?
+  dt_anotacao             DateTime?     @db.Date
+  cd_funcionario          Int?
+  ds_anotacao             String?
+  cd_funcionario_anotacao Int?
+  salas                   salas?        @relation(fields: [cd_sala], references: [cd_sala], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  funcionarios            funcionarios? @relation(fields: [cd_funcionario_anotacao], references: [cd_funcionario], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model arquivosrm {
+  codimagem    Int     @id @default(autoincrement())
+  codfilme     Int?
+  codpatologia Int?
+  descricao    String? @db.VarChar(255)
+  publicar     String? @default("S") @db.Char(1)
+  nomeimagem   String? @db.VarChar(8)
+  imprimir     String? @default("N") @db.Char(1)
+
+  @@index([codfilme], map: "codfilme_arquivosrm_key")
+  @@index([nomeimagem], map: "nomeimagem_arquivosrm_key")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model atendimentos {
+  cd_atendimento                                                       Int                          @id @default(autoincrement())
+  cd_sala                                                              Int?
+  cd_medico                                                            Int?
+  cd_paciente                                                          Int?
+  cd_horario                                                           Int?
+  dt_data                                                              DateTime                     @db.Date
+  dt_hora                                                              DateTime?                    @db.Time(6)
+  nr_controle                                                          Int?
+  ds_status                                                            Int?                         @default(2)
+  ds_observacao                                                        String?                      @db.VarChar(254)
+  ds_responsavel                                                       String?                      @db.VarChar(64)
+  ds_dados                                                             String?                      @db.VarChar(128)
+  dt_entrega                                                           DateTime?                    @db.Date
+  ds_entrega                                                           String?                      @db.VarChar(64)
+  cd_funcionario                                                       Int?
+  hr_entrega                                                           DateTime?                    @db.Time(6)
+  ds_ficha                                                             String?                      @db.VarChar(128)
+  nr_controle2                                                         Int?
+  cd_revisor                                                           Int?
+  nr_aviso                                                             Int?
+  cd_lancamento                                                        Int?
+  ds_cid                                                               String?                      @db.VarChar(8)
+  ds_observacao2                                                       String?                      @db.VarChar(254)
+  ds_responsavel_parente                                               String?                      @db.VarChar(64)
+  ds_responsavel_telefone                                              String?                      @db.VarChar(12)
+  bb_dados                                                             Bytes?
+  dt_lancamento                                                        DateTime?                    @db.Timestamp(6)
+  ds_principal                                                         String?                      @db.VarChar(20)
+  sn_urgencia                                                          Boolean?                     @default(false)
+  cd_tipo                                                              Int?
+  cd_consulta                                                          Int?
+  cd_saida                                                             Int?
+  dt_envio                                                             DateTime?                    @db.Date
+  cd_profissional                                                      Int?
+  sn_worklist                                                          Boolean?                     @default(false)
+  cd_funcionario_tecnico                                               Int?
+  cd_funcionario_marcacao                                              Int?
+  cd_funcionario_recepcao                                              Int?
+  dt_hora_fim                                                          DateTime?                    @db.Time(6)
+  cd_agendamento                                                       Int?
+  cd_indicacao                                                         Int?
+  dt_hora_ficha                                                        DateTime?                    @db.Time(6)
+  dt_hora_entrada                                                      DateTime?                    @db.Time(6)
+  dt_hora_saida                                                        DateTime?                    @db.Time(6)
+  dt_hora_atendido                                                     DateTime?                    @db.Time(6)
+  dt_hora_sala01                                                       DateTime?                    @db.Time(6)
+  dt_hora_sala02                                                       DateTime?                    @db.Time(6)
+  ds_internacao                                                        String?                      @db.VarChar(16)
+  nr_medico                                                            Int?
+  cd_acomodacao                                                        Int?
+  cd_internacao                                                        Int?
+  dt_data_saida                                                        DateTime?                    @db.Date
+  sn_imagem                                                            Boolean?
+  dt_entrega_realizado                                                 DateTime?                    @db.Timestamp(6)
+  dt_agendamento                                                       DateTime?                    @default(now()) @db.Timestamp(6)
+  ds_observacao3                                                       String?                      @db.VarChar(254)
+  cd_funcionario_resultado                                             Int?
+  dt_hora_sala00                                                       DateTime?                    @db.Time(6)
+  nr_regime_internacao                                                 String?                      @db.VarChar(2)
+  cd_responsavel                                                       Int?
+  dt_fila                                                              DateTime?                    @db.Timestamp(6)
+  ds_fila                                                              String?                      @db.VarChar(254)
+  sn_reserva                                                           Boolean?
+  ds_tipo_faturamento                                                  String?                      @db.VarChar(8)
+  nr_tipo_internacao                                                   String?                      @db.VarChar(2)
+  cd_contratado                                                        Int?
+  ds_tipo_doenca                                                       String?                      @db.VarChar(1)
+  ds_tempo_doenca                                                      String?                      @db.VarChar(1)
+  nr_tempo_doenca                                                      Int?
+  nr_urgente                                                           Int?
+  sn_contratado_executante                                             Boolean?
+  ds_cid_descricao                                                     String?                      @db.VarChar(64)
+  sn_fluxo_solicitado                                                  Boolean?
+  sn_fluxo_documentado                                                 Boolean?
+  sn_fluxo_gravado                                                     Boolean?
+  sn_fluxo_impresso                                                    Boolean?
+  sn_fluxo_envelopado                                                  Boolean?
+  sn_fluxo_conferido                                                   Boolean?
+  sn_fluxo_entrega                                                     Boolean?
+  bb_historico                                                         Bytes?
+  dt_dum                                                               DateTime?                    @db.Date
+  cd_funcionario_pedido                                                Int?
+  bb_complemento                                                       Bytes?
+  cd_complemento                                                       Int?
+  sn_entrega_filme                                                     Boolean?
+  ds_tiss_observacao                                                   String?                      @db.VarChar(500)
+  sn_retorno                                                           Boolean?
+  sn_fluxo_anestesista                                                 Boolean?
+  sn_sms                                                               Boolean?
+  dt_hora_raiox                                                        DateTime?                    @db.Time(6)
+  sn_fluxo_escaneado                                                   Boolean?
+  dt_complemento                                                       DateTime?                    @db.Timestamp(6)
+  sn_fluxo_aguardando                                                  Boolean?
+  cd_localizacao                                                       Int?
+  dt_dados                                                             DateTime?                    @db.Timestamp(6)
+  sn_fluxo_entrevista                                                  Boolean?
+  ds_studyuid                                                          String?                      @db.VarChar(64)
+  cd_cancelamento                                                      Int?
+  dt_email_laudo                                                       DateTime?                    @db.Timestamp(6)
+  dt_email_agenda                                                      DateTime?                    @db.Timestamp(6)
+  dt_sms_agenda                                                        DateTime?                    @db.Timestamp(6)
+  dt_sms_laudo                                                         DateTime?                    @db.Timestamp(6)
+  dt_hora_autorizacao                                                  DateTime?                    @db.Time(6)
+  sn_exame_externo                                                     Boolean?
+  sn_web                                                               Boolean?
+  nr_impressao                                                         Int?                         @default(0)
+  sn_impressao                                                         Boolean?
+  dt_confirmado                                                        DateTime?                    @db.Timestamp(6)
+  dt_cancelado                                                         DateTime?                    @db.Timestamp(6)
+  dt_bloqueado                                                         DateTime?                    @db.Timestamp(6)
+  dt_atendimento                                                       DateTime?                    @db.Timestamp(6)
+  cd_ligacao                                                           Int?
+  cd_senha                                                             Int?
+  nr_parcial_filme                                                     Int?
+  nr_parcial_papel                                                     Int?
+  ds_parcial_nome                                                      String?                      @db.VarChar(64)
+  dt_hora_senha                                                        DateTime?                    @db.Time(6)
+  ds_senha                                                             String?                      @db.VarChar(8)
+  ds_cartao_magnetico                                                  String?                      @db.VarChar(254)
+  dt_transferido                                                       DateTime?                    @db.Timestamp(6)
+  cd_procedencia                                                       Int?
+  ds_futurofone                                                        String?                      @db.Char(1)
+  dt_futurofone                                                        DateTime?                    @db.Timestamp(6)
+  dt_congelado                                                         DateTime?                    @db.Timestamp(6)
+  sn_extra                                                             Boolean?                     @default(false)
+  ds_acidente                                                          String?                      @db.VarChar(32)
+  dt_envelope                                                          DateTime?                    @db.Date
+  cd_funcionario_envelope                                              Int?
+  dt_conferido                                                         DateTime?                    @db.Timestamp(6)
+  cd_funcionario_conferido                                             Int?
+  cd_atendimento_depara                                                Int?
+  dt_hora_log                                                          DateTime?                    @db.Timestamp(6)
+  cd_fila                                                              Int?
+  dt_email_preparo                                                     DateTime?                    @db.Timestamp(6)
+  sn_agrupar                                                           Boolean?
+  sn_agente                                                            Boolean?
+  dt_complemento_finalizado                                            DateTime?                    @db.Timestamp(6)
+  cd_2revisor                                                          Int?
+  dt_shift                                                             DateTime?                    @db.Timestamp(6)
+  ds_entrega_local                                                     String?                      @db.VarChar(254)
+  cd_rota                                                              Int?
+  dt_hora_ficha_tecnico                                                DateTime?                    @db.Time(6)
+  dt_hora_contraste_01                                                 DateTime?                    @db.Time(6)
+  dt_hora_contraste_02                                                 DateTime?                    @db.Time(6)
+  ds_cid2                                                              String?                      @db.VarChar(8)
+  ds_cid3                                                              String?                      @db.VarChar(8)
+  ds_cid4                                                              String?                      @db.VarChar(8)
+  ds_cid2_descricao                                                    String?                      @db.VarChar(254)
+  ds_cid3_descricao                                                    String?                      @db.VarChar(254)
+  ds_cid4_descricao                                                    String?                      @db.VarChar(254)
+  dt_rota                                                              DateTime?                    @db.Date
+  sn_fluxo_motoboy                                                     Boolean?
+  sn_fluxo_medico                                                      Boolean?
+  sn_fluxo_expedicao                                                   Boolean?
+  ds_indicacao                                                         String?                      @db.VarChar(64)
+  ds_entrega_endereco                                                  String?                      @db.VarChar(254)
+  sn_exame_laudo                                                       Boolean?
+  ds_entrega_observacao                                                String?                      @db.VarChar(254)
+  cd_funcionario_motoboy                                               Int?
+  cd_funcionario_laboratorio                                           Int?
+  sn_fluxo_laboratorio                                                 Boolean?
+  dt_funcionario_motoboy                                               DateTime?                    @db.Timestamp(6)
+  dt_funcionario_laboratorio                                           DateTime?                    @db.Timestamp(6)
+  dt_funcionario_entrega                                               DateTime?                    @db.Date
+  cd_funcionario_entrega                                               Int?
+  sn_fluxo_upload                                                      Boolean?
+  sn_fluxo_download                                                    Boolean?
+  ds_preparo                                                           String?                      @db.VarChar(3)
+  cd_funcionario_confirmacao                                           Int?
+  ds_entrega_nome                                                      String?                      @db.VarChar(64)
+  cd_funcionario_transferencia                                         Int?
+  ds_grau_participacao                                                 String?                      @db.VarChar(2)
+  dt_questionario                                                      DateTime?                    @db.Time(6)
+  cd_bloqueio                                                          Int?
+  ds_guiche                                                            String?                      @db.VarChar(8)
+  dt_data_entrada                                                      DateTime?                    @db.Date
+  cd_funcionario_enfermagem                                            Int?
+  dt_hora_inicial                                                      DateTime?                    @db.Time(6)
+  dt_hora_final                                                        DateTime?                    @db.Time(6)
+  nr_classificacao                                                     Int?
+  dt_classificacao                                                     DateTime?                    @db.Date
+  nr_auditado                                                          Int?
+  dt_auditado                                                          DateTime?                    @db.Date
+  bb_segunda_opniao                                                    Bytes?
+  ds_segunda_opniao                                                    String?                      @db.VarChar(254)
+  bb_classificacao                                                     Bytes?
+  bb_replica                                                           Bytes?
+  dt_replica                                                           DateTime?                    @db.Date
+  cd_auditor                                                           Int?
+  nr_score                                                             Int?
+  bb_auditado                                                          Bytes?
+  cd_cbos                                                              Int?
+  ds_patientuid                                                        String?                      @db.VarChar(16)
+  dt_app_agenda                                                        DateTime?                    @db.Timestamp(6)
+  cd_sessao                                                            Int?
+  bb_structreport                                                      Bytes?
+  dt_sessao                                                            DateTime?                    @db.Date
+  dt_hora_sala10                                                       DateTime?                    @db.Time(6)
+  dt_parcial                                                           DateTime?                    @db.Date
+  cd_funcionario_parcial                                               Int?
+  dt_app_laudo                                                         DateTime?                    @db.Timestamp(6)
+  sn_optimus                                                           Boolean?
+  sn_ordem                                                             Boolean?
+  sn_union                                                             Boolean?
+  ds_cancelamento                                                      String?                      @db.VarChar(254)
+  dt_termo                                                             DateTime?                    @db.Timestamp(6)
+  bb_termo                                                             Bytes?
+  dt_sms_horario                                                       DateTime?                    @db.Timestamp(6)
+  dt_sms_fluxo                                                         DateTime?                    @db.Timestamp(6)
+  dt_sms_final                                                         DateTime?                    @db.Timestamp(6)
+  bb_resultado                                                         Bytes?
+  cd_funcionario_cancelado                                             Int?
+  nr_tecnico_avaliacao                                                 String?                      @db.Char(1)
+  dt_imagem                                                            DateTime?                    @db.Timestamp(6)
+  ds_entrega_pessoa                                                    String?                      @db.VarChar(64)
+  ds_entrega_documento                                                 String?                      @db.VarChar(16)
+  ds_contraste                                                         String?                      @db.VarChar(16)
+  nr_chat_clinica                                                      Int?
+  nr_chat_medico                                                       Int?
+  cd_motivo_transferencia                                              Int?
+  bb_avaliacao                                                         String?
+  ds_indicacao_clinica                                                 String?                      @db.VarChar(254)
+  cd_revisao                                                           Int?
+  ds_accession                                                         String?                      @db.VarChar(64)
+  cd_auditoria                                                         Int?
+  cd_orcamento                                                         Int?
+  nr_regime_atendimento                                                String?                      @db.Char(2)
+  dt_hora_posicao01                                                    DateTime?                    @db.Time(6)
+  dt_hora_posicao02                                                    DateTime?                    @db.Time(6)
+  dt_hora_contraste                                                    DateTime?                    @db.Time(6)
+  dt_pesquisa                                                          DateTime?                    @db.Timestamp(6)
+  ds_cobertura_especial                                                String?                      @db.VarChar(2)
+  ds_saude_ocupacional                                                 String?                      @db.VarChar(2)
+  cd_medico_anamnese                                                   Int?
+  cd_sla                                                               Int?
+  ds_tipo_identificacao                                                String?                      @db.Char(2)
+  sn_portal                                                            Boolean?
+  dt_hora_posicao03                                                    DateTime?                    @db.Time(6)
+  cd_solucao                                                           Int?
+  cd_atendimento_animati                                               Int?
+  dt_entrega_laudo                                                     DateTime?                    @db.Timestamp(6)
+  bb_revisor                                                           Bytes?
+  bb_executante                                                        Bytes?
+  dt_reconvocacao                                                      DateTime?                    @db.Timestamp(6)
+  cd_reconvocacao                                                      Int?
+  bb_solucao                                                           Bytes?
+  bb_auditor                                                           Bytes?
+  sn_reconvocar                                                        Boolean?
+  cd_animat                                                            String?                      @db.VarChar
+  cd_animati                                                           Int?
+  cd_funcionario_reconvocacao                                          Int?
+  dt_study                                                             DateTime?                    @db.Timestamp(6)
+  dt_hora_fila                                                         DateTime?                    @db.Time(6)
+  dt_deadline                                                          DateTime?                    @db.Timestamp(6)
+  cd_medico_reconvocacao                                               Int?
+  dt_hora_reconstrucao                                                 DateTime?                    @db.Time(6)
+  sn_contraste                                                         Boolean?
+  bb_contraste                                                         Bytes?
+  cd_medico_adendo                                                     Int?
+  sn_entrega_imediata                                                  Boolean?
+  cd_animati_new                                                       String?                      @db.VarChar
+  lancamentos                                                          lancamentos?                 @relation(fields: [cd_lancamento], references: [cd_lancamento], onDelete: NoAction, onUpdate: NoAction, map: "$1")
+  horarios                                                             horarios?                    @relation(fields: [cd_horario], references: [cd_horario], onDelete: NoAction, onUpdate: NoAction, map: "$3")
+  salas                                                                salas?                       @relation(fields: [cd_sala], references: [cd_sala], onDelete: NoAction, onUpdate: NoAction, map: "$4")
+  medicos_atendimentos_cd_medicoTomedicos                              medicos?                     @relation("atendimentos_cd_medicoTomedicos", fields: [cd_medico], references: [cd_medico], onDelete: NoAction, onUpdate: NoAction, map: "$5")
+  pacientes_atendimentos_cd_pacienteTopacientes                        pacientes?                   @relation("atendimentos_cd_pacienteTopacientes", fields: [cd_paciente], references: [cd_paciente], onDelete: NoAction, onUpdate: NoAction, map: "$7")
+  medicos_atendimentos_cd_2revisorTomedicos                            medicos?                     @relation("atendimentos_cd_2revisorTomedicos", fields: [cd_2revisor], references: [cd_medico], onDelete: NoAction, onUpdate: NoAction)
+  tiss_acomodacao                                                      tiss_acomodacao?             @relation(fields: [cd_acomodacao], references: [cd_acomodacao], onDelete: NoAction, onUpdate: NoAction)
+  medicos_atendimentos_cd_auditorTomedicos                             medicos?                     @relation("atendimentos_cd_auditorTomedicos", fields: [cd_auditor], references: [cd_medico], onDelete: NoAction, onUpdate: NoAction)
+  atendimentos_revisao_atendimentos_cd_auditoriaToatendimentos_revisao atendimentos_revisao?        @relation("atendimentos_cd_auditoriaToatendimentos_revisao", fields: [cd_auditoria], references: [cd_revisao], onDelete: NoAction, onUpdate: NoAction)
+  atendimentos_bloqueios                                               atendimentos_bloqueios?      @relation(fields: [cd_bloqueio], references: [cd_bloqueio], onDelete: NoAction, onUpdate: NoAction)
+  atendimentos_cancelamentos                                           atendimentos_cancelamentos?  @relation(fields: [cd_cancelamento], references: [cd_cancelamento], onDelete: NoAction, onUpdate: NoAction)
+  tiss_cbos_3010                                                       tiss_cbos_3010?              @relation(fields: [cd_cbos], references: [cd_cbos], onDelete: NoAction, onUpdate: NoAction)
+  atendimentos_complementos                                            atendimentos_complementos?   @relation(fields: [cd_complemento], references: [cd_complemento], onDelete: NoAction, onUpdate: NoAction)
+  tiss_consulta                                                        tiss_consulta?               @relation(fields: [cd_consulta], references: [cd_consulta], onDelete: NoAction, onUpdate: NoAction)
+  empresas                                                             empresas?                    @relation(fields: [cd_contratado], references: [cd_empresa], onDelete: NoAction, onUpdate: NoAction)
+  salas_filas                                                          salas_filas?                 @relation(fields: [cd_fila], references: [cd_fila], onDelete: NoAction, onUpdate: NoAction)
+  funcionarios_atendimentos_cd_funcionario_canceladoTofuncionarios     funcionarios?                @relation("atendimentos_cd_funcionario_canceladoTofuncionarios", fields: [cd_funcionario_cancelado], references: [cd_funcionario], onDelete: NoAction, onUpdate: NoAction)
+  funcionarios_atendimentos_cd_funcionario_conferidoTofuncionarios     funcionarios?                @relation("atendimentos_cd_funcionario_conferidoTofuncionarios", fields: [cd_
