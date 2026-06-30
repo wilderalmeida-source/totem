@@ -8,6 +8,9 @@ exports.novoAtendimentoTotem = novoAtendimentoTotem;
 exports.resolverIpPainelPorModalidade = resolverIpPainelPorModalidade;
 const prismaDB_1 = require("../../../config/prismaDB");
 const prismalog_1 = require("../../../config/prismalog");
+const FUNCIONARIO = process.env.IDFUNCIONARIO
+    ? Number(process.env.IDFUNCIONARIO)
+    : 1;
 function getAgoraBrasil() {
     return new Date(Date.now() - 3 * 60 * 60 * 1000);
 }
@@ -44,6 +47,7 @@ async function novoAtendimentoTotem(cd_paciente) {
                 cd_medico: cdMedicoTotem,
                 dt_data: getHojeBrasil(),
                 ds_status: 2,
+                cd_funcionario: FUNCIONARIO
             },
             include: {
                 salas: true,
@@ -56,6 +60,7 @@ async function novoAtendimentoTotem(cd_paciente) {
             },
             data: {
                 nr_controle: atendimento.cd_atendimento,
+                cd_funcionario: FUNCIONARIO
             },
         });
         return {

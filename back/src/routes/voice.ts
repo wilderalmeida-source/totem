@@ -61,6 +61,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
 
       const textoComDict = await applyDictionary(text);
       const formatado = capitalizarNome(textoComDict)
+      console.log(formatado)
       const body = {
         input: { text: formatado },
         voice: {

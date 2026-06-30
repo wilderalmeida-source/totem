@@ -88,6 +88,7 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
             ds_senha: dsSenha,
             cd_senha: senha.cd_senha,
             dt_hora_senha: dateNow,
+            cd_funcionario: FUNCIONARIO
         },
     });
     return senha;

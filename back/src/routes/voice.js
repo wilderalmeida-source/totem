@@ -60,6 +60,7 @@ async function voiceRoute(fastify) {
             });
             const textoComDict = await (0, googleVoices_1.applyDictionary)(text);
             const formatado = capitalizarNome(textoComDict);
+            console.log(formatado);
             const body = {
                 input: { text: formatado },
                 voice: {

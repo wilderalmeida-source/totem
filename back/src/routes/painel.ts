@@ -43,7 +43,10 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
       (async () => {
         const ipDestino = sock.localAddress?.replace("::ffff:", "") ?? "";
         const painelId = await descobrirPainelId(fastify, ipDestino);
-
+        console.log({
+         local: sock.localAddress,
+         remote: sock.remoteAddress
+        });
         try {
           const m2 = raw.match(/^(?:[^-]*-){2}\s*([^-]*?)\s*-/);
           const tail = (m2?.[1] ?? "").trim();
