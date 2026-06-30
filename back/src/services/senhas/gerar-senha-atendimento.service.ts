@@ -49,11 +49,8 @@ export async function gerarSenhaAtendimento({
   )
 
   let novoAtendimento = false
-  console.log('Atendimentos encontrados para paciente:', cd_paciente, exameAtendimento)
   if (exameAtendimento.length === 0 || !exameAtendimento) {
-    console.log('INICIANDO NOVO ATENDIMENTO TOTEM:')
     const novo = await novoAtendimentoTotem(cd_paciente)
-    console.log('NOVO ATENDIMENTO TOTEM:', novo)
     exameAtendimento = [novo]
     novoAtendimento = true
   }

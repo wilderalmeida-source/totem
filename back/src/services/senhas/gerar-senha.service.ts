@@ -4,7 +4,6 @@ import { gerarSenhaAtendimento } from './gerar-senha-atendimento.service'
 
 export async function gerarSenhaService(body: GerarSenhaBody) {
     const { cd_paciente, servico } = body
-    console.log('GERAR SENHA SERVICE:', body)
     if (!cd_paciente) {
         throw new Error('Paciente inválido')
     }
@@ -12,6 +11,5 @@ export async function gerarSenhaService(body: GerarSenhaBody) {
     if (servico === 'C') {
         return gerarSenhaEntrega(body)
     }
-
     return gerarSenhaAtendimento(body)
 }
