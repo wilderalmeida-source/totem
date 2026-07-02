@@ -29,11 +29,8 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
         item.ds_status != null &&
         statusValidos.includes(item.ds_status));
     let novoAtendimento = false;
-    console.log('Atendimentos encontrados para paciente:', cd_paciente, exameAtendimento);
     if (exameAtendimento.length === 0 || !exameAtendimento) {
-        console.log('INICIANDO NOVO ATENDIMENTO TOTEM:');
         const novo = await (0, senha_helpers_1.novoAtendimentoTotem)(cd_paciente);
-        console.log('NOVO ATENDIMENTO TOTEM:', novo);
         exameAtendimento = [novo];
         novoAtendimento = true;
     }
