@@ -3,14 +3,18 @@
 import { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Base from '@/components/ui/base'
-import { buscaModalidades, Modalidade,Paciente,Atendimento } from '@/services/api'
+import { buscaModalidades, Modalidade, Paciente, Atendimento } from '@/services/api'
 import { modalContext } from '@/components/modals/providers'
+
 interface PacienteModalidadeStorage {
   dados: Paciente | null
   exames: Atendimento[] | null
   tentativas: number | null
   invalido: string | null
 }
+
+const MODALIDADES_CACHE_KEY = 'modalidadesCache'
+
 export default function ModalidadePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -29,7 +33,8 @@ export default function ModalidadePage() {
 
   const [modalidades, setModalidades] = useState<Modalidade[]>([])
   const [loading, setLoadingPage] = useState(true)
-  const [pacienteStorage, setPacienteStorage] = useState<PacienteModalidadeStorage|null>(null)
+  const [pacienteStorage, setPacienteStorage] =
+    useState<PacienteModalidadeStorage | null>(null)
 
   useEffect(() => {
     const storage = sessionStorage.getItem('pacienteModalidade')
@@ -39,20 +44,40 @@ export default function ModalidadePage() {
       return
     }
 
-    setPacienteStorage(JSON.parse(storage))
+    try {
+      setPacienteStorage(JSON.parse(storage))
+    } catch {
+      sessionStorage.removeItem('pacienteModalidade')
+      router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
+    }
   }, [router, servico, preferencial])
 
   useEffect(() => {
-    async function carregar() {
+    async function carregarModalidades() {
       try {
+        const cache = sessionStorage.getItem(MODALIDADES_CACHE_KEY)
+
+        if (cache) {
+          const modalidadesCache = JSON.parse(cache) as Modalidade[]
+          setModalidades(modalidadesCache)
+          setLoadingPage(false)
+          return
+        }
+
         const response = await buscaModalidades(10000)
-        setModalidades(response ?? [])
+        const lista = response ?? []
+
+        setModalidades(lista)
+        sessionStorage.setItem(MODALIDADES_CACHE_KEY, JSON.stringify(lista))
+      } catch (error) {
+        console.error('Erro ao carregar modalidades:', error)
+        setModalidades([])
       } finally {
         setLoadingPage(false)
       }
     }
 
-    void carregar()
+    void carregarModalidades()
   }, [])
 
   function selecionarModalidade(modalidade: Modalidade) {

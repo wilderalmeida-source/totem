@@ -93,7 +93,9 @@ export async function gerarSenhaAtendimento({
 
   const nrSenha = totalSenhasHoje + 1
 
-  const senha = await prisma.atendimentos_senhas.create({
+  let senha
+try {
+  senha = await prisma.atendimentos_senhas.create({
     data: {
       dt_entrada: dateNow,
       ds_opcao: servico,
@@ -109,6 +111,23 @@ export async function gerarSenhaAtendimento({
       cd_funcionario: FUNCIONARIO,
     },
   })
+} catch (error: any) {
+  console.error('Erro ao criar atendimentos_senhas:', {
+    message: error?.message,
+    code: error?.code,
+    meta: error?.meta,
+    dadosEnviados: {
+      cd_paciente,
+      servico,
+      modalidadeSenha,
+      nrSenha,
+      IP_PAINEL,
+      dsModalidade,
+      fila,
+    },
+  })
+  throw new Error(`Falha ao gerar senha: ${error?.message ?? 'erro desconhecido'}`)
+}
 
   const dsSenha = montarDsSenha(preferencial, fila, senha.nr_senha)
 

@@ -2,16 +2,17 @@
 import { Clock } from "./Icons";
 
 type Props = {
+  painelId:number
   name: string;
   calledAt: string;     // "09:25"
   instruction?: string; // texto abaixo
 };
 
-export default function NowCard({ name, calledAt, instruction }: Props) {
+export default function NowCard({ name, calledAt, instruction, painelId }: Props) {
   return (
     <section className="bg-[#e9f0ff] shadow-2xl shadow-gray-700 px-7 pt-1 flex-1 flex flex-col border-2 rounded-2xl border-gray-500">
       <header className="mb-4 mx-auto flex flex-col items-center">
-        <h2 className="uppercase tracking-wide font-extrabold text-3xl mb-2b">CHAMANDO AGORA</h2>
+        <h2 className="uppercase tracking-wide font-extrabold text-3xl mb-2b">Recepção {painelId}</h2>
         <div className="h-2 bg-[#e9f0ff] rounded-full overflow-hidden w-24 bg-gradient-to-r from-blue-500 to-green-500">
         </div>
       </header>

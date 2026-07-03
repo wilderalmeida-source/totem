@@ -510,6 +510,7 @@ export default function Page() {
 
       <main className="flex-1 min-h-0 grid grid-cols-[3fr,1fr] grid-rows-[1fr,1fr] gap-6 pr-2">
         <NowCard
+          painelId={painelId}
           name={nome}
           calledAt={hora}
           instruction={
