@@ -18,6 +18,7 @@ import { voiceRoute } from "./routes/voice";
 import { createToken } from "./routes/createToken";
 import { authenticate } from "../middleware/autenticate";
 import { atencaoRoute } from "./routes/atencao";
+import { guichesRoute } from "./routes/guiche";
 import { configuracaoPaineisRoutes } from "./routes/paineis-config";
 
 async function bootstrap() {
@@ -40,6 +41,7 @@ async function bootstrap() {
   await fastify.register(documentosRoute)
   await fastify.register(arquivoRoute)
   await fastify.register(pacientesRoute)
+  await fastify.register(guichesRoute);
   await fastify.register(senhaRoute)
   await fastify.register(modalidadesRoute)
   await fastify.register(procedimentosRoute)

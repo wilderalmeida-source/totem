@@ -18,6 +18,12 @@ export async function voiceRoute(fastify: FastifyInstance) {
     const createbody = z.object({
       text: z.string(),
       eventId: z.string().optional(),
+      guiche: z
+        .object({
+          numero: z.string().optional(),
+          nome: z.string().optional(),
+        })
+        .optional(),
     })
     const { text, eventId } = createbody.parse(request.body)
     const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY
@@ -37,11 +43,13 @@ export async function voiceRoute(fastify: FastifyInstance) {
         return reply.status(400).send("Parâmetro 'text' é obrigatório")
       }
       // ========= VOZ DA SEMANA =========
-      const voiceName = (await resolveEffectiveVoice()).voiceName;
-      const rate = (await resolveEffectiveVoice()).rate
+      const now = new Date();
+      const effectiveVoice = await resolveEffectiveVoice(now);
+      const voiceName = effectiveVoice.voiceName;
+      const rate = effectiveVoice.rate;
+      const volume = effectiveVoice.volumeSound;
 
       // ========= DATA LOCAL (apenas dia, sem hora) =========
-      const now = new Date();
       const dateOnly = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -49,8 +57,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
       );
       const dateIso = dateOnly.toISOString();
       const year = now.getFullYear();
-      const week = (await resolveEffectiveVoice(now)).week;
-      const volume = (await resolveEffectiveVoice(now)).volumeSound
+      const week = effectiveVoice.week;
 
       // ========= SALVAR VOZ DA SEMANA NO BANCO =========
       await PrismaLog.ttsWeekVoice.upsert({
@@ -61,7 +68,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
 
       const textoComDict = await applyDictionary(text);
       const formatado = capitalizarNome(textoComDict)
-      console.log(formatado)
+      fastify.log.info({ eventId, text: formatado }, "Gerando áudio TTS")
       const body = {
         input: { text: formatado },
         voice: {
@@ -71,7 +78,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
         audioConfig: {
           audioEncoding: "MP3",
           volumeGainDb: volume,
-          speaking_rate: rate,
+          speakingRate: rate,
         },
       };
       if (!GOOGLE_TTS_KEY) {

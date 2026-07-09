@@ -58,6 +58,11 @@ export type token = $Result.DefaultSelection<Prisma.$tokenPayload>
  * 
  */
 export type configuracao_painel = $Result.DefaultSelection<Prisma.$configuracao_painelPayload>
+/**
+ * Model guiches
+ * 
+ */
+export type guiches = $Result.DefaultSelection<Prisma.$guichesPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -269,6 +274,16 @@ export class PrismaClient<
     * ```
     */
   get configuracao_painel(): Prisma.configuracao_painelDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.guiches`: Exposes CRUD operations for the **guiches** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Guiches
+    * const guiches = await prisma.guiches.findMany()
+    * ```
+    */
+  get guiches(): Prisma.guichesDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -711,7 +726,8 @@ export namespace Prisma {
     TtsVoiceTest: 'TtsVoiceTest',
     ttsEvent: 'ttsEvent',
     token: 'token',
-    configuracao_painel: 'configuracao_painel'
+    configuracao_painel: 'configuracao_painel',
+    guiches: 'guiches'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -727,7 +743,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel"
+      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1397,6 +1413,80 @@ export namespace Prisma {
           }
         }
       }
+      guiches: {
+        payload: Prisma.$guichesPayload<ExtArgs>
+        fields: Prisma.guichesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.guichesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.guichesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>
+          }
+          findFirst: {
+            args: Prisma.guichesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.guichesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>
+          }
+          findMany: {
+            args: Prisma.guichesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>[]
+          }
+          create: {
+            args: Prisma.guichesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>
+          }
+          createMany: {
+            args: Prisma.guichesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.guichesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>[]
+          }
+          delete: {
+            args: Prisma.guichesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>
+          }
+          update: {
+            args: Prisma.guichesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>
+          }
+          deleteMany: {
+            args: Prisma.guichesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.guichesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.guichesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>[]
+          }
+          upsert: {
+            args: Prisma.guichesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$guichesPayload>
+          }
+          aggregate: {
+            args: Prisma.GuichesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGuiches>
+          }
+          groupBy: {
+            args: Prisma.guichesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GuichesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.guichesCountArgs<ExtArgs>
+            result: $Utils.Optional<GuichesCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1514,6 +1604,7 @@ export namespace Prisma {
     ttsEvent?: ttsEventOmit
     token?: tokenOmit
     configuracao_painel?: configuracao_painelOmit
+    guiches?: guichesOmit
   }
 
   /* Types for Logging */
@@ -10916,6 +11007,1053 @@ export namespace Prisma {
 
 
   /**
+   * Model guiches
+   */
+
+  export type AggregateGuiches = {
+    _count: GuichesCountAggregateOutputType | null
+    _avg: GuichesAvgAggregateOutputType | null
+    _sum: GuichesSumAggregateOutputType | null
+    _min: GuichesMinAggregateOutputType | null
+    _max: GuichesMaxAggregateOutputType | null
+  }
+
+  export type GuichesAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type GuichesSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type GuichesMinAggregateOutputType = {
+    id: number | null
+    numero: string | null
+    nome: string | null
+    ativo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GuichesMaxAggregateOutputType = {
+    id: number | null
+    numero: string | null
+    nome: string | null
+    ativo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GuichesCountAggregateOutputType = {
+    id: number
+    numero: number
+    nome: number
+    ativo: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type GuichesAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type GuichesSumAggregateInputType = {
+    id?: true
+  }
+
+  export type GuichesMinAggregateInputType = {
+    id?: true
+    numero?: true
+    nome?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GuichesMaxAggregateInputType = {
+    id?: true
+    numero?: true
+    nome?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GuichesCountAggregateInputType = {
+    id?: true
+    numero?: true
+    nome?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type GuichesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which guiches to aggregate.
+     */
+    where?: guichesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of guiches to fetch.
+     */
+    orderBy?: guichesOrderByWithRelationInput | guichesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: guichesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` guiches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` guiches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned guiches
+    **/
+    _count?: true | GuichesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: GuichesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: GuichesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GuichesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GuichesMaxAggregateInputType
+  }
+
+  export type GetGuichesAggregateType<T extends GuichesAggregateArgs> = {
+        [P in keyof T & keyof AggregateGuiches]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGuiches[P]>
+      : GetScalarType<T[P], AggregateGuiches[P]>
+  }
+
+
+
+
+  export type guichesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: guichesWhereInput
+    orderBy?: guichesOrderByWithAggregationInput | guichesOrderByWithAggregationInput[]
+    by: GuichesScalarFieldEnum[] | GuichesScalarFieldEnum
+    having?: guichesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GuichesCountAggregateInputType | true
+    _avg?: GuichesAvgAggregateInputType
+    _sum?: GuichesSumAggregateInputType
+    _min?: GuichesMinAggregateInputType
+    _max?: GuichesMaxAggregateInputType
+  }
+
+  export type GuichesGroupByOutputType = {
+    id: number
+    numero: string
+    nome: string
+    ativo: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: GuichesCountAggregateOutputType | null
+    _avg: GuichesAvgAggregateOutputType | null
+    _sum: GuichesSumAggregateOutputType | null
+    _min: GuichesMinAggregateOutputType | null
+    _max: GuichesMaxAggregateOutputType | null
+  }
+
+  type GetGuichesGroupByPayload<T extends guichesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GuichesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GuichesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GuichesGroupByOutputType[P]>
+            : GetScalarType<T[P], GuichesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type guichesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    numero?: boolean
+    nome?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["guiches"]>
+
+  export type guichesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    numero?: boolean
+    nome?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["guiches"]>
+
+  export type guichesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    numero?: boolean
+    nome?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["guiches"]>
+
+  export type guichesSelectScalar = {
+    id?: boolean
+    numero?: boolean
+    nome?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type guichesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "numero" | "nome" | "ativo" | "createdAt" | "updatedAt", ExtArgs["result"]["guiches"]>
+
+  export type $guichesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "guiches"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      numero: string
+      nome: string
+      ativo: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["guiches"]>
+    composites: {}
+  }
+
+  type guichesGetPayload<S extends boolean | null | undefined | guichesDefaultArgs> = $Result.GetResult<Prisma.$guichesPayload, S>
+
+  type guichesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<guichesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GuichesCountAggregateInputType | true
+    }
+
+  export interface guichesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['guiches'], meta: { name: 'guiches' } }
+    /**
+     * Find zero or one Guiches that matches the filter.
+     * @param {guichesFindUniqueArgs} args - Arguments to find a Guiches
+     * @example
+     * // Get one Guiches
+     * const guiches = await prisma.guiches.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends guichesFindUniqueArgs>(args: SelectSubset<T, guichesFindUniqueArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Guiches that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {guichesFindUniqueOrThrowArgs} args - Arguments to find a Guiches
+     * @example
+     * // Get one Guiches
+     * const guiches = await prisma.guiches.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends guichesFindUniqueOrThrowArgs>(args: SelectSubset<T, guichesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Guiches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {guichesFindFirstArgs} args - Arguments to find a Guiches
+     * @example
+     * // Get one Guiches
+     * const guiches = await prisma.guiches.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends guichesFindFirstArgs>(args?: SelectSubset<T, guichesFindFirstArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Guiches that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {guichesFindFirstOrThrowArgs} args - Arguments to find a Guiches
+     * @example
+     * // Get one Guiches
+     * const guiches = await prisma.guiches.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends guichesFindFirstOrThrowArgs>(args?: SelectSubset<T, guichesFindFirstOrThrowArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Guiches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {guichesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Guiches
+     * const guiches = await prisma.guiches.findMany()
+     * 
+     * // Get first 10 Guiches
+     * const guiches = await prisma.guiches.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const guichesWithIdOnly = await prisma.guiches.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends guichesFindManyArgs>(args?: SelectSubset<T, guichesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Guiches.
+     * @param {guichesCreateArgs} args - Arguments to create a Guiches.
+     * @example
+     * // Create one Guiches
+     * const Guiches = await prisma.guiches.create({
+     *   data: {
+     *     // ... data to create a Guiches
+     *   }
+     * })
+     * 
+     */
+    create<T extends guichesCreateArgs>(args: SelectSubset<T, guichesCreateArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Guiches.
+     * @param {guichesCreateManyArgs} args - Arguments to create many Guiches.
+     * @example
+     * // Create many Guiches
+     * const guiches = await prisma.guiches.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends guichesCreateManyArgs>(args?: SelectSubset<T, guichesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Guiches and returns the data saved in the database.
+     * @param {guichesCreateManyAndReturnArgs} args - Arguments to create many Guiches.
+     * @example
+     * // Create many Guiches
+     * const guiches = await prisma.guiches.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Guiches and only return the `id`
+     * const guichesWithIdOnly = await prisma.guiches.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends guichesCreateManyAndReturnArgs>(args?: SelectSubset<T, guichesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Guiches.
+     * @param {guichesDeleteArgs} args - Arguments to delete one Guiches.
+     * @example
+     * // Delete one Guiches
+     * const Guiches = await prisma.guiches.delete({
+     *   where: {
+     *     // ... filter to delete one Guiches
+     *   }
+     * })
+     * 
+     */
+    delete<T extends guichesDeleteArgs>(args: SelectSubset<T, guichesDeleteArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Guiches.
+     * @param {guichesUpdateArgs} args - Arguments to update one Guiches.
+     * @example
+     * // Update one Guiches
+     * const guiches = await prisma.guiches.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends guichesUpdateArgs>(args: SelectSubset<T, guichesUpdateArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Guiches.
+     * @param {guichesDeleteManyArgs} args - Arguments to filter Guiches to delete.
+     * @example
+     * // Delete a few Guiches
+     * const { count } = await prisma.guiches.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends guichesDeleteManyArgs>(args?: SelectSubset<T, guichesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Guiches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {guichesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Guiches
+     * const guiches = await prisma.guiches.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends guichesUpdateManyArgs>(args: SelectSubset<T, guichesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Guiches and returns the data updated in the database.
+     * @param {guichesUpdateManyAndReturnArgs} args - Arguments to update many Guiches.
+     * @example
+     * // Update many Guiches
+     * const guiches = await prisma.guiches.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Guiches and only return the `id`
+     * const guichesWithIdOnly = await prisma.guiches.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends guichesUpdateManyAndReturnArgs>(args: SelectSubset<T, guichesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Guiches.
+     * @param {guichesUpsertArgs} args - Arguments to update or create a Guiches.
+     * @example
+     * // Update or create a Guiches
+     * const guiches = await prisma.guiches.upsert({
+     *   create: {
+     *     // ... data to create a Guiches
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Guiches we want to update
+     *   }
+     * })
+     */
+    upsert<T extends guichesUpsertArgs>(args: SelectSubset<T, guichesUpsertArgs<ExtArgs>>): Prisma__guichesClient<$Result.GetResult<Prisma.$guichesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Guiches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {guichesCountArgs} args - Arguments to filter Guiches to count.
+     * @example
+     * // Count the number of Guiches
+     * const count = await prisma.guiches.count({
+     *   where: {
+     *     // ... the filter for the Guiches we want to count
+     *   }
+     * })
+    **/
+    count<T extends guichesCountArgs>(
+      args?: Subset<T, guichesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GuichesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Guiches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GuichesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GuichesAggregateArgs>(args: Subset<T, GuichesAggregateArgs>): Prisma.PrismaPromise<GetGuichesAggregateType<T>>
+
+    /**
+     * Group by Guiches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {guichesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends guichesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: guichesGroupByArgs['orderBy'] }
+        : { orderBy?: guichesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, guichesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGuichesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the guiches model
+   */
+  readonly fields: guichesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for guiches.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__guichesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the guiches model
+   */
+  interface guichesFieldRefs {
+    readonly id: FieldRef<"guiches", 'Int'>
+    readonly numero: FieldRef<"guiches", 'String'>
+    readonly nome: FieldRef<"guiches", 'String'>
+    readonly ativo: FieldRef<"guiches", 'Boolean'>
+    readonly createdAt: FieldRef<"guiches", 'DateTime'>
+    readonly updatedAt: FieldRef<"guiches", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * guiches findUnique
+   */
+  export type guichesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * Filter, which guiches to fetch.
+     */
+    where: guichesWhereUniqueInput
+  }
+
+  /**
+   * guiches findUniqueOrThrow
+   */
+  export type guichesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * Filter, which guiches to fetch.
+     */
+    where: guichesWhereUniqueInput
+  }
+
+  /**
+   * guiches findFirst
+   */
+  export type guichesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * Filter, which guiches to fetch.
+     */
+    where?: guichesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of guiches to fetch.
+     */
+    orderBy?: guichesOrderByWithRelationInput | guichesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for guiches.
+     */
+    cursor?: guichesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` guiches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` guiches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of guiches.
+     */
+    distinct?: GuichesScalarFieldEnum | GuichesScalarFieldEnum[]
+  }
+
+  /**
+   * guiches findFirstOrThrow
+   */
+  export type guichesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * Filter, which guiches to fetch.
+     */
+    where?: guichesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of guiches to fetch.
+     */
+    orderBy?: guichesOrderByWithRelationInput | guichesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for guiches.
+     */
+    cursor?: guichesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` guiches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` guiches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of guiches.
+     */
+    distinct?: GuichesScalarFieldEnum | GuichesScalarFieldEnum[]
+  }
+
+  /**
+   * guiches findMany
+   */
+  export type guichesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * Filter, which guiches to fetch.
+     */
+    where?: guichesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of guiches to fetch.
+     */
+    orderBy?: guichesOrderByWithRelationInput | guichesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing guiches.
+     */
+    cursor?: guichesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` guiches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` guiches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of guiches.
+     */
+    distinct?: GuichesScalarFieldEnum | GuichesScalarFieldEnum[]
+  }
+
+  /**
+   * guiches create
+   */
+  export type guichesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * The data needed to create a guiches.
+     */
+    data: XOR<guichesCreateInput, guichesUncheckedCreateInput>
+  }
+
+  /**
+   * guiches createMany
+   */
+  export type guichesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many guiches.
+     */
+    data: guichesCreateManyInput | guichesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * guiches createManyAndReturn
+   */
+  export type guichesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * The data used to create many guiches.
+     */
+    data: guichesCreateManyInput | guichesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * guiches update
+   */
+  export type guichesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * The data needed to update a guiches.
+     */
+    data: XOR<guichesUpdateInput, guichesUncheckedUpdateInput>
+    /**
+     * Choose, which guiches to update.
+     */
+    where: guichesWhereUniqueInput
+  }
+
+  /**
+   * guiches updateMany
+   */
+  export type guichesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update guiches.
+     */
+    data: XOR<guichesUpdateManyMutationInput, guichesUncheckedUpdateManyInput>
+    /**
+     * Filter which guiches to update
+     */
+    where?: guichesWhereInput
+    /**
+     * Limit how many guiches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * guiches updateManyAndReturn
+   */
+  export type guichesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * The data used to update guiches.
+     */
+    data: XOR<guichesUpdateManyMutationInput, guichesUncheckedUpdateManyInput>
+    /**
+     * Filter which guiches to update
+     */
+    where?: guichesWhereInput
+    /**
+     * Limit how many guiches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * guiches upsert
+   */
+  export type guichesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * The filter to search for the guiches to update in case it exists.
+     */
+    where: guichesWhereUniqueInput
+    /**
+     * In case the guiches found by the `where` argument doesn't exist, create a new guiches with this data.
+     */
+    create: XOR<guichesCreateInput, guichesUncheckedCreateInput>
+    /**
+     * In case the guiches was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<guichesUpdateInput, guichesUncheckedUpdateInput>
+  }
+
+  /**
+   * guiches delete
+   */
+  export type guichesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+    /**
+     * Filter which guiches to delete.
+     */
+    where: guichesWhereUniqueInput
+  }
+
+  /**
+   * guiches deleteMany
+   */
+  export type guichesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which guiches to delete
+     */
+    where?: guichesWhereInput
+    /**
+     * Limit how many guiches to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * guiches without action
+   */
+  export type guichesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the guiches
+     */
+    select?: guichesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the guiches
+     */
+    omit?: guichesOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -11027,6 +12165,18 @@ export namespace Prisma {
   };
 
   export type Configuracao_painelScalarFieldEnum = (typeof Configuracao_painelScalarFieldEnum)[keyof typeof Configuracao_painelScalarFieldEnum]
+
+
+  export const GuichesScalarFieldEnum: {
+    id: 'id',
+    numero: 'numero',
+    nome: 'nome',
+    ativo: 'ativo',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type GuichesScalarFieldEnum = (typeof GuichesScalarFieldEnum)[keyof typeof GuichesScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -11673,6 +12823,65 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"configuracao_painel"> | Date | string
   }
 
+  export type guichesWhereInput = {
+    AND?: guichesWhereInput | guichesWhereInput[]
+    OR?: guichesWhereInput[]
+    NOT?: guichesWhereInput | guichesWhereInput[]
+    id?: IntFilter<"guiches"> | number
+    numero?: StringFilter<"guiches"> | string
+    nome?: StringFilter<"guiches"> | string
+    ativo?: BoolFilter<"guiches"> | boolean
+    createdAt?: DateTimeFilter<"guiches"> | Date | string
+    updatedAt?: DateTimeFilter<"guiches"> | Date | string
+  }
+
+  export type guichesOrderByWithRelationInput = {
+    id?: SortOrder
+    numero?: SortOrder
+    nome?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type guichesWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    numero?: string
+    AND?: guichesWhereInput | guichesWhereInput[]
+    OR?: guichesWhereInput[]
+    NOT?: guichesWhereInput | guichesWhereInput[]
+    nome?: StringFilter<"guiches"> | string
+    ativo?: BoolFilter<"guiches"> | boolean
+    createdAt?: DateTimeFilter<"guiches"> | Date | string
+    updatedAt?: DateTimeFilter<"guiches"> | Date | string
+  }, "id" | "numero">
+
+  export type guichesOrderByWithAggregationInput = {
+    id?: SortOrder
+    numero?: SortOrder
+    nome?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: guichesCountOrderByAggregateInput
+    _avg?: guichesAvgOrderByAggregateInput
+    _max?: guichesMaxOrderByAggregateInput
+    _min?: guichesMinOrderByAggregateInput
+    _sum?: guichesSumOrderByAggregateInput
+  }
+
+  export type guichesScalarWhereWithAggregatesInput = {
+    AND?: guichesScalarWhereWithAggregatesInput | guichesScalarWhereWithAggregatesInput[]
+    OR?: guichesScalarWhereWithAggregatesInput[]
+    NOT?: guichesScalarWhereWithAggregatesInput | guichesScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"guiches"> | number
+    numero?: StringWithAggregatesFilter<"guiches"> | string
+    nome?: StringWithAggregatesFilter<"guiches"> | string
+    ativo?: BoolWithAggregatesFilter<"guiches"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"guiches"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"guiches"> | Date | string
+  }
+
   export type TtsDailyUsageCreateInput = {
     date: Date | string
     chars?: number
@@ -12162,6 +13371,66 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     ativo?: BoolFieldUpdateOperationsInput | boolean
     paineis?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type guichesCreateInput = {
+    numero: string
+    nome: string
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type guichesUncheckedCreateInput = {
+    id?: number
+    numero: string
+    nome: string
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type guichesUpdateInput = {
+    numero?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type guichesUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    numero?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type guichesCreateManyInput = {
+    id?: number
+    numero: string
+    nome: string
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type guichesUpdateManyMutationInput = {
+    numero?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type guichesUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    numero?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    ativo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12731,6 +14000,41 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type guichesCountOrderByAggregateInput = {
+    id?: SortOrder
+    numero?: SortOrder
+    nome?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type guichesAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type guichesMaxOrderByAggregateInput = {
+    id?: SortOrder
+    numero?: SortOrder
+    nome?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type guichesMinOrderByAggregateInput = {
+    id?: SortOrder
+    numero?: SortOrder
+    nome?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type guichesSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type DateTimeFieldUpdateOperationsInput = {

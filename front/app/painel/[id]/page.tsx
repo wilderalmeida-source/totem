@@ -10,21 +10,31 @@ type TtsBody = { audioContent: string } | { errorTTS: string };
 
 type WsMsg =
   | {
-      type: "tcp";
-      painelId?: number;
-      ts?: number;
-      data: string;
-    }
-  | {
-      type: "tts:audio";
-      painelId?: number;
-      ts?: number;
-      payload: {
-        eventId?: string;
-        eventID?: string;
-        ttsBody: TtsBody;
+    type: "tcp";
+    painelId?: number;
+    ts?: number;
+    data: string;
+    payload?: {
+      guiche?: {
+        numero?: string;
+        nome?: string;
       };
     };
+  }
+  | {
+    type: "tts:audio";
+    painelId?: number;
+    ts?: number;
+    payload: {
+      eventId?: string;
+      eventID?: string;
+      ttsBody: TtsBody;
+      guiche?: {
+        numero?: string;
+        nome?: string;
+      };
+    };
+  };
 
 function isTcpMsg(msg: unknown): msg is Extract<WsMsg, { type: "tcp" }> {
   return (
@@ -51,35 +61,36 @@ function isTtsAudioMsg(
 
 type QueueItem =
   | {
-      kind: "atencao-mp3";
-      proxyUrl: string;
-      key: string;
-    }
+    kind: "atencao-mp3";
+    proxyUrl: string;
+    key: string;
+  }
   | {
-      kind: "atencao-speech";
-      text: string;
-      key: string;
-    }
+    kind: "atencao-speech";
+    text: string;
+    key: string;
+  }
   | {
-      kind: "tcp";
-      raw: string;
-      guiche: string;
-      nome: string;
-      hora: string;
-      key: string;
-    }
+    kind: "tcp";
+    raw: string;
+    guicheNumero: string;
+    guicheNome: string;
+    nome: string;
+    hora: string;
+    key: string;
+  }
   | {
-      kind: "tts-mp3";
-      proxyUrl: string;
-      key: string;
-      enqueuedAt: number;
-    }
+    kind: "tts-mp3";
+    proxyUrl: string;
+    key: string;
+    enqueuedAt: number;
+  }
   | {
-      kind: "tts-speech";
-      text: string;
-      key: string;
-      enqueuedAt: number;
-    };
+    kind: "tts-speech";
+    text: string;
+    key: string;
+    enqueuedAt: number;
+  };
 
 export default function Page() {
   const params = useParams();
@@ -305,15 +316,13 @@ export default function Page() {
               prependAndReindex(q, {
                 name: prevNome,
                 instruction:
-                  prevGuiche === "00"
-                    ? "ENTREGA DE EXAMES"
-                    : `GUICHÊ: ${prevGuiche}`,
+                  prevGuiche || "GUICHÊ",
               })
             );
           }
 
           setNome(item.nome);
-          setGuiche(item.guiche);
+          setGuiche(item.guicheNome);
           setHora(item.hora);
 
           await playDing();
@@ -410,14 +419,21 @@ export default function Page() {
             minute: "2-digit",
           });
 
-          const guicheAux = parts[3] || "";
+          const guicheNumero = msg.payload?.guiche?.numero || parts[3] || "";
+          const guicheNome =
+            msg.payload?.guiche?.nome ||
+            (guicheNumero === "00"
+              ? "ENTREGA DE EXAMES"
+              : `GUICHÊ: ${guicheNumero}`);
+
           const nomeAux = (parts[5] || "SEM NOME").trim();
-          const key = raw.trim();
+          const key = `${raw.trim()}-${guicheNome}`;
 
           enqueue({
             kind: "tcp",
             raw,
-            guiche: guicheAux,
+            guicheNumero,
+            guicheNome,
             nome: nomeAux,
             hora: horaMin,
             key,
@@ -513,9 +529,7 @@ export default function Page() {
           painelId={painelId}
           name={nome}
           calledAt={hora}
-          instruction={
-            guiche === "00" ? "ENTREGA DE EXAMES" : "GUICHÊ: " + guiche
-          }
+          instruction={guiche || "GUICHÊ"}
         />
 
         <Video />

@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import net from "net";
 import { PrismaLog } from "../../config/prismalog";
 import { prisma } from "../../config/prismaDB";
+
 type TtsBody = { audioContent: string } | { errorTTS: string };
 
 type PainelConfig = {
@@ -38,7 +39,38 @@ function extrairDadosTcp(raw: string) {
     senha: partes[2] ?? "",
     guiche: partes[3] ?? "",
     modalidadeNome: partes[4] ?? "",
+    paciente: partes[5] ?? "",
   };
+}
+
+function montarNomeGuichePadrao(numero: string) {
+  const numeroLimpo = String(numero ?? "").trim();
+
+  if (!numeroLimpo) {
+    return "Guichê";
+  }
+
+  return `Guichê ${numeroLimpo}`;
+}
+
+async function buscarNomeGuiche(numero: string) {
+  const numeroLimpo = String(numero ?? "").trim();
+
+  if (!numeroLimpo) {
+    return "Guichê";
+  }
+
+  const numeroFormatado = numeroLimpo.padStart(2, "0");
+
+  const guiche = await PrismaLog.guiches.findUnique({
+    where: { numero: numeroFormatado },
+  });
+
+  if (guiche?.ativo && guiche.nome?.trim()) {
+    return guiche.nome.trim();
+  }
+
+  return montarNomeGuichePadrao(numeroFormatado);
 }
 
 async function carregarCachePainel(fastify: FastifyInstance) {
@@ -115,8 +147,8 @@ async function descobrirPainelPorEvento(
       servico === "D"
         ? "marcacao"
         : servico === "C"
-        ? "resultado"
-        : "atendimento";
+          ? "resultado"
+          : "atendimento";
 
     const painel = cachePaineis.find((p) => {
       if (!p.ativo) return false;
@@ -215,51 +247,31 @@ async function tratarMensagemTcp(
     }
 
     const nomeAux =
-      out.match(/^(?:[^-]*-){5}\s*([^-]*?)\s*-/)?.[1]?.trim() ?? "";
+      out.match(/^(?:[^-]*-){5}\s*([^-]*?)\s*-/)?.[1]?.trim() ?? "SEM NOME";
 
     const guicheAux =
       out.match(/^(?:[^-]*-){3}\s*([^-]*?)\s*-/)?.[1]?.trim() ?? "";
 
-    const text = () => {
-      switch (guicheAux) {
-        case "00":
-          return `${nomeAux}, entrega de exames.`;
-        case "01":
-          return `${nomeAux}, guichê 1.`;
-        case "02":
-          return `${nomeAux}, guichê 2.`;
-        case "03":
-          return `${nomeAux}, guichê 3.`;
-        case "04":
-          return `${nomeAux}, guichê 4.`;
-        case "05":
-          return `${nomeAux}, guichê 5.`;
-        case "06":
-          return `${nomeAux}, guichê 6.`;
-        case "07":
-          return `${nomeAux}, guichê 7.`;
-        case "08":
-          return `${nomeAux}, guichê 8.`;
-        case "09":
-          return `${nomeAux}, guichê 9.`;
-        default:
-          return `${nomeAux}, guichê ${guicheAux}.`;
-      }
-    };
+    const numeroGuiche = String(guicheAux ?? "").trim().padStart(2, "0");
+    const nomeGuiche = await buscarNomeGuiche(guicheAux);
+
+    const textoChamada = `${nomeAux}, ${nomeGuiche}.`;
 
     const date = new Date();
-    const datecomplete = `${date.getDate()}/${
-      date.getMonth() + 1
-    }/${date.getFullYear()}`;
+    const datecomplete = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 
-    const eventId = `${text()}-${datecomplete}`;
+    const eventId = `${textoChamada}-${datecomplete}`;
 
     const ttsRes = await fastify.inject({
       method: "POST",
       url: "/clinux/voice",
       payload: {
-        text: text(),
+        text: textoChamada,
         eventId,
+        guiche: {
+          numero: numeroGuiche,
+          nome: nomeGuiche,
+        },
       },
       headers: {
         "content-type": "application/json",
@@ -272,6 +284,12 @@ async function tratarMensagemTcp(
       painelId,
       ts: Date.now(),
       data: out,
+      payload: {
+        guiche: {
+          numero: numeroGuiche,
+          nome: nomeGuiche,
+        },
+      },
     });
 
     if (ttsRes.statusCode === 200) {
@@ -284,6 +302,10 @@ async function tratarMensagemTcp(
         payload: {
           eventId,
           ttsBody,
+          guiche: {
+            numero: numeroGuiche,
+            nome: nomeGuiche,
+          },
         },
       });
     }

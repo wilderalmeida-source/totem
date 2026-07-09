@@ -193,6 +193,15 @@ exports.Prisma.Configuracao_painelScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.GuichesScalarFieldEnum = {
+  id: 'id',
+  numero: 'numero',
+  nome: 'nome',
+  ativo: 'ativo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -228,7 +237,8 @@ exports.Prisma.ModelName = {
   TtsVoiceTest: 'TtsVoiceTest',
   ttsEvent: 'ttsEvent',
   token: 'token',
-  configuracao_painel: 'configuracao_painel'
+  configuracao_painel: 'configuracao_painel',
+  guiches: 'guiches'
 };
 
 /**

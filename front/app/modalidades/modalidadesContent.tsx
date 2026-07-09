@@ -13,8 +13,6 @@ interface PacienteModalidadeStorage {
   invalido: string | null
 }
 
-const MODALIDADES_CACHE_KEY = 'modalidadesCache'
-
 export default function ModalidadePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -55,20 +53,8 @@ export default function ModalidadePage() {
   useEffect(() => {
     async function carregarModalidades() {
       try {
-        const cache = sessionStorage.getItem(MODALIDADES_CACHE_KEY)
-
-        if (cache) {
-          const modalidadesCache = JSON.parse(cache) as Modalidade[]
-          setModalidades(modalidadesCache)
-          setLoadingPage(false)
-          return
-        }
-
         const response = await buscaModalidades(10000)
-        const lista = response ?? []
-
-        setModalidades(lista)
-        sessionStorage.setItem(MODALIDADES_CACHE_KEY, JSON.stringify(lista))
+        setModalidades(response ?? [])
       } catch (error) {
         console.error('Erro ao carregar modalidades:', error)
         setModalidades([])
@@ -127,7 +113,7 @@ export default function ModalidadePage() {
           <p className="text-2xl">Carregando modalidades...</p>
         )}
 
-        {!loading && (
+        {!loading && modalidades.length > 0 && (
           <div className="grid w-full max-w-4xl grid-cols-2 gap-6">
             {modalidades.map((modalidade) => (
               <button
@@ -139,6 +125,12 @@ export default function ModalidadePage() {
               </button>
             ))}
           </div>
+        )}
+
+        {!loading && modalidades.length === 0 && (
+          <p className="text-2xl text-red-600">
+            Nenhuma modalidade encontrada.
+          </p>
         )}
 
         <button

@@ -143,3 +143,11 @@ INSERT INTO "NameDictionary" ("key", "value", "createdAt", "updatedAt") VALUES
   ('edineia',    'Edinéia',    '2026-03-05 12:35:24.574', '2026-03-05 12:35:24.574'),
   ('cesaria',    'Cesária',    '2026-03-06 10:57:12.923', '2026-03-06 10:57:12.923')
 ON CONFLICT ("key") DO NOTHING;
+CREATE TABLE IF NOT EXISTS "guiches" (
+  "id" SERIAL PRIMARY KEY,
+  "numero" TEXT NOT NULL UNIQUE,
+  "nome" TEXT NOT NULL,
+  "ativo" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+  "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);
