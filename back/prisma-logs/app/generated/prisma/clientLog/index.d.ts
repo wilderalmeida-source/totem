@@ -63,6 +63,11 @@ export type configuracao_painel = $Result.DefaultSelection<Prisma.$configuracao_
  * 
  */
 export type guiches = $Result.DefaultSelection<Prisma.$guichesPayload>
+/**
+ * Model recepcoes_modalidades
+ * 
+ */
+export type recepcoes_modalidades = $Result.DefaultSelection<Prisma.$recepcoes_modalidadesPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -284,6 +289,16 @@ export class PrismaClient<
     * ```
     */
   get guiches(): Prisma.guichesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.recepcoes_modalidades`: Exposes CRUD operations for the **recepcoes_modalidades** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Recepcoes_modalidades
+    * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findMany()
+    * ```
+    */
+  get recepcoes_modalidades(): Prisma.recepcoes_modalidadesDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -727,7 +742,8 @@ export namespace Prisma {
     ttsEvent: 'ttsEvent',
     token: 'token',
     configuracao_painel: 'configuracao_painel',
-    guiches: 'guiches'
+    guiches: 'guiches',
+    recepcoes_modalidades: 'recepcoes_modalidades'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -743,7 +759,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches"
+      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches" | "recepcoes_modalidades"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1487,6 +1503,80 @@ export namespace Prisma {
           }
         }
       }
+      recepcoes_modalidades: {
+        payload: Prisma.$recepcoes_modalidadesPayload<ExtArgs>
+        fields: Prisma.recepcoes_modalidadesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.recepcoes_modalidadesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.recepcoes_modalidadesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>
+          }
+          findFirst: {
+            args: Prisma.recepcoes_modalidadesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.recepcoes_modalidadesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>
+          }
+          findMany: {
+            args: Prisma.recepcoes_modalidadesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>[]
+          }
+          create: {
+            args: Prisma.recepcoes_modalidadesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>
+          }
+          createMany: {
+            args: Prisma.recepcoes_modalidadesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.recepcoes_modalidadesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>[]
+          }
+          delete: {
+            args: Prisma.recepcoes_modalidadesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>
+          }
+          update: {
+            args: Prisma.recepcoes_modalidadesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>
+          }
+          deleteMany: {
+            args: Prisma.recepcoes_modalidadesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.recepcoes_modalidadesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.recepcoes_modalidadesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>[]
+          }
+          upsert: {
+            args: Prisma.recepcoes_modalidadesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$recepcoes_modalidadesPayload>
+          }
+          aggregate: {
+            args: Prisma.Recepcoes_modalidadesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRecepcoes_modalidades>
+          }
+          groupBy: {
+            args: Prisma.recepcoes_modalidadesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Recepcoes_modalidadesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.recepcoes_modalidadesCountArgs<ExtArgs>
+            result: $Utils.Optional<Recepcoes_modalidadesCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1605,6 +1695,7 @@ export namespace Prisma {
     token?: tokenOmit
     configuracao_painel?: configuracao_painelOmit
     guiches?: guichesOmit
+    recepcoes_modalidades?: recepcoes_modalidadesOmit
   }
 
   /* Types for Logging */
@@ -12054,6 +12145,1096 @@ export namespace Prisma {
 
 
   /**
+   * Model recepcoes_modalidades
+   */
+
+  export type AggregateRecepcoes_modalidades = {
+    _count: Recepcoes_modalidadesCountAggregateOutputType | null
+    _avg: Recepcoes_modalidadesAvgAggregateOutputType | null
+    _sum: Recepcoes_modalidadesSumAggregateOutputType | null
+    _min: Recepcoes_modalidadesMinAggregateOutputType | null
+    _max: Recepcoes_modalidadesMaxAggregateOutputType | null
+  }
+
+  export type Recepcoes_modalidadesAvgAggregateOutputType = {
+    id: number | null
+    cd_modalidade: number | null
+  }
+
+  export type Recepcoes_modalidadesSumAggregateOutputType = {
+    id: number | null
+    cd_modalidade: number | null
+  }
+
+  export type Recepcoes_modalidadesMinAggregateOutputType = {
+    id: number | null
+    cd_modalidade: number | null
+    ds_modalidade: string | null
+    servico: string | null
+    recepcao: string | null
+    localizacao: string | null
+    ativo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Recepcoes_modalidadesMaxAggregateOutputType = {
+    id: number | null
+    cd_modalidade: number | null
+    ds_modalidade: string | null
+    servico: string | null
+    recepcao: string | null
+    localizacao: string | null
+    ativo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Recepcoes_modalidadesCountAggregateOutputType = {
+    id: number
+    cd_modalidade: number
+    ds_modalidade: number
+    servico: number
+    recepcao: number
+    localizacao: number
+    ativo: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type Recepcoes_modalidadesAvgAggregateInputType = {
+    id?: true
+    cd_modalidade?: true
+  }
+
+  export type Recepcoes_modalidadesSumAggregateInputType = {
+    id?: true
+    cd_modalidade?: true
+  }
+
+  export type Recepcoes_modalidadesMinAggregateInputType = {
+    id?: true
+    cd_modalidade?: true
+    ds_modalidade?: true
+    servico?: true
+    recepcao?: true
+    localizacao?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Recepcoes_modalidadesMaxAggregateInputType = {
+    id?: true
+    cd_modalidade?: true
+    ds_modalidade?: true
+    servico?: true
+    recepcao?: true
+    localizacao?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Recepcoes_modalidadesCountAggregateInputType = {
+    id?: true
+    cd_modalidade?: true
+    ds_modalidade?: true
+    servico?: true
+    recepcao?: true
+    localizacao?: true
+    ativo?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type Recepcoes_modalidadesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which recepcoes_modalidades to aggregate.
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of recepcoes_modalidades to fetch.
+     */
+    orderBy?: recepcoes_modalidadesOrderByWithRelationInput | recepcoes_modalidadesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: recepcoes_modalidadesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` recepcoes_modalidades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` recepcoes_modalidades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned recepcoes_modalidades
+    **/
+    _count?: true | Recepcoes_modalidadesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Recepcoes_modalidadesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Recepcoes_modalidadesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Recepcoes_modalidadesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Recepcoes_modalidadesMaxAggregateInputType
+  }
+
+  export type GetRecepcoes_modalidadesAggregateType<T extends Recepcoes_modalidadesAggregateArgs> = {
+        [P in keyof T & keyof AggregateRecepcoes_modalidades]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRecepcoes_modalidades[P]>
+      : GetScalarType<T[P], AggregateRecepcoes_modalidades[P]>
+  }
+
+
+
+
+  export type recepcoes_modalidadesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: recepcoes_modalidadesWhereInput
+    orderBy?: recepcoes_modalidadesOrderByWithAggregationInput | recepcoes_modalidadesOrderByWithAggregationInput[]
+    by: Recepcoes_modalidadesScalarFieldEnum[] | Recepcoes_modalidadesScalarFieldEnum
+    having?: recepcoes_modalidadesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Recepcoes_modalidadesCountAggregateInputType | true
+    _avg?: Recepcoes_modalidadesAvgAggregateInputType
+    _sum?: Recepcoes_modalidadesSumAggregateInputType
+    _min?: Recepcoes_modalidadesMinAggregateInputType
+    _max?: Recepcoes_modalidadesMaxAggregateInputType
+  }
+
+  export type Recepcoes_modalidadesGroupByOutputType = {
+    id: number
+    cd_modalidade: number
+    ds_modalidade: string
+    servico: string
+    recepcao: string
+    localizacao: string | null
+    ativo: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: Recepcoes_modalidadesCountAggregateOutputType | null
+    _avg: Recepcoes_modalidadesAvgAggregateOutputType | null
+    _sum: Recepcoes_modalidadesSumAggregateOutputType | null
+    _min: Recepcoes_modalidadesMinAggregateOutputType | null
+    _max: Recepcoes_modalidadesMaxAggregateOutputType | null
+  }
+
+  type GetRecepcoes_modalidadesGroupByPayload<T extends recepcoes_modalidadesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Recepcoes_modalidadesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Recepcoes_modalidadesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Recepcoes_modalidadesGroupByOutputType[P]>
+            : GetScalarType<T[P], Recepcoes_modalidadesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type recepcoes_modalidadesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    cd_modalidade?: boolean
+    ds_modalidade?: boolean
+    servico?: boolean
+    recepcao?: boolean
+    localizacao?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["recepcoes_modalidades"]>
+
+  export type recepcoes_modalidadesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    cd_modalidade?: boolean
+    ds_modalidade?: boolean
+    servico?: boolean
+    recepcao?: boolean
+    localizacao?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["recepcoes_modalidades"]>
+
+  export type recepcoes_modalidadesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    cd_modalidade?: boolean
+    ds_modalidade?: boolean
+    servico?: boolean
+    recepcao?: boolean
+    localizacao?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["recepcoes_modalidades"]>
+
+  export type recepcoes_modalidadesSelectScalar = {
+    id?: boolean
+    cd_modalidade?: boolean
+    ds_modalidade?: boolean
+    servico?: boolean
+    recepcao?: boolean
+    localizacao?: boolean
+    ativo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type recepcoes_modalidadesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "cd_modalidade" | "ds_modalidade" | "servico" | "recepcao" | "localizacao" | "ativo" | "createdAt" | "updatedAt", ExtArgs["result"]["recepcoes_modalidades"]>
+
+  export type $recepcoes_modalidadesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "recepcoes_modalidades"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      cd_modalidade: number
+      ds_modalidade: string
+      servico: string
+      recepcao: string
+      localizacao: string | null
+      ativo: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["recepcoes_modalidades"]>
+    composites: {}
+  }
+
+  type recepcoes_modalidadesGetPayload<S extends boolean | null | undefined | recepcoes_modalidadesDefaultArgs> = $Result.GetResult<Prisma.$recepcoes_modalidadesPayload, S>
+
+  type recepcoes_modalidadesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<recepcoes_modalidadesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Recepcoes_modalidadesCountAggregateInputType | true
+    }
+
+  export interface recepcoes_modalidadesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['recepcoes_modalidades'], meta: { name: 'recepcoes_modalidades' } }
+    /**
+     * Find zero or one Recepcoes_modalidades that matches the filter.
+     * @param {recepcoes_modalidadesFindUniqueArgs} args - Arguments to find a Recepcoes_modalidades
+     * @example
+     * // Get one Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends recepcoes_modalidadesFindUniqueArgs>(args: SelectSubset<T, recepcoes_modalidadesFindUniqueArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Recepcoes_modalidades that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {recepcoes_modalidadesFindUniqueOrThrowArgs} args - Arguments to find a Recepcoes_modalidades
+     * @example
+     * // Get one Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends recepcoes_modalidadesFindUniqueOrThrowArgs>(args: SelectSubset<T, recepcoes_modalidadesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Recepcoes_modalidades that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {recepcoes_modalidadesFindFirstArgs} args - Arguments to find a Recepcoes_modalidades
+     * @example
+     * // Get one Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends recepcoes_modalidadesFindFirstArgs>(args?: SelectSubset<T, recepcoes_modalidadesFindFirstArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Recepcoes_modalidades that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {recepcoes_modalidadesFindFirstOrThrowArgs} args - Arguments to find a Recepcoes_modalidades
+     * @example
+     * // Get one Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends recepcoes_modalidadesFindFirstOrThrowArgs>(args?: SelectSubset<T, recepcoes_modalidadesFindFirstOrThrowArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Recepcoes_modalidades that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {recepcoes_modalidadesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findMany()
+     * 
+     * // Get first 10 Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const recepcoes_modalidadesWithIdOnly = await prisma.recepcoes_modalidades.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends recepcoes_modalidadesFindManyArgs>(args?: SelectSubset<T, recepcoes_modalidadesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Recepcoes_modalidades.
+     * @param {recepcoes_modalidadesCreateArgs} args - Arguments to create a Recepcoes_modalidades.
+     * @example
+     * // Create one Recepcoes_modalidades
+     * const Recepcoes_modalidades = await prisma.recepcoes_modalidades.create({
+     *   data: {
+     *     // ... data to create a Recepcoes_modalidades
+     *   }
+     * })
+     * 
+     */
+    create<T extends recepcoes_modalidadesCreateArgs>(args: SelectSubset<T, recepcoes_modalidadesCreateArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Recepcoes_modalidades.
+     * @param {recepcoes_modalidadesCreateManyArgs} args - Arguments to create many Recepcoes_modalidades.
+     * @example
+     * // Create many Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends recepcoes_modalidadesCreateManyArgs>(args?: SelectSubset<T, recepcoes_modalidadesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Recepcoes_modalidades and returns the data saved in the database.
+     * @param {recepcoes_modalidadesCreateManyAndReturnArgs} args - Arguments to create many Recepcoes_modalidades.
+     * @example
+     * // Create many Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Recepcoes_modalidades and only return the `id`
+     * const recepcoes_modalidadesWithIdOnly = await prisma.recepcoes_modalidades.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends recepcoes_modalidadesCreateManyAndReturnArgs>(args?: SelectSubset<T, recepcoes_modalidadesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Recepcoes_modalidades.
+     * @param {recepcoes_modalidadesDeleteArgs} args - Arguments to delete one Recepcoes_modalidades.
+     * @example
+     * // Delete one Recepcoes_modalidades
+     * const Recepcoes_modalidades = await prisma.recepcoes_modalidades.delete({
+     *   where: {
+     *     // ... filter to delete one Recepcoes_modalidades
+     *   }
+     * })
+     * 
+     */
+    delete<T extends recepcoes_modalidadesDeleteArgs>(args: SelectSubset<T, recepcoes_modalidadesDeleteArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Recepcoes_modalidades.
+     * @param {recepcoes_modalidadesUpdateArgs} args - Arguments to update one Recepcoes_modalidades.
+     * @example
+     * // Update one Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends recepcoes_modalidadesUpdateArgs>(args: SelectSubset<T, recepcoes_modalidadesUpdateArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Recepcoes_modalidades.
+     * @param {recepcoes_modalidadesDeleteManyArgs} args - Arguments to filter Recepcoes_modalidades to delete.
+     * @example
+     * // Delete a few Recepcoes_modalidades
+     * const { count } = await prisma.recepcoes_modalidades.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends recepcoes_modalidadesDeleteManyArgs>(args?: SelectSubset<T, recepcoes_modalidadesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Recepcoes_modalidades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {recepcoes_modalidadesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends recepcoes_modalidadesUpdateManyArgs>(args: SelectSubset<T, recepcoes_modalidadesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Recepcoes_modalidades and returns the data updated in the database.
+     * @param {recepcoes_modalidadesUpdateManyAndReturnArgs} args - Arguments to update many Recepcoes_modalidades.
+     * @example
+     * // Update many Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Recepcoes_modalidades and only return the `id`
+     * const recepcoes_modalidadesWithIdOnly = await prisma.recepcoes_modalidades.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends recepcoes_modalidadesUpdateManyAndReturnArgs>(args: SelectSubset<T, recepcoes_modalidadesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Recepcoes_modalidades.
+     * @param {recepcoes_modalidadesUpsertArgs} args - Arguments to update or create a Recepcoes_modalidades.
+     * @example
+     * // Update or create a Recepcoes_modalidades
+     * const recepcoes_modalidades = await prisma.recepcoes_modalidades.upsert({
+     *   create: {
+     *     // ... data to create a Recepcoes_modalidades
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Recepcoes_modalidades we want to update
+     *   }
+     * })
+     */
+    upsert<T extends recepcoes_modalidadesUpsertArgs>(args: SelectSubset<T, recepcoes_modalidadesUpsertArgs<ExtArgs>>): Prisma__recepcoes_modalidadesClient<$Result.GetResult<Prisma.$recepcoes_modalidadesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Recepcoes_modalidades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {recepcoes_modalidadesCountArgs} args - Arguments to filter Recepcoes_modalidades to count.
+     * @example
+     * // Count the number of Recepcoes_modalidades
+     * const count = await prisma.recepcoes_modalidades.count({
+     *   where: {
+     *     // ... the filter for the Recepcoes_modalidades we want to count
+     *   }
+     * })
+    **/
+    count<T extends recepcoes_modalidadesCountArgs>(
+      args?: Subset<T, recepcoes_modalidadesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Recepcoes_modalidadesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Recepcoes_modalidades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Recepcoes_modalidadesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Recepcoes_modalidadesAggregateArgs>(args: Subset<T, Recepcoes_modalidadesAggregateArgs>): Prisma.PrismaPromise<GetRecepcoes_modalidadesAggregateType<T>>
+
+    /**
+     * Group by Recepcoes_modalidades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {recepcoes_modalidadesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends recepcoes_modalidadesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: recepcoes_modalidadesGroupByArgs['orderBy'] }
+        : { orderBy?: recepcoes_modalidadesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, recepcoes_modalidadesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRecepcoes_modalidadesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the recepcoes_modalidades model
+   */
+  readonly fields: recepcoes_modalidadesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for recepcoes_modalidades.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__recepcoes_modalidadesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the recepcoes_modalidades model
+   */
+  interface recepcoes_modalidadesFieldRefs {
+    readonly id: FieldRef<"recepcoes_modalidades", 'Int'>
+    readonly cd_modalidade: FieldRef<"recepcoes_modalidades", 'Int'>
+    readonly ds_modalidade: FieldRef<"recepcoes_modalidades", 'String'>
+    readonly servico: FieldRef<"recepcoes_modalidades", 'String'>
+    readonly recepcao: FieldRef<"recepcoes_modalidades", 'String'>
+    readonly localizacao: FieldRef<"recepcoes_modalidades", 'String'>
+    readonly ativo: FieldRef<"recepcoes_modalidades", 'Boolean'>
+    readonly createdAt: FieldRef<"recepcoes_modalidades", 'DateTime'>
+    readonly updatedAt: FieldRef<"recepcoes_modalidades", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * recepcoes_modalidades findUnique
+   */
+  export type recepcoes_modalidadesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * Filter, which recepcoes_modalidades to fetch.
+     */
+    where: recepcoes_modalidadesWhereUniqueInput
+  }
+
+  /**
+   * recepcoes_modalidades findUniqueOrThrow
+   */
+  export type recepcoes_modalidadesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * Filter, which recepcoes_modalidades to fetch.
+     */
+    where: recepcoes_modalidadesWhereUniqueInput
+  }
+
+  /**
+   * recepcoes_modalidades findFirst
+   */
+  export type recepcoes_modalidadesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * Filter, which recepcoes_modalidades to fetch.
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of recepcoes_modalidades to fetch.
+     */
+    orderBy?: recepcoes_modalidadesOrderByWithRelationInput | recepcoes_modalidadesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for recepcoes_modalidades.
+     */
+    cursor?: recepcoes_modalidadesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` recepcoes_modalidades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` recepcoes_modalidades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of recepcoes_modalidades.
+     */
+    distinct?: Recepcoes_modalidadesScalarFieldEnum | Recepcoes_modalidadesScalarFieldEnum[]
+  }
+
+  /**
+   * recepcoes_modalidades findFirstOrThrow
+   */
+  export type recepcoes_modalidadesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * Filter, which recepcoes_modalidades to fetch.
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of recepcoes_modalidades to fetch.
+     */
+    orderBy?: recepcoes_modalidadesOrderByWithRelationInput | recepcoes_modalidadesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for recepcoes_modalidades.
+     */
+    cursor?: recepcoes_modalidadesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` recepcoes_modalidades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` recepcoes_modalidades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of recepcoes_modalidades.
+     */
+    distinct?: Recepcoes_modalidadesScalarFieldEnum | Recepcoes_modalidadesScalarFieldEnum[]
+  }
+
+  /**
+   * recepcoes_modalidades findMany
+   */
+  export type recepcoes_modalidadesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * Filter, which recepcoes_modalidades to fetch.
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of recepcoes_modalidades to fetch.
+     */
+    orderBy?: recepcoes_modalidadesOrderByWithRelationInput | recepcoes_modalidadesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing recepcoes_modalidades.
+     */
+    cursor?: recepcoes_modalidadesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` recepcoes_modalidades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` recepcoes_modalidades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of recepcoes_modalidades.
+     */
+    distinct?: Recepcoes_modalidadesScalarFieldEnum | Recepcoes_modalidadesScalarFieldEnum[]
+  }
+
+  /**
+   * recepcoes_modalidades create
+   */
+  export type recepcoes_modalidadesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * The data needed to create a recepcoes_modalidades.
+     */
+    data: XOR<recepcoes_modalidadesCreateInput, recepcoes_modalidadesUncheckedCreateInput>
+  }
+
+  /**
+   * recepcoes_modalidades createMany
+   */
+  export type recepcoes_modalidadesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many recepcoes_modalidades.
+     */
+    data: recepcoes_modalidadesCreateManyInput | recepcoes_modalidadesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * recepcoes_modalidades createManyAndReturn
+   */
+  export type recepcoes_modalidadesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * The data used to create many recepcoes_modalidades.
+     */
+    data: recepcoes_modalidadesCreateManyInput | recepcoes_modalidadesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * recepcoes_modalidades update
+   */
+  export type recepcoes_modalidadesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * The data needed to update a recepcoes_modalidades.
+     */
+    data: XOR<recepcoes_modalidadesUpdateInput, recepcoes_modalidadesUncheckedUpdateInput>
+    /**
+     * Choose, which recepcoes_modalidades to update.
+     */
+    where: recepcoes_modalidadesWhereUniqueInput
+  }
+
+  /**
+   * recepcoes_modalidades updateMany
+   */
+  export type recepcoes_modalidadesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update recepcoes_modalidades.
+     */
+    data: XOR<recepcoes_modalidadesUpdateManyMutationInput, recepcoes_modalidadesUncheckedUpdateManyInput>
+    /**
+     * Filter which recepcoes_modalidades to update
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * Limit how many recepcoes_modalidades to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * recepcoes_modalidades updateManyAndReturn
+   */
+  export type recepcoes_modalidadesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * The data used to update recepcoes_modalidades.
+     */
+    data: XOR<recepcoes_modalidadesUpdateManyMutationInput, recepcoes_modalidadesUncheckedUpdateManyInput>
+    /**
+     * Filter which recepcoes_modalidades to update
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * Limit how many recepcoes_modalidades to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * recepcoes_modalidades upsert
+   */
+  export type recepcoes_modalidadesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * The filter to search for the recepcoes_modalidades to update in case it exists.
+     */
+    where: recepcoes_modalidadesWhereUniqueInput
+    /**
+     * In case the recepcoes_modalidades found by the `where` argument doesn't exist, create a new recepcoes_modalidades with this data.
+     */
+    create: XOR<recepcoes_modalidadesCreateInput, recepcoes_modalidadesUncheckedCreateInput>
+    /**
+     * In case the recepcoes_modalidades was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<recepcoes_modalidadesUpdateInput, recepcoes_modalidadesUncheckedUpdateInput>
+  }
+
+  /**
+   * recepcoes_modalidades delete
+   */
+  export type recepcoes_modalidadesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+    /**
+     * Filter which recepcoes_modalidades to delete.
+     */
+    where: recepcoes_modalidadesWhereUniqueInput
+  }
+
+  /**
+   * recepcoes_modalidades deleteMany
+   */
+  export type recepcoes_modalidadesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which recepcoes_modalidades to delete
+     */
+    where?: recepcoes_modalidadesWhereInput
+    /**
+     * Limit how many recepcoes_modalidades to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * recepcoes_modalidades without action
+   */
+  export type recepcoes_modalidadesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the recepcoes_modalidades
+     */
+    select?: recepcoes_modalidadesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the recepcoes_modalidades
+     */
+    omit?: recepcoes_modalidadesOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -12177,6 +13358,21 @@ export namespace Prisma {
   };
 
   export type GuichesScalarFieldEnum = (typeof GuichesScalarFieldEnum)[keyof typeof GuichesScalarFieldEnum]
+
+
+  export const Recepcoes_modalidadesScalarFieldEnum: {
+    id: 'id',
+    cd_modalidade: 'cd_modalidade',
+    ds_modalidade: 'ds_modalidade',
+    servico: 'servico',
+    recepcao: 'recepcao',
+    localizacao: 'localizacao',
+    ativo: 'ativo',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type Recepcoes_modalidadesScalarFieldEnum = (typeof Recepcoes_modalidadesScalarFieldEnum)[keyof typeof Recepcoes_modalidadesScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -12882,6 +14078,81 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"guiches"> | Date | string
   }
 
+  export type recepcoes_modalidadesWhereInput = {
+    AND?: recepcoes_modalidadesWhereInput | recepcoes_modalidadesWhereInput[]
+    OR?: recepcoes_modalidadesWhereInput[]
+    NOT?: recepcoes_modalidadesWhereInput | recepcoes_modalidadesWhereInput[]
+    id?: IntFilter<"recepcoes_modalidades"> | number
+    cd_modalidade?: IntFilter<"recepcoes_modalidades"> | number
+    ds_modalidade?: StringFilter<"recepcoes_modalidades"> | string
+    servico?: StringFilter<"recepcoes_modalidades"> | string
+    recepcao?: StringFilter<"recepcoes_modalidades"> | string
+    localizacao?: StringNullableFilter<"recepcoes_modalidades"> | string | null
+    ativo?: BoolFilter<"recepcoes_modalidades"> | boolean
+    createdAt?: DateTimeFilter<"recepcoes_modalidades"> | Date | string
+    updatedAt?: DateTimeFilter<"recepcoes_modalidades"> | Date | string
+  }
+
+  export type recepcoes_modalidadesOrderByWithRelationInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
+    ds_modalidade?: SortOrder
+    servico?: SortOrder
+    recepcao?: SortOrder
+    localizacao?: SortOrderInput | SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type recepcoes_modalidadesWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    cd_modalidade_servico?: recepcoes_modalidadesCd_modalidadeServicoCompoundUniqueInput
+    AND?: recepcoes_modalidadesWhereInput | recepcoes_modalidadesWhereInput[]
+    OR?: recepcoes_modalidadesWhereInput[]
+    NOT?: recepcoes_modalidadesWhereInput | recepcoes_modalidadesWhereInput[]
+    cd_modalidade?: IntFilter<"recepcoes_modalidades"> | number
+    ds_modalidade?: StringFilter<"recepcoes_modalidades"> | string
+    servico?: StringFilter<"recepcoes_modalidades"> | string
+    recepcao?: StringFilter<"recepcoes_modalidades"> | string
+    localizacao?: StringNullableFilter<"recepcoes_modalidades"> | string | null
+    ativo?: BoolFilter<"recepcoes_modalidades"> | boolean
+    createdAt?: DateTimeFilter<"recepcoes_modalidades"> | Date | string
+    updatedAt?: DateTimeFilter<"recepcoes_modalidades"> | Date | string
+  }, "id" | "cd_modalidade_servico">
+
+  export type recepcoes_modalidadesOrderByWithAggregationInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
+    ds_modalidade?: SortOrder
+    servico?: SortOrder
+    recepcao?: SortOrder
+    localizacao?: SortOrderInput | SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: recepcoes_modalidadesCountOrderByAggregateInput
+    _avg?: recepcoes_modalidadesAvgOrderByAggregateInput
+    _max?: recepcoes_modalidadesMaxOrderByAggregateInput
+    _min?: recepcoes_modalidadesMinOrderByAggregateInput
+    _sum?: recepcoes_modalidadesSumOrderByAggregateInput
+  }
+
+  export type recepcoes_modalidadesScalarWhereWithAggregatesInput = {
+    AND?: recepcoes_modalidadesScalarWhereWithAggregatesInput | recepcoes_modalidadesScalarWhereWithAggregatesInput[]
+    OR?: recepcoes_modalidadesScalarWhereWithAggregatesInput[]
+    NOT?: recepcoes_modalidadesScalarWhereWithAggregatesInput | recepcoes_modalidadesScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"recepcoes_modalidades"> | number
+    cd_modalidade?: IntWithAggregatesFilter<"recepcoes_modalidades"> | number
+    ds_modalidade?: StringWithAggregatesFilter<"recepcoes_modalidades"> | string
+    servico?: StringWithAggregatesFilter<"recepcoes_modalidades"> | string
+    recepcao?: StringWithAggregatesFilter<"recepcoes_modalidades"> | string
+    localizacao?: StringNullableWithAggregatesFilter<"recepcoes_modalidades"> | string | null
+    ativo?: BoolWithAggregatesFilter<"recepcoes_modalidades"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"recepcoes_modalidades"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"recepcoes_modalidades"> | Date | string
+  }
+
   export type TtsDailyUsageCreateInput = {
     date: Date | string
     chars?: number
@@ -13430,6 +14701,87 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     numero?: StringFieldUpdateOperationsInput | string
     nome?: StringFieldUpdateOperationsInput | string
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type recepcoes_modalidadesCreateInput = {
+    cd_modalidade: number
+    ds_modalidade: string
+    servico?: string
+    recepcao: string
+    localizacao?: string | null
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type recepcoes_modalidadesUncheckedCreateInput = {
+    id?: number
+    cd_modalidade: number
+    ds_modalidade: string
+    servico?: string
+    recepcao: string
+    localizacao?: string | null
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type recepcoes_modalidadesUpdateInput = {
+    cd_modalidade?: IntFieldUpdateOperationsInput | number
+    ds_modalidade?: StringFieldUpdateOperationsInput | string
+    servico?: StringFieldUpdateOperationsInput | string
+    recepcao?: StringFieldUpdateOperationsInput | string
+    localizacao?: NullableStringFieldUpdateOperationsInput | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type recepcoes_modalidadesUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    cd_modalidade?: IntFieldUpdateOperationsInput | number
+    ds_modalidade?: StringFieldUpdateOperationsInput | string
+    servico?: StringFieldUpdateOperationsInput | string
+    recepcao?: StringFieldUpdateOperationsInput | string
+    localizacao?: NullableStringFieldUpdateOperationsInput | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type recepcoes_modalidadesCreateManyInput = {
+    id?: number
+    cd_modalidade: number
+    ds_modalidade: string
+    servico?: string
+    recepcao: string
+    localizacao?: string | null
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type recepcoes_modalidadesUpdateManyMutationInput = {
+    cd_modalidade?: IntFieldUpdateOperationsInput | number
+    ds_modalidade?: StringFieldUpdateOperationsInput | string
+    servico?: StringFieldUpdateOperationsInput | string
+    recepcao?: StringFieldUpdateOperationsInput | string
+    localizacao?: NullableStringFieldUpdateOperationsInput | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type recepcoes_modalidadesUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    cd_modalidade?: IntFieldUpdateOperationsInput | number
+    ds_modalidade?: StringFieldUpdateOperationsInput | string
+    servico?: StringFieldUpdateOperationsInput | string
+    recepcao?: StringFieldUpdateOperationsInput | string
+    localizacao?: NullableStringFieldUpdateOperationsInput | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14035,6 +15387,57 @@ export namespace Prisma {
 
   export type guichesSumOrderByAggregateInput = {
     id?: SortOrder
+  }
+
+  export type recepcoes_modalidadesCd_modalidadeServicoCompoundUniqueInput = {
+    cd_modalidade: number
+    servico: string
+  }
+
+  export type recepcoes_modalidadesCountOrderByAggregateInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
+    ds_modalidade?: SortOrder
+    servico?: SortOrder
+    recepcao?: SortOrder
+    localizacao?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type recepcoes_modalidadesAvgOrderByAggregateInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
+  }
+
+  export type recepcoes_modalidadesMaxOrderByAggregateInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
+    ds_modalidade?: SortOrder
+    servico?: SortOrder
+    recepcao?: SortOrder
+    localizacao?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type recepcoes_modalidadesMinOrderByAggregateInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
+    ds_modalidade?: SortOrder
+    servico?: SortOrder
+    recepcao?: SortOrder
+    localizacao?: SortOrder
+    ativo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type recepcoes_modalidadesSumOrderByAggregateInput = {
+    id?: SortOrder
+    cd_modalidade?: SortOrder
   }
 
   export type DateTimeFieldUpdateOperationsInput = {

@@ -20,6 +20,7 @@ import { authenticate } from "../middleware/autenticate";
 import { atencaoRoute } from "./routes/atencao";
 import { guichesRoute } from "./routes/guiche";
 import { configuracaoPaineisRoutes } from "./routes/paineis-config";
+import { recepcoesModalidadesRoute } from "./routes/recepcoesModalidades";
 
 async function bootstrap() {
   const fastify = Fastify({ logger: true, })
@@ -47,6 +48,7 @@ async function bootstrap() {
   await fastify.register(procedimentosRoute)
   await fastify.register(atencaoRoute)
   await fastify.register(configuracaoPaineisRoutes)
+  await fastify.register(recepcoesModalidadesRoute)
   await fastify.register(ws)
   await fastify.register(pgNotify, { channel: "db_atendimentos_senhas", logRawPayload: false, })
 

@@ -47,7 +47,7 @@ export default function ModalProviders({
 
   return (
     <modalContext.Provider value={{ setShowModal, setDados, setExames, setLoading, setTentativas, setInvalido }}>
-      <DialogPatient />
+      {DialogPatient}
       {children}
     </modalContext.Provider>
   )

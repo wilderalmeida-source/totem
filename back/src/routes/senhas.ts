@@ -13,10 +13,13 @@ function aplicarMascaraNome(nomeCompleto: string | null | undefined): string {
   }
 
   const primeiroNome = partes[0];
-
+  const ultimoNome = partes[partes.length - 1];
   // Se tiver apenas 2 nomes (Ex: João Silva) exibe ambos.
+  if (partes.length === 2) {
+    return `${primeiroNome} ${ultimoNome}`;
+  }
   // Se tiver 3 ou mais, oculta o meio com asteriscos fixos.
-  return `${primeiroNome} ***`;
+  return `${primeiroNome} *** ${ultimoNome}`;
 }
 export async function senhaRoute(fastify: FastifyInstance) {
   fastify.get('/clinux/senhas', async (request, reply) => {

@@ -176,3 +176,28 @@ export type DictItem = {
   createdAt: string
   updatedAt: string
 }
+//=======================================
+//RECEPCAO
+//=======================================
+export type RecepcaoModalidade = {
+  id: number
+  cd_modalidade: number
+  ds_modalidade: string
+  recepcao: string
+  localizacao: string | null
+  ativo: boolean
+  createdAt?: string
+  updatedAt?: string
+  servico: string
+}
+
+
+export type RecepcaoModalidadePayload = {
+  cd_modalidade: number
+  ds_modalidade: string
+  recepcao: string
+  localizacao?: string
+  ativo: boolean
+  servico: string
+}
+export type ServicoRecepcao = "B" | "C" | "D";

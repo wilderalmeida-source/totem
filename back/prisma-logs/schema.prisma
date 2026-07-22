@@ -92,3 +92,18 @@ model guiches {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model recepcoes_modalidades {
+  id             Int             @id @default(autoincrement())
+  cd_modalidade  Int
+  ds_modalidade  String          @logs.VarChar(150)
+  servico        String          @logs.VarChar(1) @default("B")
+  recepcao       String          @logs.VarChar(100)
+  localizacao    String?         @logs.VarChar(100)
+  ativo          Boolean         @default(true)
+  createdAt      DateTime        @default(now()) @logs.Timestamp(3)
+  updatedAt      DateTime        @updatedAt @logs.Timestamp(3)
+
+  @@unique([cd_modalidade, servico])
+  @@index([servico])
+}

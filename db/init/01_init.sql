@@ -151,3 +151,58 @@ CREATE TABLE IF NOT EXISTS "guiches" (
   "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
   "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
 );
+CREATE TABLE IF NOT EXISTS "recepcoes_modalidades" (
+    id SERIAL PRIMARY KEY,
+    cd_modalidade INTEGER NOT NULL,
+    ds_modalidade VARCHAR(150) NOT NULL,
+    servico VARCHAR(1) NOT NULL,
+    recepcao VARCHAR(100) NOT NULL,
+    localizacao VARCHAR(150),
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT recepcoes_modalidades_servico_check
+        CHECK (servico IN ('B', 'C', 'D')),
+
+    CONSTRAINT recepcoes_modalidades_cd_modalidade_servico_key
+        UNIQUE (cd_modalidade, servico)
+);
+
+-- =====================================================
+-- ÍNDICES
+-- =====================================================
+
+CREATE INDEX IF NOT EXISTS recepcoes_modalidades_servico_idx
+ON public.recepcoes_modalidades(servico);
+
+CREATE INDEX IF NOT EXISTS recepcoes_modalidades_ativo_idx
+ON public.recepcoes_modalidades(ativo);
+
+-- =====================================================
+-- FUNCTION: atualizar updatedAt
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION atualizar_updated_at()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW."updatedAt" = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$;
+
+-- =====================================================
+-- TRIGGER
+-- =====================================================
+
+DROP TRIGGER IF EXISTS trg_recepcoes_modalidades_updated_at
+ON public.recepcoes_modalidades;
+
+CREATE TRIGGER trg_recepcoes_modalidades_updated_at
+BEFORE UPDATE
+ON public.recepcoes_modalidades
+FOR EACH ROW
+EXECUTE FUNCTION public.atualizar_updated_at();
+

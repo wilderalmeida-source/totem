@@ -202,6 +202,18 @@ exports.Prisma.GuichesScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.Recepcoes_modalidadesScalarFieldEnum = {
+  id: 'id',
+  cd_modalidade: 'cd_modalidade',
+  ds_modalidade: 'ds_modalidade',
+  servico: 'servico',
+  recepcao: 'recepcao',
+  localizacao: 'localizacao',
+  ativo: 'ativo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -238,7 +250,8 @@ exports.Prisma.ModelName = {
   ttsEvent: 'ttsEvent',
   token: 'token',
   configuracao_painel: 'configuracao_painel',
-  guiches: 'guiches'
+  guiches: 'guiches',
+  recepcoes_modalidades: 'recepcoes_modalidades'
 };
 
 /**

@@ -2,7 +2,6 @@
 
 import React, { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import moment from 'moment'
 import Base from '@/components/ui/base'
 import { modalContext } from '@/components/modals/providers'
 import { TotemHeader } from '@/components/totem/totemHeader'
@@ -15,6 +14,7 @@ import { buscarPacienteNomeData } from '@/services/buscaNomeData'
 import type { Paciente } from '@/services/api'
 import type { DadosPaciente } from '@/components/modals/patientModal'
 import { buscarConfiguracaoPaineis } from '@/services/api'
+import { formatarDataNascimento } from '@/lib/formatdate'
 
 const SERVICO_LABEL: Record<string, string> = {
   C: 'Entrega de Exames',
@@ -57,7 +57,7 @@ export default function DataNasc() {
   const title = useMemo(() => SERVICO_LABEL[servico] ?? 'Atendimento', [servico])
 
   const tituloBusca = useMemo(() => {
-    if (tipo === 'DATA') return moment(nome).utc().format('DD/MM/YYYY')
+    if (tipo === 'DATA') return formatarDataNascimento(nome)
     return nome
   }, [nome, tipo])
 
@@ -85,58 +85,58 @@ export default function DataNasc() {
   )
 
   async function abrirPacienteComBusca(paciente: Paciente) {
-  setLoading(true)
-  setInvalido(null)
-  setTentativas(null)
+    setLoading(true)
+    setInvalido(null)
+    setTentativas(null)
 
-  try {
-    const dsPaciente = tipo === 'DATA' ? paciente.ds_paciente ?? text : nome
-    const dtNascimento = tipo === 'DATA' ? nome : paciente.dt_nascimento ?? text
+    try {
+      const dsPaciente = tipo === 'DATA' ? paciente.ds_paciente ?? text : nome
+      const dtNascimento = tipo === 'DATA' ? nome : paciente.dt_nascimento ?? text
 
-    const result = await buscarPacienteNomeData({
-      ds_paciente: dsPaciente,
-      dt_nascimento: dtNascimento,
-      servico,
-      preferencial,
-    })
+      const result = await buscarPacienteNomeData({
+        ds_paciente: dsPaciente,
+        dt_nascimento: dtNascimento,
+        servico,
+        preferencial,
+      })
 
-    const configPainel = await buscarConfiguracaoPaineis()
+      const configPainel = await buscarConfiguracaoPaineis()
 
-    const paineisAtivos =
-      configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? []
+      const paineisAtivos =
+        configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? []
 
-    const temSelecaoModalidadeAtiva =
-      configPainel?.ativo === true && paineisAtivos.length >= 2
+      const temSelecaoModalidadeAtiva =
+        configPainel?.ativo === true && paineisAtivos.length >= 2
 
-    const naoTemExames = !result.exames || result.exames.length === 0
+      const naoTemExames = !result.exames || result.exames.length === 0
 
-    if (temSelecaoModalidadeAtiva && naoTemExames && result.dados) {
-      sessionStorage.setItem(
-        'pacienteModalidade',
-        JSON.stringify({
-          dados: result.dados,
-          exames: result.exames,
-          tentativas: result.tentativas,
-          invalido: result.invalido,
-        })
-      )
+      if (temSelecaoModalidadeAtiva && naoTemExames && result.dados) {
+        sessionStorage.setItem(
+          'pacienteModalidade',
+          JSON.stringify({
+            dados: result.dados,
+            exames: result.exames,
+            tentativas: result.tentativas,
+            invalido: result.invalido,
+          })
+        )
 
-      router.replace(
-        `/modalidades?servico=${servico}&preferencial=${preferencial}`
-      )
+        router.replace(
+          `/modalidades?servico=${servico}&preferencial=${preferencial}`
+        )
 
-      return
+        return
+      }
+
+      setDados(result.dados)
+      setExames(result.exames)
+      setTentativas(result.tentativas)
+      setInvalido(result.invalido)
+      setShowModal(true)
+    } finally {
+      setLoading(false)
     }
-
-    setDados(result.dados)
-    setExames(result.exames)
-    setTentativas(result.tentativas)
-    setInvalido(result.invalido)
-    setShowModal(true)
-  } finally {
-    setLoading(false)
   }
-}
 
   function avancar() {
     if (!text.trim()) {

@@ -1,9 +1,8 @@
 'use client'
 
-import moment from 'moment'
-
 import type { Atendimento, Paciente } from '@/services/api'
 import type { TipoBusca } from '@/lib/patientUtils'
+import { formatarDataNascimento } from '@/lib/formatdate'
 
 interface DatePatientListProps {
   tipo: TipoBusca
@@ -53,7 +52,7 @@ export function DatePatientList({
       return !filtroTexto || nome.includes(filtroTexto)
     }
 
-    const data = moment(paciente.dt_nascimento).utc().format('DD/MM/YYYY')
+    const data = formatarDataNascimento(paciente.dt_nascimento)
     const dataNumerica = onlyNumbers(data)
 
     return !filtroNumerico || dataNumerica.includes(filtroNumerico)
@@ -89,7 +88,7 @@ export function DatePatientList({
             const label =
               tipo === 'DATA'
                 ? paciente.ds_paciente ?? paciente.ds_nome ?? 'SEM NOME'
-                : moment(paciente.dt_nascimento).utc().format('DD/MM/YYYY')
+                : formatarDataNascimento(paciente.dt_nascimento)
 
             return (
               <li

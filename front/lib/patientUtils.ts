@@ -1,7 +1,6 @@
-import moment from "moment";
 
 import { Paciente } from "@/services/api";
-
+import { formatarDataNascimento } from "./formatdate";
 export type TipoBusca = "DATA" | "CPF" | "NOME";
 
 export const COMMON_NAMES = ["MARIA", "JOAO", "JOSÉ", "JOSE"];
@@ -51,7 +50,7 @@ export function toISODateBR(value: string) {
 
 export function formatBirthDate(value?: string) {
   if (!value) return "SEM DATA";
-  return moment(value).utc().format("DD/MM/YYYY");
+  return formatarDataNascimento(value);
 }
 
 export function getInputMask(tipo: TipoBusca) {
