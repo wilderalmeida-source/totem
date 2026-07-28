@@ -28,8 +28,6 @@ async function bootstrap() {
     await instance.register(createToken)
   })
   await fastify.register(painelClinux);
-  await fastify.register(cors, { origin: true })
-  await fastify.addHook('preHandler', authenticate)
   await fastify.register(fastifyStatic, {
     root: path.join(__dirname, '../public/audios'), // Onde os arquivos estão fisicamente
     prefix: '/audios/', // Como eles aparecerão na URL

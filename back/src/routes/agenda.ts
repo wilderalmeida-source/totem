@@ -66,6 +66,7 @@ export async function agendaRoute(fastify: FastifyInstance) {
       },
       orderBy
     })
+    console.log(agenda)
     /*status
     5:Finalizado
     1:Cancelado

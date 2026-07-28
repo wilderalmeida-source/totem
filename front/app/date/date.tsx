@@ -127,7 +127,6 @@ export default function DataNasc() {
 
         return
       }
-
       setDados(result.dados)
       setExames(result.exames)
       setTentativas(result.tentativas)

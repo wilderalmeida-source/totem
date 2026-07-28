@@ -42,6 +42,55 @@ export interface DadosPaciente {
   modalidade?: number;
 }
 
+
+
+
+function obterDataHoraAtendimento(atendimento: Atendimento): Date | null {
+  if (!atendimento.dt_data) return null;
+
+  const data = String(atendimento.dt_data).slice(0, 10);
+  const hora = atendimento.dt_hora
+    ? String(atendimento.dt_hora).match(/T(\d{2}:\d{2}:\d{2})/)?.[1] ?? "00:00:00"
+    : "00:00:00";
+
+  const dataHora = new Date(`${data}T${hora}`);
+  return Number.isNaN(dataHora.getTime()) ? null : dataHora;
+}
+
+function obterAtendimentoMaisProximo(
+  atendimentos: Atendimento[] | null,
+): Atendimento | null {
+  const agora = Date.now();
+
+  const validos = (atendimentos ?? [])
+    .map((item) => {
+      const atendimento = item as Atendimento;
+      const dataHora = obterDataHoraAtendimento(atendimento);
+      const cdModalidade = Number(atendimento.salas?.cd_modalidade ?? 0);
+
+      return { atendimento, dataHora, cdModalidade };
+    })
+    .filter(
+      (item) =>
+        item.dataHora !== null &&
+        item.cdModalidade > 0 &&
+        (item.atendimento.exames?.length ?? 0) > 0,
+    );
+
+  const proximoFuturo = validos
+    .filter((item) => item.dataHora!.getTime() >= agora)
+    .sort((a, b) => a.dataHora!.getTime() - b.dataHora!.getTime())[0];
+
+  if (proximoFuturo) return proximoFuturo.atendimento;
+
+  // Se todos os horários do dia já passaram, usa o atendimento mais recente.
+  return (
+    validos.sort(
+      (a, b) => b.dataHora!.getTime() - a.dataHora!.getTime(),
+    )[0]?.atendimento ?? null
+  );
+}
+
 interface ConfirmacaoRecepcao {
   recepcao: string;
   localizacao: string | null;
@@ -116,7 +165,6 @@ export function DialogPatient({
 
   useEffect(() => {
     if (!confirmacaoRecepcao) return;
-
     setSegundosRestantes(15);
 
     const contador = window.setInterval(() => {
@@ -170,22 +218,35 @@ export function DialogPatient({
     // Fluxo normal
     if (!dados) return;
 
+    // Para agendamento, usa a modalidade do próximo atendimento do dia.
+    // Para os demais serviços, mantém a modalidade já presente em dados.
+    const atendimentoMaisProximo =
+      dados.servico === "D" || "B" ? obterAtendimentoMaisProximo(exames) : null;
+
+    const cdModalidade = Number(
+      atendimentoMaisProximo?.salas?.cd_modalidade ??
+        dados.cd_modalidade ??
+        dados.modalidade ??
+        0,
+    );
+    console.log("Exames:", exames)
+    console.log("Atendimento mais próximo:", atendimentoMaisProximo);
+    console.log("Modalidade usada para gerar a senha:", cdModalidade);
+    
+
     // Evita que clique, toque ou submit duplicado gere mais de uma senha.
     if (processandoRef.current) return;
     processandoRef.current = true;
     setLoading(true);
+
     await sendClinux({
       cd_paciente: dados.cd_paciente,
       ds_paciente: dados.ds_paciente,
       dt_nascimento: dados.dt_nascimento,
       preferencial: dados.preferencial,
       servico: dados.servico,
-      cd_modalidade: dados.cd_modalidade ?? dados.modalidade,
+      cd_modalidade: cdModalidade || undefined,
     });
-
-    const cdModalidade = Number(dados.cd_modalidade ?? dados.modalidade ?? 0);
-
-    console.log("Modalidade do atendimento:", cdModalidade);
 
     if (!cdModalidade) {
       console.log("Atendimento sem modalidade. Mantendo o fluxo antigo.");

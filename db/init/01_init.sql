@@ -198,11 +198,11 @@ $$;
 -- =====================================================
 
 DROP TRIGGER IF EXISTS trg_recepcoes_modalidades_updated_at
-ON public.recepcoes_modalidades;
+ON recepcoes_modalidades;
 
 CREATE TRIGGER trg_recepcoes_modalidades_updated_at
 BEFORE UPDATE
-ON public.recepcoes_modalidades
+ON recepcoes_modalidades
 FOR EACH ROW
 EXECUTE FUNCTION public.atualizar_updated_at();
 

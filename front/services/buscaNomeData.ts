@@ -60,14 +60,16 @@ export async function buscarPacienteNomeData({
       : []
     console.log('Exames de entrega:', exames)
   } else {
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0)
+  const agora = new Date()
+
+  const inicioDia = new Date(agora)
+  inicioDia.setHours(0, 0, 0, 0)
 
     const atendimento = await buscaAtendimentos({
       cd_paciente: paciente.cd_paciente,
-      date: { from: hoje },
+      date: { from: inicioDia },
     })
-
+    console.log(atendimento)
     exames = atendimento
       ? atendimento.filter(
         (item) =>
