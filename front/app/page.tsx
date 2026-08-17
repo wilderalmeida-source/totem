@@ -5,7 +5,7 @@ import Historic from '@/components/ui/historic'
 export const dynamic = 'force-dynamic'
 
 const services = [
-  { servico: 'Agendamento', ID: 'D' },
+  { servico: 'Agendar Exames', ID: 'D' },
   { servico: 'Atendimento', ID: 'B' },
   { servico: 'Entrega de Exames', ID: 'C' },
 ]
