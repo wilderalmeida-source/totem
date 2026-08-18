@@ -137,13 +137,13 @@ export default function DataNasc() {
     }
   }
 
-  function avancar() {
+  async function avancar() {
     if (!text.trim()) {
       window.alert(tipo === 'DATA' ? 'Digite o nome do paciente' : 'Digite a data de nascimento')
       return
     }
 
-    abrirModal(
+    const dadosNovoPaciente: DadosPaciente =
       tipo === 'DATA'
         ? {
           ds_paciente: text.trim(),
@@ -159,7 +159,43 @@ export default function DataNasc() {
           servico,
           preferencial,
         }
-    )
+
+    try {
+      setLoading(true)
+
+      const configPainel = await buscarConfiguracaoPaineis()
+
+      const paineisAtivos =
+        configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? []
+
+      const temSelecaoModalidadeAtiva =
+        configPainel?.ativo === true && paineisAtivos.length >= 2
+
+      if (temSelecaoModalidadeAtiva) {
+        sessionStorage.setItem(
+          'pacienteModalidade',
+          JSON.stringify({
+            dados: dadosNovoPaciente,
+            exames: null,
+            tentativas: null,
+            invalido: null,
+          })
+        )
+
+        router.replace(
+          `/modalidades?servico=${servico}&preferencial=${preferencial}`
+        )
+
+        return
+      }
+
+      abrirModal(dadosNovoPaciente)
+    } catch (error) {
+      console.error(error)
+      window.alert('Erro ao carregar a configuração de modalidades.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   function voltar() {

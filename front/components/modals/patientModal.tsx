@@ -221,7 +221,9 @@ export function DialogPatient({
     // Para agendamento, usa a modalidade do próximo atendimento do dia.
     // Para os demais serviços, mantém a modalidade já presente em dados.
     const atendimentoMaisProximo =
-      dados.servico === "D" || "B" ? obterAtendimentoMaisProximo(exames) : null;
+      dados.servico === "D" || dados.servico === "B"
+      ? obterAtendimentoMaisProximo(exames)
+      : null;
 
     const cdModalidade = Number(
       atendimentoMaisProximo?.salas?.cd_modalidade ??

@@ -118,7 +118,7 @@ export default function Totem() {
   function voltar() {
     router.replace(`/preferencial?servico=${servico}`)
   }
-  function avancar() {
+  async function avancar() {
     if (!text.trim()) {
       window.alert("Digite o nome do paciente");
       return;
@@ -129,14 +129,54 @@ export default function Totem() {
       return;
     }
 
-    setDados({
+    const dadosNovoPaciente = {
       ds_paciente: text.trim(),
       dt_nascimento: undefined,
-      tipo: "NEW",
+      tipo: "NEW" as const,
       servico,
       preferencial,
-    });
-    setShowModal(true);
+    };
+
+    try {
+      setLoading(true);
+
+      const configPainel = await buscarConfiguracaoPaineis();
+
+      const paineisAtivos =
+        configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? [];
+
+      const temSelecaoModalidadeAtiva =
+        configPainel?.ativo === true && paineisAtivos.length >= 2;
+
+      if (temSelecaoModalidadeAtiva) {
+        sessionStorage.setItem(
+          "pacienteModalidade",
+          JSON.stringify({
+            dados: dadosNovoPaciente,
+            exames: null,
+            tentativas: null,
+            invalido: null,
+          })
+        );
+
+        router.replace(
+          `/modalidades?servico=${servico}&preferencial=${preferencial}`
+        );
+
+        return;
+      }
+
+      setDados(dadosNovoPaciente);
+      setExames(null);
+      setTentativas(null);
+      setInvalido(null);
+      setShowModal(true);
+    } catch (error) {
+      console.error(error);
+      window.alert("Erro ao carregar a configuração de modalidades.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function abrirQRCode() {
