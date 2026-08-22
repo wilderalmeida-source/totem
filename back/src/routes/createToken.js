@@ -11,7 +11,7 @@ function addDays(date, days) {
 async function createToken(fastify) {
     // ✅ Desabilita a herança de hooks do pai
     fastify.decorateRequest('skipAuth', true);
-    fastify.get("/tokens", {
+    fastify.post("/tokens", {
         config: { skipAuth: true } // ← flag customizada
     }, async (request, reply) => {
         const adminSecret = request.headers['x-admin-key'];

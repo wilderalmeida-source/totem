@@ -1,4 +1,3 @@
-'use server'
 import { apiFetch } from './client'
 import type {
     RecepcaoModalidade,

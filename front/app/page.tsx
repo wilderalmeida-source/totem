@@ -1,6 +1,7 @@
 import Base from '@/components/ui/base'
 import Servicos from '@/components/ui/servicos'
 import Historic from '@/components/ui/historic'
+import AdminAccessTrigger from '@/components/AdminAccessTrigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +18,9 @@ export default function Home() {
     <Base type="home">
       <div className="flex w-full h-full flex-col">
         <div>
-          <h2 className="text-6xl text-center">Olá, seja bem vindo ao {empresa}!</h2>
+          <h2 className="text-6xl text-center">
+            Olá, seja bem vindo ao <AdminAccessTrigger companyName={empresa} />!
+          </h2>
           <h6 className="text-4xl text-center mt-4">Escolha uma opção abaixo.</h6>
         </div>
         <Servicos servicos={services} />

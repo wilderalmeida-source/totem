@@ -179,6 +179,31 @@ ON public.recepcoes_modalidades(servico);
 CREATE INDEX IF NOT EXISTS recepcoes_modalidades_ativo_idx
 ON public.recepcoes_modalidades(ativo);
 
+CREATE TABLE IF NOT EXISTS "AdminUser" (
+  "id" SERIAL PRIMARY KEY,
+  "username" VARCHAR(100) NOT NULL UNIQUE,
+  "displayName" VARCHAR(150) NOT NULL,
+  "passwordHash" VARCHAR(255) NOT NULL,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "AuditLog" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "sessionId" VARCHAR(100),
+  "actor" VARCHAR(100),
+  "category" VARCHAR(30) NOT NULL,
+  "action" VARCHAR(100) NOT NULL,
+  "step" VARCHAR(100),
+  "metadata" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "AuditLog_sessionId_idx" ON "AuditLog"("sessionId");
+CREATE INDEX IF NOT EXISTS "AuditLog_category_idx" ON "AuditLog"("category");
+
 -- =====================================================
 -- FUNCTION: atualizar updatedAt
 -- =====================================================

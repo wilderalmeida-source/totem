@@ -11,7 +11,13 @@ export async function authenticate(request: any, reply: any) {
     return reply.code(401).send({ error: "Token ausente" });
   }
 
-  const token = authHeader.replace("Bearer ", "");
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+
+  if (!match) {
+    return reply.code(401).send({ error: "Formato de token inválido" });
+  }
+
+  const token = match[1];
   const tokenHash = hashToken(token);
 
   const existing = await PrismaLog.token.findUnique({
@@ -24,6 +30,10 @@ export async function authenticate(request: any, reply: any) {
 
   if (existing.expiresAt < new Date()) {
     return reply.code(401).send({ error: "Token expirado" });
+  }
+
+  if (existing.revokedAt) {
+    return reply.code(401).send({ error: "Token revogado" });
   }
 
   request.apiToken = existing;

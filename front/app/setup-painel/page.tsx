@@ -264,8 +264,8 @@ export default function ConfiguracaoPaineisPage() {
 
     const paineisAtivos = config.filter((painel) => painel.ativo)
 
-    if (paineisAtivos.length < 2) {
-      alert('Ative pelo menos 2 painéis para usar a seleção de modalidade.')
+    if (paineisAtivos.length < 1) {
+      alert('Ative pelo menos 1 painel para usar a seleção de modalidade.')
       return false
     }
 
@@ -348,7 +348,7 @@ async function salvarConfiguracao() {
 
           {ativo && (
             <p className="mt-3 text-sm font-medium text-gray-500">
-              Para salvar, é necessário ativar pelo menos 2 painéis.
+              Para salvar, é necessário ativar pelo menos 1 painel.
             </p>
           )}
         </div>

@@ -1,5 +1,3 @@
-'use server'
-
 import { apiFetch } from "./client"
 import { Atendimento, AtendimentoFiltro } from "./types"
 

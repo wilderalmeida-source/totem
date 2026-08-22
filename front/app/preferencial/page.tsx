@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import Image, { StaticImageData } from 'next/image'
+import type { StaticImageData } from 'next/image'
 import Base from '@/components/ui/base'
 import normal from '@/assets/icons/normal.png'
 import idoso from '@/assets/icons/idosos.png'
@@ -9,6 +8,7 @@ import cadeirante from '@/assets/icons/cadeira.png'
 import colo from '@/assets/icons/colo.png'
 import atencao from '@/assets/icons/atencao.png'
 import voltar from '@/assets/icons/voltar.png'
+import PriorityOptions from '@/components/PriorityOptions'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type PageProps = {
@@ -48,23 +48,7 @@ export default async function Preferencial({ searchParams }: PageProps) {
                               <h6 className="text-2xl text-center mt-4">Escolha uma opção abaixo</h6>
                         </div>
 
-                        <div className="mt-10 grid grid-cols-2 gap-3 xl:grid-cols-4 lg:grid-cols-4">
-                              {OPCOES.map(({ label, icone, preferencial, href, cor }) => (
-                                    <Link key={label} href={href ?? `/totem?servico=${servico}&preferencial=${preferencial}`}>
-                                          <button className={`pt-2 border-2 rounded-lg w-full h-full font-semibold text-white text-center text-2xl ${cor ?? 'bg-gray-500'}`}>
-                                                <Image
-                                                      className="mx-auto invert mb-5"
-                                                      src={icone}
-                                                      width={100}
-                                                      height={100}
-                                                      alt={label}
-                                                      priority
-                                                />
-                                                {label}
-                                          </button>
-                                    </Link>
-                              ))}
-                        </div>
+                        <PriorityOptions options={OPCOES} servico={servico} />
                   </div>
             </Base>
       )

@@ -24,6 +24,12 @@ async function voiceRoute(fastify) {
         const createbody = zod_1.z.object({
             text: zod_1.z.string(),
             eventId: zod_1.z.string().optional(),
+            guiche: zod_1.z
+                .object({
+                numero: zod_1.z.string().optional(),
+                nome: zod_1.z.string().optional(),
+            })
+                .optional(),
         });
         const { text, eventId } = createbody.parse(request.body);
         const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY;
@@ -43,15 +49,16 @@ async function voiceRoute(fastify) {
                 return reply.status(400).send("Parâmetro 'text' é obrigatório");
             }
             // ========= VOZ DA SEMANA =========
-            const voiceName = (await (0, googleVoices_1.resolveEffectiveVoice)()).voiceName;
-            const rate = (await (0, googleVoices_1.resolveEffectiveVoice)()).rate;
-            // ========= DATA LOCAL (apenas dia, sem hora) =========
             const now = new Date();
+            const effectiveVoice = await (0, googleVoices_1.resolveEffectiveVoice)(now);
+            const voiceName = effectiveVoice.voiceName;
+            const rate = effectiveVoice.rate;
+            const volume = effectiveVoice.volumeSound;
+            // ========= DATA LOCAL (apenas dia, sem hora) =========
             const dateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const dateIso = dateOnly.toISOString();
             const year = now.getFullYear();
-            const week = (await (0, googleVoices_1.resolveEffectiveVoice)(now)).week;
-            const volume = (await (0, googleVoices_1.resolveEffectiveVoice)(now)).volumeSound;
+            const week = effectiveVoice.week;
             // ========= SALVAR VOZ DA SEMANA NO BANCO =========
             await prismalog_1.PrismaLog.ttsWeekVoice.upsert({
                 where: { year_week: { year, week } },
@@ -60,7 +67,7 @@ async function voiceRoute(fastify) {
             });
             const textoComDict = await (0, googleVoices_1.applyDictionary)(text);
             const formatado = capitalizarNome(textoComDict);
-            console.log(formatado);
+            fastify.log.info({ eventId, text: formatado }, "Gerando áudio TTS");
             const body = {
                 input: { text: formatado },
                 voice: {
@@ -70,7 +77,7 @@ async function voiceRoute(fastify) {
                 audioConfig: {
                     audioEncoding: "MP3",
                     volumeGainDb: volume,
-                    speaking_rate: rate,
+                    speakingRate: rate,
                 },
             };
             if (!GOOGLE_TTS_KEY) {

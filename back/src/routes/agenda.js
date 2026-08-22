@@ -67,6 +67,7 @@ async function agendaRoute(fastify) {
             },
             orderBy
         });
+        console.log(agenda);
         /*status
         5:Finalizado
         1:Cancelado

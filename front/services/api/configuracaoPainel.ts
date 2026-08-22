@@ -1,5 +1,5 @@
 export async function buscarConfiguracaoPaineis() {
-  const response = await fetch('/api/paineis-config', {
+  const response = await fetch('/api/backend/clinux/paineis-config', {
     cache: 'no-store',
   })
 
@@ -11,7 +11,7 @@ export async function buscarConfiguracaoPaineis() {
 }
 
 export async function salvarConfiguracaoPaineis(payload: unknown) {
-  const response = await fetch('/api/paineis-config', {
+  const response = await fetch('/api/backend/clinux/paineis-config', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

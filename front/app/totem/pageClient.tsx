@@ -13,6 +13,7 @@ import { usePatientSearch } from "@/hooks/usePatientSearch";
 import { buscarConfiguracaoPaineis, Paciente } from "@/services/api";
 import { onlyNumbers, TipoBusca } from "@/lib/patientUtils";
 import { buscarPacienteCPF } from "@/services/buscaCPF";
+import { auditTotem } from "@/lib/audit-client";
 interface PainelConfig {
   painel: number
   ativo: boolean
@@ -106,6 +107,7 @@ export default function Totem() {
   }
 }
   function handleChangeTipo(nextTipo: TipoBusca) {
+    auditTotem('tipo_busca_selecionado', 'busca', { tipo: nextTipo, servico, preferencial });
     setTipo(nextTipo);
     setText("");
     clearPatients();
@@ -119,6 +121,7 @@ export default function Totem() {
     router.replace(`/preferencial?servico=${servico}`)
   }
   async function avancar() {
+    auditTotem('avancar_clicado', 'busca', { tipo, servico, preferencial, preenchido: Boolean(text.trim()) });
     if (!text.trim()) {
       window.alert("Digite o nome do paciente");
       return;

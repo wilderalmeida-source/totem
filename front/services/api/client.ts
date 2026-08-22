@@ -1,8 +1,3 @@
-'use server'
-
-const API_INTERNA = process.env.LINK_API_INTERNA
-const TOKEN = `Bearer ${process.env.TOKEN_API_INT}`
-
 type FetchOptions = RequestInit & {
   tags?: string[]
 }
@@ -11,23 +6,16 @@ export const apiFetch = async (
   path: string,
   { tags, headers, ...options }: FetchOptions = {}
 ) => {
-  if (!API_INTERNA) {
-    throw new Error('LINK_API_INTERNA não configurada')
-  }
+  const serverSide = typeof window === 'undefined'
+  const apiBase = serverSide ? process.env.LINK_API_INTERNA : '/api/backend'
+  const apiToken = serverSide ? process.env.TOKEN_API_INT : undefined
 
-  if (!process.env.TOKEN_API_INT) {
-    throw new Error('TOKEN_API_INT não configurado')
-  }
-  if (options.body) {
+  if (!apiBase) throw new Error('LINK_API_INTERNA não configurada')
+  if (serverSide && !apiToken) throw new Error('TOKEN_API_INT não configurado')
 
-  }
-  const mergedHeaders = new Headers({
-    'Content-Type': 'application/json',
-    Authorization: TOKEN,
-  })
-  const mergedHeaders2 = new Headers({
-    Authorization: TOKEN,
-  })
+  const mergedHeaders = new Headers()
+  if (options.body) mergedHeaders.set('Content-Type', 'application/json')
+  if (apiToken) mergedHeaders.set('Authorization', `Bearer ${apiToken}`)
   if (headers) {
     const customHeaders = new Headers(headers)
 
@@ -36,10 +24,10 @@ export const apiFetch = async (
     })
   }
 
-  return fetch(`${API_INTERNA}${path}`, {
+  return fetch(`${apiBase}${path}`, {
     cache: 'no-cache',
-    headers: options.body ? mergedHeaders : mergedHeaders2,
-    ...(tags ? { next: { tags } } : {}),
+    headers: mergedHeaders,
+    ...(serverSide && tags ? { next: { tags } } : {}),
     ...options,
   })
 }

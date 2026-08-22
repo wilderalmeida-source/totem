@@ -30,44 +30,62 @@ async function resolveModalidade(cd_modalidade) {
     return modalidade?.ds_modalidade ?? '';
 }
 async function novoAtendimentoTotem(cd_paciente) {
-    console.log('Criando novo atendimento para paciente:', cd_paciente);
-    const cdSalaTotem = Number(process.env.IDSALA);
-    const cdMedicoTotem = Number(process.env.IDMEDICO);
-    if (!cdSalaTotem) {
-        throw new Error('IDSALA não configurado no .env');
-    }
-    if (!cdMedicoTotem) {
-        throw new Error('IDMEDICO não configurado no .env');
-    }
-    return prismaDB_1.prisma.$transaction(async (tx) => {
-        const atendimento = await tx.atendimentos.create({
-            data: {
-                cd_paciente,
-                cd_sala: cdSalaTotem,
-                cd_medico: cdMedicoTotem,
-                dt_data: getHojeBrasil(),
-                ds_status: 2,
-                cd_funcionario: FUNCIONARIO
-            },
-            include: {
-                salas: true,
-                exames: true,
-            },
+    try {
+        console.log("Criando novo atendimento para paciente:", cd_paciente);
+        const cdSalaTotem = Number(process.env.IDSALA);
+        const cdMedicoTotem = Number(process.env.IDMEDICO);
+        console.log({
+            IDSALA: process.env.IDSALA,
+            IDMEDICO: process.env.IDMEDICO,
+            cdSalaTotem,
+            cdMedicoTotem,
+            FUNCIONARIO,
         });
-        await tx.atendimentos.update({
-            where: {
-                cd_atendimento: atendimento.cd_atendimento,
-            },
-            data: {
+        if (!cdSalaTotem) {
+            throw new Error("IDSALA não configurado no .env");
+        }
+        if (!cdMedicoTotem) {
+            throw new Error("IDMEDICO não configurado no .env");
+        }
+        return await prismaDB_1.prisma.$transaction(async (tx) => {
+            const atendimento = await tx.atendimentos.create({
+                data: {
+                    cd_paciente,
+                    cd_sala: cdSalaTotem,
+                    cd_medico: cdMedicoTotem,
+                    dt_data: getHojeBrasil(),
+                    ds_status: 2,
+                    cd_funcionario: FUNCIONARIO,
+                },
+                include: {
+                    salas: true,
+                    exames: true,
+                },
+            });
+            await tx.atendimentos.update({
+                where: {
+                    cd_atendimento: atendimento.cd_atendimento,
+                },
+                data: {
+                    nr_controle: atendimento.cd_atendimento,
+                    cd_funcionario: FUNCIONARIO,
+                },
+            });
+            return {
+                ...atendimento,
                 nr_controle: atendimento.cd_atendimento,
-                cd_funcionario: FUNCIONARIO
-            },
+            };
         });
-        return {
-            ...atendimento,
-            nr_controle: atendimento.cd_atendimento,
-        };
-    });
+    }
+    catch (error) {
+        console.error("Erro em novoAtendimentoTotem:", {
+            message: error?.message,
+            code: error?.code,
+            meta: error?.meta,
+            stack: error?.stack,
+        });
+        throw error;
+    }
 }
 function servicoParaConfig(servico) {
     if (servico === 'C')

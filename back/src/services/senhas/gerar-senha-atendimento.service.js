@@ -58,22 +58,42 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
         },
     });
     const nrSenha = totalSenhasHoje + 1;
-    const senha = await prismaDB_1.prisma.atendimentos_senhas.create({
-        data: {
-            dt_entrada: dateNow,
-            ds_opcao: servico,
-            nr_empresa: EMPRESA,
-            nr_modalidade: modalidadeSenha,
-            nr_senha: nrSenha,
-            sn_preferencial: preferencial !== 0,
-            sn_especial: preferencial === 2,
-            sn_preparo: false,
-            ds_painel: IP_PAINEL,
-            ds_local: dsModalidade,
-            ds_fila: fila,
-            cd_funcionario: FUNCIONARIO,
-        },
-    });
+    let senha;
+    try {
+        senha = await prismaDB_1.prisma.atendimentos_senhas.create({
+            data: {
+                dt_entrada: dateNow,
+                ds_opcao: servico,
+                nr_empresa: EMPRESA,
+                nr_modalidade: modalidadeSenha,
+                nr_senha: nrSenha,
+                sn_preferencial: preferencial !== 0,
+                sn_especial: preferencial === 2,
+                sn_preparo: false,
+                ds_painel: IP_PAINEL,
+                ds_local: dsModalidade,
+                ds_fila: fila,
+                cd_funcionario: FUNCIONARIO,
+            },
+        });
+    }
+    catch (error) {
+        console.error('Erro ao criar atendimentos_senhas:', {
+            message: error?.message,
+            code: error?.code,
+            meta: error?.meta,
+            dadosEnviados: {
+                cd_paciente,
+                servico,
+                modalidadeSenha,
+                nrSenha,
+                IP_PAINEL,
+                dsModalidade,
+                fila,
+            },
+        });
+        throw new Error(`Falha ao gerar senha: ${error?.message ?? 'erro desconhecido'}`);
+    }
     const dsSenha = (0, senha_helpers_1.montarDsSenha)(preferencial, fila, senha.nr_senha);
     await prismaDB_1.prisma.atendimentos.updateMany({
         where: {

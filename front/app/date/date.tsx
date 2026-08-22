@@ -15,6 +15,7 @@ import type { Paciente } from '@/services/api'
 import type { DadosPaciente } from '@/components/modals/patientModal'
 import { buscarConfiguracaoPaineis } from '@/services/api'
 import { formatarDataNascimento } from '@/lib/formatdate'
+import { auditTotem } from '@/lib/audit-client'
 
 const SERVICO_LABEL: Record<string, string> = {
   C: 'Entrega de Exames',
@@ -138,6 +139,7 @@ export default function DataNasc() {
   }
 
   async function avancar() {
+    auditTotem('avancar_clicado', 'busca_complementar', { tipo, servico, preferencial, preenchido: Boolean(text.trim()) })
     if (!text.trim()) {
       window.alert(tipo === 'DATA' ? 'Digite o nome do paciente' : 'Digite a data de nascimento')
       return

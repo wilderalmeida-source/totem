@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Base from '@/components/ui/base'
 import { buscaModalidades, Modalidade, Paciente, Atendimento } from '@/services/api'
 import { modalContext } from '@/components/modals/providers'
+import { auditTotem } from '@/lib/audit-client'
 
 interface PacienteModalidadeStorage {
   dados: Paciente | null
@@ -67,6 +68,7 @@ export default function ModalidadePage() {
   }, [])
 
   function selecionarModalidade(modalidade: Modalidade) {
+    auditTotem('modalidade_selecionada', 'modalidade', { modalidadeId: modalidade.cd_modalidade, servico, preferencial })
     if (!pacienteStorage?.dados) {
       window.alert('Dados do paciente não encontrados.')
       router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)

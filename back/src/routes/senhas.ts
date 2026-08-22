@@ -177,7 +177,6 @@ export async function senhaRoute(fastify: FastifyInstance) {
       return reply.send({
         senhas,
         senhasnr,
-        senhasRawQuery: senhasEntregaRaw
       })
     } catch (err: any) {
       return reply.status(400).send({

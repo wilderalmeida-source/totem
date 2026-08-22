@@ -22,6 +22,7 @@ import ok from "@/assets/icons/ok.png";
 import atention from "@/assets/icons/atention.png";
 import { formatarDataNascimento } from "@/lib/formatdate";
 import type { RecepcaoModalidade } from "@/services/api/types";
+import { auditTotem } from "@/lib/audit-client";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 export interface DadosPaciente {
@@ -182,6 +183,7 @@ export function DialogPatient({
   }, [confirmacaoRecepcao]);
 
   const gerarSenha = async (valorQR: string | null = null) => {
+    auditTotem('confirmacao_senha', 'confirmacao', { servico: dados?.servico, preferencial: dados?.preferencial, pacienteId: dados?.cd_paciente, viaQr: Boolean(valorQR) });
     // Fluxo QR
     if (dados?.qr) {
       if (!valorQR) {

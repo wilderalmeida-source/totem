@@ -11,7 +11,11 @@ async function authenticate(request, reply) {
     if (!authHeader) {
         return reply.code(401).send({ error: "Token ausente" });
     }
-    const token = authHeader.replace("Bearer ", "");
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
+    if (!match) {
+        return reply.code(401).send({ error: "Formato de token inválido" });
+    }
+    const token = match[1];
     const tokenHash = (0, token_1.hashToken)(token);
     const existing = await prismalog_1.PrismaLog.token.findUnique({
         where: { tokenHash },
@@ -21,6 +25,9 @@ async function authenticate(request, reply) {
     }
     if (existing.expiresAt < new Date()) {
         return reply.code(401).send({ error: "Token expirado" });
+    }
+    if (existing.revokedAt) {
+        return reply.code(401).send({ error: "Token revogado" });
     }
     request.apiToken = existing;
 }

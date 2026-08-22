@@ -214,12 +214,38 @@ exports.Prisma.Recepcoes_modalidadesScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.AdminUserScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  displayName: 'displayName',
+  passwordHash: 'passwordHash',
+  active: 'active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  actor: 'actor',
+  category: 'category',
+  action: 'action',
+  step: 'step',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
@@ -251,7 +277,9 @@ exports.Prisma.ModelName = {
   token: 'token',
   configuracao_painel: 'configuracao_painel',
   guiches: 'guiches',
-  recepcoes_modalidades: 'recepcoes_modalidades'
+  recepcoes_modalidades: 'recepcoes_modalidades',
+  AdminUser: 'AdminUser',
+  AuditLog: 'AuditLog'
 };
 
 /**

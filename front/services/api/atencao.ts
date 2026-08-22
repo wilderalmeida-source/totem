@@ -1,5 +1,3 @@
-'use server'
-
 import { apiFetch } from "./client"
 
 export const tocaAtencao = async (TorP: string) => {

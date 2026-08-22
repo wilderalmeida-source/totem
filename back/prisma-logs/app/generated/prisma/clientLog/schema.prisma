@@ -99,7 +99,7 @@ model recepcoes_modalidades {
   id            Int      @id @default(autoincrement())
   cd_modalidade Int
   ds_modalidade String   @logs.VarChar(150)
-  servico       String   @default("B")
+  servico       String   @default("B") @logs.VarChar(1)
   recepcao      String   @logs.VarChar(100)
   localizacao   String?  @logs.VarChar(100)
   ativo         Boolean  @default(true)
@@ -108,4 +108,29 @@ model recepcoes_modalidades {
 
   @@unique([cd_modalidade, servico])
   @@index([servico])
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @logs.VarChar(100)
+  displayName  String   @logs.VarChar(150)
+  passwordHash String   @logs.VarChar(255)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AuditLog {
+  id        BigInt   @id @default(autoincrement())
+  sessionId String?  @logs.VarChar(100)
+  actor     String?  @logs.VarChar(100)
+  category  String   @logs.VarChar(30)
+  action    String   @logs.VarChar(100)
+  step      String?  @logs.VarChar(100)
+  metadata  Json?
+  createdAt DateTime @default(now()) @logs.Timestamp(3)
+
+  @@index([createdAt])
+  @@index([sessionId])
+  @@index([category])
 }

@@ -1,5 +1,3 @@
-'use server'
-
 import { apiFetch } from "./client"
 
 export const buscaDicionario = async (search?: string) => {

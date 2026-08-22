@@ -21,12 +21,31 @@ import { atencaoRoute } from "./routes/atencao";
 import { guichesRoute } from "./routes/guiche";
 import { configuracaoPaineisRoutes } from "./routes/paineis-config";
 import { recepcoesModalidadesRoute } from "./routes/recepcoesModalidades";
+import { adminRoutes } from "./routes/admin";
 
 async function bootstrap() {
   const fastify = Fastify({ logger: true, })
+  const frontendOrigins = (process.env.FRONTEND_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+
   await fastify.register(async (instance) => {
     await instance.register(createToken)
   })
+  await fastify.register(cors, {
+    origin(origin, callback) {
+      // Requisições internas entre containers normalmente não enviam Origin.
+      if (!origin || frontendOrigins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+
+      callback(new Error('Origem não permitida pelo CORS'), false)
+    },
+  })
+  fastify.addHook('preHandler', authenticate)
+
   await fastify.register(painelClinux);
   await fastify.register(fastifyStatic, {
     root: path.join(__dirname, '../public/audios'), // Onde os arquivos estão fisicamente
@@ -47,6 +66,7 @@ async function bootstrap() {
   await fastify.register(atencaoRoute)
   await fastify.register(configuracaoPaineisRoutes)
   await fastify.register(recepcoesModalidadesRoute)
+  await fastify.register(adminRoutes)
   await fastify.register(ws)
   await fastify.register(pgNotify, { channel: "db_atendimentos_senhas", logRawPayload: false, })
 

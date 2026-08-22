@@ -13,9 +13,13 @@ function aplicarMascaraNome(nomeCompleto) {
         return partes[0];
     }
     const primeiroNome = partes[0];
+    const ultimoNome = partes[partes.length - 1];
     // Se tiver apenas 2 nomes (Ex: João Silva) exibe ambos.
+    if (partes.length === 2) {
+        return `${primeiroNome} ${ultimoNome}`;
+    }
     // Se tiver 3 ou mais, oculta o meio com asteriscos fixos.
-    return `${primeiroNome} ***`;
+    return `${primeiroNome} *** ${ultimoNome}`;
 }
 async function senhaRoute(fastify) {
     fastify.get('/clinux/senhas', async (request, reply) => {
@@ -144,7 +148,6 @@ async function senhaRoute(fastify) {
             return reply.send({
                 senhas,
                 senhasnr,
-                senhasRawQuery: senhasEntregaRaw
             });
         }
         catch (err) {
