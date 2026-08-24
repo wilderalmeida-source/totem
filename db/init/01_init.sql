@@ -194,6 +194,20 @@ CREATE TABLE IF NOT EXISTS "AdminUser" (
   "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Mantém bancos já existentes compatíveis quando este arquivo for
+-- executado manualmente. CREATE TABLE IF NOT EXISTS não adiciona colunas
+-- novas a uma tabela que já existe.
+ALTER TABLE "AdminUser"
+ADD COLUMN IF NOT EXISTS "mustChangePassword"
+BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE "AdminUser"
+ADD COLUMN IF NOT EXISTS "permissions"
+TEXT[] NOT NULL DEFAULT ARRAY[
+  'ATENCAO', 'VOZ', 'DICIONARIO', 'GUICHES', 'RECEPCOES',
+  'PAINEIS', 'STATUS', 'LOGS', 'USUARIOS'
+]::TEXT[];
+
 CREATE TABLE IF NOT EXISTS "AuditLog" (
   "id" BIGSERIAL PRIMARY KEY,
   "sessionId" VARCHAR(100),
