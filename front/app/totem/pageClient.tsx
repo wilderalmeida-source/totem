@@ -14,19 +14,7 @@ import { buscarConfiguracaoPaineis, Paciente } from "@/services/api";
 import { onlyNumbers, TipoBusca } from "@/lib/patientUtils";
 import { buscarPacienteCPF } from "@/services/buscaCPF";
 import { auditTotem } from "@/lib/audit-client";
-interface PainelConfig {
-  painel: number
-  ativo: boolean
-  ip: string
-  atendimento: number[]
-  marcacao: number[]
-  resultado: number[]
-  universal: {
-    atendimento: boolean
-    marcacao: boolean
-    resultado: boolean
-  }
-}
+import { deveSelecionarModalidade } from "@/lib/painel-selection";
 export default function Totem() {
   const url = useSearchParams();
   const { setShowModal, setDados, setExames, setInvalido, setLoading, setTentativas } = useContext(modalContext);
@@ -68,11 +56,7 @@ export default function Totem() {
 
     const configPainel = await buscarConfiguracaoPaineis();
 
-    const paineisAtivos =
-      configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? [];
-
-    const temSelecaoModalidadeAtiva =
-      configPainel?.ativo === true && paineisAtivos.length >= 2;
+    const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico);
 
     const naoTemExames = !result.exames || result.exames.length === 0;
 
@@ -145,11 +129,7 @@ export default function Totem() {
 
       const configPainel = await buscarConfiguracaoPaineis();
 
-      const paineisAtivos =
-        configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? [];
-
-      const temSelecaoModalidadeAtiva =
-        configPainel?.ativo === true && paineisAtivos.length >= 2;
+      const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico);
 
       if (temSelecaoModalidadeAtiva) {
         sessionStorage.setItem(

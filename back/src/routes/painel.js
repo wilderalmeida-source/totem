@@ -26,6 +26,36 @@ function extrairDadosTcp(raw) {
         paciente: partes[5] ?? "",
     };
 }
+async function extrairNomePaciente(body, servico) {
+    const fontes = servico === 'C'
+        ? [body?.senhasnr, body?.senhasRawQuery]
+        : [body?.senhasRawQuery, body?.senhas];
+    for (const fonte of fontes) {
+        if (!Array.isArray(fonte))
+            continue;
+        for (const row of fonte) {
+            const pacienteRelacionado = row?.atendimentos?.[0]
+                ?.pacientes_atendimentos_cd_pacienteTopacientes;
+            const cdPaciente = Number(row?.cd_paciente ?? pacienteRelacionado?.cd_paciente);
+            if (Number.isInteger(cdPaciente) && cdPaciente > 0) {
+                const pacienteOriginal = await prismaDB_1.prisma.pacientes.findUnique({
+                    where: { cd_paciente: cdPaciente },
+                    select: { ds_paciente: true },
+                });
+                if (pacienteOriginal?.ds_paciente?.trim()) {
+                    return pacienteOriginal.ds_paciente.trim();
+                }
+            }
+            if (typeof row?.ds_paciente === 'string' && row.ds_paciente.trim()) {
+                return row.ds_paciente.trim();
+            }
+            if (typeof pacienteRelacionado?.ds_paciente === 'string' && pacienteRelacionado.ds_paciente.trim()) {
+                return pacienteRelacionado.ds_paciente.trim();
+            }
+        }
+    }
+    return undefined;
+}
 function montarNomeGuichePadrao(numero) {
     const numeroLimpo = String(numero ?? "").trim();
     if (!numeroLimpo) {
@@ -115,6 +145,7 @@ async function descobrirPainelPorEvento(fastify, raw) {
 }
 async function tratarMensagemTcp(fastify, raw, painelId) {
     try {
+        const { servico } = extrairDadosTcp(raw);
         const m2 = raw.match(/^(?:[^-]*-){2}\s*([^-]*?)\s*-/);
         const tail = (m2?.[1] ?? "").trim();
         if (!tail) {
@@ -134,24 +165,7 @@ async function tratarMensagemTcp(fastify, raw, painelId) {
             },
         });
         const body = res.json();
-        let dsPaciente;
-        if (Array.isArray(body.senhasRawQuery) &&
-            body.senhasRawQuery.length > 0) {
-            const pacienteRaw = body.senhasRawQuery.find((r) => r.ds_paciente);
-            if (pacienteRaw?.ds_paciente) {
-                dsPaciente = pacienteRaw.ds_paciente;
-            }
-            else {
-                for (const row of body.senhasRawQuery) {
-                    const at = row.atendimentos?.[0];
-                    const pac = at?.pacientes_atendimentos_cd_pacienteTopacientes;
-                    if (pac?.ds_paciente) {
-                        dsPaciente = pac.ds_paciente;
-                        break;
-                    }
-                }
-            }
-        }
+        const dsPaciente = await extrairNomePaciente(body, servico);
         let out = raw;
         if (dsPaciente) {
             const re56 = /^((?:[^-]*-){5})\s*([^-]*?)\s*(-)/;

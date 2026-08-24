@@ -16,23 +16,11 @@ import type { DadosPaciente } from '@/components/modals/patientModal'
 import { buscarConfiguracaoPaineis } from '@/services/api'
 import { formatarDataNascimento } from '@/lib/formatdate'
 import { auditTotem } from '@/lib/audit-client'
+import { deveSelecionarModalidade } from '@/lib/painel-selection'
 
 const SERVICO_LABEL: Record<string, string> = {
   C: 'Entrega de Exames',
   D: 'Agendamento',
-}
-interface PainelConfig {
-  painel: number
-  ativo: boolean
-  ip: string
-  atendimento: number[]
-  marcacao: number[]
-  resultado: number[]
-  universal: {
-    atendimento: boolean
-    marcacao: boolean
-    resultado: boolean
-  }
 }
 export default function DataNasc() {
   const url = useSearchParams()
@@ -103,11 +91,7 @@ export default function DataNasc() {
 
       const configPainel = await buscarConfiguracaoPaineis()
 
-      const paineisAtivos =
-        configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? []
-
-      const temSelecaoModalidadeAtiva =
-        configPainel?.ativo === true && paineisAtivos.length >= 2
+      const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico)
 
       const naoTemExames = !result.exames || result.exames.length === 0
 
@@ -167,11 +151,7 @@ export default function DataNasc() {
 
       const configPainel = await buscarConfiguracaoPaineis()
 
-      const paineisAtivos =
-        configPainel?.paineis?.filter((painel: PainelConfig) => painel.ativo) ?? []
-
-      const temSelecaoModalidadeAtiva =
-        configPainel?.ativo === true && paineisAtivos.length >= 2
+      const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico)
 
       if (temSelecaoModalidadeAtiva) {
         sessionStorage.setItem(
