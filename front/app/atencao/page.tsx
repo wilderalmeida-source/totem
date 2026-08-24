@@ -137,7 +137,7 @@ export default function AtencaoPanel() {
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans text-slate-800">
       {/* Header / Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="hidden">
         <button className="bg-[#0f172a] text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium">
           <Settings size={16} /> Configurações
         </button>

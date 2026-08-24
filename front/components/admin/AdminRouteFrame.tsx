@@ -25,7 +25,13 @@ export default function AdminRouteFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [permissions, setPermissions] = useState<string[]>([]);
-  useEffect(() => { fetch('/api/auth/session', { cache: 'no-store' }).then((response) => response.json()).then((data) => setPermissions(data.permissions ?? [])).catch(() => setPermissions([])) }, []);
+  useEffect(() => {
+    if (!adminPaths.has(pathname)) return
+    fetch('/api/auth/session', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((data) => setPermissions(data.permissions ?? []))
+      .catch(() => setPermissions([]))
+  }, [pathname]);
   if (!adminPaths.has(pathname)) return children;
   const current = sections.find((section) => section.href === pathname);
 

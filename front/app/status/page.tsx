@@ -81,7 +81,7 @@ export default function VoiceStatsPage() {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-8 [&>a]:hidden">
       <Link href="/configuracao"><Button>Configurações</Button></Link>
       <Link href="/dic" className="ml-3"><Button>Dicionário</Button></Link>
       {/* Card voz da semana */}

@@ -52,6 +52,14 @@ async function adminRoutes(fastify) {
         const body = zod_1.z.object({ displayName: zod_1.z.string().trim().min(2).max(150).optional(), password: strongPassword.optional(), active: zod_1.z.boolean().optional(), permissions: zod_1.z.array(permission).min(1).optional() }).parse(request.body);
         return prismalog_1.PrismaLog.adminUser.update({ where: { id }, data: { displayName: body.displayName, active: body.active, permissions: body.permissions, ...(body.password ? { passwordHash: hashPassword(body.password), mustChangePassword: true } : {}) }, select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true } });
     });
+    fastify.delete('/clinux/admin/users/:id', async (request, reply) => {
+        const { id } = zod_1.z.object({ id: zod_1.z.coerce.number().int().positive() }).parse(request.params);
+        const user = await prismalog_1.PrismaLog.adminUser.findUnique({ where: { id }, select: { id: true, username: true } });
+        if (!user)
+            return reply.code(404).send({ error: 'Usuário não encontrado.' });
+        await prismalog_1.PrismaLog.adminUser.delete({ where: { id } });
+        return reply.code(204).send();
+    });
     fastify.post('/clinux/admin/users/change-password', async (request, reply) => {
         const body = zod_1.z.object({ username: zod_1.z.string().min(1).max(100), currentPassword: zod_1.z.string().min(1).max(256), newPassword: strongPassword }).parse(request.body);
         const user = await prismalog_1.PrismaLog.adminUser.findUnique({ where: { username: body.username } });

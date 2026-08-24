@@ -7,7 +7,6 @@ import {
   BookOpenText,
   Gauge,
   LayoutDashboard,
-  LogOut,
   MapPin,
   MonitorCog,
   SlidersHorizontal,
@@ -43,9 +42,6 @@ export default function ConfiguracoesPage() {
             <h1 className="mt-1 text-4xl font-bold tracking-tight text-slate-950">Central de configurações</h1>
             <p className="mt-3 max-w-2xl text-slate-600">Gerencie os serviços e acompanhe o funcionamento do Totem em um só lugar.</p>
           </div>
-          <form action="/api/auth/logout" method="post">
-            <button className="flex h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 font-semibold text-slate-700 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"><LogOut size={18} /> Sair</button>
-          </form>
         </header>
 
         <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

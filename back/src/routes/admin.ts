@@ -58,6 +58,14 @@ export async function adminRoutes(fastify: FastifyInstance) {
     return PrismaLog.adminUser.update({ where: { id }, data: { displayName: body.displayName, active: body.active, permissions: body.permissions, ...(body.password ? { passwordHash: hashPassword(body.password), mustChangePassword: true } : {}) }, select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true } })
   })
 
+  fastify.delete('/clinux/admin/users/:id', async (request, reply) => {
+    const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(request.params)
+    const user = await PrismaLog.adminUser.findUnique({ where: { id }, select: { id: true, username: true } })
+    if (!user) return reply.code(404).send({ error: 'Usuário não encontrado.' })
+    await PrismaLog.adminUser.delete({ where: { id } })
+    return reply.code(204).send()
+  })
+
   fastify.post('/clinux/admin/users/change-password', async (request, reply) => {
     const body = z.object({ username: z.string().min(1).max(100), currentPassword: z.string().min(1).max(256), newPassword: strongPassword }).parse(request.body)
     const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
