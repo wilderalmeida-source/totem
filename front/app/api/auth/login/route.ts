@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     safeEqual(username, usernameExpected) && safeEqual(password, passwordExpected)
   );
 
-  let authenticatedUser: { username: string; displayName?: string } | null = null;
+  let authenticatedUser: { username: string; displayName?: string; mustChangePassword?: boolean; permissions?: string[] } | null = null;
   const apiBase = process.env.LINK_API_INTERNA;
   const apiToken = process.env.TOKEN_API_INT;
   if (!bootstrapValid && apiBase && apiToken) {
@@ -129,10 +129,11 @@ export async function POST(request: NextRequest) {
   if (apiBase && apiToken) {
     void fetch(`${apiBase}/clinux/audit`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` }, body: JSON.stringify({ category: 'ADMIN', actor: authenticatedUser?.username ?? username, action: 'login_realizado', step: 'autenticacao' }) }).catch(() => undefined);
   }
-  const response = NextResponse.json({ ok: true });
+  const mustChangePassword = authenticatedUser?.mustChangePassword === true;
+  const response = NextResponse.json({ ok: true, mustChangePassword });
   response.cookies.set({
     name: ADMIN_SESSION_COOKIE,
-    value: await createAdminSession(authenticatedUser?.username ?? username, sessionSecret),
+    value: await createAdminSession(authenticatedUser?.username ?? username, sessionSecret, mustChangePassword, authenticatedUser?.permissions ?? ['*']),
     httpOnly: true,
     secure: isSecureRequest(request),
     sameSite: "strict",

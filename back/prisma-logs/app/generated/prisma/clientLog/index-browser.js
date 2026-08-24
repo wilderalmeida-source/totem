@@ -220,6 +220,8 @@ exports.Prisma.AdminUserScalarFieldEnum = {
   displayName: 'displayName',
   passwordHash: 'passwordHash',
   active: 'active',
+  mustChangePassword: 'mustChangePassword',
+  permissions: 'permissions',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

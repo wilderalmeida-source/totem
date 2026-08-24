@@ -151,6 +151,21 @@ export function DialogPatient({
     useState<ConfirmacaoRecepcao | null>(null);
   const [segundosRestantes, setSegundosRestantes] = useState(15);
   const processandoRef = useRef(false);
+  const aberturaRegistradaRef = useRef(false);
+
+  useEffect(() => {
+    if (!showModal) {
+      aberturaRegistradaRef.current = false;
+      return;
+    }
+
+    if (aberturaRegistradaRef.current || !dados?.ds_paciente) return;
+
+    auditTotem('modal_paciente_aberto', 'modal', {
+      nomePaciente: dados.ds_paciente,
+    });
+    aberturaRegistradaRef.current = true;
+  }, [showModal, dados]);
 
   const finalizarAtendimento = () => {
     processandoRef.current = false;

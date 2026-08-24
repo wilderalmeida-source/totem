@@ -4,6 +4,8 @@ export const ADMIN_SESSION_TTL_SECONDS = 60 * 60 * 8;
 export type SessionPayload = {
   sub: string;
   exp: number;
+  mustChangePassword?: boolean;
+  permissions: string[];
 };
 
 function encodeBase64Url(value: string | ArrayBuffer) {
@@ -35,10 +37,12 @@ async function sign(value: string, secret: string) {
   return encodeBase64Url(signature);
 }
 
-export async function createAdminSession(username: string, secret: string) {
+export async function createAdminSession(username: string, secret: string, mustChangePassword = false, permissions: string[] = ['*']) {
   const payload: SessionPayload = {
     sub: username,
     exp: Math.floor(Date.now() / 1000) + ADMIN_SESSION_TTL_SECONDS,
+    mustChangePassword,
+    permissions,
   };
   const encodedPayload = encodeBase64Url(JSON.stringify(payload));
   return `${encodedPayload}.${await sign(encodedPayload, secret)}`;
@@ -68,6 +72,7 @@ export async function readAdminSession(token: string, secret: string): Promise<S
     return (
       typeof payload.sub === "string" &&
       typeof payload.exp === "number" &&
+      Array.isArray(payload.permissions) &&
       payload.exp > Math.floor(Date.now() / 1000)
     ) ? payload : null;
   } catch {

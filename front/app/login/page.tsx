@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, Suspense, useState } from "react";
-import { LockKeyhole, LogIn } from "lucide-react";
+import { ArrowLeft, LockKeyhole, LogIn } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 function LoginForm() {
@@ -25,14 +26,16 @@ function LoginForm() {
           password: form.get("password"),
         }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json()) as { error?: string; mustChangePassword?: boolean };
       if (!response.ok) {
         setError(result.error || "Não foi possível entrar.");
         return;
       }
 
       const requested = searchParams.get("next");
-      const destination = requested?.startsWith("/") && !requested.startsWith("//")
+      const destination = result.mustChangePassword
+        ? "/alterar-senha"
+        : requested?.startsWith("/") && !requested.startsWith("//")
         ? requested
         : "/configuracoes";
       router.replace(destination);
@@ -47,6 +50,12 @@ function LoginForm() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white p-8 shadow-2xl">
+        <Link
+          href="/"
+          className="mb-7 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+        >
+          <ArrowLeft size={18} /> Voltar ao Totem
+        </Link>
         <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white">
           <LockKeyhole size={28} />
         </div>

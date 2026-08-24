@@ -17,6 +17,14 @@ function verifyPassword(password: string, stored: string) {
   return actual.length === expected.length && timingSafeEqual(actual, expected)
 }
 
+const strongPassword = z.string().min(12).max(256)
+  .regex(/[a-z]/, 'A senha precisa de uma letra minúscula.')
+  .regex(/[A-Z]/, 'A senha precisa de uma letra maiúscula.')
+  .regex(/[0-9]/, 'A senha precisa de um número.')
+  .regex(/[^a-zA-Z0-9]/, 'A senha precisa de um símbolo.')
+
+const permission = z.enum(['ATENCAO', 'VOZ', 'DICIONARIO', 'GUICHES', 'RECEPCOES', 'PAINEIS', 'STATUS', 'LOGS', 'USUARIOS'])
+
 export async function adminRoutes(fastify: FastifyInstance) {
   fastify.post('/clinux/admin/users/verify', async (request, reply) => {
     const body = z.object({ username: z.string().min(1).max(100), password: z.string().min(1).max(256) }).parse(request.body)
@@ -24,11 +32,11 @@ export async function adminRoutes(fastify: FastifyInstance) {
     if (!user || !user.active || !verifyPassword(body.password, user.passwordHash)) {
       return reply.code(401).send({ error: 'Usuário ou senha inválidos.' })
     }
-    return { username: user.username, displayName: user.displayName }
+    return { username: user.username, displayName: user.displayName, mustChangePassword: user.mustChangePassword, permissions: user.permissions }
   })
 
   fastify.get('/clinux/admin/users', async () => PrismaLog.adminUser.findMany({
-    select: { id: true, username: true, displayName: true, active: true, createdAt: true, updatedAt: true },
+    select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true, createdAt: true, updatedAt: true },
     orderBy: { username: 'asc' },
   }))
 
@@ -36,16 +44,28 @@ export async function adminRoutes(fastify: FastifyInstance) {
     const body = z.object({
       username: z.string().trim().min(3).max(100).regex(/^[a-zA-Z0-9._-]+$/),
       displayName: z.string().trim().min(2).max(150),
-      password: z.string().min(10).max(256),
+      password: strongPassword,
+      permissions: z.array(permission).min(1),
     }).parse(request.body)
-    const user = await PrismaLog.adminUser.create({ data: { username: body.username, displayName: body.displayName, passwordHash: hashPassword(body.password) } })
-    return reply.code(201).send({ id: user.id, username: user.username, displayName: user.displayName, active: user.active })
+    if (body.password.toLowerCase().includes(body.username.toLowerCase())) return reply.code(400).send({ error: 'A senha não pode conter o usuário.' })
+    const user = await PrismaLog.adminUser.create({ data: { username: body.username, displayName: body.displayName, passwordHash: hashPassword(body.password), permissions: body.permissions } })
+    return reply.code(201).send({ id: user.id, username: user.username, displayName: user.displayName, active: user.active, mustChangePassword: user.mustChangePassword, permissions: user.permissions })
   })
 
   fastify.patch('/clinux/admin/users/:id', async (request) => {
     const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(request.params)
-    const body = z.object({ displayName: z.string().trim().min(2).max(150).optional(), password: z.string().min(10).max(256).optional(), active: z.boolean().optional() }).parse(request.body)
-    return PrismaLog.adminUser.update({ where: { id }, data: { displayName: body.displayName, active: body.active, ...(body.password ? { passwordHash: hashPassword(body.password) } : {}) }, select: { id: true, username: true, displayName: true, active: true } })
+    const body = z.object({ displayName: z.string().trim().min(2).max(150).optional(), password: strongPassword.optional(), active: z.boolean().optional(), permissions: z.array(permission).min(1).optional() }).parse(request.body)
+    return PrismaLog.adminUser.update({ where: { id }, data: { displayName: body.displayName, active: body.active, permissions: body.permissions, ...(body.password ? { passwordHash: hashPassword(body.password), mustChangePassword: true } : {}) }, select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true } })
+  })
+
+  fastify.post('/clinux/admin/users/change-password', async (request, reply) => {
+    const body = z.object({ username: z.string().min(1).max(100), currentPassword: z.string().min(1).max(256), newPassword: strongPassword }).parse(request.body)
+    const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
+    if (!user || !user.active || !verifyPassword(body.currentPassword, user.passwordHash)) return reply.code(401).send({ error: 'Senha atual inválida.' })
+    if (verifyPassword(body.newPassword, user.passwordHash)) return reply.code(400).send({ error: 'A nova senha deve ser diferente da atual.' })
+    if (body.newPassword.toLowerCase().includes(user.username.toLowerCase())) return reply.code(400).send({ error: 'A senha não pode conter o usuário.' })
+    await PrismaLog.adminUser.update({ where: { id: user.id }, data: { passwordHash: hashPassword(body.newPassword), mustChangePassword: false } })
+    return { ok: true }
   })
 
   fastify.post('/clinux/audit', async (request, reply) => {

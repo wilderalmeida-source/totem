@@ -27,6 +27,18 @@ function requiresAdmin(pathname: string, method: string) {
   return false;
 }
 
+function requiredPermission(pathname: string) {
+  if (pathname.startsWith('/clinux/voice/dictionary')) return 'DICIONARIO'
+  if (pathname.startsWith('/clinux/voice')) return 'VOZ'
+  if (pathname.startsWith('/clinux/atencao')) return 'ATENCAO'
+  if (pathname.startsWith('/clinux/guiches')) return 'GUICHES'
+  if (pathname.startsWith('/clinux/paineis-config')) return 'PAINEIS'
+  if (pathname.startsWith('/clinux/recepcoes-modalidades')) return 'RECEPCOES'
+  if (pathname.startsWith('/clinux/admin/users')) return 'USUARIOS'
+  if (pathname.startsWith('/clinux/audit')) return 'LOGS'
+  return null
+}
+
 async function getAdminSession(request: NextRequest) {
   const token = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
   const secret = process.env.SESSION_SECRET;
@@ -51,6 +63,10 @@ async function proxy(request: NextRequest, context: RouteContext) {
   const adminSession = await getAdminSession(request);
   if (requiresAdmin(pathname, request.method) && !adminSession) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+  }
+  const permission = requiredPermission(pathname)
+  if (requiresAdmin(pathname, request.method) && permission && !adminSession?.permissions.includes('*') && !adminSession?.permissions.includes(permission)) {
+    return NextResponse.json({ error: 'Acesso não permitido.' }, { status: 403 })
   }
 
   const target = new URL(pathname, apiBase.endsWith("/") ? apiBase : `${apiBase}/`);

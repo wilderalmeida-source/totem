@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import AdminRouteFrame from "@/components/admin/AdminRouteFrame";
 
 // fontes locais
 const geistSans = localFont({
@@ -37,7 +38,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
       >
-        {children}
+        <AdminRouteFrame>{children}</AdminRouteFrame>
       </body>
     </html>
   );

@@ -114,6 +114,8 @@ model AdminUser {
   displayName  String   @logs.VarChar(150)
   passwordHash String   @logs.VarChar(255)
   active       Boolean  @default(true)
+  mustChangePassword Boolean @default(true)
+  permissions  String[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

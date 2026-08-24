@@ -13442,6 +13442,7 @@ export namespace Prisma {
     displayName: string | null
     passwordHash: string | null
     active: boolean | null
+    mustChangePassword: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13452,6 +13453,7 @@ export namespace Prisma {
     displayName: string | null
     passwordHash: string | null
     active: boolean | null
+    mustChangePassword: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13462,6 +13464,8 @@ export namespace Prisma {
     displayName: number
     passwordHash: number
     active: number
+    mustChangePassword: number
+    permissions: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -13482,6 +13486,7 @@ export namespace Prisma {
     displayName?: true
     passwordHash?: true
     active?: true
+    mustChangePassword?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13492,6 +13497,7 @@ export namespace Prisma {
     displayName?: true
     passwordHash?: true
     active?: true
+    mustChangePassword?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13502,6 +13508,8 @@ export namespace Prisma {
     displayName?: true
     passwordHash?: true
     active?: true
+    mustChangePassword?: true
+    permissions?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -13599,6 +13607,8 @@ export namespace Prisma {
     displayName: string
     passwordHash: string
     active: boolean
+    mustChangePassword: boolean
+    permissions: string[]
     createdAt: Date
     updatedAt: Date
     _count: AdminUserCountAggregateOutputType | null
@@ -13628,6 +13638,8 @@ export namespace Prisma {
     displayName?: boolean
     passwordHash?: boolean
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["adminUser"]>
@@ -13638,6 +13650,8 @@ export namespace Prisma {
     displayName?: boolean
     passwordHash?: boolean
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["adminUser"]>
@@ -13648,6 +13662,8 @@ export namespace Prisma {
     displayName?: boolean
     passwordHash?: boolean
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["adminUser"]>
@@ -13658,11 +13674,13 @@ export namespace Prisma {
     displayName?: boolean
     passwordHash?: boolean
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AdminUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "displayName" | "passwordHash" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["adminUser"]>
+  export type AdminUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "displayName" | "passwordHash" | "active" | "mustChangePassword" | "permissions" | "createdAt" | "updatedAt", ExtArgs["result"]["adminUser"]>
 
   export type $AdminUserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AdminUser"
@@ -13673,6 +13691,8 @@ export namespace Prisma {
       displayName: string
       passwordHash: string
       active: boolean
+      mustChangePassword: boolean
+      permissions: string[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["adminUser"]>
@@ -14103,6 +14123,8 @@ export namespace Prisma {
     readonly displayName: FieldRef<"AdminUser", 'String'>
     readonly passwordHash: FieldRef<"AdminUser", 'String'>
     readonly active: FieldRef<"AdminUser", 'Boolean'>
+    readonly mustChangePassword: FieldRef<"AdminUser", 'Boolean'>
+    readonly permissions: FieldRef<"AdminUser", 'String[]'>
     readonly createdAt: FieldRef<"AdminUser", 'DateTime'>
     readonly updatedAt: FieldRef<"AdminUser", 'DateTime'>
   }
@@ -15692,6 +15714,8 @@ export namespace Prisma {
     displayName: 'displayName',
     passwordHash: 'passwordHash',
     active: 'active',
+    mustChangePassword: 'mustChangePassword',
+    permissions: 'permissions',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -16508,6 +16532,8 @@ export namespace Prisma {
     displayName?: StringFilter<"AdminUser"> | string
     passwordHash?: StringFilter<"AdminUser"> | string
     active?: BoolFilter<"AdminUser"> | boolean
+    mustChangePassword?: BoolFilter<"AdminUser"> | boolean
+    permissions?: StringNullableListFilter<"AdminUser">
     createdAt?: DateTimeFilter<"AdminUser"> | Date | string
     updatedAt?: DateTimeFilter<"AdminUser"> | Date | string
   }
@@ -16518,6 +16544,8 @@ export namespace Prisma {
     displayName?: SortOrder
     passwordHash?: SortOrder
     active?: SortOrder
+    mustChangePassword?: SortOrder
+    permissions?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16531,6 +16559,8 @@ export namespace Prisma {
     displayName?: StringFilter<"AdminUser"> | string
     passwordHash?: StringFilter<"AdminUser"> | string
     active?: BoolFilter<"AdminUser"> | boolean
+    mustChangePassword?: BoolFilter<"AdminUser"> | boolean
+    permissions?: StringNullableListFilter<"AdminUser">
     createdAt?: DateTimeFilter<"AdminUser"> | Date | string
     updatedAt?: DateTimeFilter<"AdminUser"> | Date | string
   }, "id" | "username">
@@ -16541,6 +16571,8 @@ export namespace Prisma {
     displayName?: SortOrder
     passwordHash?: SortOrder
     active?: SortOrder
+    mustChangePassword?: SortOrder
+    permissions?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: AdminUserCountOrderByAggregateInput
@@ -16559,6 +16591,8 @@ export namespace Prisma {
     displayName?: StringWithAggregatesFilter<"AdminUser"> | string
     passwordHash?: StringWithAggregatesFilter<"AdminUser"> | string
     active?: BoolWithAggregatesFilter<"AdminUser"> | boolean
+    mustChangePassword?: BoolWithAggregatesFilter<"AdminUser"> | boolean
+    permissions?: StringNullableListFilter<"AdminUser">
     createdAt?: DateTimeWithAggregatesFilter<"AdminUser"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"AdminUser"> | Date | string
   }
@@ -17271,6 +17305,8 @@ export namespace Prisma {
     displayName: string
     passwordHash: string
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: AdminUserCreatepermissionsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17281,6 +17317,8 @@ export namespace Prisma {
     displayName: string
     passwordHash: string
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: AdminUserCreatepermissionsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17290,6 +17328,8 @@ export namespace Prisma {
     displayName?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    permissions?: AdminUserUpdatepermissionsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17300,6 +17340,8 @@ export namespace Prisma {
     displayName?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    permissions?: AdminUserUpdatepermissionsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17310,6 +17352,8 @@ export namespace Prisma {
     displayName: string
     passwordHash: string
     active?: boolean
+    mustChangePassword?: boolean
+    permissions?: AdminUserCreatepermissionsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17319,6 +17363,8 @@ export namespace Prisma {
     displayName?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    permissions?: AdminUserUpdatepermissionsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17329,6 +17375,8 @@ export namespace Prisma {
     displayName?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     active?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
+    permissions?: AdminUserUpdatepermissionsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18063,12 +18111,22 @@ export namespace Prisma {
     cd_modalidade?: SortOrder
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type AdminUserCountOrderByAggregateInput = {
     id?: SortOrder
     username?: SortOrder
     displayName?: SortOrder
     passwordHash?: SortOrder
     active?: SortOrder
+    mustChangePassword?: SortOrder
+    permissions?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18083,6 +18141,7 @@ export namespace Prisma {
     displayName?: SortOrder
     passwordHash?: SortOrder
     active?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18093,6 +18152,7 @@ export namespace Prisma {
     displayName?: SortOrder
     passwordHash?: SortOrder
     active?: SortOrder
+    mustChangePassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18231,6 +18291,15 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type AdminUserCreatepermissionsInput = {
+    set: string[]
+  }
+
+  export type AdminUserUpdatepermissionsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {

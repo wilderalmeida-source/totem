@@ -110,6 +110,15 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+
+.admin-page-content > main,
+.admin-page-content > div {
+  min-height: calc(100vh - 4rem);
+}
+
+.admin-page-content {
+  background: rgb(241 245 249);
+}
 .simple-keyboard .hg-row .hg-button {
   @apply px-6 py-8 text-3xl;
   height: 4rem;
