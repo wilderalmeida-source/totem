@@ -20,7 +20,8 @@ export async function salvarConfiguracaoPaineis(payload: unknown) {
   })
 
   if (!response.ok) {
-    throw new Error('Erro ao salvar configuração dos painéis')
+    const data = await response.json().catch(() => null) as { error?: string } | null
+    throw new Error(data?.error || 'Erro ao salvar configuração dos painéis')
   }
 
   return response.json()

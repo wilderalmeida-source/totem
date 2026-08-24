@@ -54,7 +54,7 @@ export async function configuracaoPaineisRoutes(fastify: FastifyInstance) {
 
     const paineisAtivos = paineis.filter((painel) => painel.ativo)
 
-    if (ativo && paineisAtivos.length < 2) {
+    if (ativo && paineisAtivos.length < 1) {
       return reply.code(400).send({
         error: 'É necessário ativar pelo menos 2 painéis.',
       })

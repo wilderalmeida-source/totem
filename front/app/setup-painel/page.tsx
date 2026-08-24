@@ -314,7 +314,7 @@ async function salvarConfiguracao() {
     alert('Configuração salva com sucesso.')
   } catch (error) {
     console.error(error)
-    alert('Erro ao salvar configuração dos painéis.')
+    alert(error instanceof Error ? error.message : 'Erro ao salvar configuração dos painéis.')
   }
 }
 
