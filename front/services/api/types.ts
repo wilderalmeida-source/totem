@@ -6,6 +6,7 @@ import { DateRange } from "react-day-picker"
 export type Sala = {
   cd_modalidade: number
   ds_sala?: string
+  dt_hora_chegada?: string | null
 }
 
 export type ExameProc = {

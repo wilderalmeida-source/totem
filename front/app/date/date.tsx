@@ -211,6 +211,7 @@ export default function DataNasc() {
             inputRef={inputRef}
             onChange={(event) => updateSearchText(event.target.value)}
             onQRCodeClick={abrirQRCode}
+            qrCodeDisabled={servico !== 'C'}
           />
 
           <DatePatientList

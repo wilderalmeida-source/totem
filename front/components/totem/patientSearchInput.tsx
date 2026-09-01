@@ -12,6 +12,7 @@ interface PatientSearchInputProps {
   inputRef: React.Ref<HTMLInputElement>;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onQRCodeClick: () => void;
+  qrCodeDisabled?: boolean;
 }
 
 export function PatientSearchInput({
@@ -20,6 +21,7 @@ export function PatientSearchInput({
   inputRef,
   onChange,
   onQRCodeClick,
+  qrCodeDisabled = false,
 }: PatientSearchInputProps) {
   return (
     <div className="flex w-full">
@@ -38,14 +40,16 @@ export function PatientSearchInput({
         }}
       />
 
-      <Image
-        className="cursor-pointer w-16"
-        src={qrcode}
-        width={40}
-        height={40}
-        alt="qrcode"
+      <button
+        type="button"
+        disabled={qrCodeDisabled}
         onClick={onQRCodeClick}
-      />
+        aria-label={qrCodeDisabled ? "QR Code disponível apenas para entrega de exames" : "Ler QR Code"}
+        title={qrCodeDisabled ? "QR Code disponível apenas para entrega de exames" : "Ler QR Code"}
+        className="flex w-16 items-center justify-center disabled:cursor-not-allowed disabled:opacity-30"
+      >
+        <Image src={qrcode} width={40} height={40} alt="QR Code" />
+      </button>
     </div>
   );
 }

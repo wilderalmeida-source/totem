@@ -5,6 +5,7 @@ const ALLOWED_PREFIXES = [
   "/clinux/agenda", "/clinux/arquivo", "/clinux/atencao",
   "/clinux/documentos", "/clinux/guiches", "/clinux/medicos",
   "/clinux/modalidades", "/clinux/pacientes", "/clinux/paineis-config",
+  "/clinux/atrasos-config", "/clinux/midias-config",
   "/clinux/procedimentos", "/clinux/recepcoes-modalidades",
   "/clinux/salas", "/clinux/senhas", "/clinux/voice", "/clinux/admin", "/clinux/audit",
 ] as const;
@@ -21,6 +22,7 @@ function requiresAdmin(pathname: string, method: string) {
   if (pathname === "/clinux/atencao/text") return true;
   if (pathname.startsWith("/clinux/guiches")) return true;
   if (pathname.startsWith("/clinux/paineis-config") && method !== "GET") return true;
+  if ((pathname.startsWith("/clinux/atrasos-config") || pathname.startsWith("/clinux/midias-config")) && method !== "GET") return true;
   if (pathname.startsWith("/clinux/recepcoes-modalidades") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/admin")) return true;
   if (pathname === "/clinux/audit" && method === "GET") return true;
@@ -33,6 +35,7 @@ function requiredPermission(pathname: string) {
   if (pathname.startsWith('/clinux/atencao')) return 'ATENCAO'
   if (pathname.startsWith('/clinux/guiches')) return 'GUICHES'
   if (pathname.startsWith('/clinux/paineis-config')) return 'PAINEIS'
+  if (pathname.startsWith('/clinux/atrasos-config') || pathname.startsWith('/clinux/midias-config')) return 'PAINEIS'
   if (pathname.startsWith('/clinux/recepcoes-modalidades')) return 'RECEPCOES'
   if (pathname.startsWith('/clinux/admin/users')) return 'USUARIOS'
   if (pathname.startsWith('/clinux/audit')) return 'LOGS'

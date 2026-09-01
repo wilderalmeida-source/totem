@@ -14,9 +14,13 @@ import {
   ScrollText,
   UserCog,
   KeyRound,
+  Clock3,
+  ImagePlay,
 } from "lucide-react";
 
 const sections = [
+  { href: "/configuracao-atrasos", title: "Atrasos", description: "Defina a tolerância e o horário usado para destacar exames atrasados.", icon: Clock3, color: "bg-red-600", permission: 'PAINEIS' },
+  { href: "/midias", title: "Mídias e playlists", description: "Envie imagens e vídeos e organize a sequência exibida nos painéis.", icon: ImagePlay, color: "bg-fuchsia-600", permission: 'PAINEIS' },
   { href: "/atencao", title: "Aviso de atenção", description: "Configure e reproduza o aviso sonoro da recepção.", icon: BellRing, color: "bg-amber-500", permission: 'ATENCAO' },
   { href: "/configuracao", title: "Voz e áudio", description: "Escolha vozes, velocidade, volume e regras automáticas.", icon: SlidersHorizontal, color: "bg-violet-600", permission: 'VOZ' },
   { href: "/dic", title: "Dicionário", description: "Ajuste a pronúncia de nomes e termos usados nas chamadas.", icon: BookOpenText, color: "bg-emerald-600", permission: 'DICIONARIO' },

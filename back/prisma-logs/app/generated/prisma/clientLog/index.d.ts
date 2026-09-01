@@ -69,6 +69,16 @@ export type guiches = $Result.DefaultSelection<Prisma.$guichesPayload>
  */
 export type recepcoes_modalidades = $Result.DefaultSelection<Prisma.$recepcoes_modalidadesPayload>
 /**
+ * Model configuracao_atraso
+ * 
+ */
+export type configuracao_atraso = $Result.DefaultSelection<Prisma.$configuracao_atrasoPayload>
+/**
+ * Model configuracao_midia
+ * 
+ */
+export type configuracao_midia = $Result.DefaultSelection<Prisma.$configuracao_midiaPayload>
+/**
  * Model AdminUser
  * 
  */
@@ -309,6 +319,26 @@ export class PrismaClient<
     * ```
     */
   get recepcoes_modalidades(): Prisma.recepcoes_modalidadesDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.configuracao_atraso`: Exposes CRUD operations for the **configuracao_atraso** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Configuracao_atrasos
+    * const configuracao_atrasos = await prisma.configuracao_atraso.findMany()
+    * ```
+    */
+  get configuracao_atraso(): Prisma.configuracao_atrasoDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.configuracao_midia`: Exposes CRUD operations for the **configuracao_midia** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Configuracao_midias
+    * const configuracao_midias = await prisma.configuracao_midia.findMany()
+    * ```
+    */
+  get configuracao_midia(): Prisma.configuracao_midiaDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.adminUser`: Exposes CRUD operations for the **AdminUser** model.
@@ -774,6 +804,8 @@ export namespace Prisma {
     configuracao_painel: 'configuracao_painel',
     guiches: 'guiches',
     recepcoes_modalidades: 'recepcoes_modalidades',
+    configuracao_atraso: 'configuracao_atraso',
+    configuracao_midia: 'configuracao_midia',
     AdminUser: 'AdminUser',
     AuditLog: 'AuditLog'
   };
@@ -791,7 +823,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches" | "recepcoes_modalidades" | "adminUser" | "auditLog"
+      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches" | "recepcoes_modalidades" | "configuracao_atraso" | "configuracao_midia" | "adminUser" | "auditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1609,6 +1641,154 @@ export namespace Prisma {
           }
         }
       }
+      configuracao_atraso: {
+        payload: Prisma.$configuracao_atrasoPayload<ExtArgs>
+        fields: Prisma.configuracao_atrasoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.configuracao_atrasoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.configuracao_atrasoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>
+          }
+          findFirst: {
+            args: Prisma.configuracao_atrasoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.configuracao_atrasoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>
+          }
+          findMany: {
+            args: Prisma.configuracao_atrasoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>[]
+          }
+          create: {
+            args: Prisma.configuracao_atrasoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>
+          }
+          createMany: {
+            args: Prisma.configuracao_atrasoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.configuracao_atrasoCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>[]
+          }
+          delete: {
+            args: Prisma.configuracao_atrasoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>
+          }
+          update: {
+            args: Prisma.configuracao_atrasoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>
+          }
+          deleteMany: {
+            args: Prisma.configuracao_atrasoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.configuracao_atrasoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.configuracao_atrasoUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>[]
+          }
+          upsert: {
+            args: Prisma.configuracao_atrasoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_atrasoPayload>
+          }
+          aggregate: {
+            args: Prisma.Configuracao_atrasoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConfiguracao_atraso>
+          }
+          groupBy: {
+            args: Prisma.configuracao_atrasoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Configuracao_atrasoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.configuracao_atrasoCountArgs<ExtArgs>
+            result: $Utils.Optional<Configuracao_atrasoCountAggregateOutputType> | number
+          }
+        }
+      }
+      configuracao_midia: {
+        payload: Prisma.$configuracao_midiaPayload<ExtArgs>
+        fields: Prisma.configuracao_midiaFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.configuracao_midiaFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.configuracao_midiaFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>
+          }
+          findFirst: {
+            args: Prisma.configuracao_midiaFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.configuracao_midiaFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>
+          }
+          findMany: {
+            args: Prisma.configuracao_midiaFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>[]
+          }
+          create: {
+            args: Prisma.configuracao_midiaCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>
+          }
+          createMany: {
+            args: Prisma.configuracao_midiaCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.configuracao_midiaCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>[]
+          }
+          delete: {
+            args: Prisma.configuracao_midiaDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>
+          }
+          update: {
+            args: Prisma.configuracao_midiaUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>
+          }
+          deleteMany: {
+            args: Prisma.configuracao_midiaDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.configuracao_midiaUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.configuracao_midiaUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>[]
+          }
+          upsert: {
+            args: Prisma.configuracao_midiaUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$configuracao_midiaPayload>
+          }
+          aggregate: {
+            args: Prisma.Configuracao_midiaAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConfiguracao_midia>
+          }
+          groupBy: {
+            args: Prisma.configuracao_midiaGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Configuracao_midiaGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.configuracao_midiaCountArgs<ExtArgs>
+            result: $Utils.Optional<Configuracao_midiaCountAggregateOutputType> | number
+          }
+        }
+      }
       AdminUser: {
         payload: Prisma.$AdminUserPayload<ExtArgs>
         fields: Prisma.AdminUserFieldRefs
@@ -1876,6 +2056,8 @@ export namespace Prisma {
     configuracao_painel?: configuracao_painelOmit
     guiches?: guichesOmit
     recepcoes_modalidades?: recepcoes_modalidadesOmit
+    configuracao_atraso?: configuracao_atrasoOmit
+    configuracao_midia?: configuracao_midiaOmit
     adminUser?: AdminUserOmit
     auditLog?: AuditLogOmit
   }
@@ -13417,6 +13599,2091 @@ export namespace Prisma {
 
 
   /**
+   * Model configuracao_atraso
+   */
+
+  export type AggregateConfiguracao_atraso = {
+    _count: Configuracao_atrasoCountAggregateOutputType | null
+    _avg: Configuracao_atrasoAvgAggregateOutputType | null
+    _sum: Configuracao_atrasoSumAggregateOutputType | null
+    _min: Configuracao_atrasoMinAggregateOutputType | null
+    _max: Configuracao_atrasoMaxAggregateOutputType | null
+  }
+
+  export type Configuracao_atrasoAvgAggregateOutputType = {
+    id: number | null
+    toleranciaMinutos: number | null
+  }
+
+  export type Configuracao_atrasoSumAggregateOutputType = {
+    id: number | null
+    toleranciaMinutos: number | null
+  }
+
+  export type Configuracao_atrasoMinAggregateOutputType = {
+    id: number | null
+    toleranciaMinutos: number | null
+    baseHorario: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Configuracao_atrasoMaxAggregateOutputType = {
+    id: number | null
+    toleranciaMinutos: number | null
+    baseHorario: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Configuracao_atrasoCountAggregateOutputType = {
+    id: number
+    toleranciaMinutos: number
+    baseHorario: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type Configuracao_atrasoAvgAggregateInputType = {
+    id?: true
+    toleranciaMinutos?: true
+  }
+
+  export type Configuracao_atrasoSumAggregateInputType = {
+    id?: true
+    toleranciaMinutos?: true
+  }
+
+  export type Configuracao_atrasoMinAggregateInputType = {
+    id?: true
+    toleranciaMinutos?: true
+    baseHorario?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Configuracao_atrasoMaxAggregateInputType = {
+    id?: true
+    toleranciaMinutos?: true
+    baseHorario?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Configuracao_atrasoCountAggregateInputType = {
+    id?: true
+    toleranciaMinutos?: true
+    baseHorario?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type Configuracao_atrasoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which configuracao_atraso to aggregate.
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_atrasos to fetch.
+     */
+    orderBy?: configuracao_atrasoOrderByWithRelationInput | configuracao_atrasoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: configuracao_atrasoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_atrasos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_atrasos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned configuracao_atrasos
+    **/
+    _count?: true | Configuracao_atrasoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Configuracao_atrasoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Configuracao_atrasoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Configuracao_atrasoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Configuracao_atrasoMaxAggregateInputType
+  }
+
+  export type GetConfiguracao_atrasoAggregateType<T extends Configuracao_atrasoAggregateArgs> = {
+        [P in keyof T & keyof AggregateConfiguracao_atraso]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConfiguracao_atraso[P]>
+      : GetScalarType<T[P], AggregateConfiguracao_atraso[P]>
+  }
+
+
+
+
+  export type configuracao_atrasoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: configuracao_atrasoWhereInput
+    orderBy?: configuracao_atrasoOrderByWithAggregationInput | configuracao_atrasoOrderByWithAggregationInput[]
+    by: Configuracao_atrasoScalarFieldEnum[] | Configuracao_atrasoScalarFieldEnum
+    having?: configuracao_atrasoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Configuracao_atrasoCountAggregateInputType | true
+    _avg?: Configuracao_atrasoAvgAggregateInputType
+    _sum?: Configuracao_atrasoSumAggregateInputType
+    _min?: Configuracao_atrasoMinAggregateInputType
+    _max?: Configuracao_atrasoMaxAggregateInputType
+  }
+
+  export type Configuracao_atrasoGroupByOutputType = {
+    id: number
+    toleranciaMinutos: number
+    baseHorario: string
+    createdAt: Date
+    updatedAt: Date
+    _count: Configuracao_atrasoCountAggregateOutputType | null
+    _avg: Configuracao_atrasoAvgAggregateOutputType | null
+    _sum: Configuracao_atrasoSumAggregateOutputType | null
+    _min: Configuracao_atrasoMinAggregateOutputType | null
+    _max: Configuracao_atrasoMaxAggregateOutputType | null
+  }
+
+  type GetConfiguracao_atrasoGroupByPayload<T extends configuracao_atrasoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Configuracao_atrasoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Configuracao_atrasoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Configuracao_atrasoGroupByOutputType[P]>
+            : GetScalarType<T[P], Configuracao_atrasoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type configuracao_atrasoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    toleranciaMinutos?: boolean
+    baseHorario?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracao_atraso"]>
+
+  export type configuracao_atrasoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    toleranciaMinutos?: boolean
+    baseHorario?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracao_atraso"]>
+
+  export type configuracao_atrasoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    toleranciaMinutos?: boolean
+    baseHorario?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracao_atraso"]>
+
+  export type configuracao_atrasoSelectScalar = {
+    id?: boolean
+    toleranciaMinutos?: boolean
+    baseHorario?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type configuracao_atrasoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "toleranciaMinutos" | "baseHorario" | "createdAt" | "updatedAt", ExtArgs["result"]["configuracao_atraso"]>
+
+  export type $configuracao_atrasoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "configuracao_atraso"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      toleranciaMinutos: number
+      baseHorario: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["configuracao_atraso"]>
+    composites: {}
+  }
+
+  type configuracao_atrasoGetPayload<S extends boolean | null | undefined | configuracao_atrasoDefaultArgs> = $Result.GetResult<Prisma.$configuracao_atrasoPayload, S>
+
+  type configuracao_atrasoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<configuracao_atrasoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Configuracao_atrasoCountAggregateInputType | true
+    }
+
+  export interface configuracao_atrasoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['configuracao_atraso'], meta: { name: 'configuracao_atraso' } }
+    /**
+     * Find zero or one Configuracao_atraso that matches the filter.
+     * @param {configuracao_atrasoFindUniqueArgs} args - Arguments to find a Configuracao_atraso
+     * @example
+     * // Get one Configuracao_atraso
+     * const configuracao_atraso = await prisma.configuracao_atraso.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends configuracao_atrasoFindUniqueArgs>(args: SelectSubset<T, configuracao_atrasoFindUniqueArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Configuracao_atraso that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {configuracao_atrasoFindUniqueOrThrowArgs} args - Arguments to find a Configuracao_atraso
+     * @example
+     * // Get one Configuracao_atraso
+     * const configuracao_atraso = await prisma.configuracao_atraso.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends configuracao_atrasoFindUniqueOrThrowArgs>(args: SelectSubset<T, configuracao_atrasoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Configuracao_atraso that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_atrasoFindFirstArgs} args - Arguments to find a Configuracao_atraso
+     * @example
+     * // Get one Configuracao_atraso
+     * const configuracao_atraso = await prisma.configuracao_atraso.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends configuracao_atrasoFindFirstArgs>(args?: SelectSubset<T, configuracao_atrasoFindFirstArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Configuracao_atraso that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_atrasoFindFirstOrThrowArgs} args - Arguments to find a Configuracao_atraso
+     * @example
+     * // Get one Configuracao_atraso
+     * const configuracao_atraso = await prisma.configuracao_atraso.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends configuracao_atrasoFindFirstOrThrowArgs>(args?: SelectSubset<T, configuracao_atrasoFindFirstOrThrowArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Configuracao_atrasos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_atrasoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Configuracao_atrasos
+     * const configuracao_atrasos = await prisma.configuracao_atraso.findMany()
+     * 
+     * // Get first 10 Configuracao_atrasos
+     * const configuracao_atrasos = await prisma.configuracao_atraso.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const configuracao_atrasoWithIdOnly = await prisma.configuracao_atraso.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends configuracao_atrasoFindManyArgs>(args?: SelectSubset<T, configuracao_atrasoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Configuracao_atraso.
+     * @param {configuracao_atrasoCreateArgs} args - Arguments to create a Configuracao_atraso.
+     * @example
+     * // Create one Configuracao_atraso
+     * const Configuracao_atraso = await prisma.configuracao_atraso.create({
+     *   data: {
+     *     // ... data to create a Configuracao_atraso
+     *   }
+     * })
+     * 
+     */
+    create<T extends configuracao_atrasoCreateArgs>(args: SelectSubset<T, configuracao_atrasoCreateArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Configuracao_atrasos.
+     * @param {configuracao_atrasoCreateManyArgs} args - Arguments to create many Configuracao_atrasos.
+     * @example
+     * // Create many Configuracao_atrasos
+     * const configuracao_atraso = await prisma.configuracao_atraso.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends configuracao_atrasoCreateManyArgs>(args?: SelectSubset<T, configuracao_atrasoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Configuracao_atrasos and returns the data saved in the database.
+     * @param {configuracao_atrasoCreateManyAndReturnArgs} args - Arguments to create many Configuracao_atrasos.
+     * @example
+     * // Create many Configuracao_atrasos
+     * const configuracao_atraso = await prisma.configuracao_atraso.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Configuracao_atrasos and only return the `id`
+     * const configuracao_atrasoWithIdOnly = await prisma.configuracao_atraso.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends configuracao_atrasoCreateManyAndReturnArgs>(args?: SelectSubset<T, configuracao_atrasoCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Configuracao_atraso.
+     * @param {configuracao_atrasoDeleteArgs} args - Arguments to delete one Configuracao_atraso.
+     * @example
+     * // Delete one Configuracao_atraso
+     * const Configuracao_atraso = await prisma.configuracao_atraso.delete({
+     *   where: {
+     *     // ... filter to delete one Configuracao_atraso
+     *   }
+     * })
+     * 
+     */
+    delete<T extends configuracao_atrasoDeleteArgs>(args: SelectSubset<T, configuracao_atrasoDeleteArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Configuracao_atraso.
+     * @param {configuracao_atrasoUpdateArgs} args - Arguments to update one Configuracao_atraso.
+     * @example
+     * // Update one Configuracao_atraso
+     * const configuracao_atraso = await prisma.configuracao_atraso.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends configuracao_atrasoUpdateArgs>(args: SelectSubset<T, configuracao_atrasoUpdateArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Configuracao_atrasos.
+     * @param {configuracao_atrasoDeleteManyArgs} args - Arguments to filter Configuracao_atrasos to delete.
+     * @example
+     * // Delete a few Configuracao_atrasos
+     * const { count } = await prisma.configuracao_atraso.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends configuracao_atrasoDeleteManyArgs>(args?: SelectSubset<T, configuracao_atrasoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Configuracao_atrasos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_atrasoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Configuracao_atrasos
+     * const configuracao_atraso = await prisma.configuracao_atraso.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends configuracao_atrasoUpdateManyArgs>(args: SelectSubset<T, configuracao_atrasoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Configuracao_atrasos and returns the data updated in the database.
+     * @param {configuracao_atrasoUpdateManyAndReturnArgs} args - Arguments to update many Configuracao_atrasos.
+     * @example
+     * // Update many Configuracao_atrasos
+     * const configuracao_atraso = await prisma.configuracao_atraso.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Configuracao_atrasos and only return the `id`
+     * const configuracao_atrasoWithIdOnly = await prisma.configuracao_atraso.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends configuracao_atrasoUpdateManyAndReturnArgs>(args: SelectSubset<T, configuracao_atrasoUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Configuracao_atraso.
+     * @param {configuracao_atrasoUpsertArgs} args - Arguments to update or create a Configuracao_atraso.
+     * @example
+     * // Update or create a Configuracao_atraso
+     * const configuracao_atraso = await prisma.configuracao_atraso.upsert({
+     *   create: {
+     *     // ... data to create a Configuracao_atraso
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Configuracao_atraso we want to update
+     *   }
+     * })
+     */
+    upsert<T extends configuracao_atrasoUpsertArgs>(args: SelectSubset<T, configuracao_atrasoUpsertArgs<ExtArgs>>): Prisma__configuracao_atrasoClient<$Result.GetResult<Prisma.$configuracao_atrasoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Configuracao_atrasos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_atrasoCountArgs} args - Arguments to filter Configuracao_atrasos to count.
+     * @example
+     * // Count the number of Configuracao_atrasos
+     * const count = await prisma.configuracao_atraso.count({
+     *   where: {
+     *     // ... the filter for the Configuracao_atrasos we want to count
+     *   }
+     * })
+    **/
+    count<T extends configuracao_atrasoCountArgs>(
+      args?: Subset<T, configuracao_atrasoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Configuracao_atrasoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Configuracao_atraso.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Configuracao_atrasoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Configuracao_atrasoAggregateArgs>(args: Subset<T, Configuracao_atrasoAggregateArgs>): Prisma.PrismaPromise<GetConfiguracao_atrasoAggregateType<T>>
+
+    /**
+     * Group by Configuracao_atraso.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_atrasoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends configuracao_atrasoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: configuracao_atrasoGroupByArgs['orderBy'] }
+        : { orderBy?: configuracao_atrasoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, configuracao_atrasoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConfiguracao_atrasoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the configuracao_atraso model
+   */
+  readonly fields: configuracao_atrasoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for configuracao_atraso.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__configuracao_atrasoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the configuracao_atraso model
+   */
+  interface configuracao_atrasoFieldRefs {
+    readonly id: FieldRef<"configuracao_atraso", 'Int'>
+    readonly toleranciaMinutos: FieldRef<"configuracao_atraso", 'Int'>
+    readonly baseHorario: FieldRef<"configuracao_atraso", 'String'>
+    readonly createdAt: FieldRef<"configuracao_atraso", 'DateTime'>
+    readonly updatedAt: FieldRef<"configuracao_atraso", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * configuracao_atraso findUnique
+   */
+  export type configuracao_atrasoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_atraso to fetch.
+     */
+    where: configuracao_atrasoWhereUniqueInput
+  }
+
+  /**
+   * configuracao_atraso findUniqueOrThrow
+   */
+  export type configuracao_atrasoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_atraso to fetch.
+     */
+    where: configuracao_atrasoWhereUniqueInput
+  }
+
+  /**
+   * configuracao_atraso findFirst
+   */
+  export type configuracao_atrasoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_atraso to fetch.
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_atrasos to fetch.
+     */
+    orderBy?: configuracao_atrasoOrderByWithRelationInput | configuracao_atrasoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for configuracao_atrasos.
+     */
+    cursor?: configuracao_atrasoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_atrasos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_atrasos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of configuracao_atrasos.
+     */
+    distinct?: Configuracao_atrasoScalarFieldEnum | Configuracao_atrasoScalarFieldEnum[]
+  }
+
+  /**
+   * configuracao_atraso findFirstOrThrow
+   */
+  export type configuracao_atrasoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_atraso to fetch.
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_atrasos to fetch.
+     */
+    orderBy?: configuracao_atrasoOrderByWithRelationInput | configuracao_atrasoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for configuracao_atrasos.
+     */
+    cursor?: configuracao_atrasoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_atrasos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_atrasos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of configuracao_atrasos.
+     */
+    distinct?: Configuracao_atrasoScalarFieldEnum | Configuracao_atrasoScalarFieldEnum[]
+  }
+
+  /**
+   * configuracao_atraso findMany
+   */
+  export type configuracao_atrasoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_atrasos to fetch.
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_atrasos to fetch.
+     */
+    orderBy?: configuracao_atrasoOrderByWithRelationInput | configuracao_atrasoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing configuracao_atrasos.
+     */
+    cursor?: configuracao_atrasoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_atrasos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_atrasos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of configuracao_atrasos.
+     */
+    distinct?: Configuracao_atrasoScalarFieldEnum | Configuracao_atrasoScalarFieldEnum[]
+  }
+
+  /**
+   * configuracao_atraso create
+   */
+  export type configuracao_atrasoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * The data needed to create a configuracao_atraso.
+     */
+    data: XOR<configuracao_atrasoCreateInput, configuracao_atrasoUncheckedCreateInput>
+  }
+
+  /**
+   * configuracao_atraso createMany
+   */
+  export type configuracao_atrasoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many configuracao_atrasos.
+     */
+    data: configuracao_atrasoCreateManyInput | configuracao_atrasoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * configuracao_atraso createManyAndReturn
+   */
+  export type configuracao_atrasoCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * The data used to create many configuracao_atrasos.
+     */
+    data: configuracao_atrasoCreateManyInput | configuracao_atrasoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * configuracao_atraso update
+   */
+  export type configuracao_atrasoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * The data needed to update a configuracao_atraso.
+     */
+    data: XOR<configuracao_atrasoUpdateInput, configuracao_atrasoUncheckedUpdateInput>
+    /**
+     * Choose, which configuracao_atraso to update.
+     */
+    where: configuracao_atrasoWhereUniqueInput
+  }
+
+  /**
+   * configuracao_atraso updateMany
+   */
+  export type configuracao_atrasoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update configuracao_atrasos.
+     */
+    data: XOR<configuracao_atrasoUpdateManyMutationInput, configuracao_atrasoUncheckedUpdateManyInput>
+    /**
+     * Filter which configuracao_atrasos to update
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * Limit how many configuracao_atrasos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * configuracao_atraso updateManyAndReturn
+   */
+  export type configuracao_atrasoUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * The data used to update configuracao_atrasos.
+     */
+    data: XOR<configuracao_atrasoUpdateManyMutationInput, configuracao_atrasoUncheckedUpdateManyInput>
+    /**
+     * Filter which configuracao_atrasos to update
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * Limit how many configuracao_atrasos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * configuracao_atraso upsert
+   */
+  export type configuracao_atrasoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * The filter to search for the configuracao_atraso to update in case it exists.
+     */
+    where: configuracao_atrasoWhereUniqueInput
+    /**
+     * In case the configuracao_atraso found by the `where` argument doesn't exist, create a new configuracao_atraso with this data.
+     */
+    create: XOR<configuracao_atrasoCreateInput, configuracao_atrasoUncheckedCreateInput>
+    /**
+     * In case the configuracao_atraso was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<configuracao_atrasoUpdateInput, configuracao_atrasoUncheckedUpdateInput>
+  }
+
+  /**
+   * configuracao_atraso delete
+   */
+  export type configuracao_atrasoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+    /**
+     * Filter which configuracao_atraso to delete.
+     */
+    where: configuracao_atrasoWhereUniqueInput
+  }
+
+  /**
+   * configuracao_atraso deleteMany
+   */
+  export type configuracao_atrasoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which configuracao_atrasos to delete
+     */
+    where?: configuracao_atrasoWhereInput
+    /**
+     * Limit how many configuracao_atrasos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * configuracao_atraso without action
+   */
+  export type configuracao_atrasoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_atraso
+     */
+    select?: configuracao_atrasoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_atraso
+     */
+    omit?: configuracao_atrasoOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model configuracao_midia
+   */
+
+  export type AggregateConfiguracao_midia = {
+    _count: Configuracao_midiaCountAggregateOutputType | null
+    _avg: Configuracao_midiaAvgAggregateOutputType | null
+    _sum: Configuracao_midiaSumAggregateOutputType | null
+    _min: Configuracao_midiaMinAggregateOutputType | null
+    _max: Configuracao_midiaMaxAggregateOutputType | null
+  }
+
+  export type Configuracao_midiaAvgAggregateOutputType = {
+    id: number | null
+    duracaoImagemSegundos: number | null
+  }
+
+  export type Configuracao_midiaSumAggregateOutputType = {
+    id: number | null
+    duracaoImagemSegundos: number | null
+  }
+
+  export type Configuracao_midiaMinAggregateOutputType = {
+    id: number | null
+    playlistAtivaId: string | null
+    duracaoImagemSegundos: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Configuracao_midiaMaxAggregateOutputType = {
+    id: number | null
+    playlistAtivaId: string | null
+    duracaoImagemSegundos: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type Configuracao_midiaCountAggregateOutputType = {
+    id: number
+    playlistAtivaId: number
+    duracaoImagemSegundos: number
+    playlists: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type Configuracao_midiaAvgAggregateInputType = {
+    id?: true
+    duracaoImagemSegundos?: true
+  }
+
+  export type Configuracao_midiaSumAggregateInputType = {
+    id?: true
+    duracaoImagemSegundos?: true
+  }
+
+  export type Configuracao_midiaMinAggregateInputType = {
+    id?: true
+    playlistAtivaId?: true
+    duracaoImagemSegundos?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Configuracao_midiaMaxAggregateInputType = {
+    id?: true
+    playlistAtivaId?: true
+    duracaoImagemSegundos?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type Configuracao_midiaCountAggregateInputType = {
+    id?: true
+    playlistAtivaId?: true
+    duracaoImagemSegundos?: true
+    playlists?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type Configuracao_midiaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which configuracao_midia to aggregate.
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_midias to fetch.
+     */
+    orderBy?: configuracao_midiaOrderByWithRelationInput | configuracao_midiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: configuracao_midiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_midias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_midias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned configuracao_midias
+    **/
+    _count?: true | Configuracao_midiaCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Configuracao_midiaAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Configuracao_midiaSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Configuracao_midiaMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Configuracao_midiaMaxAggregateInputType
+  }
+
+  export type GetConfiguracao_midiaAggregateType<T extends Configuracao_midiaAggregateArgs> = {
+        [P in keyof T & keyof AggregateConfiguracao_midia]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConfiguracao_midia[P]>
+      : GetScalarType<T[P], AggregateConfiguracao_midia[P]>
+  }
+
+
+
+
+  export type configuracao_midiaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: configuracao_midiaWhereInput
+    orderBy?: configuracao_midiaOrderByWithAggregationInput | configuracao_midiaOrderByWithAggregationInput[]
+    by: Configuracao_midiaScalarFieldEnum[] | Configuracao_midiaScalarFieldEnum
+    having?: configuracao_midiaScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Configuracao_midiaCountAggregateInputType | true
+    _avg?: Configuracao_midiaAvgAggregateInputType
+    _sum?: Configuracao_midiaSumAggregateInputType
+    _min?: Configuracao_midiaMinAggregateInputType
+    _max?: Configuracao_midiaMaxAggregateInputType
+  }
+
+  export type Configuracao_midiaGroupByOutputType = {
+    id: number
+    playlistAtivaId: string | null
+    duracaoImagemSegundos: number
+    playlists: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: Configuracao_midiaCountAggregateOutputType | null
+    _avg: Configuracao_midiaAvgAggregateOutputType | null
+    _sum: Configuracao_midiaSumAggregateOutputType | null
+    _min: Configuracao_midiaMinAggregateOutputType | null
+    _max: Configuracao_midiaMaxAggregateOutputType | null
+  }
+
+  type GetConfiguracao_midiaGroupByPayload<T extends configuracao_midiaGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Configuracao_midiaGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Configuracao_midiaGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Configuracao_midiaGroupByOutputType[P]>
+            : GetScalarType<T[P], Configuracao_midiaGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type configuracao_midiaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playlistAtivaId?: boolean
+    duracaoImagemSegundos?: boolean
+    playlists?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracao_midia"]>
+
+  export type configuracao_midiaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playlistAtivaId?: boolean
+    duracaoImagemSegundos?: boolean
+    playlists?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracao_midia"]>
+
+  export type configuracao_midiaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playlistAtivaId?: boolean
+    duracaoImagemSegundos?: boolean
+    playlists?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["configuracao_midia"]>
+
+  export type configuracao_midiaSelectScalar = {
+    id?: boolean
+    playlistAtivaId?: boolean
+    duracaoImagemSegundos?: boolean
+    playlists?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type configuracao_midiaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playlistAtivaId" | "duracaoImagemSegundos" | "playlists" | "createdAt" | "updatedAt", ExtArgs["result"]["configuracao_midia"]>
+
+  export type $configuracao_midiaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "configuracao_midia"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      playlistAtivaId: string | null
+      duracaoImagemSegundos: number
+      playlists: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["configuracao_midia"]>
+    composites: {}
+  }
+
+  type configuracao_midiaGetPayload<S extends boolean | null | undefined | configuracao_midiaDefaultArgs> = $Result.GetResult<Prisma.$configuracao_midiaPayload, S>
+
+  type configuracao_midiaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<configuracao_midiaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Configuracao_midiaCountAggregateInputType | true
+    }
+
+  export interface configuracao_midiaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['configuracao_midia'], meta: { name: 'configuracao_midia' } }
+    /**
+     * Find zero or one Configuracao_midia that matches the filter.
+     * @param {configuracao_midiaFindUniqueArgs} args - Arguments to find a Configuracao_midia
+     * @example
+     * // Get one Configuracao_midia
+     * const configuracao_midia = await prisma.configuracao_midia.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends configuracao_midiaFindUniqueArgs>(args: SelectSubset<T, configuracao_midiaFindUniqueArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Configuracao_midia that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {configuracao_midiaFindUniqueOrThrowArgs} args - Arguments to find a Configuracao_midia
+     * @example
+     * // Get one Configuracao_midia
+     * const configuracao_midia = await prisma.configuracao_midia.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends configuracao_midiaFindUniqueOrThrowArgs>(args: SelectSubset<T, configuracao_midiaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Configuracao_midia that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_midiaFindFirstArgs} args - Arguments to find a Configuracao_midia
+     * @example
+     * // Get one Configuracao_midia
+     * const configuracao_midia = await prisma.configuracao_midia.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends configuracao_midiaFindFirstArgs>(args?: SelectSubset<T, configuracao_midiaFindFirstArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Configuracao_midia that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_midiaFindFirstOrThrowArgs} args - Arguments to find a Configuracao_midia
+     * @example
+     * // Get one Configuracao_midia
+     * const configuracao_midia = await prisma.configuracao_midia.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends configuracao_midiaFindFirstOrThrowArgs>(args?: SelectSubset<T, configuracao_midiaFindFirstOrThrowArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Configuracao_midias that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_midiaFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Configuracao_midias
+     * const configuracao_midias = await prisma.configuracao_midia.findMany()
+     * 
+     * // Get first 10 Configuracao_midias
+     * const configuracao_midias = await prisma.configuracao_midia.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const configuracao_midiaWithIdOnly = await prisma.configuracao_midia.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends configuracao_midiaFindManyArgs>(args?: SelectSubset<T, configuracao_midiaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Configuracao_midia.
+     * @param {configuracao_midiaCreateArgs} args - Arguments to create a Configuracao_midia.
+     * @example
+     * // Create one Configuracao_midia
+     * const Configuracao_midia = await prisma.configuracao_midia.create({
+     *   data: {
+     *     // ... data to create a Configuracao_midia
+     *   }
+     * })
+     * 
+     */
+    create<T extends configuracao_midiaCreateArgs>(args: SelectSubset<T, configuracao_midiaCreateArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Configuracao_midias.
+     * @param {configuracao_midiaCreateManyArgs} args - Arguments to create many Configuracao_midias.
+     * @example
+     * // Create many Configuracao_midias
+     * const configuracao_midia = await prisma.configuracao_midia.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends configuracao_midiaCreateManyArgs>(args?: SelectSubset<T, configuracao_midiaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Configuracao_midias and returns the data saved in the database.
+     * @param {configuracao_midiaCreateManyAndReturnArgs} args - Arguments to create many Configuracao_midias.
+     * @example
+     * // Create many Configuracao_midias
+     * const configuracao_midia = await prisma.configuracao_midia.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Configuracao_midias and only return the `id`
+     * const configuracao_midiaWithIdOnly = await prisma.configuracao_midia.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends configuracao_midiaCreateManyAndReturnArgs>(args?: SelectSubset<T, configuracao_midiaCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Configuracao_midia.
+     * @param {configuracao_midiaDeleteArgs} args - Arguments to delete one Configuracao_midia.
+     * @example
+     * // Delete one Configuracao_midia
+     * const Configuracao_midia = await prisma.configuracao_midia.delete({
+     *   where: {
+     *     // ... filter to delete one Configuracao_midia
+     *   }
+     * })
+     * 
+     */
+    delete<T extends configuracao_midiaDeleteArgs>(args: SelectSubset<T, configuracao_midiaDeleteArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Configuracao_midia.
+     * @param {configuracao_midiaUpdateArgs} args - Arguments to update one Configuracao_midia.
+     * @example
+     * // Update one Configuracao_midia
+     * const configuracao_midia = await prisma.configuracao_midia.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends configuracao_midiaUpdateArgs>(args: SelectSubset<T, configuracao_midiaUpdateArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Configuracao_midias.
+     * @param {configuracao_midiaDeleteManyArgs} args - Arguments to filter Configuracao_midias to delete.
+     * @example
+     * // Delete a few Configuracao_midias
+     * const { count } = await prisma.configuracao_midia.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends configuracao_midiaDeleteManyArgs>(args?: SelectSubset<T, configuracao_midiaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Configuracao_midias.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_midiaUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Configuracao_midias
+     * const configuracao_midia = await prisma.configuracao_midia.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends configuracao_midiaUpdateManyArgs>(args: SelectSubset<T, configuracao_midiaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Configuracao_midias and returns the data updated in the database.
+     * @param {configuracao_midiaUpdateManyAndReturnArgs} args - Arguments to update many Configuracao_midias.
+     * @example
+     * // Update many Configuracao_midias
+     * const configuracao_midia = await prisma.configuracao_midia.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Configuracao_midias and only return the `id`
+     * const configuracao_midiaWithIdOnly = await prisma.configuracao_midia.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends configuracao_midiaUpdateManyAndReturnArgs>(args: SelectSubset<T, configuracao_midiaUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Configuracao_midia.
+     * @param {configuracao_midiaUpsertArgs} args - Arguments to update or create a Configuracao_midia.
+     * @example
+     * // Update or create a Configuracao_midia
+     * const configuracao_midia = await prisma.configuracao_midia.upsert({
+     *   create: {
+     *     // ... data to create a Configuracao_midia
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Configuracao_midia we want to update
+     *   }
+     * })
+     */
+    upsert<T extends configuracao_midiaUpsertArgs>(args: SelectSubset<T, configuracao_midiaUpsertArgs<ExtArgs>>): Prisma__configuracao_midiaClient<$Result.GetResult<Prisma.$configuracao_midiaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Configuracao_midias.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_midiaCountArgs} args - Arguments to filter Configuracao_midias to count.
+     * @example
+     * // Count the number of Configuracao_midias
+     * const count = await prisma.configuracao_midia.count({
+     *   where: {
+     *     // ... the filter for the Configuracao_midias we want to count
+     *   }
+     * })
+    **/
+    count<T extends configuracao_midiaCountArgs>(
+      args?: Subset<T, configuracao_midiaCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Configuracao_midiaCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Configuracao_midia.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Configuracao_midiaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Configuracao_midiaAggregateArgs>(args: Subset<T, Configuracao_midiaAggregateArgs>): Prisma.PrismaPromise<GetConfiguracao_midiaAggregateType<T>>
+
+    /**
+     * Group by Configuracao_midia.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {configuracao_midiaGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends configuracao_midiaGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: configuracao_midiaGroupByArgs['orderBy'] }
+        : { orderBy?: configuracao_midiaGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, configuracao_midiaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConfiguracao_midiaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the configuracao_midia model
+   */
+  readonly fields: configuracao_midiaFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for configuracao_midia.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__configuracao_midiaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the configuracao_midia model
+   */
+  interface configuracao_midiaFieldRefs {
+    readonly id: FieldRef<"configuracao_midia", 'Int'>
+    readonly playlistAtivaId: FieldRef<"configuracao_midia", 'String'>
+    readonly duracaoImagemSegundos: FieldRef<"configuracao_midia", 'Int'>
+    readonly playlists: FieldRef<"configuracao_midia", 'Json'>
+    readonly createdAt: FieldRef<"configuracao_midia", 'DateTime'>
+    readonly updatedAt: FieldRef<"configuracao_midia", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * configuracao_midia findUnique
+   */
+  export type configuracao_midiaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_midia to fetch.
+     */
+    where: configuracao_midiaWhereUniqueInput
+  }
+
+  /**
+   * configuracao_midia findUniqueOrThrow
+   */
+  export type configuracao_midiaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_midia to fetch.
+     */
+    where: configuracao_midiaWhereUniqueInput
+  }
+
+  /**
+   * configuracao_midia findFirst
+   */
+  export type configuracao_midiaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_midia to fetch.
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_midias to fetch.
+     */
+    orderBy?: configuracao_midiaOrderByWithRelationInput | configuracao_midiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for configuracao_midias.
+     */
+    cursor?: configuracao_midiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_midias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_midias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of configuracao_midias.
+     */
+    distinct?: Configuracao_midiaScalarFieldEnum | Configuracao_midiaScalarFieldEnum[]
+  }
+
+  /**
+   * configuracao_midia findFirstOrThrow
+   */
+  export type configuracao_midiaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_midia to fetch.
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_midias to fetch.
+     */
+    orderBy?: configuracao_midiaOrderByWithRelationInput | configuracao_midiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for configuracao_midias.
+     */
+    cursor?: configuracao_midiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_midias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_midias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of configuracao_midias.
+     */
+    distinct?: Configuracao_midiaScalarFieldEnum | Configuracao_midiaScalarFieldEnum[]
+  }
+
+  /**
+   * configuracao_midia findMany
+   */
+  export type configuracao_midiaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * Filter, which configuracao_midias to fetch.
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of configuracao_midias to fetch.
+     */
+    orderBy?: configuracao_midiaOrderByWithRelationInput | configuracao_midiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing configuracao_midias.
+     */
+    cursor?: configuracao_midiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` configuracao_midias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` configuracao_midias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of configuracao_midias.
+     */
+    distinct?: Configuracao_midiaScalarFieldEnum | Configuracao_midiaScalarFieldEnum[]
+  }
+
+  /**
+   * configuracao_midia create
+   */
+  export type configuracao_midiaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * The data needed to create a configuracao_midia.
+     */
+    data: XOR<configuracao_midiaCreateInput, configuracao_midiaUncheckedCreateInput>
+  }
+
+  /**
+   * configuracao_midia createMany
+   */
+  export type configuracao_midiaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many configuracao_midias.
+     */
+    data: configuracao_midiaCreateManyInput | configuracao_midiaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * configuracao_midia createManyAndReturn
+   */
+  export type configuracao_midiaCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * The data used to create many configuracao_midias.
+     */
+    data: configuracao_midiaCreateManyInput | configuracao_midiaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * configuracao_midia update
+   */
+  export type configuracao_midiaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * The data needed to update a configuracao_midia.
+     */
+    data: XOR<configuracao_midiaUpdateInput, configuracao_midiaUncheckedUpdateInput>
+    /**
+     * Choose, which configuracao_midia to update.
+     */
+    where: configuracao_midiaWhereUniqueInput
+  }
+
+  /**
+   * configuracao_midia updateMany
+   */
+  export type configuracao_midiaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update configuracao_midias.
+     */
+    data: XOR<configuracao_midiaUpdateManyMutationInput, configuracao_midiaUncheckedUpdateManyInput>
+    /**
+     * Filter which configuracao_midias to update
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * Limit how many configuracao_midias to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * configuracao_midia updateManyAndReturn
+   */
+  export type configuracao_midiaUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * The data used to update configuracao_midias.
+     */
+    data: XOR<configuracao_midiaUpdateManyMutationInput, configuracao_midiaUncheckedUpdateManyInput>
+    /**
+     * Filter which configuracao_midias to update
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * Limit how many configuracao_midias to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * configuracao_midia upsert
+   */
+  export type configuracao_midiaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * The filter to search for the configuracao_midia to update in case it exists.
+     */
+    where: configuracao_midiaWhereUniqueInput
+    /**
+     * In case the configuracao_midia found by the `where` argument doesn't exist, create a new configuracao_midia with this data.
+     */
+    create: XOR<configuracao_midiaCreateInput, configuracao_midiaUncheckedCreateInput>
+    /**
+     * In case the configuracao_midia was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<configuracao_midiaUpdateInput, configuracao_midiaUncheckedUpdateInput>
+  }
+
+  /**
+   * configuracao_midia delete
+   */
+  export type configuracao_midiaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+    /**
+     * Filter which configuracao_midia to delete.
+     */
+    where: configuracao_midiaWhereUniqueInput
+  }
+
+  /**
+   * configuracao_midia deleteMany
+   */
+  export type configuracao_midiaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which configuracao_midias to delete
+     */
+    where?: configuracao_midiaWhereInput
+    /**
+     * Limit how many configuracao_midias to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * configuracao_midia without action
+   */
+  export type configuracao_midiaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the configuracao_midia
+     */
+    select?: configuracao_midiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the configuracao_midia
+     */
+    omit?: configuracao_midiaOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model AdminUser
    */
 
@@ -15708,6 +17975,29 @@ export namespace Prisma {
   export type Recepcoes_modalidadesScalarFieldEnum = (typeof Recepcoes_modalidadesScalarFieldEnum)[keyof typeof Recepcoes_modalidadesScalarFieldEnum]
 
 
+  export const Configuracao_atrasoScalarFieldEnum: {
+    id: 'id',
+    toleranciaMinutos: 'toleranciaMinutos',
+    baseHorario: 'baseHorario',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type Configuracao_atrasoScalarFieldEnum = (typeof Configuracao_atrasoScalarFieldEnum)[keyof typeof Configuracao_atrasoScalarFieldEnum]
+
+
+  export const Configuracao_midiaScalarFieldEnum: {
+    id: 'id',
+    playlistAtivaId: 'playlistAtivaId',
+    duracaoImagemSegundos: 'duracaoImagemSegundos',
+    playlists: 'playlists',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type Configuracao_midiaScalarFieldEnum = (typeof Configuracao_midiaScalarFieldEnum)[keyof typeof Configuracao_midiaScalarFieldEnum]
+
+
   export const AdminUserScalarFieldEnum: {
     id: 'id',
     username: 'username',
@@ -16523,6 +18813,119 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"recepcoes_modalidades"> | Date | string
   }
 
+  export type configuracao_atrasoWhereInput = {
+    AND?: configuracao_atrasoWhereInput | configuracao_atrasoWhereInput[]
+    OR?: configuracao_atrasoWhereInput[]
+    NOT?: configuracao_atrasoWhereInput | configuracao_atrasoWhereInput[]
+    id?: IntFilter<"configuracao_atraso"> | number
+    toleranciaMinutos?: IntFilter<"configuracao_atraso"> | number
+    baseHorario?: StringFilter<"configuracao_atraso"> | string
+    createdAt?: DateTimeFilter<"configuracao_atraso"> | Date | string
+    updatedAt?: DateTimeFilter<"configuracao_atraso"> | Date | string
+  }
+
+  export type configuracao_atrasoOrderByWithRelationInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+    baseHorario?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_atrasoWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: configuracao_atrasoWhereInput | configuracao_atrasoWhereInput[]
+    OR?: configuracao_atrasoWhereInput[]
+    NOT?: configuracao_atrasoWhereInput | configuracao_atrasoWhereInput[]
+    toleranciaMinutos?: IntFilter<"configuracao_atraso"> | number
+    baseHorario?: StringFilter<"configuracao_atraso"> | string
+    createdAt?: DateTimeFilter<"configuracao_atraso"> | Date | string
+    updatedAt?: DateTimeFilter<"configuracao_atraso"> | Date | string
+  }, "id">
+
+  export type configuracao_atrasoOrderByWithAggregationInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+    baseHorario?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: configuracao_atrasoCountOrderByAggregateInput
+    _avg?: configuracao_atrasoAvgOrderByAggregateInput
+    _max?: configuracao_atrasoMaxOrderByAggregateInput
+    _min?: configuracao_atrasoMinOrderByAggregateInput
+    _sum?: configuracao_atrasoSumOrderByAggregateInput
+  }
+
+  export type configuracao_atrasoScalarWhereWithAggregatesInput = {
+    AND?: configuracao_atrasoScalarWhereWithAggregatesInput | configuracao_atrasoScalarWhereWithAggregatesInput[]
+    OR?: configuracao_atrasoScalarWhereWithAggregatesInput[]
+    NOT?: configuracao_atrasoScalarWhereWithAggregatesInput | configuracao_atrasoScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"configuracao_atraso"> | number
+    toleranciaMinutos?: IntWithAggregatesFilter<"configuracao_atraso"> | number
+    baseHorario?: StringWithAggregatesFilter<"configuracao_atraso"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"configuracao_atraso"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"configuracao_atraso"> | Date | string
+  }
+
+  export type configuracao_midiaWhereInput = {
+    AND?: configuracao_midiaWhereInput | configuracao_midiaWhereInput[]
+    OR?: configuracao_midiaWhereInput[]
+    NOT?: configuracao_midiaWhereInput | configuracao_midiaWhereInput[]
+    id?: IntFilter<"configuracao_midia"> | number
+    playlistAtivaId?: StringNullableFilter<"configuracao_midia"> | string | null
+    duracaoImagemSegundos?: IntFilter<"configuracao_midia"> | number
+    playlists?: JsonFilter<"configuracao_midia">
+    createdAt?: DateTimeFilter<"configuracao_midia"> | Date | string
+    updatedAt?: DateTimeFilter<"configuracao_midia"> | Date | string
+  }
+
+  export type configuracao_midiaOrderByWithRelationInput = {
+    id?: SortOrder
+    playlistAtivaId?: SortOrderInput | SortOrder
+    duracaoImagemSegundos?: SortOrder
+    playlists?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_midiaWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: configuracao_midiaWhereInput | configuracao_midiaWhereInput[]
+    OR?: configuracao_midiaWhereInput[]
+    NOT?: configuracao_midiaWhereInput | configuracao_midiaWhereInput[]
+    playlistAtivaId?: StringNullableFilter<"configuracao_midia"> | string | null
+    duracaoImagemSegundos?: IntFilter<"configuracao_midia"> | number
+    playlists?: JsonFilter<"configuracao_midia">
+    createdAt?: DateTimeFilter<"configuracao_midia"> | Date | string
+    updatedAt?: DateTimeFilter<"configuracao_midia"> | Date | string
+  }, "id">
+
+  export type configuracao_midiaOrderByWithAggregationInput = {
+    id?: SortOrder
+    playlistAtivaId?: SortOrderInput | SortOrder
+    duracaoImagemSegundos?: SortOrder
+    playlists?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: configuracao_midiaCountOrderByAggregateInput
+    _avg?: configuracao_midiaAvgOrderByAggregateInput
+    _max?: configuracao_midiaMaxOrderByAggregateInput
+    _min?: configuracao_midiaMinOrderByAggregateInput
+    _sum?: configuracao_midiaSumOrderByAggregateInput
+  }
+
+  export type configuracao_midiaScalarWhereWithAggregatesInput = {
+    AND?: configuracao_midiaScalarWhereWithAggregatesInput | configuracao_midiaScalarWhereWithAggregatesInput[]
+    OR?: configuracao_midiaScalarWhereWithAggregatesInput[]
+    NOT?: configuracao_midiaScalarWhereWithAggregatesInput | configuracao_midiaScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"configuracao_midia"> | number
+    playlistAtivaId?: StringNullableWithAggregatesFilter<"configuracao_midia"> | string | null
+    duracaoImagemSegundos?: IntWithAggregatesFilter<"configuracao_midia"> | number
+    playlists?: JsonWithAggregatesFilter<"configuracao_midia">
+    createdAt?: DateTimeWithAggregatesFilter<"configuracao_midia"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"configuracao_midia"> | Date | string
+  }
+
   export type AdminUserWhereInput = {
     AND?: AdminUserWhereInput | AdminUserWhereInput[]
     OR?: AdminUserWhereInput[]
@@ -17296,6 +19699,125 @@ export namespace Prisma {
     recepcao?: StringFieldUpdateOperationsInput | string
     localizacao?: NullableStringFieldUpdateOperationsInput | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_atrasoCreateInput = {
+    id?: number
+    toleranciaMinutos?: number
+    baseHorario?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type configuracao_atrasoUncheckedCreateInput = {
+    id?: number
+    toleranciaMinutos?: number
+    baseHorario?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type configuracao_atrasoUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    toleranciaMinutos?: IntFieldUpdateOperationsInput | number
+    baseHorario?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_atrasoUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    toleranciaMinutos?: IntFieldUpdateOperationsInput | number
+    baseHorario?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_atrasoCreateManyInput = {
+    id?: number
+    toleranciaMinutos?: number
+    baseHorario?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type configuracao_atrasoUpdateManyMutationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    toleranciaMinutos?: IntFieldUpdateOperationsInput | number
+    baseHorario?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_atrasoUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    toleranciaMinutos?: IntFieldUpdateOperationsInput | number
+    baseHorario?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_midiaCreateInput = {
+    id?: number
+    playlistAtivaId?: string | null
+    duracaoImagemSegundos?: number
+    playlists: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type configuracao_midiaUncheckedCreateInput = {
+    id?: number
+    playlistAtivaId?: string | null
+    duracaoImagemSegundos?: number
+    playlists: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type configuracao_midiaUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playlistAtivaId?: NullableStringFieldUpdateOperationsInput | string | null
+    duracaoImagemSegundos?: IntFieldUpdateOperationsInput | number
+    playlists?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_midiaUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playlistAtivaId?: NullableStringFieldUpdateOperationsInput | string | null
+    duracaoImagemSegundos?: IntFieldUpdateOperationsInput | number
+    playlists?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_midiaCreateManyInput = {
+    id?: number
+    playlistAtivaId?: string | null
+    duracaoImagemSegundos?: number
+    playlists: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type configuracao_midiaUpdateManyMutationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playlistAtivaId?: NullableStringFieldUpdateOperationsInput | string | null
+    duracaoImagemSegundos?: IntFieldUpdateOperationsInput | number
+    playlists?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type configuracao_midiaUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playlistAtivaId?: NullableStringFieldUpdateOperationsInput | string | null
+    duracaoImagemSegundos?: IntFieldUpdateOperationsInput | number
+    playlists?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18109,6 +20631,75 @@ export namespace Prisma {
   export type recepcoes_modalidadesSumOrderByAggregateInput = {
     id?: SortOrder
     cd_modalidade?: SortOrder
+  }
+
+  export type configuracao_atrasoCountOrderByAggregateInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+    baseHorario?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_atrasoAvgOrderByAggregateInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+  }
+
+  export type configuracao_atrasoMaxOrderByAggregateInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+    baseHorario?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_atrasoMinOrderByAggregateInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+    baseHorario?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_atrasoSumOrderByAggregateInput = {
+    id?: SortOrder
+    toleranciaMinutos?: SortOrder
+  }
+
+  export type configuracao_midiaCountOrderByAggregateInput = {
+    id?: SortOrder
+    playlistAtivaId?: SortOrder
+    duracaoImagemSegundos?: SortOrder
+    playlists?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_midiaAvgOrderByAggregateInput = {
+    id?: SortOrder
+    duracaoImagemSegundos?: SortOrder
+  }
+
+  export type configuracao_midiaMaxOrderByAggregateInput = {
+    id?: SortOrder
+    playlistAtivaId?: SortOrder
+    duracaoImagemSegundos?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_midiaMinOrderByAggregateInput = {
+    id?: SortOrder
+    playlistAtivaId?: SortOrder
+    duracaoImagemSegundos?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type configuracao_midiaSumOrderByAggregateInput = {
+    id?: SortOrder
+    duracaoImagemSegundos?: SortOrder
   }
 
   export type StringNullableListFilter<$PrismaModel = never> = {

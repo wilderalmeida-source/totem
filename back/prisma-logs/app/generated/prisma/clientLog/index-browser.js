@@ -214,6 +214,23 @@ exports.Prisma.Recepcoes_modalidadesScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.Configuracao_atrasoScalarFieldEnum = {
+  id: 'id',
+  toleranciaMinutos: 'toleranciaMinutos',
+  baseHorario: 'baseHorario',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.Configuracao_midiaScalarFieldEnum = {
+  id: 'id',
+  playlistAtivaId: 'playlistAtivaId',
+  duracaoImagemSegundos: 'duracaoImagemSegundos',
+  playlists: 'playlists',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.AdminUserScalarFieldEnum = {
   id: 'id',
   username: 'username',
@@ -280,6 +297,8 @@ exports.Prisma.ModelName = {
   configuracao_painel: 'configuracao_painel',
   guiches: 'guiches',
   recepcoes_modalidades: 'recepcoes_modalidades',
+  configuracao_atraso: 'configuracao_atraso',
+  configuracao_midia: 'configuracao_midia',
   AdminUser: 'AdminUser',
   AuditLog: 'AuditLog'
 };

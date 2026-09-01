@@ -44,6 +44,7 @@ services:
       - "2345:2345"
     volumes:
       - ./public/audios:/app/public/audios
+      - ./export/modelos-rtf:/app/export/modelos-rtf
     depends_on:
       postgres_infra:
         condition: service_healthy

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BellRing, BookOpenText, Gauge, KeyRound, LayoutDashboard, LogOut, MapPin, Menu, MonitorCog, ScrollText, SlidersHorizontal, UserCog, UsersRound, X } from "lucide-react";
+import { BellRing, BookOpenText, Clock3, Gauge, ImagePlay, KeyRound, LayoutDashboard, LogOut, MapPin, Menu, MonitorCog, ScrollText, SlidersHorizontal, UserCog, UsersRound, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 
 const sections = [
+  { href: "/configuracao-atrasos", label: "Atrasos", icon: Clock3, permission: 'PAINEIS' },
+  { href: "/midias", label: "Mídias", icon: ImagePlay, permission: 'PAINEIS' },
   { href: "/configuracoes", label: "Central", icon: LayoutDashboard, permission: null },
   { href: "/atencao", label: "Aviso de atenção", icon: BellRing, permission: 'ATENCAO' },
   { href: "/configuracao", label: "Voz e áudio", icon: SlidersHorizontal, permission: 'VOZ' },

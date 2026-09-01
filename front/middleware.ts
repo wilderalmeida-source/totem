@@ -7,6 +7,7 @@ import {
 const routePermissions: Array<[string, string]> = [
   ['/atencao', 'ATENCAO'], ['/configuracao', 'VOZ'], ['/dic', 'DICIONARIO'],
   ['/guiche', 'GUICHES'], ['/recepcao', 'RECEPCOES'], ['/setup-painel', 'PAINEIS'],
+  ['/configuracao-atrasos', 'PAINEIS'], ['/midias', 'PAINEIS'],
   ['/status', 'STATUS'], ['/logs', 'LOGS'], ['/usuarios', 'USUARIOS'],
   ['/api/guiches', 'GUICHES'], ['/api/paineis-config', 'PAINEIS'],
 ];
@@ -49,6 +50,8 @@ export const config = {
     "/guiche/:path*",
     "/recepcao/:path*",
     "/setup-painel/:path*",
+    "/configuracao-atrasos/:path*",
+    "/midias/:path*",
     "/status/:path*",
     "/logs/:path*",
     "/usuarios/:path*",

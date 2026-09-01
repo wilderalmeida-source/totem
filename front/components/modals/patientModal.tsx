@@ -58,6 +58,42 @@ function obterDataHoraAtendimento(atendimento: Atendimento): Date | null {
   return Number.isNaN(dataHora.getTime()) ? null : dataHora;
 }
 
+function extrairSegundosDoHorario(valor: string | null | undefined): number | null {
+  if (!valor) return null;
+
+  const texto = String(valor);
+  const partes = texto.match(/(?:T|\s)(\d{2}):(\d{2})(?::(\d{2}))?/)
+    ?? texto.match(/^(\d{2}):(\d{2})(?::(\d{2}))?/);
+
+  if (!partes) return null;
+
+  return Number(partes[1]) * 3600 + Number(partes[2]) * 60 + Number(partes[3] ?? 0);
+}
+
+function formatarHoraChegada(atendimento: Atendimento): string {
+  const horarioAtendimento = extrairSegundosDoHorario(atendimento.dt_hora);
+  if (horarioAtendimento === null) return "Horário não informado";
+
+  const antecedencia = extrairSegundosDoHorario(atendimento.salas?.dt_hora_chegada) ?? 0;
+  const segundosNoDia = 24 * 60 * 60;
+  const chegada = (horarioAtendimento - antecedencia + segundosNoDia) % segundosNoDia;
+  const horas = Math.floor(chegada / 3600);
+  const minutos = Math.floor((chegada % 3600) / 60);
+
+  return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+}
+
+type ConfiguracaoAtraso = { toleranceMinutes: number; timeBasis: "EXAM" | "ARRIVAL" };
+function estaAtrasado(atendimento: Atendimento, config: ConfiguracaoAtraso, agora: number) {
+  if (!atendimento.dt_data) return false;
+  const exame = extrairSegundosDoHorario(atendimento.dt_hora);
+  if (exame === null) return false;
+  const antecedencia = config.timeBasis === "ARRIVAL" ? extrairSegundosDoHorario(atendimento.salas?.dt_hora_chegada) ?? 0 : 0;
+  const referencia = exame - antecedencia + config.toleranceMinutes * 60;
+  const inicioDia = new Date(`${String(atendimento.dt_data).slice(0, 10)}T00:00:00`);
+  return !Number.isNaN(inicioDia.getTime()) && agora > inicioDia.getTime() + referencia * 1000;
+}
+
 function obterAtendimentoMaisProximo(
   atendimentos: Atendimento[] | null,
 ): Atendimento | null {
@@ -150,8 +186,18 @@ export function DialogPatient({
   const [confirmacaoRecepcao, setConfirmacaoRecepcao] =
     useState<ConfirmacaoRecepcao | null>(null);
   const [segundosRestantes, setSegundosRestantes] = useState(15);
+  const [configAtraso, setConfigAtraso] = useState<ConfiguracaoAtraso>({ toleranceMinutes: 0, timeBasis: "ARRIVAL" });
+  const [agora, setAgora] = useState(Date.now());
   const processandoRef = useRef(false);
   const aberturaRegistradaRef = useRef(false);
+  const mostraHorarioPrevisto = dados?.servico === "B" || dados?.servico === "D";
+
+  useEffect(() => {
+    if (!showModal || !mostraHorarioPrevisto) return;
+    fetch("/api/late-settings", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((value) => { if (value) setConfigAtraso(value); }).catch(() => undefined);
+    const timer = window.setInterval(() => setAgora(Date.now()), 30_000);
+    return () => window.clearInterval(timer);
+  }, [showModal, mostraHorarioPrevisto]);
 
   useEffect(() => {
     if (!showModal) {
@@ -449,13 +495,15 @@ export function DialogPatient({
                 <thead className="text-xs text-gray-700 uppercase sticky top-0">
                   <tr>
                     <th className="px-6 py-3 w-64 bg-slate-300">Exame</th>
-                    <th className="px-6 py-3 w-1/5 bg-slate-300">Laudado</th>
+                    <th className="px-6 py-3 w-1/5 bg-slate-300">
+                      {mostraHorarioPrevisto ? "Chegada prevista" : "Laudado"}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {exames.flatMap((atend, ai) =>
                     (atend.exames ?? []).map((exame, ei) => (
-                      <tr key={`${ai}-${ei}`}>
+                      <tr key={`${ai}-${ei}`} className={mostraHorarioPrevisto && estaAtrasado(atend, configAtraso, agora) ? "bg-red-50 text-red-950" : undefined}>
                         <td>
                           {
                             exame
@@ -463,8 +511,10 @@ export function DialogPatient({
                               ?.ds_procedimento
                           }
                         </td>
-                        <td>
-                          <StatusIcon done={!!exame.dt_assinado} />
+                        <td className={mostraHorarioPrevisto ? "font-bold text-gray-800" : undefined}>
+                          {mostraHorarioPrevisto
+                            ? formatarHoraChegada(atend)
+                            : <StatusIcon done={!!exame.dt_assinado} />}
                         </td>
                       </tr>
                     )),

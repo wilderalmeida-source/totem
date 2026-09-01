@@ -110,6 +110,23 @@ model recepcoes_modalidades {
   @@index([servico])
 }
 
+model configuracao_atraso {
+  id                Int      @id @default(1)
+  toleranciaMinutos Int      @default(0)
+  baseHorario       String   @default("CHEGADA") @logs.VarChar(10)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model configuracao_midia {
+  id                    Int      @id @default(1)
+  playlistAtivaId       String?  @logs.VarChar(60)
+  duracaoImagemSegundos Int      @default(10)
+  playlists             Json
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
 model AdminUser {
   id                 Int      @id @default(autoincrement())
   username           String   @unique @logs.VarChar(100)

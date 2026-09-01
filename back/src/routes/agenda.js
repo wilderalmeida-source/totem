@@ -62,7 +62,7 @@ async function agendaRoute(fastify) {
                 cd_senha: true,
                 nr_controle: true,
                 ds_observacao: true,
-                salas: { select: { ds_sala: true, cd_sala: true, cd_modalidade: true } },
+                salas: { select: { ds_sala: true, cd_sala: true, cd_modalidade: true, dt_hora_chegada: true } },
                 exames: { select: { procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } }, cd_exame: true, dt_assinado: true, dt_laudo: true, procedimentos_exames_cd_procedimento_laudoToprocedimentos: true } }, ds_status: true, ds_senha: true, dt_hora_senha: true,
             },
             orderBy
@@ -105,7 +105,7 @@ async function agendaRoute(fastify) {
                         cd_atendimento: true, dt_data: true, dt_hora: true,
                         pacientes_atendimentos_cd_pacienteTopacientes: { select: { ds_paciente: true, cd_paciente: true, dt_nascimento: true, ds_sexo: true, ds_telefone: true, ds_celular: true, ds_celular_web: true } },
                         medicos_atendimentos_cd_medicoTomedicos: { select: { cd_medico: true, ds_medico: true } },
-                        salas: { select: { ds_sala: true, cd_modalidade: true } },
+                        salas: { select: { ds_sala: true, cd_modalidade: true, dt_hora_chegada: true } },
                     },
                 });
                 break; // saiu sem erro, encerra o while

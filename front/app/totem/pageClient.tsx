@@ -185,6 +185,7 @@ export default function Totem() {
             inputRef={inputRef}
             onChange={handleInputChange}
             onQRCodeClick={abrirQRCode}
+            qrCodeDisabled={servico !== "C"}
           />
 
           <PatientList

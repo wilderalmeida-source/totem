@@ -22,6 +22,7 @@ import { guichesRoute } from "./routes/guiche";
 import { configuracaoPaineisRoutes } from "./routes/paineis-config";
 import { recepcoesModalidadesRoute } from "./routes/recepcoesModalidades";
 import { adminRoutes } from "./routes/admin";
+import { configuracoesTotemRoutes } from "./routes/configuracoes-totem";
 
 async function bootstrap() {
   const fastify = Fastify({ logger: true, })
@@ -67,6 +68,7 @@ async function bootstrap() {
   await fastify.register(configuracaoPaineisRoutes)
   await fastify.register(recepcoesModalidadesRoute)
   await fastify.register(adminRoutes)
+  await fastify.register(configuracoesTotemRoutes)
   await fastify.register(ws)
   await fastify.register(pgNotify, { channel: "db_atendimentos_senhas", logRawPayload: false, })
 
