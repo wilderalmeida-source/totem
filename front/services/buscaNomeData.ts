@@ -58,7 +58,6 @@ export async function buscarPacienteNomeData({
     exames = entrega
       ? entrega.slice(0, 10)
       : []
-    console.log('Exames de entrega:', exames)
   } else {
   const agora = new Date()
 
@@ -69,7 +68,6 @@ export async function buscarPacienteNomeData({
       cd_paciente: paciente.cd_paciente,
       date: { from: inicioDia },
     })
-    console.log(atendimento)
     exames = atendimento
       ? atendimento.filter(
         (item) =>

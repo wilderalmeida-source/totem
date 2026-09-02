@@ -174,7 +174,9 @@ export function normalizeKey(s: string) {
 export async function applyDictionary(text: string) {
   // troca palavra a palavra (bom p/ nomes)
   const parts = text.trim().split(/\s+/);
-  const keys = parts.map(normalizeKey);
+  const splitToken = (part: string) =>
+    part.match(/^([^\p{L}\p{N}]*)([\p{L}\p{N}'’-]+)([^\p{L}\p{N}]*)$/u);
+  const keys = parts.map((part) => normalizeKey(splitToken(part)?.[2] ?? part));
 
   const dictRows = await PrismaLog.nameDictionary.findMany({
     where: { key: { in: keys } },
@@ -183,8 +185,10 @@ export async function applyDictionary(text: string) {
   const dict = new Map(dictRows.map((r: any) => [r.key, r.value]));
 
   const replaced = parts.map((p) => {
-    const k = normalizeKey(p);
-    return dict.get(k) ?? p;
+    const token = splitToken(p);
+    const word = token?.[2] ?? p;
+    const value = dict.get(normalizeKey(word));
+    return value ? `${token?.[1] ?? ""}${value}${token?.[3] ?? ""}` : p;
   });
 
   return replaced.join(" ");

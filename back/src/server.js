@@ -75,7 +75,6 @@ async function bootstrap() {
     fastify.listen({ port: 5000, host: '0.0.0.0' }, (err, address) => {
         if (err) {
             fastify.log.error(err);
-            console.log(err, address);
             process.exit(1);
         }
     });

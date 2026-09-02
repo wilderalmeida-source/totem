@@ -24,7 +24,7 @@ export default function DigitalClock() {
   return (
     <time
       aria-label={`Horário atual: ${time}`}
-      className="absolute right-6 top-5 select-none font-mono text-lg font-medium tabular-nums tracking-wide text-slate-500"
+      className="mb-2 select-none font-mono text-lg font-medium tabular-nums tracking-wide text-slate-500"
     >
       {time}
     </time>

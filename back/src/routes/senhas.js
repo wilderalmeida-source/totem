@@ -167,7 +167,6 @@ async function senhaRoute(fastify) {
         });
         try {
             const body = createbody.parse(request.body);
-            console.log('GERAR SENHA POST:', body);
             const senha = await (0, gerar_senha_service_1.gerarSenhaService)(body);
             return reply.send(senha);
         }

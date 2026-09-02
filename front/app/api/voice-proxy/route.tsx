@@ -8,7 +8,6 @@ export async function GET(request: Request) {
 
   const NODE_SERVER = process.env.LINK_API_INTERNA;
   const INTERNAL_TOKEN = process.env.TOKEN_API_INT; // O token que o Node exige
-  console.log(`${NODE_SERVER}${audioPath}`)
 
   try {
     // O servidor Next.js faz a chamada para o Node com o TOKEN escondido

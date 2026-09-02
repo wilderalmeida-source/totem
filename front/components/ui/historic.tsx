@@ -124,7 +124,6 @@ export default function Historic() {
       setLoading(true)
 
       const response = await buscaSenhas()
-      console.log('SENHAS ENTREGA:', response.senhasnr)
 
       startTransition(() => {
         setDados(response)
@@ -163,7 +162,7 @@ export default function Historic() {
 
         if (!aborted) scheduleFetch()
       } catch {
-        console.log('Erro conexão WS')
+        console.warn('Erro de conexão com os eventos em tempo real')
       }
     }
 

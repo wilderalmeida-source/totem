@@ -294,9 +294,6 @@ export function DialogPatient({
         dados.modalidade ??
         0,
     );
-    console.log("Exames:", exames)
-    console.log("Atendimento mais próximo:", atendimentoMaisProximo);
-    console.log("Modalidade usada para gerar a senha:", cdModalidade);
     
 
     // Evita que clique, toque ou submit duplicado gere mais de uma senha.
@@ -314,7 +311,6 @@ export function DialogPatient({
     });
 
     if (!cdModalidade) {
-      console.log("Atendimento sem modalidade. Mantendo o fluxo antigo.");
       irParaInicio();
       return;
     }
@@ -326,11 +322,9 @@ export function DialogPatient({
         ? resposta
         : [];
 
-      console.log("Recepções disponíveis:", recepcoes);
 
       const servicoAtual = String(dados.servico ?? "").trim().toUpperCase();
 
-      console.log("Serviço do atendimento:", servicoAtual);
 
       const destino = recepcoes.find((item) => {
         const modalidadeRecepcao = Number(item.cd_modalidade);
@@ -349,12 +343,8 @@ export function DialogPatient({
         return recepcaoAtiva && mesmaModalidade && mesmoServico;
       });
 
-      console.log("Recepção encontrada:", destino);
 
       if (!destino) {
-        console.log(
-          `Nenhuma recepção ativa encontrada para a modalidade ${cdModalidade} e serviço ${servicoAtual}.`,
-        );
         irParaInicio();
         return;
       }

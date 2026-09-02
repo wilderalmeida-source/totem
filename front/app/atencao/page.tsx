@@ -18,7 +18,7 @@ export default function AtencaoPanel() {
           setText(response.audioContent);
         }
       } catch (error) {
-        console.log(error)
+        console.error(error)
       } finally {
         setLoading(false);
       }

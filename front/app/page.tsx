@@ -2,7 +2,6 @@ import Base from '@/components/ui/base'
 import Servicos from '@/components/ui/servicos'
 import Historic from '@/components/ui/historic'
 import AdminAccessTrigger from '@/components/AdminAccessTrigger'
-import DigitalClock from '@/components/DigitalClock'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,8 +16,7 @@ export default function Home() {
 
   return (
     <Base type="home">
-      <div className="relative flex w-full h-full flex-col">
-        <DigitalClock />
+      <div className="flex w-full h-full flex-col">
         <div>
           <h2 className="text-6xl text-center">
             Olá, seja bem vindo ao <AdminAccessTrigger companyName={empresa} />!

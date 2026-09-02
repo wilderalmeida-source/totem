@@ -54,6 +54,16 @@ export async function configuracaoPaineisRoutes(fastify: FastifyInstance) {
 
     const paineisAtivos = paineis.filter((painel) => painel.ativo)
 
+    const configMidia = await PrismaLog.configuracao_midia.findUnique({ where: { id: 1 } })
+    const playlists = Array.isArray(configMidia?.playlists) ? configMidia.playlists as any[] : []
+    const playlistIds = new Set(playlists.map((playlist) => String(playlist.id)))
+    for (const painel of paineis) {
+      if (painel.playlistId != null && painel.playlistId !== '' && !playlistIds.has(String(painel.playlistId))) {
+        return reply.code(400).send({ error: `A playlist configurada no Painel ${painel.painel} não existe.` })
+      }
+      painel.playlistId = painel.playlistId ? String(painel.playlistId) : null
+    }
+
     if (ativo && paineisAtivos.length < 1) {
       return reply.code(400).send({
         error: 'É necessário ativar pelo menos 2 painéis.',

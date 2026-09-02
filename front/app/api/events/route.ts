@@ -32,9 +32,8 @@ export async function GET() {
         socket.off('close', cleanup);
         socket.off('error', cleanup);
         if (closeController) {
-          try { controller.close(); } catch (_e) { console.log(`Conexão fechada: ${_e}`) }
+          try { controller.close(); } catch {}
         }
-        console.log("--- Conexão SSE encerrada e limpa ---");
       };
 
       cleanupFn = cleanup;
@@ -45,7 +44,7 @@ export async function GET() {
     },
 
     cancel(reason) {
-      console.log("Cliente desconectou do SSE:", reason);
+      void reason;
       cleanupFn?.(false); // ✅ não tenta fechar o controller — browser já fechou
     }
   });

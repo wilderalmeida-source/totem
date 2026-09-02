@@ -57,22 +57,19 @@ export default function RecepcaoModalidadesPage() {
         setCarregando(true);
 
         try {
-            console.log("Iniciando modalidades");
 
             const listaModalidades = await buscaModalidades(10000);
 
-            console.log("Modalidades recebidas:", listaModalidades);
 
             setModalidades(listaModalidades ?? []);
 
             const listaRecepcoes = await buscarRecepcoesModalidades();
 
-            console.log("Recepções recebidas:", listaRecepcoes);
 
             setRecepcoes(listaRecepcoes ?? []);
         } catch (error) {
             setRecepcoes([]);
-            console.log("Erro ao carregar dados:", error);
+            console.error("Erro ao carregar dados:", error);
         } finally {
             setCarregando(false);
         }

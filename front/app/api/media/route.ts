@@ -15,6 +15,16 @@ const configEndpoint = () => `${process.env.LINK_API_INTERNA}/clinux/midias-conf
 const backendHeaders = () => ({ Authorization: `Bearer ${process.env.TOKEN_API_INT}`, "Content-Type": "application/json" });
 async function readConfig(): Promise<Config> { try { const response = await fetch(configEndpoint(), { cache: "no-store", headers: backendHeaders() }); return response.ok ? await response.json() : empty; } catch { return empty; } }
 async function saveConfig(config: Config) { return fetch(configEndpoint(), { method: "PUT", headers: backendHeaders(), body: JSON.stringify(config) }); }
+async function readPanelPlaylist(panelId: number): Promise<string | null> {
+  if (!Number.isInteger(panelId) || panelId < 1) return null;
+  try {
+    const response = await fetch(`${process.env.LINK_API_INTERNA}/clinux/paineis-config`, { cache: "no-store", headers: backendHeaders() });
+    if (!response.ok) return null;
+    const config = await response.json();
+    const panel = Array.isArray(config?.paineis) ? config.paineis.find((item: { painel?: number }) => Number(item.painel) === panelId) : null;
+    return typeof panel?.playlistId === "string" ? panel.playlistId : null;
+  } catch { return null; }
+}
 
 function safeName(value: string) {
   const ext = path.extname(value).toLowerCase();
@@ -23,15 +33,17 @@ function safeName(value: string) {
 }
 async function listFiles() {
   await ensureMediaDirectory();
-  return (await fs.readdir(MEDIA_DIRECTORY, { withFileTypes: true })).filter((entry) => entry.isFile() && extensions.has(path.extname(entry.name).toLowerCase())).map((entry) => entry.name);
+  return (await fs.readdir(MEDIA_DIRECTORY, { withFileTypes: true })).filter((entry) => entry.isFile() && extensions.has(path.extname(entry.name).toLowerCase())).map((entry) => entry.name).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
-const describe = (name: string) => ({ name, url: `/videos/${encodeURIComponent(name)}`, type: videos.has(path.extname(name).toLowerCase()) ? "video" : "image" });
+const describe = (name: string) => ({ name, url: `/api/media/file?name=${encodeURIComponent(name)}`, type: videos.has(path.extname(name).toLowerCase()) ? "video" : "image" });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const names = await listFiles(); const config = await readConfig(); const available = new Set(names);
   const playlists = config.playlists.map((list) => ({ ...list, items: list.items.filter((name) => available.has(name)) }));
-  const active = playlists.find((list) => list.id === config.activePlaylistId) ?? playlists[0] ?? null;
-  return NextResponse.json({ ...config, activePlaylistId: active?.id ?? null, playlists, files: names.map(describe), activeItems: (active?.items ?? names).map(describe) });
+  const panelId = Number(request.nextUrl.searchParams.get("painel") ?? 0);
+  const selectedPlaylistId = await readPanelPlaylist(panelId);
+  const active = playlists.find((list) => list.id === selectedPlaylistId) ?? playlists[0] ?? null;
+  return NextResponse.json({ ...config, activePlaylistId: active?.id ?? null, selectedPlaylistId, playlists, files: names.map(describe), activeItems: (active?.items ?? names).map(describe) });
 }
 export async function POST(request: NextRequest) {
   if (!(await requirePanelAdmin(request))) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });

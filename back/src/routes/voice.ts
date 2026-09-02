@@ -31,13 +31,6 @@ export async function voiceRoute(fastify: FastifyInstance) {
     if (!fs.existsSync(pastaPublica)) {
       fs.mkdirSync(pastaPublica, { recursive: true });
     }
-    // verificamos se tem audio no cache.
-    const nomeArquivo = `chamada-${eventId?.replace(/[^a-z0-9]/gi, '_') || 'temp'}.mp3`;
-    const caminhoCompleto = path.join(pastaPublica, nomeArquivo);
-    const urlRelativa = `/audios/${nomeArquivo}`;
-    if (fs.existsSync(caminhoCompleto)) {
-      return reply.status(200).send({ audioContent: urlRelativa });
-    }
     try {
       if (!text || typeof text !== "string") {
         return reply.status(400).send("Parâmetro 'text' é obrigatório")
@@ -48,6 +41,19 @@ export async function voiceRoute(fastify: FastifyInstance) {
       const voiceName = effectiveVoice.voiceName;
       const rate = effectiveVoice.rate;
       const volume = effectiveVoice.volumeSound;
+
+      // O cache precisa considerar o texto depois do dicionário. Caso contrário,
+      // um áudio antigo continua sendo usado após uma correção de pronúncia.
+      const textoComDict = await applyDictionary(text);
+      const formatado = capitalizarNome(textoComDict)
+      const cacheKey = makeCacheKey({ voiceName, rate, volume, text: formatado });
+      const eventPrefix = eventId?.replace(/[^a-z0-9]/gi, '_').slice(0, 80) || 'temp';
+      const nomeArquivo = `chamada-${eventPrefix}-${cacheKey.slice(0, 16)}.mp3`;
+      const caminhoCompleto = path.join(pastaPublica, nomeArquivo);
+      const urlRelativa = `/audios/${nomeArquivo}`;
+      if (fs.existsSync(caminhoCompleto)) {
+        return reply.status(200).send({ audioContent: urlRelativa });
+      }
 
       // ========= DATA LOCAL (apenas dia, sem hora) =========
       const dateOnly = new Date(
@@ -66,8 +72,6 @@ export async function voiceRoute(fastify: FastifyInstance) {
         create: { year, week, voiceName },
       });
 
-      const textoComDict = await applyDictionary(text);
-      const formatado = capitalizarNome(textoComDict)
       fastify.log.info({ eventId, text: formatado }, "Gerando áudio TTS")
       const body = {
         input: { text: formatado },

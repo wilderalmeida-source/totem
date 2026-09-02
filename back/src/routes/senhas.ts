@@ -196,7 +196,6 @@ export async function senhaRoute(fastify: FastifyInstance) {
 
     try {
       const body = createbody.parse(request.body)
-      console.log('GERAR SENHA POST:', body)
       const senha = await gerarSenhaService(body)
 
       return reply.send(senha)

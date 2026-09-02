@@ -67,7 +67,6 @@ async function agendaRoute(fastify) {
             },
             orderBy
         });
-        console.log(agenda);
         /*status
         5:Finalizado
         1:Cancelado
@@ -136,7 +135,6 @@ async function agendaRoute(fastify) {
         });
         const body = schema.parse(request.body);
         const { cd_atendimento, cd_senha, ds_senha } = body;
-        console.log(cd_atendimento, cd_senha, ds_senha);
         const result = await prismaDB_1.prisma.$transaction(async (tx) => {
             const FUNCIONARIO = process.env.IDFUNCIONARIO ? parseInt(process.env.IDFUNCIONARIO) : 1;
             const data = {};

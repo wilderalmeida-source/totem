@@ -3,4 +3,5 @@ node_modules/
 docker-compose.dev.yml
 docker-compose.yml
 public/
+docs/
 /back/prisma/app/generated/

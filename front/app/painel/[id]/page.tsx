@@ -381,7 +381,6 @@ export default function Page() {
       );
 
       if (alreadyPending) {
-        console.log("⏱️ Descartado, já está na fila:", item.key);
         return;
       }
 
@@ -493,7 +492,7 @@ export default function Page() {
           }
         }
       } catch {
-        console.log("Erro na mensagem");
+        console.warn("Mensagem inválida recebida pelo painel");
       }
     };
 
@@ -532,7 +531,7 @@ export default function Page() {
           instruction={guiche || "GUICHÊ"}
         />
 
-        <Video />
+        <Video painelId={painelId} />
 
         <QueueList people={queue} />
       </main>

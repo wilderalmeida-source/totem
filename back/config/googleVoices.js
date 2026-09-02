@@ -153,14 +153,17 @@ function normalizeKey(s) {
 async function applyDictionary(text) {
     // troca palavra a palavra (bom p/ nomes)
     const parts = text.trim().split(/\s+/);
-    const keys = parts.map(normalizeKey);
+    const splitToken = (part) => part.match(/^([^\p{L}\p{N}]*)([\p{L}\p{N}'’-]+)([^\p{L}\p{N}]*)$/u);
+    const keys = parts.map((part) => normalizeKey(splitToken(part)?.[2] ?? part));
     const dictRows = await prismalog_1.PrismaLog.nameDictionary.findMany({
         where: { key: { in: keys } },
     });
     const dict = new Map(dictRows.map((r) => [r.key, r.value]));
     const replaced = parts.map((p) => {
-        const k = normalizeKey(p);
-        return dict.get(k) ?? p;
+        const token = splitToken(p);
+        const word = token?.[2] ?? p;
+        const value = dict.get(normalizeKey(word));
+        return value ? `${token?.[1] ?? ""}${value}${token?.[3] ?? ""}` : p;
     });
     return replaced.join(" ");
 }

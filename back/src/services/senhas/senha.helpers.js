@@ -31,16 +31,8 @@ async function resolveModalidade(cd_modalidade) {
 }
 async function novoAtendimentoTotem(cd_paciente) {
     try {
-        console.log("Criando novo atendimento para paciente:", cd_paciente);
         const cdSalaTotem = Number(process.env.IDSALA);
         const cdMedicoTotem = Number(process.env.IDMEDICO);
-        console.log({
-            IDSALA: process.env.IDSALA,
-            IDMEDICO: process.env.IDMEDICO,
-            cdSalaTotem,
-            cdMedicoTotem,
-            FUNCIONARIO,
-        });
         if (!cdSalaTotem) {
             throw new Error("IDSALA não configurado no .env");
         }

@@ -37,13 +37,6 @@ async function voiceRoute(fastify) {
         if (!node_fs_1.default.existsSync(pastaPublica)) {
             node_fs_1.default.mkdirSync(pastaPublica, { recursive: true });
         }
-        // verificamos se tem audio no cache.
-        const nomeArquivo = `chamada-${eventId?.replace(/[^a-z0-9]/gi, '_') || 'temp'}.mp3`;
-        const caminhoCompleto = node_path_1.default.join(pastaPublica, nomeArquivo);
-        const urlRelativa = `/audios/${nomeArquivo}`;
-        if (node_fs_1.default.existsSync(caminhoCompleto)) {
-            return reply.status(200).send({ audioContent: urlRelativa });
-        }
         try {
             if (!text || typeof text !== "string") {
                 return reply.status(400).send("Parâmetro 'text' é obrigatório");
@@ -54,6 +47,18 @@ async function voiceRoute(fastify) {
             const voiceName = effectiveVoice.voiceName;
             const rate = effectiveVoice.rate;
             const volume = effectiveVoice.volumeSound;
+            // O cache precisa considerar o texto depois do dicionário. Caso contrário,
+            // um áudio antigo continua sendo usado após uma correção de pronúncia.
+            const textoComDict = await (0, googleVoices_1.applyDictionary)(text);
+            const formatado = capitalizarNome(textoComDict);
+            const cacheKey = (0, googleVoices_1.makeCacheKey)({ voiceName, rate, volume, text: formatado });
+            const eventPrefix = eventId?.replace(/[^a-z0-9]/gi, '_').slice(0, 80) || 'temp';
+            const nomeArquivo = `chamada-${eventPrefix}-${cacheKey.slice(0, 16)}.mp3`;
+            const caminhoCompleto = node_path_1.default.join(pastaPublica, nomeArquivo);
+            const urlRelativa = `/audios/${nomeArquivo}`;
+            if (node_fs_1.default.existsSync(caminhoCompleto)) {
+                return reply.status(200).send({ audioContent: urlRelativa });
+            }
             // ========= DATA LOCAL (apenas dia, sem hora) =========
             const dateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const dateIso = dateOnly.toISOString();
@@ -65,8 +70,6 @@ async function voiceRoute(fastify) {
                 update: { voiceName },
                 create: { year, week, voiceName },
             });
-            const textoComDict = await (0, googleVoices_1.applyDictionary)(text);
-            const formatado = capitalizarNome(textoComDict);
             fastify.log.info({ eventId, text: formatado }, "Gerando áudio TTS");
             const body = {
                 input: { text: formatado },
