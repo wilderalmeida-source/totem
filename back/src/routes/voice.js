@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.capitalizarNome = capitalizarNome;
+exports.normalizarGuicheParaFala = normalizarGuicheParaFala;
 exports.voiceRoute = voiceRoute;
 const zod_1 = require("zod");
 const prismalog_1 = require("../../config/prismalog");
@@ -18,6 +19,9 @@ function capitalizarNome(nome) {
         .split(/\s+/) // divide por um ou mais espaços
         .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
         .join(" ");
+}
+function normalizarGuicheParaFala(texto) {
+    return texto.replace(/guich[eê]\s+0([1-9])(?!\d)/giu, "Guichê $1");
 }
 async function voiceRoute(fastify) {
     fastify.post('/clinux/voice', async (request, reply) => {
@@ -49,7 +53,7 @@ async function voiceRoute(fastify) {
             const volume = effectiveVoice.volumeSound;
             // O cache precisa considerar o texto depois do dicionário. Caso contrário,
             // um áudio antigo continua sendo usado após uma correção de pronúncia.
-            const textoComDict = await (0, googleVoices_1.applyDictionary)(text);
+            const textoComDict = await (0, googleVoices_1.applyDictionary)(normalizarGuicheParaFala(text));
             const formatado = capitalizarNome(textoComDict);
             const cacheKey = (0, googleVoices_1.makeCacheKey)({ voiceName, rate, volume, text: formatado });
             const eventPrefix = eventId?.replace(/[^a-z0-9]/gi, '_').slice(0, 80) || 'temp';

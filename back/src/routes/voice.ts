@@ -13,6 +13,11 @@ export function capitalizarNome(nome: string): string {
     .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
     .join(" ");
 }
+
+export function normalizarGuicheParaFala(texto: string): string {
+  return texto.replace(/guich[eê]\s+0([1-9])(?!\d)/giu, "Guichê $1")
+}
+
 export async function voiceRoute(fastify: FastifyInstance) {
   fastify.post('/clinux/voice', async (request, reply) => {
     const createbody = z.object({
@@ -44,7 +49,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
 
       // O cache precisa considerar o texto depois do dicionário. Caso contrário,
       // um áudio antigo continua sendo usado após uma correção de pronúncia.
-      const textoComDict = await applyDictionary(text);
+      const textoComDict = await applyDictionary(normalizarGuicheParaFala(text));
       const formatado = capitalizarNome(textoComDict)
       const cacheKey = makeCacheKey({ voiceName, rate, volume, text: formatado });
       const eventPrefix = eventId?.replace(/[^a-z0-9]/gi, '_').slice(0, 80) || 'temp';
