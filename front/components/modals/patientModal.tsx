@@ -481,11 +481,12 @@ export function DialogPatient({
 
             {/* Tabela de exames */}
             {!invalido && exames && exames.length > 0 && (
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <div className="w-full overflow-hidden rounded-lg border border-slate-300">
+              <table className="w-full table-fixed border-collapse text-left text-sm text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase sticky top-0">
                   <tr>
-                    <th className="px-6 py-3 w-64 bg-slate-300">Exame</th>
-                    <th className="px-6 py-3 w-1/5 bg-slate-300">
+                    <th className="w-4/5 bg-slate-300 px-6 py-3">Exame</th>
+                    <th className="w-1/5 bg-slate-300 px-4 py-3">
                       {mostraHorarioPrevisto ? "Chegada prevista" : "Laudado"}
                     </th>
                   </tr>
@@ -493,15 +494,22 @@ export function DialogPatient({
                 <tbody>
                   {exames.flatMap((atend, ai) =>
                     (atend.exames ?? []).map((exame, ei) => (
-                      <tr key={`${ai}-${ei}`} className={mostraHorarioPrevisto && estaAtrasado(atend, configAtraso, agora) ? "bg-red-50 text-red-950" : undefined}>
-                        <td>
+                      <tr
+                        key={`${ai}-${ei}`}
+                        className={
+                          mostraHorarioPrevisto && estaAtrasado(atend, configAtraso, agora)
+                            ? "bg-red-200 font-semibold text-red-950 [&>td]:border-y-2 [&>td]:border-red-500 [&>td]:!text-red-950 [&>td:first-child]:border-l-2 [&>td:first-child]:shadow-[inset_6px_0_0_#dc2626] [&>td:last-child]:border-r-2"
+                            : undefined
+                        }
+                      >
+                        <td className="break-words px-6 py-3">
                           {
                             exame
                               .procedimentos_exames_cd_procedimentoToprocedimentos
                               ?.ds_procedimento
                           }
                         </td>
-                        <td className={mostraHorarioPrevisto ? "font-bold text-gray-800" : undefined}>
+                        <td className={`px-4 py-3 ${mostraHorarioPrevisto ? "font-bold text-gray-800" : ""}`}>
                           {mostraHorarioPrevisto
                             ? formatarHoraChegada(atend)
                             : <StatusIcon done={!!exame.dt_assinado} />}
@@ -511,6 +519,7 @@ export function DialogPatient({
                   )}
                 </tbody>
               </table>
+              </div>
             )}
 
             {/* Form QR oculto */}
