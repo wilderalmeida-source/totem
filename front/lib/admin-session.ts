@@ -6,6 +6,8 @@ export type SessionPayload = {
   exp: number;
   mustChangePassword?: boolean;
   permissions: string[];
+  source?: 'database' | 'bootstrap';
+  version?: string;
 };
 
 function encodeBase64Url(value: string | ArrayBuffer) {
@@ -37,12 +39,13 @@ async function sign(value: string, secret: string) {
   return encodeBase64Url(signature);
 }
 
-export async function createAdminSession(username: string, secret: string, mustChangePassword = false, permissions: string[] = ['*']) {
+export async function createAdminSession(username: string, secret: string, mustChangePassword = false, permissions: string[] = ['*'], identity: { source: 'database' | 'bootstrap'; version?: string } = { source: 'database' }) {
   const payload: SessionPayload = {
     sub: username,
     exp: Math.floor(Date.now() / 1000) + ADMIN_SESSION_TTL_SECONDS,
     mustChangePassword,
     permissions,
+    ...identity,
   };
   const encodedPayload = encodeBase64Url(JSON.stringify(payload));
   return `${encodedPayload}.${await sign(encodedPayload, secret)}`;
@@ -69,12 +72,28 @@ export async function readAdminSession(token: string, secret: string): Promise<S
   try {
     const normalized = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
     const payload = JSON.parse(atob(normalized)) as SessionPayload;
-    return (
+    const valid = (
       typeof payload.sub === "string" &&
       typeof payload.exp === "number" &&
       Array.isArray(payload.permissions) &&
       payload.exp > Math.floor(Date.now() / 1000)
-    ) ? payload : null;
+    );
+    if (!valid) return null;
+    if (payload.source === 'bootstrap') return payload.sub === process.env.ADMIN_USERNAME ? payload : null;
+    if (payload.source !== 'database' || !payload.version) return null;
+    const base = process.env.LINK_API_INTERNA;
+    const apiToken = process.env.TOKEN_API_INT;
+    if (!base || !apiToken) return null;
+    const response = await fetch(`${base}/clinux/admin/users/session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` },
+      body: JSON.stringify({ username: payload.sub, version: payload.version }),
+      cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) return null;
+    const current = await response.json();
+    if (!Array.isArray(current.permissions) || !current.permissions.every((p: unknown) => typeof p === 'string')) return null;
+    return { ...payload, permissions: current.permissions, mustChangePassword: current.mustChangePassword === true };
   } catch {
     return null;
   }

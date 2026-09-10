@@ -87,7 +87,8 @@ function servicoParaConfig(servico) {
     return 'atendimento';
 }
 async function resolverIpPainelPorModalidade(servico, nr_modalidade) {
-    const IP_PADRAO = process.env.IPPAINEL ?? '';
+    // IP_PAINEL corresponde ao env.backend; aceita o nome legado durante a transicao.
+    const IP_PADRAO = process.env.IP_PAINEL?.trim() || process.env.IPPAINEL?.trim() || '';
     const config = await prismalog_1.PrismaLog.configuracao_painel.findUnique({
         where: { id: 1 },
     });

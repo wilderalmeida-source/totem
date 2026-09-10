@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.gerarSenhaAtendimento = gerarSenhaAtendimento;
+const flow_audit_1 = require("../../lib/flow-audit");
+const reservar_numero_senha_service_1 = require("./reservar-numero-senha.service");
 const prismaDB_1 = require("../../../config/prismaDB");
 const senha_helpers_1 = require("./senha.helpers");
 async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_modalidade, }) {
@@ -50,17 +52,9 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
         dsModalidade = 'ATENDIMENTO PRÉ';
     }
     const fila = novoAtendimento ? 'N' : dsModalidade[0];
-    const totalSenhasHoje = await prismaDB_1.prisma.atendimentos_senhas.count({
-        where: {
-            dt_entrada: {
-                gte: hoje,
-            },
-        },
-    });
-    const nrSenha = totalSenhasHoje + 1;
-    let senha;
-    try {
-        senha = await prismaDB_1.prisma.atendimentos_senhas.create({
+    const nrSenha = await (0, reservar_numero_senha_service_1.reservarNumeroSenha)(hoje);
+    const result = await (0, flow_audit_1.auditOperation)('clinico.gravar_senha_e_vinculo', () => prismaDB_1.prisma.$transaction(async (tx) => {
+        const senha = await tx.atendimentos_senhas.create({
             data: {
                 dt_entrada: dateNow,
                 ds_opcao: servico,
@@ -76,37 +70,22 @@ async function gerarSenhaAtendimento({ cd_paciente, servico, preferencial, cd_mo
                 cd_funcionario: FUNCIONARIO,
             },
         });
-    }
-    catch (error) {
-        console.error('Erro ao criar atendimentos_senhas:', {
-            message: error?.message,
-            code: error?.code,
-            meta: error?.meta,
-            dadosEnviados: {
-                cd_paciente,
-                servico,
-                modalidadeSenha,
-                nrSenha,
-                IP_PAINEL,
-                dsModalidade,
-                fila,
+        const dsSenha = (0, senha_helpers_1.montarDsSenha)(preferencial, fila, senha.nr_senha);
+        await tx.atendimentos.updateMany({
+            where: {
+                cd_atendimento: {
+                    in: exameAtendimento.map((item) => item.cd_atendimento),
+                },
+            },
+            data: {
+                ds_senha: dsSenha,
+                cd_senha: senha.cd_senha,
+                dt_hora_senha: dateNow,
+                cd_funcionario: FUNCIONARIO
             },
         });
-        throw new Error(`Falha ao gerar senha: ${error?.message ?? 'erro desconhecido'}`);
-    }
-    const dsSenha = (0, senha_helpers_1.montarDsSenha)(preferencial, fila, senha.nr_senha);
-    await prismaDB_1.prisma.atendimentos.updateMany({
-        where: {
-            cd_atendimento: {
-                in: exameAtendimento.map((item) => item.cd_atendimento),
-            },
-        },
-        data: {
-            ds_senha: dsSenha,
-            cd_senha: senha.cd_senha,
-            dt_hora_senha: dateNow,
-            cd_funcionario: FUNCIONARIO
-        },
-    });
-    return senha;
+        return senha;
+    }, { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }));
+    (0, flow_audit_1.flowAudit)('senha_e_vinculo_confirmados', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, atendimentos: exameAtendimento.map(item => item.cd_atendimento), code: 'TICKET_COMMITTED' });
+    return result;
 }

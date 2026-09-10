@@ -1,5 +1,3 @@
-'use server'
-
 import { cadastraPaciente, cadastraSenha, Paciente } from "@/services/api"
 import { parseBRDate } from "@/lib/createDate"
 
@@ -10,6 +8,7 @@ type Props = {
   preferencial: number | null | undefined
   servico: string | null
   cd_modalidade: number | null | undefined
+  onPatientRegistered?: (patient: Paciente) => void
 }
 
 export async function sendClinux({
@@ -18,7 +17,8 @@ export async function sendClinux({
   dt_nascimento,
   preferencial,
   servico,
-  cd_modalidade
+  cd_modalidade,
+  onPatientRegistered,
 }: Props) {
   if (!cd_paciente) {
     const dt = dt_nascimento
@@ -26,9 +26,16 @@ export async function sendClinux({
       : new Date(0).toISOString()
 
     const paciente: Paciente = await cadastraPaciente({ ds_paciente, dt_nascimento: dt })
+    if (!paciente?.cd_paciente || !Number.isSafeInteger(paciente.cd_paciente) || paciente.cd_paciente <= 0) {
+      throw new Error('Cadastro do paciente não confirmado. Não foi possível emitir a senha.')
+    }
     cd_paciente = paciente.cd_paciente
+    onPatientRegistered?.(paciente)
   }
-  if (cd_paciente) {
-    await cadastraSenha({ cd_paciente, servico, preferencial, cd_modalidade, })
+  if (!Number.isSafeInteger(cd_paciente) || !cd_paciente || cd_paciente <= 0) {
+    throw new Error('Cadastro do paciente não confirmado. Não foi possível emitir a senha.')
   }
+  const result = await cadastraSenha({ cd_paciente, servico, preferencial, cd_modalidade, })
+  if (result?.ok !== true) throw new Error('Emissão não confirmada. Consulte a recepção antes de tentar novamente.')
+  return result
 }

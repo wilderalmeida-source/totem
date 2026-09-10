@@ -4,14 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
+const node_crypto_1 = require("node:crypto");
+const flow_audit_1 = require("./lib/flow-audit");
 const cors_1 = __importDefault(require("@fastify/cors"));
 const static_1 = __importDefault(require("@fastify/static"));
 const node_path_1 = __importDefault(require("node:path"));
 const salas_1 = require("./routes/salas");
 const medicos_1 = require("./routes/medicos");
 const agenda_1 = require("./routes/agenda");
-const documentos_1 = require("./routes/documentos");
-const arquivo_1 = require("./routes/arquivo");
 const pacientes_1 = require("./routes/pacientes");
 const senhas_1 = require("./routes/senhas");
 const modalidades_1 = require("./routes/modalidades");
@@ -28,8 +28,18 @@ const paineis_config_1 = require("./routes/paineis-config");
 const recepcoesModalidades_1 = require("./routes/recepcoesModalidades");
 const admin_1 = require("./routes/admin");
 const configuracoes_totem_1 = require("./routes/configuracoes-totem");
+const atendimentos_totem_1 = require("./routes/atendimentos-totem");
 async function bootstrap() {
     const fastify = (0, fastify_1.default)({ logger: true, });
+    fastify.addHook('onRequest', (request, _reply, done) => {
+        flow_audit_1.auditContext.run({ flowId: (0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) ?? (0, node_crypto_1.randomUUID)(),
+            device: (0, flow_audit_1.auditIdentifier)(request.headers['x-device-id']) ?? 'nao_informado' }, done);
+    });
+    fastify.addHook('onResponse', async (request, reply) => {
+        if (!request.url.startsWith('/clinux/audit') && /^\/clinux\/(pacientes|totem|senhas|voice)/.test(request.url)) {
+            (0, flow_audit_1.flowAudit)('resposta_backend', request.url.split('?')[0], { status: reply.statusCode, durationMs: reply.elapsedTime });
+        }
+    });
     const frontendOrigins = (process.env.FRONTEND_ORIGINS ?? '')
         .split(',')
         .map((origin) => origin.trim())
@@ -58,8 +68,7 @@ async function bootstrap() {
     await fastify.register(salas_1.salaRoute);
     await fastify.register(medicos_1.medicosRoute);
     await fastify.register(agenda_1.agendaRoute);
-    await fastify.register(documentos_1.documentosRoute);
-    await fastify.register(arquivo_1.arquivoRoute);
+    await fastify.register(atendimentos_totem_1.atendimentosTotemRoute);
     await fastify.register(pacientes_1.pacientesRoute);
     await fastify.register(guiche_1.guichesRoute);
     await fastify.register(senhas_1.senhaRoute);

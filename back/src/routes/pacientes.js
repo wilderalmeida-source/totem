@@ -3,8 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.pacientesRoute = pacientesRoute;
 const zod_1 = require("zod");
 const prismaDB_1 = require("../../config/prismaDB");
+const search_validation_1 = require("../lib/search-validation");
+const patient_diagnostics_1 = require("../lib/patient-diagnostics");
+const identification_attempts_1 = require("../lib/identification-attempts");
+const patientQuery = zod_1.z.union([
+    zod_1.z.object({ tipo: zod_1.z.literal('RESET'), ds_paciente: zod_1.z.string().max(150).optional() }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.undefined().optional(), cd_paciente: search_validation_1.positiveId }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.literal('ID'), ds_cpf: search_validation_1.cpf, dt_nascimento: search_validation_1.birthDate }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.literal('NOMEDATA'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.literal('NOME'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate.optional() }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.literal('MASK').optional(), ds_cpf: search_validation_1.cpf }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.literal('DATA').optional(), dt_nascimento: search_validation_1.birthDate, ds_paciente: search_validation_1.patientName.optional() }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.undefined().optional(), ds_paciente: search_validation_1.prefixName }).strict(),
+]);
 async function pacientesRoute(fastify) {
-    let tentativas = 3;
     function gerarECompletarDezDatas(datasReaisBanco) {
         const listaDatasFormata = [];
         // 1. FORÇA a conversão de todas as datas reais para string ISO e adiciona na lista
@@ -57,110 +69,116 @@ async function pacientesRoute(fastify) {
             dt_nascimento: dataStr
         }));
     }
-    fastify.get("/clinux/pacientes", async (request, reply) => {
-        const bodySchema = zod_1.z.object({
-            cd_paciente: zod_1.z.string().trim().optional(),
-            ds_paciente: zod_1.z.string().trim().optional(),
-            dt_nascimento: zod_1.z.string().trim().min(1).optional(),
-            ds_cpf: zod_1.z.string().trim().min(1).optional(),
-            tipo: zod_1.z.string().trim().min(1).optional(),
-        });
+    fastify.get('/clinux/pacientes', async (request, reply) => {
+        const inicio = Date.now();
+        const recebido = (0, patient_diagnostics_1.describePatientInput)(request.query);
+        const query = patientQuery.safeParse(request.query ?? {});
+        if (!query.success) {
+            (0, patient_diagnostics_1.patientDiagnostic)(request.id, { recebido, etapa: 'validacao_zod', resultado: 'filtros_invalidos', prismaExecutado: false,
+                validacaoCampos: {
+                    nomeValido: search_validation_1.patientName.safeParse(request.query?.ds_paciente).success,
+                    nascimentoValido: search_validation_1.birthDate.safeParse(request.query?.dt_nascimento).success,
+                    formatoNascimentoEsperado: 'AAAA-MM-DD ou ISO UTC; data deve existir no calendario',
+                    cpfValido: search_validation_1.cpf.safeParse(request.query?.ds_cpf).success,
+                },
+                erros: query.error.issues.map(issue => ({ campo: issue.path.join('.'), codigo: issue.code })) });
+            return reply.code(400).send({ error: 'Filtros de paciente inválidos.' });
+        }
+        const input = query.data;
+        // Contador de UX por fluxo; nao substitui protecao contra forca bruta.
+        const headerFlow = request.headers['x-flow-id'];
+        const flow = typeof headerFlow === 'string' && /^[a-zA-Z0-9_.:-]{1,100}$/.test(headerFlow) ? headerFlow : request.id;
+        if (input.tipo === 'RESET') {
+            const tentativas = (0, identification_attempts_1.identificationAttempts)(flow, 'reset');
+            return reply.send([{ tentativas }]);
+        }
+        if ((input.tipo === 'ID' || input.tipo === 'NOMEDATA') && (0, identification_attempts_1.identificationAttempts)(flow, 'read') === 0) {
+            return reply.send([{ tentativas: 0 }]);
+        }
+        const where = {};
+        let select;
+        if ('cd_paciente' in input) {
+            where.cd_paciente = input.cd_paciente;
+            select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true };
+        }
+        else if (input.tipo === 'ID') {
+            where.ds_cpf = input.ds_cpf;
+            where.dt_nascimento = input.dt_nascimento;
+            select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true };
+        }
+        else if (input.tipo === 'NOMEDATA' || input.tipo === 'NOME') {
+            // Busca candidatos; a igualdade do nome completo normalizado é conferida abaixo.
+            // Escapa os curingas LIKE para que caracteres do nome sejam literais.
+            where.ds_paciente = { contains: input.ds_paciente.replace(/[\\%_]/g, '\\$&'), mode: 'insensitive' };
+            if (input.dt_nascimento)
+                where.dt_nascimento = input.dt_nascimento;
+            select = input.tipo === 'NOMEDATA'
+                ? { cd_paciente: true, ds_paciente: true, dt_nascimento: true }
+                : { ds_paciente: true, dt_nascimento: true };
+        }
+        else if ('ds_cpf' in input) {
+            where.ds_cpf = input.ds_cpf;
+            select = { dt_nascimento: true };
+        }
+        else if ('dt_nascimento' in input) {
+            where.dt_nascimento = input.dt_nascimento;
+            if (input.ds_paciente)
+                where.ds_paciente = { contains: input.ds_paciente, mode: 'insensitive' };
+            select = input.tipo === 'DATA'
+                ? { cd_paciente: true, ds_paciente: true, dt_nascimento: true }
+                : { dt_nascimento: true };
+        }
+        else {
+            where.ds_paciente = { startsWith: input.ds_paciente, mode: 'insensitive' };
+            select = { ds_paciente: true };
+        }
+        const distinct = !('cd_paciente' in input) && input.tipo !== 'DATA' && input.tipo !== 'ID' && input.tipo !== 'NOMEDATA'
+            ? ('dt_nascimento' in input || 'ds_cpf' in input || input.tipo === 'NOME' ? ['dt_nascimento'] : ['ds_paciente'])
+            : [];
+        if (input.tipo === 'NOME')
+            distinct.splice(0, distinct.length, 'ds_paciente', 'dt_nascimento');
+        const consultar = () => prismaDB_1.prisma.pacientes.findMany({ where, select, distinct, orderBy: { ds_paciente: 'asc' }, take: search_validation_1.SEARCH_LIMIT + 1 });
+        let pacientes;
         try {
-            const { cd_paciente, ds_paciente, dt_nascimento, ds_cpf, tipo } = bodySchema.parse(request.query ?? {});
-            // Se nada foi enviado, retorne lista vazia
-            if (cd_paciente === undefined && ds_paciente === undefined && dt_nascimento === undefined && ds_cpf === undefined && tipo === undefined) {
-                return reply.send([]);
-            }
-            // Monta o where somente com os campos presentes
-            const where = {};
-            const select = {};
-            if (tipo == "ID" && dt_nascimento && ds_cpf) {
-                where.ds_cpf = ds_cpf;
-                where.dt_nascimento = new Date(dt_nascimento);
-                select.ds_paciente = true;
-                select.cd_paciente = true;
-                select.dt_nascimento = true;
-            }
-            if (typeof cd_paciente === "string") {
-                where.cd_paciente = parseInt(cd_paciente);
-                select.ds_paciente = true;
-                select.cd_paciente = true;
-                select.dt_nascimento = true;
-            }
-            if (ds_paciente) {
-                where.ds_paciente = { startsWith: ds_paciente, mode: "insensitive" };
-                select.ds_paciente = true;
-            }
-            if (dt_nascimento) {
-                where.dt_nascimento = dt_nascimento;
-                select.dt_nascimento = true;
-            }
-            if (ds_cpf) {
-                where.ds_cpf = ds_cpf;
-                select.dt_nascimento = true;
-            }
-            if (tipo == "DATA") {
-                where.dt_nascimento = dt_nascimento;
-                select.ds_paciente = true;
-            }
-            if (tipo == "NOME") {
-                where.ds_paciente = { startsWith: ds_paciente, mode: "insensitive" };
-                select.dt_nascimento = true;
-            }
-            if (tipo == "NOMEDATA" && dt_nascimento && ds_paciente) {
-                where.OR = [
-                    { ds_paciente: " " + ds_paciente },
-                    { ds_paciente: ds_paciente },
-                    { ds_paciente: " " + ds_paciente + " " },
-                    { ds_paciente: ds_paciente + " " }
-                ];
-                where.dt_nascimento = dt_nascimento;
-                select.ds_paciente = true;
-                select.cd_paciente = true;
-                select.dt_nascimento = true;
-            }
-            const pacientes = await prismaDB_1.prisma.pacientes.findMany({
-                where,
-                select,
-                orderBy: { ds_paciente: "asc" },
-            });
-            if (tipo == "ID" && pacientes.length <= 0) {
-                tentativas -= 1;
-                return reply.send([{ tentativas }]);
-            }
-            if (tipo == "NOMEDATA" && pacientes.length <= 0) {
-                tentativas -= 1;
-                return reply.send([{ tentativas }]);
-            }
-            if (tipo == "RESET") {
-                tentativas = 3;
-                return reply.send([{ tentativas }]);
-            }
-            if (tipo == "MASK" && pacientes.length > 0 && pacientes.length < 10) {
-                const arrayDAtas = [];
-                for (let i = 0; i < pacientes.length; i++) {
-                    arrayDAtas.push(pacientes[i].dt_nascimento.toString());
-                }
-                const blocoDeDezDatas = gerarECompletarDezDatas(arrayDAtas);
-                return reply.send(blocoDeDezDatas);
-            }
-            if (tipo == "NOME" && pacientes.length > 0 && pacientes.length < 10) {
-                const arrayDAtas = [];
-                for (let i = 0; i < pacientes.length; i++) {
-                    arrayDAtas.push(pacientes[i].dt_nascimento.toString());
-                }
-                const blocoDeDezDatas = gerarECompletarDezDatas(arrayDAtas);
-                return reply.send(blocoDeDezDatas);
-            }
-            return reply.send(pacientes);
+            pacientes = await consultar();
         }
-        catch (err) {
-            // Erros de validação do Zod ou outros
-            return reply.status(400).send({
-                error: "Requisição inválida",
-                details: err?.errors ?? String(err),
-            });
+        catch (error) {
+            (0, patient_diagnostics_1.patientDiagnostic)(request.id, { recebido, normalizado: (0, patient_diagnostics_1.describePatientInput)(input), ramo: input.tipo ?? 'FILTRO',
+                operacao: 'prisma.pacientes.findMany', resultado: 'erro_prisma', duracaoMs: Date.now() - inicio,
+                codigo: error && typeof error === 'object' && 'code' in error ? String(error.code) : 'DESCONHECIDO' });
+            throw error;
         }
+        const retornados = pacientes.length;
+        (0, patient_diagnostics_1.patientDiagnostic)(request.id, { recebido, normalizado: (0, patient_diagnostics_1.describePatientInput)(input), ramo: input.tipo ?? 'FILTRO',
+            operacao: 'prisma.pacientes.findMany', duracaoMs: Date.now() - inicio,
+            filtro: { ...where, ds_cpf: where.ds_cpf ? '[omitido]' : undefined },
+            resultado: retornados > search_validation_1.SEARCH_LIMIT ? 'limite_excedido' : 'consulta_concluida', retornados,
+            correspondenciasNomeCompleto: input.tipo === 'NOME' || input.tipo === 'NOMEDATA'
+                ? pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === input.ds_paciente.trim().toUpperCase()).length : undefined,
+            amostra: pacientes.slice(0, 10).map(p => (0, patient_diagnostics_1.describePatientInput)(p)), amostraLimitada: retornados > 10 });
+        if (pacientes.length > search_validation_1.SEARCH_LIMIT)
+            return reply.code(422).send({ error: search_validation_1.REFINE_SEARCH });
+        if (input.tipo === 'NOME' || input.tipo === 'NOMEDATA') {
+            const nome = input.ds_paciente.trim().toUpperCase();
+            pacientes = pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === nome);
+        }
+        if ((input.tipo === 'ID' || input.tipo === 'NOMEDATA') && !pacientes.length) {
+            const tentativas = (0, identification_attempts_1.identificationAttempts)(flow, 'fail');
+            (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: 'identificacao_incorreta', tentativas, flow });
+            return reply.send([{ tentativas }]);
+        }
+        if ((input.tipo === 'ID' || input.tipo === 'NOMEDATA') && pacientes.length === 1)
+            (0, identification_attempts_1.identificationAttempts)(flow, 'reset');
+        if (input.tipo === 'NOME') {
+            const datas = [...new Set(pacientes.map(p => p.dt_nascimento?.toISOString()).filter((data) => Boolean(data)))];
+            if (datas.length > 0 && datas.length < 10)
+                return reply.send(gerarECompletarDezDatas(datas));
+            return reply.send(datas.map(dt_nascimento => ({ dt_nascimento })));
+        }
+        if (input.tipo === 'MASK' && pacientes.length > 0 && pacientes.length < 10) {
+            return reply.send(gerarECompletarDezDatas(pacientes.map(p => p.dt_nascimento)));
+        }
+        return reply.send(pacientes);
     });
     fastify.post("/clinux/pacientes", async (request, reply) => {
         const bodySchema = zod_1.z.object({

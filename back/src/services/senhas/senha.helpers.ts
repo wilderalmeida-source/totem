@@ -98,7 +98,8 @@ export async function resolverIpPainelPorModalidade(
   servico: string,
   nr_modalidade: number
 ) {
-  const IP_PADRAO = process.env.IPPAINEL ?? ''
+  // IP_PAINEL corresponde ao env.backend; aceita o nome legado durante a transicao.
+  const IP_PADRAO = process.env.IP_PAINEL?.trim() || process.env.IPPAINEL?.trim() || ''
 
   const config = await PrismaLog.configuracao_painel.findUnique({
     where: { id: 1 },

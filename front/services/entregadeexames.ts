@@ -1,5 +1,3 @@
-'use server'
-
 import { buscaAtendimentos, Atendimento } from "@/services/api"
 
 export async function entregaDeExames(cd_paciente: number): Promise<Atendimento[]> {

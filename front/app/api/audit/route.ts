@@ -7,6 +7,6 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null) as Record<string, unknown> | null
   if (!body || typeof body.action !== 'string') return NextResponse.json({ error: 'Evento inválido.' }, { status: 400 })
   const payload = { category: 'TOTEM', sessionId: typeof body.sessionId === 'string' ? body.sessionId.slice(0, 100) : undefined, action: body.action.slice(0, 100), step: typeof body.step === 'string' ? body.step.slice(0, 100) : undefined, metadata: typeof body.metadata === 'object' && body.metadata ? body.metadata : undefined }
-  const response = await fetch(`${apiBase}/clinux/audit`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` }, body: JSON.stringify(payload), cache: 'no-store' })
-  return new NextResponse(null, { status: response.ok ? 204 : 502 })
+  const response = await fetch(`${apiBase}/clinux/audit`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` }, body: JSON.stringify(payload), cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(5000) }).catch(() => null)
+  return new NextResponse(null, { status: response?.ok ? 204 : 502 })
 }

@@ -23,6 +23,7 @@ import atention from "@/assets/icons/atention.png";
 import { formatarDataNascimento } from "@/lib/formatdate";
 import type { RecepcaoModalidade } from "@/services/api/types";
 import { auditTotem } from "@/lib/audit-client";
+import { endPatientSession } from '@/lib/patient-session-client';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 export interface DadosPaciente {
@@ -186,6 +187,7 @@ export function DialogPatient({
   const [confirmacaoRecepcao, setConfirmacaoRecepcao] =
     useState<ConfirmacaoRecepcao | null>(null);
   const [segundosRestantes, setSegundosRestantes] = useState(15);
+  const [falhaEmissao, setFalhaEmissao] = useState(false);
   const [configAtraso, setConfigAtraso] = useState<ConfiguracaoAtraso>({ toleranceMinutes: 0, timeBasis: "ARRIVAL" });
   const [agora, setAgora] = useState(Date.now());
   const processandoRef = useRef(false);
@@ -213,12 +215,16 @@ export function DialogPatient({
     aberturaRegistradaRef.current = true;
   }, [showModal, dados]);
 
-  const finalizarAtendimento = () => {
+  const finalizarAtendimento = async () => {
     processandoRef.current = false;
     setLoading(false);
     setConfirmacaoRecepcao(null);
+    setFalhaEmissao(false);
     setShowModal(false);
-    window.location.href = "/";
+    setDados(null);
+    setExames(null);
+    try { await endPatientSession(falhaEmissao ? 'falha_emissao' : confirmacaoRecepcao ? 'sucesso' : 'fechamento_modal'); } catch { /* A tela inicial bloqueia até concluir a limpeza. */ }
+    window.location.replace('/');
   };
 
   const irParaInicio = () => {
@@ -226,7 +232,7 @@ export function DialogPatient({
   };
 
   useEffect(() => {
-    if (!confirmacaoRecepcao) return;
+    if (!confirmacaoRecepcao && !falhaEmissao) return;
     setSegundosRestantes(15);
 
     const contador = window.setInterval(() => {
@@ -241,19 +247,25 @@ export function DialogPatient({
       window.clearInterval(contador);
       window.clearTimeout(fechamentoAutomatico);
     };
-  }, [confirmacaoRecepcao]);
+  }, [confirmacaoRecepcao, falhaEmissao]);
 
   const gerarSenha = async (valorQR: string | null = null) => {
+    if (falhaEmissao) return;
     auditTotem('confirmacao_senha', 'confirmacao', { servico: dados?.servico, preferencial: dados?.preferencial, pacienteId: dados?.cd_paciente, viaQr: Boolean(valorQR) });
     // Fluxo QR
     if (dados?.qr) {
+      if (processandoRef.current) return;
       if (!valorQR) {
         window.alert("PACIENTE NÃO ENCONTRADO");
         return;
       }
 
+      if (!/^[1-9]\d*$/.test(valorQR.trim())) { window.alert('QR Code inválido.'); return; }
+      processandoRef.current = true;
+      setLoading(true);
+      try {
       const listpaciente = await buscaPaciente({
-        cd_paciente: parseInt(valorQR),
+        cd_paciente: Number(valorQR.trim()),
       });
       if (!listpaciente?.length) {
         window.alert("PACIENTE NÃO ENCONTRADO");
@@ -270,11 +282,18 @@ export function DialogPatient({
       if (dados.servico === "C" && listpaciente[0].cd_paciente) {
         const entrega = await entregaDeExames(listpaciente[0].cd_paciente);
         setExames(
-          entrega.filter((i) => [5].includes(i.status ?? -999)).slice(0, 10),
+          entrega.filter((i) => i.ds_status === 5).slice(0, 10),
         );
       }
 
       setDados(newDados);
+      } catch (error) {
+        window.alert(error instanceof Error ? error.message : 'Não foi possível identificar o paciente.');
+      } finally {
+        processandoRef.current = false;
+        setLoading(false);
+      }
+
       return;
     }
 
@@ -301,14 +320,22 @@ export function DialogPatient({
     processandoRef.current = true;
     setLoading(true);
 
-    await sendClinux({
+    try {
+      await sendClinux({
       cd_paciente: dados.cd_paciente,
       ds_paciente: dados.ds_paciente,
       dt_nascimento: dados.dt_nascimento,
       preferencial: dados.preferencial,
       servico: dados.servico,
       cd_modalidade: cdModalidade || undefined,
-    });
+      onPatientRegistered: (patient) => setDados(current => current ? { ...current, ...patient } : current),
+      });
+    } catch (error) {
+      processandoRef.current = false;
+      setLoading(false);
+      setFalhaEmissao(true);
+      return;
+    }
 
     if (!cdModalidade) {
       irParaInicio();
@@ -361,12 +388,16 @@ export function DialogPatient({
   };
 
   const handleCancelar = () => {
+    if (loading) return;
     const semPacienteNovo =
       !dados?.cd_paciente && !dados?.qr && dados?.tipo !== "NEW";
     if (tentativas && tentativas <= 0 && semPacienteNovo) {
       irParaInicio();
     } else {
       setShowModal(false);
+      setDados(null);
+      setExames(null);
+      void endPatientSession('cancelar_modal').catch(() => window.location.replace('/'));
     }
   };
 
@@ -374,16 +405,30 @@ export function DialogPatient({
     <Dialog
       open={showModal}
       onOpenChange={(aberto) => {
-        if (confirmacaoRecepcao && !aberto) {
+        if ((confirmacaoRecepcao || falhaEmissao) && !aberto) {
           finalizarAtendimento();
           return;
         }
 
-        setShowModal(aberto);
+        if (!aberto) handleCancelar();
+        else setShowModal(true);
       }}
     >
       <DialogContent>
-        {confirmacaoRecepcao ? (
+        {falhaEmissao ? (
+          <div className="flex flex-col gap-6 py-4 text-center" role="alert">
+            <DialogHeader>
+              <DialogTitle className="text-3xl font-bold">Não foi possível confirmar a emissão</DialogTitle>
+              <DialogDescription className="text-xl">
+                Procure a recepção para verificar sua senha antes de tentar novamente.
+              </DialogDescription>
+            </DialogHeader>
+            <p>O totem voltará ao início em {segundosRestantes} segundos.</p>
+            <Button type="button" className="h-14 text-xl" onClick={finalizarAtendimento}>
+              Voltar ao início
+            </Button>
+          </div>
+        ) : confirmacaoRecepcao ? (
           <div className="flex flex-col gap-6 py-4 text-center">
             <DialogHeader>
               <DialogTitle className="text-3xl font-bold text-green-700">

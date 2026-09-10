@@ -9,7 +9,7 @@ import { PatientSearchInput } from '@/components/totem/patientSearchInput'
 import { VirtualKeyboard } from '@/components/totem/virtualKeyboard'
 import { DatePatientList } from '@/components/totem/datePatientList'
 import { useDatePatientSearch } from '@/hooks/useDatePatientSearch'
-import { TipoBusca } from '@/lib/patientUtils'
+import { TipoBusca, isValidDateBR, toISODateBR } from '@/lib/patientUtils'
 import { buscarPacienteNomeData } from '@/services/buscaNomeData'
 import type { Paciente } from '@/services/api'
 import type { DadosPaciente } from '@/components/modals/patientModal'
@@ -17,6 +17,7 @@ import { buscarConfiguracaoPaineis } from '@/services/api'
 import { formatarDataNascimento } from '@/lib/formatdate'
 import { auditTotem } from '@/lib/audit-client'
 import { deveSelecionarModalidade } from '@/lib/painel-selection'
+import { endPatientSession } from '@/lib/patient-session-client'
 
 const SERVICO_LABEL: Record<string, string> = {
   C: 'Entrega de Exames',
@@ -41,6 +42,8 @@ export default function DataNasc() {
   const preferencial = Number(url.get('preferencial') ?? 0)
 
   const [text, setText] = useState('')
+  const [saindo, setSaindo] = useState(false)
+  const saindoRef = useRef(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const title = useMemo(() => SERVICO_LABEL[servico] ?? 'Atendimento', [servico])
@@ -56,7 +59,11 @@ export default function DataNasc() {
     idsComExame,
     loading,
     error,
-  } = useDatePatientSearch({ nome, tipo })
+  } = useDatePatientSearch({
+    nome, tipo,
+    filtroNome: tipo === 'DATA' ? text : undefined,
+    filtroNascimento: tipo === 'NOME' && isValidDateBR(text) ? toISODateBR(text) : undefined,
+  })
 
   const updateSearchText = useCallback((value: string) => {
     setText((value ?? '').toUpperCase())
@@ -74,6 +81,7 @@ export default function DataNasc() {
   )
 
   async function abrirPacienteComBusca(paciente: Paciente) {
+    if (saindoRef.current) return
     setLoading(true)
     setInvalido(null)
     setTentativas(null)
@@ -90,6 +98,7 @@ export default function DataNasc() {
       })
 
       const configPainel = await buscarConfiguracaoPaineis()
+      if (saindoRef.current) return
 
       const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico)
 
@@ -123,6 +132,7 @@ export default function DataNasc() {
   }
 
   async function avancar() {
+    if (saindoRef.current) return
     auditTotem('avancar_clicado', 'busca_complementar', { tipo, servico, preferencial, preenchido: Boolean(text.trim()) })
     if (!text.trim()) {
       window.alert(tipo === 'DATA' ? 'Digite o nome do paciente' : 'Digite a data de nascimento')
@@ -150,6 +160,7 @@ export default function DataNasc() {
       setLoading(true)
 
       const configPainel = await buscarConfiguracaoPaineis()
+      if (saindoRef.current) return
 
       const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico)
 
@@ -180,8 +191,21 @@ export default function DataNasc() {
     }
   }
 
-  function voltar() {
-    router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
+  async function voltar() {
+    if (saindoRef.current) return
+    saindoRef.current = true
+    setSaindo(true)
+    setShowModal(false)
+    setDados(null)
+    setExames(null)
+    setTentativas(null)
+    setInvalido(null)
+    try {
+      await endPatientSession('voltar_date')
+      router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
+    } catch {
+      window.location.replace('/')
+    }
   }
 
   function abrirQRCode() {
@@ -192,6 +216,8 @@ export default function DataNasc() {
       preferencial,
     })
   }
+
+  if (saindo) return <div role="status">Encerrando atendimento...</div>
 
   return (
     <div className="overflow-hidden h-screen">

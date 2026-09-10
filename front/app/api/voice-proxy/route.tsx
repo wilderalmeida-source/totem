@@ -1,34 +1,52 @@
-import { NextResponse } from 'next/server';
+import { auditServer } from '@/lib/flow-audit-server';
+﻿import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const audioPath = searchParams.get('path'); // ex: /audios/chamada-123.mp3
+  const start = Date.now();
+  const audioPath = new URL(request.url).searchParams.get('path');
 
-  if (!audioPath) return new NextResponse('Missing path', { status: 400 });
+  // Os geradores retornam MP3 diretamente em /audios/, sem subdiretórios.
+  if (!audioPath || !/^\/audios\/[a-zA-Z0-9_-]+\.mp3$/.test(audioPath)) {
+    return new NextResponse('Caminho de áudio inválido.', { status: 400 });
+  }
 
-  const NODE_SERVER = process.env.LINK_API_INTERNA;
-  const INTERNAL_TOKEN = process.env.TOKEN_API_INT; // O token que o Node exige
+  const apiBase = process.env.LINK_API_INTERNA;
+  const apiToken = process.env.TOKEN_API_INT;
+  if (!apiBase || !apiToken) {
+    return new NextResponse('Serviço de áudio não configurado.', { status: 503 });
+  }
 
   try {
-    // O servidor Next.js faz a chamada para o Node com o TOKEN escondido
-    const res = await fetch(`${NODE_SERVER}${audioPath}`, {
-      headers: {
-        'Authorization': `Bearer ${INTERNAL_TOKEN}`
-      }
+    // O navegador acessa o Next; somente o Next acessa o container do backend.
+    const target = new URL(audioPath, apiBase);
+    if (!['http:', 'https:'].includes(target.protocol)) {
+      return new NextResponse('Serviço de áudio não configurado.', { status: 503 });
+    }
+
+    const res = await fetch(target, {
+      headers: { Authorization: `Bearer ${apiToken}` },
+      redirect: 'manual',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
     });
 
-    if (!res.ok) throw new Error('Falha ao buscar áudio no Node');
+    // Não seguir redirecionamentos que possam contornar a restrição de rota.
+    if (!res.ok) {
+      await res.body?.cancel();
+      return new NextResponse('Áudio indisponível.', {
+        status: res.status === 404 ? 404 : 502,
+      });
+    }
 
-    const audioBuffer = await res.arrayBuffer();
-    
-    // Retorna o áudio para o navegador como se o Next.js fosse o dono do arquivo
-    return new NextResponse(audioBuffer, {
+    return new NextResponse(res.body, {
       headers: {
         'Content-Type': 'audio/mpeg',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
       },
     });
-  } catch (_err) {
-    return new NextResponse(`Erro no proxy de áudio${_err}`, { status: 500 });
+  } catch {
+    auditServer(request, 'audio_proxy_falhou', 'audio.proxy', { code: 'AUDIO_PROXY_FAILED', durationMs: Date.now() - start });
+    return new NextResponse('Falha ao buscar áudio.', { status: 502 });
   }
 }

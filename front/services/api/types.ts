@@ -104,28 +104,6 @@ export type Modalidade = {
 export type ModalidadesResponse = Modalidade[]
 
 /* =======================
-   DOCUMENTOS
-======================= */
-export type Documento = {
-  cd_documento: number | null
-  cd_atendimento: number | null
-  ds_documento: string | null
-  bb_documento: string | null
-  dt_documento: string | null
-  cd_funcionario: number | null
-  ds_arquivo: string | null
-  cd_tipo: number | null
-  nr_documento: string | null
-  cd_paciente: number | null
-  dt_scanner: string | null
-  sn_convertido: boolean | null
-  atendimentos: string | null
-  pacientes: string | null
-  atendimentos_documentos_tipos?: { ds_tipo: string | null }
-  arquivo: string | null
-}
-
-/* =======================
    VOZ
 ======================= */
 export type VoiceStatsEvent = {

@@ -1,3 +1,6 @@
+import { randomUUID } from 'node:crypto'
+import { createTcpFrames } from '../lib/tcp-frames'
+import { auditContext, flowAudit } from '../lib/flow-audit'
 import fp from "fastify-plugin";
 import type { FastifyInstance } from "fastify";
 import net from "net";
@@ -218,10 +221,13 @@ async function tratarMensagemTcp(
 ) {
   try {
     const { servico } = extrairDadosTcp(raw);
+    flowAudit('tcp_interpretado', 'tcp.2345', { painelId, servico, bytes: Buffer.byteLength(raw), code: 'TCP_PARSED' });
     const m2 = raw.match(/^(?:[^-]*-){2}\s*([^-]*?)\s*-/);
     const tail = (m2?.[1] ?? "").trim();
+    flowAudit('chamado_referencia', 'tcp.2345', { painelId, servico, referencia: tail.slice(0, 30) });
 
     if (!tail) {
+      flowAudit('tcp_sem_controle', 'tcp.2345', { painelId, code: 'TCP_MISSING_CONTROL' });
       fastify.broadcast({
         type: "tcp",
         painelId,
@@ -235,7 +241,8 @@ async function tratarMensagemTcp(
       method: "GET",
       url: `/clinux/senhas?filtroControle=${encodeURIComponent(tail)}`,
       headers: {
-        Authorization: `Bearer ${process.env.TOKENAPIINT}`,
+        Authorization: `Bearer ${(process.env.TOKEN_API_INT?.trim() || process.env.TOKENAPIINT?.trim())}`,
+        'x-flow-id': auditContext.getStore()?.flowId ?? '',
       },
     });
 
@@ -276,6 +283,8 @@ async function tratarMensagemTcp(
 
     const eventId = `${textoChamada}-${datecomplete}`;
 
+    flowAudit('tts_iniciado', 'audio.geracao', { painelId, code: 'TTS_REQUESTED' });
+    const ttsStart = Date.now();
     const ttsRes = await fastify.inject({
       method: "POST",
       url: "/clinux/voice",
@@ -289,7 +298,7 @@ async function tratarMensagemTcp(
       },
       headers: {
         "content-type": "application/json",
-        Authorization: `Bearer ${process.env.TOKENAPIINT}`,
+        Authorization: `Bearer ${(process.env.TOKEN_API_INT?.trim() || process.env.TOKENAPIINT?.trim())}`,
       },
     });
 
@@ -306,6 +315,7 @@ async function tratarMensagemTcp(
       },
     });
 
+    flowAudit('tts_resposta', 'audio.geracao', { painelId, status: ttsRes.statusCode, durationMs: Date.now() - ttsStart });
     if (ttsRes.statusCode === 200) {
       const ttsBody = ttsRes.json() as TtsBody;
 
@@ -339,10 +349,13 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
   await carregarCachePainel(fastify);
 
   const server = net.createServer((sock) => {
-    sock.on("data", (buf) => {
-      const raw = buf.toString("utf8");
-
-      void (async () => {
+    let queue = Promise.resolve()
+    let queued = 0
+    const frames = createTcpFrames((raw) => {
+      if (queued >= 100) throw new Error('TCP_QUEUE_FULL')
+      queued++
+      queue = queue.then(() => auditContext.run({ flowId: randomUUID(), device: sock.remoteAddress ?? 'tcp' }, async () => {
+        flowAudit('tcp_recebido', 'tcp.2345', { bytes: Buffer.byteLength(raw), code: 'TCP_RECEIVED' });
         const painelId = await descobrirPainelPorEvento(fastify, raw);
 
         fastify.log.info(
@@ -356,10 +369,20 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
         );
 
         await tratarMensagemTcp(fastify, raw, painelId);
-      })();
+      })).catch(() => flowAudit('tcp_tratamento_falhou', 'tcp.2345', { code: 'TCP_ROUTING_FAILED' })).finally(() => { queued-- });
+    });
+    sock.on("data", (buf) => {
+      try { frames.push(buf) } catch (error) {
+        flowAudit('tcp_mensagem_rejeitada', 'tcp.2345', { code: error instanceof Error ? error.message : 'TCP_INVALID_FRAME' });
+        sock.destroy();
+      }
+    });
+    sock.on('close', () => {
+      if (frames.finish()) flowAudit('tcp_mensagem_incompleta', 'tcp.2345', { code: 'TCP_INCOMPLETE_FRAME' });
     });
 
     sock.on("error", (err) => {
+      flowAudit('tcp_socket_erro', 'tcp.2345', { code: 'TCP_SOCKET_ERROR' });
       fastify.log.error({ err }, "Erro no socket TCP");
     });
   });

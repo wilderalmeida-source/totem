@@ -202,6 +202,15 @@ ON public.recepcoes_modalidades(servico);
 CREATE INDEX IF NOT EXISTS recepcoes_modalidades_ativo_idx
 ON public.recepcoes_modalidades(ativo);
 
+-- Contador diario de senhas do totem: executar no banco de logs.
+-- Este bloco pode ser aplicado isoladamente em uma atualizacao manual.
+-- Nao reinicializar os valores existentes: numeros reservados nao sao reutilizados.
+CREATE TABLE IF NOT EXISTS "TotemSenhaCounter" (
+  "date" DATE NOT NULL,
+  "number" INTEGER NOT NULL,
+  CONSTRAINT "TotemSenhaCounter_pkey" PRIMARY KEY ("date")
+);
+
 CREATE TABLE IF NOT EXISTS "AdminUser" (
   "id" SERIAL PRIMARY KEY,
   "username" VARCHAR(100) NOT NULL UNIQUE,

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.gerarSenhaEntrega = gerarSenhaEntrega;
+const flow_audit_1 = require("../../lib/flow-audit");
 const prismaDB_1 = require("../../../config/prismaDB");
 const senha_helpers_1 = require("./senha.helpers");
 async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) {
@@ -51,7 +52,7 @@ async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) 
     const modalidadeSenha = atendimento.salas?.cd_modalidade ?? cd_modalidade ?? modalidadeTotem;
     const IP_PAINEL = await (0, senha_helpers_1.resolverIpPainelPorModalidade)('C', modalidadeSenha);
     const dsModalidade = await (0, senha_helpers_1.resolveModalidade)(modalidadeSenha);
-    return prismaDB_1.prisma.atendimentos_senhas.create({
+    const result = await (0, flow_audit_1.auditOperation)('clinico.gravar_senha_entrega', () => prismaDB_1.prisma.atendimentos_senhas.create({
         data: {
             dt_entrada: dateNow,
             ds_opcao: 'C',
@@ -67,5 +68,7 @@ async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) 
             ds_fila: 'R',
             cd_funcionario: FUNCIONARIO,
         },
-    });
+    }));
+    (0, flow_audit_1.flowAudit)('senha_entrega_confirmada', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, nr_controle: nrControle, code: 'TICKET_COMMITTED' });
+    return result;
 }

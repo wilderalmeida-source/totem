@@ -1,10 +1,21 @@
+export function auditContextHeaders(): Record<string, string> {
+  try {
+    let flow = sessionStorage.getItem('totemAuditSession')
+    if (!flow) { flow = createSessionId(); sessionStorage.setItem('totemAuditSession', flow) }
+    let device = localStorage.getItem('totemDeviceId')
+    if (!device) { device = createSessionId(); localStorage.setItem('totemDeviceId', device) }
+    return { 'x-flow-id': flow, 'x-device-id': device }
+  } catch { return {} }
+}
 export function auditTotem(action: string, step: string, metadata?: Record<string, unknown>) {
-  let sessionId = sessionStorage.getItem('totemAuditSession')
-  if (!sessionId) {
-    sessionId = createSessionId()
-    sessionStorage.setItem('totemAuditSession', sessionId)
-  }
-  void fetch('/api/audit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, action, step, metadata }), keepalive: true })
+  const context = auditContextHeaders()
+  try {
+    void fetch('/api/audit', { method: 'POST', headers: { 'Content-Type': 'application/json', ...context },
+      body: JSON.stringify({ sessionId: context['x-flow-id'], action, step, metadata: {
+        ...metadata, device: context['x-device-id'], deviceLabel: localStorage.getItem('totemDeviceLabel') ?? undefined,
+        source: 'browser', version: process.env.NEXT_PUBLIC_APP_VERSION ?? 'nao_informada',
+      } }), keepalive: true, signal: AbortSignal.timeout(5000) }).catch(() => undefined)
+  } catch { /* Auditoria nao interrompe o fluxo. */ }
 }
 
 function createSessionId() {

@@ -1,6 +1,6 @@
 'use client'
 
-import type { Atendimento, Paciente } from '@/services/api'
+import type { PacienteComExame, Paciente } from '@/services/api'
 import type { TipoBusca } from '@/lib/patientUtils'
 import { formatarDataNascimento } from '@/lib/formatdate'
 import { auditTotem } from '@/lib/audit-client'
@@ -9,7 +9,7 @@ interface DatePatientListProps {
   tipo: TipoBusca
   filtro: string
   pacientes: Paciente[]
-  atendimentosHoje: Atendimento[]
+  atendimentosHoje: PacienteComExame[]
   idsComExame: Set<number>
   loading?: boolean
   error?: string | null

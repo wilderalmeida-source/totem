@@ -22,14 +22,37 @@ const strongPassword = zod_1.z.string().min(12).max(256)
     .regex(/[0-9]/, 'A senha precisa de um número.')
     .regex(/[^a-zA-Z0-9]/, 'A senha precisa de um símbolo.');
 const permission = zod_1.z.enum(['ATENCAO', 'VOZ', 'DICIONARIO', 'GUICHES', 'RECEPCOES', 'PAINEIS', 'STATUS', 'LOGS', 'USUARIOS']);
+const auditGroups = {
+    EMISSAO: { OR: [
+            { step: { in: ['emissao', 'confirmacao', 'logs.contador', 'logs.reserva_numero', 'clinico.contagem', 'clinico.maior_numero', 'clinico.gravar_senha_e_vinculo', 'clinico.gravar_senha_entrega', 'patientSession.senha', 'patientSession/senha', '/clinux/senhas'] } },
+        ] },
+    SESSAO: { step: { in: ['sessao', 'patientSession'] } },
+    COMUNICACAO: { action: { in: ['resposta_backend', 'resposta_next', 'falha_comunicacao', 'requisicao_falhou', 'proxy_resposta', 'proxy_falhou'] } },
+    AUDIO: { OR: [
+            { step: { startsWith: 'audio.' } }, { step: { startsWith: 'painel.' } },
+            { step: 'tcp.2345' }, { step: '/clinux/voice' },
+        ] },
+    PACIENTES: { OR: [
+            { step: { in: ['pacientesRoute.GET', 'patientSession.POST', '/clinux/pacientes', 'busca_complementar'] } },
+            { step: { startsWith: '/clinux/totem/' } },
+        ] },
+};
 async function adminRoutes(fastify) {
+    fastify.post('/clinux/admin/users/session', async (request, reply) => {
+        const body = zod_1.z.object({ username: zod_1.z.string().min(1).max(100), version: zod_1.z.string() }).strict().parse(request.body);
+        const user = await prismalog_1.PrismaLog.adminUser.findUnique({ where: { username: body.username } });
+        if (!user?.active || user.updatedAt.toISOString() !== body.version) {
+            return reply.code(401).send({ error: 'Sessao encerrada.' });
+        }
+        return { permissions: user.permissions, mustChangePassword: user.mustChangePassword };
+    });
     fastify.post('/clinux/admin/users/verify', async (request, reply) => {
         const body = zod_1.z.object({ username: zod_1.z.string().min(1).max(100), password: zod_1.z.string().min(1).max(256) }).parse(request.body);
         const user = await prismalog_1.PrismaLog.adminUser.findUnique({ where: { username: body.username } });
         if (!user || !user.active || !verifyPassword(body.password, user.passwordHash)) {
             return reply.code(401).send({ error: 'Usuário ou senha inválidos.' });
         }
-        return { username: user.username, displayName: user.displayName, mustChangePassword: user.mustChangePassword, permissions: user.permissions };
+        return { username: user.username, displayName: user.displayName, mustChangePassword: user.mustChangePassword, permissions: user.permissions, version: user.updatedAt.toISOString() };
     });
     fastify.get('/clinux/admin/users', async () => prismalog_1.PrismaLog.adminUser.findMany({
         select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true, createdAt: true, updatedAt: true },
@@ -78,8 +101,13 @@ async function adminRoutes(fastify) {
         return reply.code(201).send({ ok: true });
     });
     fastify.get('/clinux/audit', async (request) => {
-        const query = zod_1.z.object({ category: zod_1.z.enum(['TOTEM', 'ADMIN']).optional(), page: zod_1.z.coerce.number().int().positive().default(1), limit: zod_1.z.coerce.number().int().min(1).max(200).default(50) }).parse(request.query);
-        const where = query.category ? { category: query.category } : {};
+        const query = zod_1.z.object({ group: zod_1.z.enum(['EMISSAO', 'SESSAO', 'COMUNICACAO', 'AUDIO', 'PACIENTES']).optional(), category: zod_1.z.enum(['TOTEM', 'ADMIN']).optional(), flow: zod_1.z.string().max(100).optional(), device: zod_1.z.string().max(100).optional(), page: zod_1.z.coerce.number().int().positive().default(1), limit: zod_1.z.coerce.number().int().min(1).max(200).default(50) }).parse(request.query);
+        const where = {
+            ...(query.category ? { category: query.category } : {}),
+            ...(query.flow ? { OR: [{ sessionId: query.flow }, { metadata: { path: ['traceId'], equals: query.flow } }] } : {}),
+            ...(query.device ? { metadata: { path: ['device'], equals: query.device } } : {}),
+            ...(query.group ? { AND: [auditGroups[query.group]] } : {}),
+        };
         const [items, total] = await Promise.all([prismalog_1.PrismaLog.auditLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (query.page - 1) * query.limit, take: query.limit }), prismalog_1.PrismaLog.auditLog.count({ where })]);
         return { items: items.map((item) => ({ ...item, id: item.id.toString() })), total, page: query.page };
     });

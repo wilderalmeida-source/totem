@@ -1,86 +1,69 @@
-'use client'
+﻿'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-
-import { buscaAtendimentos, buscaPaciente, type Atendimento, type Paciente } from '@/services/api'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { buscaPacientesComExames, buscaPaciente, type PacienteComExame, type Paciente } from '@/services/api'
 import type { TipoBusca } from '@/lib/patientUtils'
-
-const STATUS_VALIDOS = [2, 3, 7]
 
 interface UseDatePatientSearchParams {
   nome: string
   tipo: TipoBusca
+  filtroNome?: string
+  filtroNascimento?: string
 }
 
-export function useDatePatientSearch({ nome, tipo }: UseDatePatientSearchParams) {
+export function useDatePatientSearch({ nome, tipo, filtroNome, filtroNascimento }: UseDatePatientSearchParams) {
   const [pacientes, setPacientes] = useState<Paciente[]>([])
-  const [atendimentosHoje, setAtendimentosHoje] = useState<Atendimento[]>([])
+  const [atendimentosHoje, setAtendimentosHoje] = useState<PacienteComExame[]>([])
   const [idsComExame, setIdsComExame] = useState<Set<number>>(new Set())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const sequence = useRef(0)
 
   const carregarDados = useCallback(async () => {
+    const requestId = ++sequence.current
     if (!nome) return
-
     setLoading(true)
     setError(null)
-
     try {
       if (tipo === 'DATA') {
-        const hoje = new Date()
-        hoje.setHours(0, 0, 0, 0)
-
         const [responsePacientes, responseAtendimentos] = await Promise.all([
-          buscaPaciente({ dt_nascimento: nome, tipo: 'DATA' }),
-          buscaAtendimentos({ dt_nascimento: nome, date: { from: hoje } }),
+          buscaPaciente({ dt_nascimento: nome, tipo: 'DATA', ds_paciente: filtroNome?.trim() || undefined }),
+          buscaPacientesComExames(nome, filtroNome),
         ])
-
-        const atendimentosValidos = (responseAtendimentos ?? []).filter(
-          (atendimento) =>
-            atendimento.exames &&
-            atendimento.exames.length > 0 &&
-            atendimento.ds_status &&
-            STATUS_VALIDOS.includes(atendimento.ds_status)
-        )
-
+        if (requestId !== sequence.current) return
         const ids = new Set<number>()
-        const atendimentosUnicos = atendimentosValidos.filter((atendimento) => {
+        const unicos = responseAtendimentos.filter(atendimento => {
           const id = atendimento.pacientes_atendimentos_cd_pacienteTopacientes?.cd_paciente
           if (!id || ids.has(id)) return false
           ids.add(id)
           return true
         })
-
-        const listaPacientes = Array.isArray(responsePacientes) ? responsePacientes : []
-
-        setAtendimentosHoje(atendimentosUnicos)
+        setAtendimentosHoje(unicos)
         setIdsComExame(ids)
-        setPacientes(listaPacientes.filter((paciente) => !paciente.cd_paciente || !ids.has(paciente.cd_paciente)))
-        return
+        setPacientes(responsePacientes.filter(paciente => !paciente.cd_paciente || !ids.has(paciente.cd_paciente)))
+      } else {
+        const response = await buscaPaciente({ ds_paciente: nome, tipo: 'NOME', dt_nascimento: filtroNascimento })
+        if (requestId !== sequence.current) return
+        setPacientes(response)
+        setAtendimentosHoje([])
+        setIdsComExame(new Set())
       }
-
-      const response = await buscaPaciente({ ds_paciente: nome, tipo: 'NOME' })
-      setPacientes(Array.isArray(response) ? response : [])
+    } catch (err) {
+      if (requestId !== sequence.current) return
+      setPacientes([])
       setAtendimentosHoje([])
       setIdsComExame(new Set())
-    } catch (err) {
-      console.error('[useDatePatientSearch] erro:', err)
-      setError('Erro ao buscar pacientes.')
+      setError(err instanceof Error ? err.message : 'Erro ao buscar pacientes.')
     } finally {
-      setLoading(false)
+      if (requestId === sequence.current) setLoading(false)
     }
-  }, [nome, tipo])
+  }, [nome, tipo, filtroNome, filtroNascimento])
 
   useEffect(() => {
-    void carregarDados()
+    setLoading(true)
+    const timer = setTimeout(() => { void carregarDados() }, 250)
+    return () => { clearTimeout(timer); sequence.current += 1 }
   }, [carregarDados])
 
-  return {
-    pacientes,
-    atendimentosHoje,
-    idsComExame,
-    loading,
-    error,
-    reload: carregarDados,
-  }
+  return { pacientes, atendimentosHoje, idsComExame, loading, error, reload: carregarDados }
 }

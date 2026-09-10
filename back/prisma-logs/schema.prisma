@@ -9,6 +9,11 @@ datasource logs {
   provider = "postgresql"
 }
 
+model TotemSenhaCounter {
+  date   DateTime @id @logs.Date
+  number Int
+}
+
 model TtsDailyUsage {
   id       Int      @id @default(autoincrement())
   date     DateTime @unique

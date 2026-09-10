@@ -1,3 +1,4 @@
+import { auditContextHeaders } from '@/lib/audit-client'
 type FetchOptions = RequestInit & {
   tags?: string[]
 }
@@ -13,7 +14,7 @@ export const apiFetch = async (
   if (!apiBase) throw new Error('LINK_API_INTERNA não configurada')
   if (serverSide && !apiToken) throw new Error('TOKEN_API_INT não configurado')
 
-  const mergedHeaders = new Headers()
+  const mergedHeaders = new Headers(serverSide ? undefined : auditContextHeaders())
   if (options.body) mergedHeaders.set('Content-Type', 'application/json')
   if (apiToken) mergedHeaders.set('Authorization', `Bearer ${apiToken}`)
   if (headers) {

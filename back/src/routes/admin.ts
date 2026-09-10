@@ -25,14 +25,38 @@ const strongPassword = z.string().min(12).max(256)
 
 const permission = z.enum(['ATENCAO', 'VOZ', 'DICIONARIO', 'GUICHES', 'RECEPCOES', 'PAINEIS', 'STATUS', 'LOGS', 'USUARIOS'])
 
+const auditGroups = {
+  EMISSAO: { OR: [
+    { step: { in: ['emissao', 'confirmacao', 'logs.contador', 'logs.reserva_numero', 'clinico.contagem', 'clinico.maior_numero', 'clinico.gravar_senha_e_vinculo', 'clinico.gravar_senha_entrega', 'patientSession.senha', 'patientSession/senha', '/clinux/senhas'] } },
+  ] },
+  SESSAO: { step: { in: ['sessao', 'patientSession'] } },
+  COMUNICACAO: { action: { in: ['resposta_backend', 'resposta_next', 'falha_comunicacao', 'requisicao_falhou', 'proxy_resposta', 'proxy_falhou'] } },
+  AUDIO: { OR: [
+    { step: { startsWith: 'audio.' } }, { step: { startsWith: 'painel.' } },
+    { step: 'tcp.2345' }, { step: '/clinux/voice' },
+  ] },
+  PACIENTES: { OR: [
+    { step: { in: ['pacientesRoute.GET', 'patientSession.POST', '/clinux/pacientes', 'busca_complementar'] } },
+    { step: { startsWith: '/clinux/totem/' } },
+  ] },
+} satisfies Record<string, Prisma.AuditLogWhereInput>
+
 export async function adminRoutes(fastify: FastifyInstance) {
+  fastify.post('/clinux/admin/users/session', async (request, reply) => {
+    const body = z.object({ username: z.string().min(1).max(100), version: z.string() }).strict().parse(request.body)
+    const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
+    if (!user?.active || user.updatedAt.toISOString() !== body.version) {
+      return reply.code(401).send({ error: 'Sessao encerrada.' })
+    }
+    return { permissions: user.permissions, mustChangePassword: user.mustChangePassword }
+  })
   fastify.post('/clinux/admin/users/verify', async (request, reply) => {
     const body = z.object({ username: z.string().min(1).max(100), password: z.string().min(1).max(256) }).parse(request.body)
     const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
     if (!user || !user.active || !verifyPassword(body.password, user.passwordHash)) {
       return reply.code(401).send({ error: 'Usuário ou senha inválidos.' })
     }
-    return { username: user.username, displayName: user.displayName, mustChangePassword: user.mustChangePassword, permissions: user.permissions }
+    return { username: user.username, displayName: user.displayName, mustChangePassword: user.mustChangePassword, permissions: user.permissions, version: user.updatedAt.toISOString() }
   })
 
   fastify.get('/clinux/admin/users', async () => PrismaLog.adminUser.findMany({
@@ -83,8 +107,13 @@ export async function adminRoutes(fastify: FastifyInstance) {
   })
 
   fastify.get('/clinux/audit', async (request) => {
-    const query = z.object({ category: z.enum(['TOTEM', 'ADMIN']).optional(), page: z.coerce.number().int().positive().default(1), limit: z.coerce.number().int().min(1).max(200).default(50) }).parse(request.query)
-    const where = query.category ? { category: query.category } : {}
+    const query = z.object({ group: z.enum(['EMISSAO', 'SESSAO', 'COMUNICACAO', 'AUDIO', 'PACIENTES']).optional(), category: z.enum(['TOTEM', 'ADMIN']).optional(), flow: z.string().max(100).optional(), device: z.string().max(100).optional(), page: z.coerce.number().int().positive().default(1), limit: z.coerce.number().int().min(1).max(200).default(50) }).parse(request.query)
+    const where: Prisma.AuditLogWhereInput = {
+      ...(query.category ? { category: query.category } : {}),
+      ...(query.flow ? { OR: [{ sessionId: query.flow }, { metadata: { path: ['traceId'], equals: query.flow } }] } : {}),
+      ...(query.device ? { metadata: { path: ['device'], equals: query.device } } : {}),
+      ...(query.group ? { AND: [auditGroups[query.group]] } : {}),
+    }
     const [items, total] = await Promise.all([PrismaLog.auditLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (query.page - 1) * query.limit, take: query.limit }), PrismaLog.auditLog.count({ where })])
     return { items: items.map((item) => ({ ...item, id: item.id.toString() })), total, page: query.page }
   })

@@ -1,3 +1,4 @@
+import { flowAudit, auditOperation } from '../../lib/flow-audit'
 import { prisma } from '../../../config/prismaDB'
 import { GerarSenhaBody } from './senha.types'
 import {
@@ -83,7 +84,7 @@ export async function gerarSenhaEntrega({
   )
   const dsModalidade = await resolveModalidade(modalidadeSenha)
 
-  return prisma.atendimentos_senhas.create({
+  const result = await auditOperation('clinico.gravar_senha_entrega', () => prisma.atendimentos_senhas.create({
     data: {
       dt_entrada: dateNow,
       ds_opcao: 'C',
@@ -99,5 +100,7 @@ export async function gerarSenhaEntrega({
       ds_fila: 'R',
       cd_funcionario: FUNCIONARIO,
     },
-  })
+  }))
+  flowAudit('senha_entrega_confirmada', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, nr_controle: nrControle, code: 'TICKET_COMMITTED' })
+  return result
 }

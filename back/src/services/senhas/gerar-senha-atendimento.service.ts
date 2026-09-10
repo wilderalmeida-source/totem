@@ -1,3 +1,5 @@
+import { flowAudit, auditOperation } from '../../lib/flow-audit'
+import { reservarNumeroSenha } from './reservar-numero-senha.service'
 import { prisma } from '../../../config/prismaDB'
 import { GerarSenhaBody } from './senha.types'
 import {
@@ -83,67 +85,43 @@ export async function gerarSenhaAtendimento({
 
   const fila = novoAtendimento ? 'N' : dsModalidade[0]
 
-  const totalSenhasHoje = await prisma.atendimentos_senhas.count({
-    where: {
-      dt_entrada: {
-        gte: hoje,
+  const nrSenha = await reservarNumeroSenha(hoje)
+
+  const result = await auditOperation('clinico.gravar_senha_e_vinculo', () => prisma.$transaction(async (tx) => {
+    const senha = await tx.atendimentos_senhas.create({
+      data: {
+        dt_entrada: dateNow,
+        ds_opcao: servico,
+        nr_empresa: EMPRESA,
+        nr_modalidade: modalidadeSenha,
+        nr_senha: nrSenha,
+        sn_preferencial: preferencial !== 0,
+        sn_especial: preferencial === 2,
+        sn_preparo: false,
+        ds_painel: IP_PAINEL,
+        ds_local: dsModalidade,
+        ds_fila: fila,
+        cd_funcionario: FUNCIONARIO,
       },
-    },
-  })
+    })
+    const dsSenha = montarDsSenha(preferencial, fila, senha.nr_senha)
 
-  const nrSenha = totalSenhasHoje + 1
-
-  let senha
-try {
-  senha = await prisma.atendimentos_senhas.create({
-    data: {
-      dt_entrada: dateNow,
-      ds_opcao: servico,
-      nr_empresa: EMPRESA,
-      nr_modalidade: modalidadeSenha,
-      nr_senha: nrSenha,
-      sn_preferencial: preferencial !== 0,
-      sn_especial: preferencial === 2,
-      sn_preparo: false,
-      ds_painel: IP_PAINEL,
-      ds_local: dsModalidade,
-      ds_fila: fila,
-      cd_funcionario: FUNCIONARIO,
-    },
-  })
-} catch (error: any) {
-  console.error('Erro ao criar atendimentos_senhas:', {
-    message: error?.message,
-    code: error?.code,
-    meta: error?.meta,
-    dadosEnviados: {
-      cd_paciente,
-      servico,
-      modalidadeSenha,
-      nrSenha,
-      IP_PAINEL,
-      dsModalidade,
-      fila,
-    },
-  })
-  throw new Error(`Falha ao gerar senha: ${error?.message ?? 'erro desconhecido'}`)
-}
-
-  const dsSenha = montarDsSenha(preferencial, fila, senha.nr_senha)
-
-  await prisma.atendimentos.updateMany({
-    where: {
-      cd_atendimento: {
-        in: exameAtendimento.map((item) => item.cd_atendimento),
+    await tx.atendimentos.updateMany({
+      where: {
+        cd_atendimento: {
+          in: exameAtendimento.map((item) => item.cd_atendimento),
+        },
       },
-    },
-    data: {
-      ds_senha: dsSenha,
-      cd_senha: senha.cd_senha,
-      dt_hora_senha: dateNow,
-      cd_funcionario: FUNCIONARIO
-    },
-  })
+      data: {
+        ds_senha: dsSenha,
+        cd_senha: senha.cd_senha,
+        dt_hora_senha: dateNow,
+        cd_funcionario: FUNCIONARIO
+      },
+    })
 
-  return senha
+    return senha
+  }, { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }))
+  flowAudit('senha_e_vinculo_confirmados', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, atendimentos: exameAtendimento.map(item => item.cd_atendimento), code: 'TICKET_COMMITTED' })
+  return result
 }

@@ -3,56 +3,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.agendaRoute = agendaRoute;
 const zod_1 = require("zod");
 const prismaDB_1 = require("../../config/prismaDB");
+const search_validation_1 = require("../lib/search-validation");
 async function agendaRoute(fastify) {
     fastify.get('/clinux/agenda', async (request, reply) => {
-        const createbody = zod_1.z.object({
-            medico: zod_1.z.string().optional().transform(value => value || undefined),
-            sala: zod_1.z.string().optional().transform(value => value || undefined),
-            busca: zod_1.z.string().optional().transform(value => value || undefined),
-            status: zod_1.z.string().optional().transform(value => value || undefined),
-            cd_paciente: zod_1.z.string().optional().transform(value => value || undefined),
-            dt_nascimento: zod_1.z.string().optional().transform(value => value || undefined),
-            data_inicial: zod_1.z.string(),
-            data_final: zod_1.z.string(),
-            lote: zod_1.z.string().optional().transform(value => value || undefined),
-            tipo: zod_1.z.string().optional().transform(value => value || undefined),
-        });
-        const { data_inicial, data_final, medico, sala, status, busca, lote, cd_paciente, dt_nascimento, tipo } = createbody.parse(request.query);
-        const where = {};
-        let orderBy = [];
-        if (typeof medico === "string") {
-            where.cd_medico = parseInt(medico);
-        }
-        if (typeof sala === "string") {
-            where.cd_sala = parseInt(sala);
-        }
-        if (typeof status === "string") {
-            where.ds_status = parseInt(status);
-        }
-        if (typeof lote === "string") {
-            where.cd_lancamento = parseInt(lote);
-        }
-        if (typeof tipo === "string") {
-            orderBy = [{ dt_data: 'desc' }];
-        }
-        if (typeof tipo != "string") {
-            orderBy = [{ dt_data: 'asc' }, { dt_hora: 'asc' }];
-        }
-        if (typeof cd_paciente === "string") {
-            where.cd_paciente = parseInt(cd_paciente);
-        }
-        if (typeof busca === "string") {
-            where.ds_paciente = { startsWith: busca };
-        }
-        if (typeof dt_nascimento === "string") {
-            where.pacientes_atendimentos_cd_pacienteTopacientes = { dt_nascimento: new Date(dt_nascimento) };
-        }
-        if (typeof data_inicial === "string") {
-            where.dt_data = {
-                lte: new Date(data_final),
-                gte: new Date(data_inicial),
-            };
-        }
+        const parsed = zod_1.z.object({
+            medico: search_validation_1.positiveId.optional(), sala: search_validation_1.positiveId.optional(), busca: search_validation_1.patientName.optional(),
+            status: search_validation_1.positiveId.optional(), cd_paciente: search_validation_1.positiveId.optional(),
+            dt_nascimento: search_validation_1.birthDate.optional(), data_inicial: search_validation_1.birthDate, data_final: search_validation_1.birthDate,
+            lote: search_validation_1.positiveId.optional(), tipo: zod_1.z.enum(['entrega']).optional(),
+        }).strict().refine(q => q.data_final >= q.data_inicial && q.data_final.getTime() - q.data_inicial.getTime() <= 31 * 86400000).safeParse(request.query);
+        if (!parsed.success)
+            return reply.code(400).send({ error: 'Informe filtros válidos e um período de até 31 dias.' });
+        const q = parsed.data;
+        const where = {
+            cd_medico: q.medico, cd_sala: q.sala, ds_status: q.status, cd_lancamento: q.lote,
+            cd_paciente: q.cd_paciente,
+            ...(q.busca ? { ds_paciente: { startsWith: q.busca } } : {}),
+            ...(q.dt_nascimento ? { pacientes_atendimentos_cd_pacienteTopacientes: { dt_nascimento: q.dt_nascimento } } : {}),
+            dt_data: { gte: q.data_inicial, lte: q.data_final },
+        };
+        const orderBy = [{ dt_data: 'asc' }, { dt_hora: 'asc' }];
         const agenda = await prismaDB_1.prisma.atendimentos.findMany({
             where,
             select: {
@@ -65,8 +35,10 @@ async function agendaRoute(fastify) {
                 salas: { select: { ds_sala: true, cd_sala: true, cd_modalidade: true, dt_hora_chegada: true } },
                 exames: { select: { procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } }, cd_exame: true, dt_assinado: true, dt_laudo: true, procedimentos_exames_cd_procedimento_laudoToprocedimentos: true } }, ds_status: true, ds_senha: true, dt_hora_senha: true,
             },
-            orderBy
+            orderBy, take: 1001
         });
+        if (agenda.length > 1000)
+            return reply.code(422).send({ error: 'Muitos atendimentos. Reduza o período ou refine os filtros.' });
         /*status
         5:Finalizado
         1:Cancelado

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { buscaPaciente, Paciente } from "@/services/api";
 import {
@@ -15,13 +15,19 @@ export function usePatientSearch(tipo: TipoBusca) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const sequence = useRef(0);
+
   const clearPatients = useCallback(() => {
+    sequence.current += 1;
+    setLoading(false);
     setPacientes([]);
     setError(null);
   }, []);
 
   const pesquisar = useCallback(
     async (valor: string) => {
+      const requestId = ++sequence.current;
+      setLoading(false);
       const term = (valor ?? "").toUpperCase().trim();
       const number = onlyNumbers(valor);
 
@@ -55,13 +61,15 @@ export function usePatientSearch(tipo: TipoBusca) {
               : { dt_nascimento: toISODateBR(number) }
         );
 
+        if (requestId !== sequence.current) return;
         setPacientes((result ?? []).map(normalizePaciente));
       } catch (err) {
+        if (requestId !== sequence.current) return;
         console.error("Erro ao pesquisar paciente:", err);
         setPacientes([]);
-        setError("Não foi possível buscar o paciente. Tente novamente.");
+        setError(err instanceof Error ? err.message : "Falha ao buscar paciente.");
       } finally {
-        setLoading(false);
+        if (requestId === sequence.current) setLoading(false);
       }
     },
     [tipo]

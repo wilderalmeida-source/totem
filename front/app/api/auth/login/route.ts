@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     safeEqual(username, usernameExpected) && safeEqual(password, passwordExpected)
   );
 
-  let authenticatedUser: { username: string; displayName?: string; mustChangePassword?: boolean; permissions?: string[] } | null = null;
+  let authenticatedUser: { username: string; displayName?: string; mustChangePassword?: boolean; permissions?: string[]; version?: string } | null = null;
   const apiBase = process.env.LINK_API_INTERNA;
   const apiToken = process.env.TOKEN_API_INT;
   if (!bootstrapValid && apiBase && apiToken) {
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ ok: true, mustChangePassword });
   response.cookies.set({
     name: ADMIN_SESSION_COOKIE,
-    value: await createAdminSession(authenticatedUser?.username ?? username, sessionSecret, mustChangePassword, authenticatedUser?.permissions ?? ['*']),
+    value: await createAdminSession(authenticatedUser?.username ?? username, sessionSecret, mustChangePassword, authenticatedUser?.permissions ?? ['*'], { source: bootstrapValid ? 'bootstrap' : 'database', version: authenticatedUser?.version }),
     httpOnly: true,
     secure: isSecureRequest(request),
     sameSite: "strict",

@@ -1,12 +1,12 @@
 import Fastify from "fastify";
+import { randomUUID } from 'node:crypto'
+import { auditContext, auditIdentifier, flowAudit } from './lib/flow-audit'
 import cors from "@fastify/cors"
 import fastifyStatic from '@fastify/static';
 import path from 'node:path';
 import { salaRoute } from "./routes/salas";
 import { medicosRoute } from "./routes/medicos";
 import { agendaRoute } from "./routes/agenda";
-import { documentosRoute } from "./routes/documentos";
-import { arquivoRoute } from "./routes/arquivo";
 import { pacientesRoute } from "./routes/pacientes";
 import { senhaRoute } from "./routes/senhas";
 import { modalidadesRoute } from "./routes/modalidades";
@@ -24,8 +24,19 @@ import { recepcoesModalidadesRoute } from "./routes/recepcoesModalidades";
 import { adminRoutes } from "./routes/admin";
 import { configuracoesTotemRoutes } from "./routes/configuracoes-totem";
 
+import { atendimentosTotemRoute } from './routes/atendimentos-totem';
+
 async function bootstrap() {
   const fastify = Fastify({ logger: true, })
+  fastify.addHook('onRequest', (request, _reply, done) => {
+    auditContext.run({ flowId: auditIdentifier(request.headers['x-flow-id']) ?? randomUUID(),
+      device: auditIdentifier(request.headers['x-device-id']) ?? 'nao_informado' }, done)
+  })
+  fastify.addHook('onResponse', async (request, reply) => {
+    if (!request.url.startsWith('/clinux/audit') && /^\/clinux\/(pacientes|totem|senhas|voice)/.test(request.url)) {
+      flowAudit('resposta_backend', request.url.split('?')[0], { status: reply.statusCode, durationMs: reply.elapsedTime })
+    }
+  })
   const frontendOrigins = (process.env.FRONTEND_ORIGINS ?? '')
     .split(',')
     .map((origin) => origin.trim())
@@ -57,8 +68,7 @@ async function bootstrap() {
   await fastify.register(salaRoute)
   await fastify.register(medicosRoute)
   await fastify.register(agendaRoute)
-  await fastify.register(documentosRoute)
-  await fastify.register(arquivoRoute)
+  await fastify.register(atendimentosTotemRoute)
   await fastify.register(pacientesRoute)
   await fastify.register(guichesRoute);
   await fastify.register(senhaRoute)

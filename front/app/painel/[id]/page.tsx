@@ -1,5 +1,6 @@
 "use client";
 
+import { auditTotem } from '@/lib/audit-client';
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import NowCard from "@/components/NowCard";
@@ -26,6 +27,7 @@ type WsMsg =
     painelId?: number;
     ts?: number;
     payload: {
+      traceId?: string;
       eventId?: string;
       eventID?: string;
       ttsBody: TtsBody;
@@ -81,12 +83,14 @@ type QueueItem =
   }
   | {
     kind: "tts-mp3";
+    traceId?: string;
     proxyUrl: string;
     key: string;
     enqueuedAt: number;
   }
   | {
     kind: "tts-speech";
+    traceId?: string;
     text: string;
     key: string;
     enqueuedAt: number;
@@ -178,7 +182,7 @@ export default function Page() {
     });
   }, []);
 
-  const playAudioUrl = useCallback((proxyUrl: string): Promise<void> => {
+  const playAudioUrl = useCallback((proxyUrl: string, traceId?: string): Promise<void> => {
     return new Promise((resolve) => {
       const audio = new Audio(proxyUrl);
       audio.preload = "auto";
@@ -195,9 +199,10 @@ export default function Page() {
     });
   }, []);
 
-  const speakText = useCallback((text: string): Promise<void> => {
+  const speakText = useCallback((text: string, traceId?: string): Promise<void> => {
     return new Promise((resolve) => {
       if (!window.speechSynthesis) {
+        auditTotem('audio_falhou', 'painel.speech', { traceId, code: 'SPEECH_UNAVAILABLE' });
         resolve();
         return;
       }
@@ -272,6 +277,9 @@ export default function Page() {
           }
 
           const audio = new Audio(item.proxyUrl);
+          audio.addEventListener('playing', () => auditTotem('audio_iniciado', 'painel.atencao', { code: 'AUDIO_PLAYING' }), { once: true });
+          audio.addEventListener('ended', () => auditTotem('audio_concluido', 'painel.atencao', { code: 'AUDIO_ENDED' }), { once: true });
+          audio.addEventListener('error', () => auditTotem('audio_falhou', 'painel.atencao', { code: 'AUDIO_MEDIA_ERROR' }), { once: true });
           audio.preload = "auto";
 
           await new Promise<void>((resolve) => {
@@ -290,7 +298,7 @@ export default function Page() {
           await new Promise<void>((resolve) => {
             audio.addEventListener("ended", () => resolve(), { once: true });
             audio.addEventListener("error", () => resolve(), { once: true });
-            audio.play().catch(() => resolve());
+            audio.play().catch(() => { auditTotem('audio_rejeitado', 'painel.atencao', { code: 'AUDIO_PLAY_FAILED' }); resolve(); });
           });
 
           if (currentTtsRef.current === audio) currentTtsRef.current = null;
@@ -328,10 +336,10 @@ export default function Page() {
           await playDing();
         } else if (item.kind === "tts-mp3") {
           await playDing();
-          await playAudioUrl(item.proxyUrl);
+          await playAudioUrl(item.proxyUrl, item.traceId);
         } else if (item.kind === "tts-speech") {
           await playDing();
-          await speakText(item.text);
+          await speakText(item.text, item.traceId);
         }
       } catch (err) {
         console.warn("Audio queue item error:", err);
@@ -442,7 +450,8 @@ export default function Page() {
         }
 
         if (isTtsAudioMsg(msg)) {
-          const { ttsBody, eventID, eventId } = msg.payload;
+          const { ttsBody, eventID, eventId, traceId } = msg.payload;
+          auditTotem('audio_evento_recebido', 'painel.websocket', { traceId, painelId: msg.painelId, code: 'AUDIO_EVENT_RECEIVED' });
           const id = eventID ?? eventId ?? "";
 
           if ("audioContent" in ttsBody) {
@@ -462,6 +471,7 @@ export default function Page() {
 
             enqueue({
               kind: "tts-mp3",
+              traceId,
               proxyUrl,
               key: String(id) || proxyUrl,
               enqueuedAt: Date.now(),
@@ -483,6 +493,7 @@ export default function Page() {
 
             enqueue({
               kind: "tts-speech",
+              traceId,
               text: ttsBody.errorTTS,
               key: String(id) || ttsBody.errorTTS,
               enqueuedAt: Date.now(),

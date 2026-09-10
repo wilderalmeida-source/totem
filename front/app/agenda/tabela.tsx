@@ -1,14 +1,11 @@
 'use client'
 import moment from "moment"
-import Image from 'next/image'
-import docsIcon from "../../assets/img/docs.svg"
 import ShortUniqueId from "short-unique-id"
 import { ReactElement, useCallback, useContext, useEffect, useState } from "react"
 import { format } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import Documentos from "../../components/document"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -44,7 +41,17 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
     setSem(null)
 
     const filtros: AtendimentoFiltro = { buscaMedic, buscaSala, buscaPaciente, buscaStatus, date }
-    const dados: Atendimento[] = await buscaAtendimentos(filtros)
+    let dados: Atendimento[]
+    try {
+      dados = await buscaAtendimentos(filtros)
+    } catch (error) {
+      setTr([])
+      setCountCancelados(0)
+      setCountFinalizados(0)
+      setCountAgendados(0)
+      setSem(error instanceof Error ? error.message : 'Falha ao buscar agenda.')
+      return
+    }
 
     if (!dados || dados.length < 1) {
       setSem('Não possui agenda')
@@ -104,14 +111,6 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
           <td className="px-3 py-2 max-w-24">{status}</td>
           <td className="px-3 py-2 max-w-24">{procedimeto.ds_senha}</td>
           <td className="px-3 py-2 max-w-24">{procedimeto.dt_hora_senha?.slice(11, 16)}</td>
-          <td className="px-3 py-2 max-w-24">
-            <Popover>
-              <PopoverTrigger><Image src={docsIcon} alt="Scanner" /></PopoverTrigger>
-              <PopoverContent className="flex flex-1 flex-col">
-                <Documentos numero={procedimeto.cd_atendimento} />
-              </PopoverContent>
-            </Popover>
-          </td>
         </tr>
       )
     })
@@ -253,7 +252,6 @@ export function Table({ listMedicos, ListSalas }: SelectProps) {
                 <th className="pl-3 py-3">Status</th>
                 <th className="pl-3 py-3">Senha</th>
                 <th className="pl-3 py-3">Hora Senha</th>
-                <th className="pl-3 py-3">Açoes</th>
               </tr>
             </thead>
             <tbody className="h-4 bg-gray-200">

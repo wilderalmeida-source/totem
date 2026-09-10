@@ -1,11 +1,12 @@
 'use client'
 
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Base from '@/components/ui/base'
 import { buscaModalidades, Modalidade, Paciente, Atendimento } from '@/services/api'
 import { modalContext } from '@/components/modals/providers'
 import { auditTotem } from '@/lib/audit-client'
+import { endPatientSession } from '@/lib/patient-session-client'
 
 interface PacienteModalidadeStorage {
   dados: Paciente | null
@@ -32,6 +33,8 @@ export default function ModalidadePage() {
 
   const [modalidades, setModalidades] = useState<Modalidade[]>([])
   const [loading, setLoadingPage] = useState(true)
+  const [saindo, setSaindo] = useState(false)
+  const saindoRef = useRef(false)
   const [pacienteStorage, setPacienteStorage] =
     useState<PacienteModalidadeStorage | null>(null)
 
@@ -95,10 +98,25 @@ export default function ModalidadePage() {
     setShowModal(true)
   }
 
-  function voltar() {
-    sessionStorage.removeItem('pacienteModalidade')
-    router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
+  async function voltar() {
+    if (saindoRef.current) return
+    saindoRef.current = true
+    setSaindo(true)
+    setPacienteStorage(null)
+    setShowModal(false)
+    setDados(null)
+    setExames(null)
+    setTentativas(null)
+    setInvalido(null)
+    try {
+      await endPatientSession('voltar_modalidades')
+      router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
+    } catch {
+      window.location.replace('/')
+    }
   }
+
+  if (saindo) return <div role="status">Encerrando atendimento...</div>
 
   return (
     <Base>

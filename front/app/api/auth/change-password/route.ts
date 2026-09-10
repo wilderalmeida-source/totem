@@ -30,6 +30,6 @@ export async function POST(request: NextRequest) {
   }).catch(() => undefined)
 
   const response = NextResponse.json({ ok: true })
-  response.cookies.set({ name: ADMIN_SESSION_COOKIE, value: await createAdminSession(session.sub, secret, false, session.permissions), httpOnly: true, secure: request.headers.get('x-forwarded-proto') === 'https' || request.nextUrl.protocol === 'https:', sameSite: 'strict', path: '/', maxAge: ADMIN_SESSION_TTL_SECONDS })
+  response.cookies.set({ name: ADMIN_SESSION_COOKIE, value: await createAdminSession(session.sub, secret, false, result.permissions, { source: 'database', version: result.version }), httpOnly: true, secure: request.headers.get('x-forwarded-proto') === 'https' || request.nextUrl.protocol === 'https:', sameSite: 'strict', path: '/', maxAge: ADMIN_SESSION_TTL_SECONDS })
   return response
 }
