@@ -10,6 +10,7 @@ export default function LogsPage() {
   const [flow, setFlow] = useState('')
   const [device, setDevice] = useState('')
   const [label, setLabel] = useState('')
+  const [filters, setFilters] = useState({ flow: '', device: '' })
   const [refresh, setRefresh] = useState(0)
   const [error, setError] = useState('')
   useEffect(() => { setLabel(localStorage.getItem('totemDeviceLabel') ?? '') }, [])
@@ -17,17 +18,17 @@ export default function LogsPage() {
   useEffect(() => {
     let cancelled = false
     setLoading(true); setError(''); setItems([])
-    const params = new URLSearchParams({ limit: '200', ...(group ? { group } : {}), ...(category ? { category } : {}), ...(flow ? { flow } : {}), ...(device ? { device } : {}) })
+    const params = new URLSearchParams({ limit: '200', ...(group ? { group } : {}), ...(category ? { category } : {}), ...(filters.flow ? { flow: filters.flow } : {}), ...(filters.device ? { device: filters.device } : {}) })
     fetch('/api/backend/clinux/audit?' + params, { cache: 'no-store' }).then(async response => {
       if (!response.ok) throw Error('Nao foi possivel consultar os logs.')
       const data = await response.json(); if (!cancelled) setItems(data.items ?? [])
     }).catch(() => { if (!cancelled) setError('Nao foi possivel consultar os logs. Atualize ou entre novamente.') }).finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
-  }, [category, group, refresh])
+  }, [category, group, refresh, filters])
 
   return <main className="min-h-screen bg-slate-100 p-6 md:p-10"><div className="mx-auto max-w-7xl">
     <div className="mb-8"><p className="font-bold uppercase tracking-widest text-blue-600">Auditoria</p><h1 className="text-3xl font-bold">Logs do sistema</h1></div>
-    <form className="mb-5 flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); setRefresh(value => value + 1) }}>
+    <form className="mb-5 flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); setFilters({ flow, device }); setRefresh(value => value + 1) }}>
       <input className="rounded border p-2" aria-label="ID do fluxo" placeholder="ID do fluxo ou chamada" value={flow} onChange={event => setFlow(event.target.value)} />
       <input className="rounded border p-2" aria-label="ID do equipamento" placeholder="ID do equipamento" value={device} onChange={event => setDevice(event.target.value)} />
       <button className="rounded bg-blue-600 p-2 text-white">Buscar / Atualizar</button>

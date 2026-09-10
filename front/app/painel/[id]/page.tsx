@@ -193,9 +193,10 @@ export default function Page() {
         resolve();
       };
 
-      audio.addEventListener("ended", done, { once: true });
-      audio.addEventListener("error", done, { once: true });
-      audio.play().catch(done);
+      audio.addEventListener('playing', () => auditTotem('audio_iniciado', 'painel.audio', { traceId, code: 'AUDIO_PLAYING' }), { once: true });
+      audio.addEventListener('ended', () => { auditTotem('audio_concluido', 'painel.audio', { traceId, code: 'AUDIO_ENDED' }); done(); }, { once: true });
+      audio.addEventListener('error', () => { auditTotem('audio_falhou', 'painel.audio', { traceId, code: 'AUDIO_MEDIA_ERROR', mediaCode: audio.error?.code }); done(); }, { once: true });
+      audio.play().catch(error => { auditTotem('audio_rejeitado', 'painel.audio', { traceId, code: error?.name === 'NotAllowedError' ? 'AUDIO_AUTOPLAY_BLOCKED' : 'AUDIO_PLAY_FAILED' }); done(); });
     });
   }, []);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import OrbitProgress from "react-loading-indicator";
 import {
@@ -215,7 +215,7 @@ export function DialogPatient({
     aberturaRegistradaRef.current = true;
   }, [showModal, dados]);
 
-  const finalizarAtendimento = async () => {
+  const finalizarAtendimento = useCallback(async () => {
     processandoRef.current = false;
     setLoading(false);
     setConfirmacaoRecepcao(null);
@@ -225,7 +225,7 @@ export function DialogPatient({
     setExames(null);
     try { await endPatientSession(falhaEmissao ? 'falha_emissao' : confirmacaoRecepcao ? 'sucesso' : 'fechamento_modal'); } catch { /* A tela inicial bloqueia até concluir a limpeza. */ }
     window.location.replace('/');
-  };
+  }, [falhaEmissao, confirmacaoRecepcao, setLoading, setShowModal, setDados, setExames]);
 
   const irParaInicio = () => {
     setTimeout(finalizarAtendimento, 600);
@@ -247,7 +247,7 @@ export function DialogPatient({
       window.clearInterval(contador);
       window.clearTimeout(fechamentoAutomatico);
     };
-  }, [confirmacaoRecepcao, falhaEmissao]);
+  }, [confirmacaoRecepcao, falhaEmissao, finalizarAtendimento]);
 
   const gerarSenha = async (valorQR: string | null = null) => {
     if (falhaEmissao) return;
@@ -330,7 +330,7 @@ export function DialogPatient({
       cd_modalidade: cdModalidade || undefined,
       onPatientRegistered: (patient) => setDados(current => current ? { ...current, ...patient } : current),
       });
-    } catch (error) {
+    } catch {
       processandoRef.current = false;
       setLoading(false);
       setFalhaEmissao(true);
