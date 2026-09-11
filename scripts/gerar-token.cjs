@@ -86,7 +86,9 @@ async function main() {
 }
 
 module.exports = { updateEnv };
-if (require.main === module) main().catch(() => {
-  console.error('Nao foi possivel concluir. Verifique o backend, ADMIN_SECRET e permissoes. Em caso de falha de gravacao, confira os backups antes de usar os arquivos.');
+if (require.main === module) main().catch((error) => {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.error('Nao foi possivel concluir: ' + detail);
+  console.error('Verifique o backend, ADMIN_SECRET e permissoes. Em caso de falha de gravacao, confira os backups antes de usar os arquivos.');
   process.exitCode = 1;
 });
