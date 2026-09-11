@@ -3,7 +3,7 @@ import { z } from "zod"
 import { prisma } from '../../config/prismaDB'
 import type { Prisma } from '../../prisma/app/generated/prisma/client'
 
-import { birthDate, cpf, patientName, positiveId, prefixName, SEARCH_LIMIT, REFINE_SEARCH } from '../lib/search-validation'
+import { birthDate, cpf, patientName, positiveId, prefixName, SEARCH_LIMIT } from '../lib/search-validation'
 import { describePatientInput, patientDiagnostic } from '../lib/patient-diagnostics'
 import { identificationAttempts } from '../lib/identification-attempts'
 
@@ -154,7 +154,10 @@ export async function pacientesRoute(fastify: FastifyInstance) {
       correspondenciasNomeCompleto: input.tipo === 'NOME' || input.tipo === 'NOMEDATA'
         ? pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === input.ds_paciente.trim().toUpperCase()).length : undefined,
       amostra: pacientes.slice(0, 10).map(p => describePatientInput(p)), amostraLimitada: retornados > 10 })
-    if (pacientes.length > SEARCH_LIMIT) return reply.code(422).send({ error: REFINE_SEARCH })
+    if (pacientes.length > SEARCH_LIMIT) {
+      pacientes = pacientes.slice(0, SEARCH_LIMIT)
+      reply.header('X-Result-Truncated', 'true')
+    }
     if (input.tipo === 'NOME' || input.tipo === 'NOMEDATA') {
       const nome = input.ds_paciente.trim().toUpperCase()
       pacientes = pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === nome)

@@ -156,8 +156,10 @@ async function pacientesRoute(fastify) {
             correspondenciasNomeCompleto: input.tipo === 'NOME' || input.tipo === 'NOMEDATA'
                 ? pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === input.ds_paciente.trim().toUpperCase()).length : undefined,
             amostra: pacientes.slice(0, 10).map(p => (0, patient_diagnostics_1.describePatientInput)(p)), amostraLimitada: retornados > 10 });
-        if (pacientes.length > search_validation_1.SEARCH_LIMIT)
-            return reply.code(422).send({ error: search_validation_1.REFINE_SEARCH });
+        if (pacientes.length > search_validation_1.SEARCH_LIMIT) {
+            pacientes = pacientes.slice(0, search_validation_1.SEARCH_LIMIT);
+            reply.header('X-Result-Truncated', 'true');
+        }
         if (input.tipo === 'NOME' || input.tipo === 'NOMEDATA') {
             const nome = input.ds_paciente.trim().toUpperCase();
             pacientes = pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === nome);
