@@ -27,6 +27,7 @@ const guiche_1 = require("./routes/guiche");
 const paineis_config_1 = require("./routes/paineis-config");
 const recepcoesModalidades_1 = require("./routes/recepcoesModalidades");
 const admin_1 = require("./routes/admin");
+const totem_access_1 = require("./routes/totem-access");
 const configuracoes_totem_1 = require("./routes/configuracoes-totem");
 const atendimentos_totem_1 = require("./routes/atendimentos-totem");
 async function bootstrap() {
@@ -78,6 +79,7 @@ async function bootstrap() {
     await fastify.register(paineis_config_1.configuracaoPaineisRoutes);
     await fastify.register(recepcoesModalidades_1.recepcoesModalidadesRoute);
     await fastify.register(admin_1.adminRoutes);
+    await fastify.register(totem_access_1.totemAccessRoutes);
     await fastify.register(configuracoes_totem_1.configuracoesTotemRoutes);
     await fastify.register(websocket_1.default);
     await fastify.register(pgNotify_1.default, { channel: "db_atendimentos_senhas", logRawPayload: false, });

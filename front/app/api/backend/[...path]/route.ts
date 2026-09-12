@@ -1,4 +1,5 @@
 import { auditServer } from '@/lib/flow-audit-server';
+import { requireTotemOperator } from '@/lib/require-totem-operator';
 import { NextRequest, NextResponse } from "next/server";
 import { ADMIN_SESSION_COOKIE, readAdminSession } from "@/lib/admin-session";
 import { PATIENT_SESSION_COOKIE } from '@/lib/patient-session-config';
@@ -68,6 +69,10 @@ async function proxy(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: 'Rota não permitida.' }, { status: 404 });
   }
   const pathname = `/${segments.join("/")}`;
+  if (/^\/clinux\/(pacientes|totem)(\/|$)/.test(pathname) || (pathname === '/clinux/senhas' && request.method !== 'GET')) {
+    const denied = await requireTotemOperator(request);
+    if (denied) return denied;
+  }
   if (!pathAllowed(pathname)) {
     return NextResponse.json({ error: "Rota não permitida." }, { status: 404 });
   }

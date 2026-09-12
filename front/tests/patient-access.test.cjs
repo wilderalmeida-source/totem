@@ -15,6 +15,7 @@ function load(file, session, calls) {
     process: { env: { LINK_API_INTERNA: 'http://backend:5000', TOKEN_API_INT: 'test-token', SESSION_SECRET: 'test-secret' } },
     require: name => name === 'next/server' ? require(name) : {
       auditServer: () => {},
+      requireTotemOperator: async () => null,
       ADMIN_SESSION_COOKIE: 'session', readAdminSession: async () => session,
       PATIENT_SESSION_COOKIE: 'patient-session', readPatientSession: () => null,
     },

@@ -35,6 +35,7 @@ function environment() {
     const source = fs.readFileSync(filename, 'utf8');
     const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
     const localRequire = name => {
+      if (name === '@/lib/require-totem-operator') return { requireTotemOperator: async () => null };
       if (name.startsWith('@/')) return load(name.slice(2) + '.ts');
       if (name.startsWith('.')) return load(path.resolve(path.dirname(filename), name) + '.ts');
       return require(name);

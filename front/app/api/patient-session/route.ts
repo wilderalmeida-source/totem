@@ -1,4 +1,5 @@
 import { auditServer } from '@/lib/flow-audit-server'
+import { requireTotemOperator } from '@/lib/require-totem-operator'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { PATIENT_SESSION_COOKIE } from '@/lib/patient-session-config'
@@ -20,6 +21,8 @@ const confirmation = z.discriminatedUnion('tipo', [
 ])
 
 export async function POST(request: NextRequest) {
+  const denied = await requireTotemOperator(request)
+  if (denied) return denied
   if (!sameOrigin(request)) return patientJson({ error: 'Origem inválida.' }, 403)
   revokePatientSession(request.cookies.get(PATIENT_SESSION_COOKIE)?.value)
   const fail = (error: string, status: number) => sessionCookie(request, patientJson({ error }, status))
@@ -64,11 +67,15 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const denied = await requireTotemOperator(request)
+  if (denied) return denied
   const session = readPatientSession(request.cookies.get(PATIENT_SESSION_COOKIE)?.value)
   return session ? patientJson({ expiresAt: session.expiresAt, absoluteExpiresAt: session.absoluteExpiresAt }) : patientJson({ error: 'Identifique o paciente novamente.' }, 401)
 }
 
 export async function PATCH(request: NextRequest) {
+  const denied = await requireTotemOperator(request)
+  if (denied) return denied
   if (!sameOrigin(request)) return patientJson({ error: 'Origem inválida.' }, 403)
   const session = touchPatientSession(request.cookies.get(PATIENT_SESSION_COOKIE)?.value)
   return session ? patientJson({ expiresAt: session.expiresAt, absoluteExpiresAt: session.absoluteExpiresAt }) : patientJson({ error: 'Identifique o paciente novamente.' }, 401)

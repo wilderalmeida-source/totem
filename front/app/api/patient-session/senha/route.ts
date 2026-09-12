@@ -1,4 +1,5 @@
 import { auditServer } from '@/lib/flow-audit-server'
+import { requireTotemOperator } from '@/lib/require-totem-operator'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { PATIENT_SESSION_COOKIE } from '@/lib/patient-session-config'
@@ -14,6 +15,8 @@ const schema = z.object({
 }).strict()
 
 export async function POST(request: NextRequest) {
+  const denied = await requireTotemOperator(request)
+  if (denied) return denied
   if (!sameOrigin(request)) return patientJson({ error: 'Origem inválida.' }, 403)
   const token = request.cookies.get(PATIENT_SESSION_COOKIE)?.value
   const session = readPatientSession(token)

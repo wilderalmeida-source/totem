@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import AdminRouteFrame from "@/components/admin/AdminRouteFrame";
 import PatientSessionGuard from '@/components/totem/PatientSessionGuard';
+import OperatorSessionGuard from '@/components/totem/OperatorSessionGuard';
 
 // fontes locais
 const geistSans = localFont({
@@ -39,7 +40,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
       >
-        <PatientSessionGuard><AdminRouteFrame>{children}</AdminRouteFrame></PatientSessionGuard>
+        <OperatorSessionGuard><PatientSessionGuard><AdminRouteFrame>{children}</AdminRouteFrame></PatientSessionGuard></OperatorSessionGuard>
       </body>
     </html>
   );

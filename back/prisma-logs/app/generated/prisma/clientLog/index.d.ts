@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model TotemSenhaCounter
+ * 
+ */
+export type TotemSenhaCounter = $Result.DefaultSelection<Prisma.$TotemSenhaCounterPayload>
+/**
  * Model TtsDailyUsage
  * 
  */
@@ -84,6 +89,26 @@ export type configuracao_midia = $Result.DefaultSelection<Prisma.$configuracao_m
  */
 export type AdminUser = $Result.DefaultSelection<Prisma.$AdminUserPayload>
 /**
+ * Model TotemAccessSettings
+ * 
+ */
+export type TotemAccessSettings = $Result.DefaultSelection<Prisma.$TotemAccessSettingsPayload>
+/**
+ * Model TotemOperator
+ * 
+ */
+export type TotemOperator = $Result.DefaultSelection<Prisma.$TotemOperatorPayload>
+/**
+ * Model TotemOperatorSession
+ * 
+ */
+export type TotemOperatorSession = $Result.DefaultSelection<Prisma.$TotemOperatorSessionPayload>
+/**
+ * Model TotemLoginAttempt
+ * 
+ */
+export type TotemLoginAttempt = $Result.DefaultSelection<Prisma.$TotemLoginAttemptPayload>
+/**
  * Model AuditLog
  * 
  */
@@ -98,8 +123,8 @@ export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more TtsDailyUsages
- * const ttsDailyUsages = await prisma.ttsDailyUsage.findMany()
+ * // Fetch zero or more TotemSenhaCounters
+ * const totemSenhaCounters = await prisma.totemSenhaCounter.findMany()
  * ```
  *
  *
@@ -121,8 +146,8 @@ export class PrismaClient<
    * const prisma = new PrismaClient({
    *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
    * })
-   * // Fetch zero or more TtsDailyUsages
-   * const ttsDailyUsages = await prisma.ttsDailyUsage.findMany()
+   * // Fetch zero or more TotemSenhaCounters
+   * const totemSenhaCounters = await prisma.totemSenhaCounter.findMany()
    * ```
    *
    *
@@ -211,6 +236,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.totemSenhaCounter`: Exposes CRUD operations for the **TotemSenhaCounter** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TotemSenhaCounters
+    * const totemSenhaCounters = await prisma.totemSenhaCounter.findMany()
+    * ```
+    */
+  get totemSenhaCounter(): Prisma.TotemSenhaCounterDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.ttsDailyUsage`: Exposes CRUD operations for the **TtsDailyUsage** model.
     * Example usage:
     * ```ts
@@ -349,6 +384,46 @@ export class PrismaClient<
     * ```
     */
   get adminUser(): Prisma.AdminUserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.totemAccessSettings`: Exposes CRUD operations for the **TotemAccessSettings** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TotemAccessSettings
+    * const totemAccessSettings = await prisma.totemAccessSettings.findMany()
+    * ```
+    */
+  get totemAccessSettings(): Prisma.TotemAccessSettingsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.totemOperator`: Exposes CRUD operations for the **TotemOperator** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TotemOperators
+    * const totemOperators = await prisma.totemOperator.findMany()
+    * ```
+    */
+  get totemOperator(): Prisma.TotemOperatorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.totemOperatorSession`: Exposes CRUD operations for the **TotemOperatorSession** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TotemOperatorSessions
+    * const totemOperatorSessions = await prisma.totemOperatorSession.findMany()
+    * ```
+    */
+  get totemOperatorSession(): Prisma.TotemOperatorSessionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.totemLoginAttempt`: Exposes CRUD operations for the **TotemLoginAttempt** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TotemLoginAttempts
+    * const totemLoginAttempts = await prisma.totemLoginAttempt.findMany()
+    * ```
+    */
+  get totemLoginAttempt(): Prisma.TotemLoginAttemptDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.auditLog`: Exposes CRUD operations for the **AuditLog** model.
@@ -793,6 +868,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    TotemSenhaCounter: 'TotemSenhaCounter',
     TtsDailyUsage: 'TtsDailyUsage',
     TtsWeekVoice: 'TtsWeekVoice',
     TtsSettings: 'TtsSettings',
@@ -807,6 +883,10 @@ export namespace Prisma {
     configuracao_atraso: 'configuracao_atraso',
     configuracao_midia: 'configuracao_midia',
     AdminUser: 'AdminUser',
+    TotemAccessSettings: 'TotemAccessSettings',
+    TotemOperator: 'TotemOperator',
+    TotemOperatorSession: 'TotemOperatorSession',
+    TotemLoginAttempt: 'TotemLoginAttempt',
     AuditLog: 'AuditLog'
   };
 
@@ -823,10 +903,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches" | "recepcoes_modalidades" | "configuracao_atraso" | "configuracao_midia" | "adminUser" | "auditLog"
+      modelProps: "totemSenhaCounter" | "ttsDailyUsage" | "ttsWeekVoice" | "ttsSettings" | "ttsVoiceOverride" | "nameDictionary" | "ttsVoiceTest" | "ttsEvent" | "token" | "configuracao_painel" | "guiches" | "recepcoes_modalidades" | "configuracao_atraso" | "configuracao_midia" | "adminUser" | "totemAccessSettings" | "totemOperator" | "totemOperatorSession" | "totemLoginAttempt" | "auditLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      TotemSenhaCounter: {
+        payload: Prisma.$TotemSenhaCounterPayload<ExtArgs>
+        fields: Prisma.TotemSenhaCounterFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TotemSenhaCounterFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TotemSenhaCounterFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>
+          }
+          findFirst: {
+            args: Prisma.TotemSenhaCounterFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TotemSenhaCounterFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>
+          }
+          findMany: {
+            args: Prisma.TotemSenhaCounterFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>[]
+          }
+          create: {
+            args: Prisma.TotemSenhaCounterCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>
+          }
+          createMany: {
+            args: Prisma.TotemSenhaCounterCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TotemSenhaCounterCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>[]
+          }
+          delete: {
+            args: Prisma.TotemSenhaCounterDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>
+          }
+          update: {
+            args: Prisma.TotemSenhaCounterUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>
+          }
+          deleteMany: {
+            args: Prisma.TotemSenhaCounterDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TotemSenhaCounterUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TotemSenhaCounterUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>[]
+          }
+          upsert: {
+            args: Prisma.TotemSenhaCounterUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemSenhaCounterPayload>
+          }
+          aggregate: {
+            args: Prisma.TotemSenhaCounterAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTotemSenhaCounter>
+          }
+          groupBy: {
+            args: Prisma.TotemSenhaCounterGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TotemSenhaCounterGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TotemSenhaCounterCountArgs<ExtArgs>
+            result: $Utils.Optional<TotemSenhaCounterCountAggregateOutputType> | number
+          }
+        }
+      }
       TtsDailyUsage: {
         payload: Prisma.$TtsDailyUsagePayload<ExtArgs>
         fields: Prisma.TtsDailyUsageFieldRefs
@@ -1863,6 +2017,302 @@ export namespace Prisma {
           }
         }
       }
+      TotemAccessSettings: {
+        payload: Prisma.$TotemAccessSettingsPayload<ExtArgs>
+        fields: Prisma.TotemAccessSettingsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TotemAccessSettingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TotemAccessSettingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>
+          }
+          findFirst: {
+            args: Prisma.TotemAccessSettingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TotemAccessSettingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>
+          }
+          findMany: {
+            args: Prisma.TotemAccessSettingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>[]
+          }
+          create: {
+            args: Prisma.TotemAccessSettingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>
+          }
+          createMany: {
+            args: Prisma.TotemAccessSettingsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TotemAccessSettingsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>[]
+          }
+          delete: {
+            args: Prisma.TotemAccessSettingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>
+          }
+          update: {
+            args: Prisma.TotemAccessSettingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>
+          }
+          deleteMany: {
+            args: Prisma.TotemAccessSettingsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TotemAccessSettingsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TotemAccessSettingsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>[]
+          }
+          upsert: {
+            args: Prisma.TotemAccessSettingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemAccessSettingsPayload>
+          }
+          aggregate: {
+            args: Prisma.TotemAccessSettingsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTotemAccessSettings>
+          }
+          groupBy: {
+            args: Prisma.TotemAccessSettingsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TotemAccessSettingsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TotemAccessSettingsCountArgs<ExtArgs>
+            result: $Utils.Optional<TotemAccessSettingsCountAggregateOutputType> | number
+          }
+        }
+      }
+      TotemOperator: {
+        payload: Prisma.$TotemOperatorPayload<ExtArgs>
+        fields: Prisma.TotemOperatorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TotemOperatorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TotemOperatorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>
+          }
+          findFirst: {
+            args: Prisma.TotemOperatorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TotemOperatorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>
+          }
+          findMany: {
+            args: Prisma.TotemOperatorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>[]
+          }
+          create: {
+            args: Prisma.TotemOperatorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>
+          }
+          createMany: {
+            args: Prisma.TotemOperatorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TotemOperatorCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>[]
+          }
+          delete: {
+            args: Prisma.TotemOperatorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>
+          }
+          update: {
+            args: Prisma.TotemOperatorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>
+          }
+          deleteMany: {
+            args: Prisma.TotemOperatorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TotemOperatorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TotemOperatorUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>[]
+          }
+          upsert: {
+            args: Prisma.TotemOperatorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorPayload>
+          }
+          aggregate: {
+            args: Prisma.TotemOperatorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTotemOperator>
+          }
+          groupBy: {
+            args: Prisma.TotemOperatorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TotemOperatorGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TotemOperatorCountArgs<ExtArgs>
+            result: $Utils.Optional<TotemOperatorCountAggregateOutputType> | number
+          }
+        }
+      }
+      TotemOperatorSession: {
+        payload: Prisma.$TotemOperatorSessionPayload<ExtArgs>
+        fields: Prisma.TotemOperatorSessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TotemOperatorSessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TotemOperatorSessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>
+          }
+          findFirst: {
+            args: Prisma.TotemOperatorSessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TotemOperatorSessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>
+          }
+          findMany: {
+            args: Prisma.TotemOperatorSessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>[]
+          }
+          create: {
+            args: Prisma.TotemOperatorSessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>
+          }
+          createMany: {
+            args: Prisma.TotemOperatorSessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TotemOperatorSessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>[]
+          }
+          delete: {
+            args: Prisma.TotemOperatorSessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>
+          }
+          update: {
+            args: Prisma.TotemOperatorSessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.TotemOperatorSessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TotemOperatorSessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TotemOperatorSessionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>[]
+          }
+          upsert: {
+            args: Prisma.TotemOperatorSessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemOperatorSessionPayload>
+          }
+          aggregate: {
+            args: Prisma.TotemOperatorSessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTotemOperatorSession>
+          }
+          groupBy: {
+            args: Prisma.TotemOperatorSessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TotemOperatorSessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TotemOperatorSessionCountArgs<ExtArgs>
+            result: $Utils.Optional<TotemOperatorSessionCountAggregateOutputType> | number
+          }
+        }
+      }
+      TotemLoginAttempt: {
+        payload: Prisma.$TotemLoginAttemptPayload<ExtArgs>
+        fields: Prisma.TotemLoginAttemptFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TotemLoginAttemptFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TotemLoginAttemptFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>
+          }
+          findFirst: {
+            args: Prisma.TotemLoginAttemptFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TotemLoginAttemptFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>
+          }
+          findMany: {
+            args: Prisma.TotemLoginAttemptFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>[]
+          }
+          create: {
+            args: Prisma.TotemLoginAttemptCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>
+          }
+          createMany: {
+            args: Prisma.TotemLoginAttemptCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TotemLoginAttemptCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>[]
+          }
+          delete: {
+            args: Prisma.TotemLoginAttemptDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>
+          }
+          update: {
+            args: Prisma.TotemLoginAttemptUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>
+          }
+          deleteMany: {
+            args: Prisma.TotemLoginAttemptDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TotemLoginAttemptUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TotemLoginAttemptUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>[]
+          }
+          upsert: {
+            args: Prisma.TotemLoginAttemptUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotemLoginAttemptPayload>
+          }
+          aggregate: {
+            args: Prisma.TotemLoginAttemptAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTotemLoginAttempt>
+          }
+          groupBy: {
+            args: Prisma.TotemLoginAttemptGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TotemLoginAttemptGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TotemLoginAttemptCountArgs<ExtArgs>
+            result: $Utils.Optional<TotemLoginAttemptCountAggregateOutputType> | number
+          }
+        }
+      }
       AuditLog: {
         payload: Prisma.$AuditLogPayload<ExtArgs>
         fields: Prisma.AuditLogFieldRefs
@@ -2045,6 +2495,7 @@ export namespace Prisma {
     comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
+    totemSenhaCounter?: TotemSenhaCounterOmit
     ttsDailyUsage?: TtsDailyUsageOmit
     ttsWeekVoice?: TtsWeekVoiceOmit
     ttsSettings?: TtsSettingsOmit
@@ -2059,6 +2510,10 @@ export namespace Prisma {
     configuracao_atraso?: configuracao_atrasoOmit
     configuracao_midia?: configuracao_midiaOmit
     adminUser?: AdminUserOmit
+    totemAccessSettings?: TotemAccessSettingsOmit
+    totemOperator?: TotemOperatorOmit
+    totemOperatorSession?: TotemOperatorSessionOmit
+    totemLoginAttempt?: TotemLoginAttemptOmit
     auditLog?: AuditLogOmit
   }
 
@@ -2135,10 +2590,1035 @@ export namespace Prisma {
    */
 
 
+  /**
+   * Count Type TotemOperatorCountOutputType
+   */
+
+  export type TotemOperatorCountOutputType = {
+    sessions: number
+  }
+
+  export type TotemOperatorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    sessions?: boolean | TotemOperatorCountOutputTypeCountSessionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TotemOperatorCountOutputType without action
+   */
+  export type TotemOperatorCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorCountOutputType
+     */
+    select?: TotemOperatorCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TotemOperatorCountOutputType without action
+   */
+  export type TotemOperatorCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotemOperatorSessionWhereInput
+  }
+
 
   /**
    * Models
    */
+
+  /**
+   * Model TotemSenhaCounter
+   */
+
+  export type AggregateTotemSenhaCounter = {
+    _count: TotemSenhaCounterCountAggregateOutputType | null
+    _avg: TotemSenhaCounterAvgAggregateOutputType | null
+    _sum: TotemSenhaCounterSumAggregateOutputType | null
+    _min: TotemSenhaCounterMinAggregateOutputType | null
+    _max: TotemSenhaCounterMaxAggregateOutputType | null
+  }
+
+  export type TotemSenhaCounterAvgAggregateOutputType = {
+    number: number | null
+  }
+
+  export type TotemSenhaCounterSumAggregateOutputType = {
+    number: number | null
+  }
+
+  export type TotemSenhaCounterMinAggregateOutputType = {
+    date: Date | null
+    number: number | null
+  }
+
+  export type TotemSenhaCounterMaxAggregateOutputType = {
+    date: Date | null
+    number: number | null
+  }
+
+  export type TotemSenhaCounterCountAggregateOutputType = {
+    date: number
+    number: number
+    _all: number
+  }
+
+
+  export type TotemSenhaCounterAvgAggregateInputType = {
+    number?: true
+  }
+
+  export type TotemSenhaCounterSumAggregateInputType = {
+    number?: true
+  }
+
+  export type TotemSenhaCounterMinAggregateInputType = {
+    date?: true
+    number?: true
+  }
+
+  export type TotemSenhaCounterMaxAggregateInputType = {
+    date?: true
+    number?: true
+  }
+
+  export type TotemSenhaCounterCountAggregateInputType = {
+    date?: true
+    number?: true
+    _all?: true
+  }
+
+  export type TotemSenhaCounterAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemSenhaCounter to aggregate.
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemSenhaCounters to fetch.
+     */
+    orderBy?: TotemSenhaCounterOrderByWithRelationInput | TotemSenhaCounterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TotemSenhaCounterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemSenhaCounters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemSenhaCounters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TotemSenhaCounters
+    **/
+    _count?: true | TotemSenhaCounterCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TotemSenhaCounterAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TotemSenhaCounterSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TotemSenhaCounterMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TotemSenhaCounterMaxAggregateInputType
+  }
+
+  export type GetTotemSenhaCounterAggregateType<T extends TotemSenhaCounterAggregateArgs> = {
+        [P in keyof T & keyof AggregateTotemSenhaCounter]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTotemSenhaCounter[P]>
+      : GetScalarType<T[P], AggregateTotemSenhaCounter[P]>
+  }
+
+
+
+
+  export type TotemSenhaCounterGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotemSenhaCounterWhereInput
+    orderBy?: TotemSenhaCounterOrderByWithAggregationInput | TotemSenhaCounterOrderByWithAggregationInput[]
+    by: TotemSenhaCounterScalarFieldEnum[] | TotemSenhaCounterScalarFieldEnum
+    having?: TotemSenhaCounterScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TotemSenhaCounterCountAggregateInputType | true
+    _avg?: TotemSenhaCounterAvgAggregateInputType
+    _sum?: TotemSenhaCounterSumAggregateInputType
+    _min?: TotemSenhaCounterMinAggregateInputType
+    _max?: TotemSenhaCounterMaxAggregateInputType
+  }
+
+  export type TotemSenhaCounterGroupByOutputType = {
+    date: Date
+    number: number
+    _count: TotemSenhaCounterCountAggregateOutputType | null
+    _avg: TotemSenhaCounterAvgAggregateOutputType | null
+    _sum: TotemSenhaCounterSumAggregateOutputType | null
+    _min: TotemSenhaCounterMinAggregateOutputType | null
+    _max: TotemSenhaCounterMaxAggregateOutputType | null
+  }
+
+  type GetTotemSenhaCounterGroupByPayload<T extends TotemSenhaCounterGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TotemSenhaCounterGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TotemSenhaCounterGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TotemSenhaCounterGroupByOutputType[P]>
+            : GetScalarType<T[P], TotemSenhaCounterGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TotemSenhaCounterSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    date?: boolean
+    number?: boolean
+  }, ExtArgs["result"]["totemSenhaCounter"]>
+
+  export type TotemSenhaCounterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    date?: boolean
+    number?: boolean
+  }, ExtArgs["result"]["totemSenhaCounter"]>
+
+  export type TotemSenhaCounterSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    date?: boolean
+    number?: boolean
+  }, ExtArgs["result"]["totemSenhaCounter"]>
+
+  export type TotemSenhaCounterSelectScalar = {
+    date?: boolean
+    number?: boolean
+  }
+
+  export type TotemSenhaCounterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"date" | "number", ExtArgs["result"]["totemSenhaCounter"]>
+
+  export type $TotemSenhaCounterPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TotemSenhaCounter"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      date: Date
+      number: number
+    }, ExtArgs["result"]["totemSenhaCounter"]>
+    composites: {}
+  }
+
+  type TotemSenhaCounterGetPayload<S extends boolean | null | undefined | TotemSenhaCounterDefaultArgs> = $Result.GetResult<Prisma.$TotemSenhaCounterPayload, S>
+
+  type TotemSenhaCounterCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TotemSenhaCounterFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TotemSenhaCounterCountAggregateInputType | true
+    }
+
+  export interface TotemSenhaCounterDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TotemSenhaCounter'], meta: { name: 'TotemSenhaCounter' } }
+    /**
+     * Find zero or one TotemSenhaCounter that matches the filter.
+     * @param {TotemSenhaCounterFindUniqueArgs} args - Arguments to find a TotemSenhaCounter
+     * @example
+     * // Get one TotemSenhaCounter
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TotemSenhaCounterFindUniqueArgs>(args: SelectSubset<T, TotemSenhaCounterFindUniqueArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TotemSenhaCounter that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TotemSenhaCounterFindUniqueOrThrowArgs} args - Arguments to find a TotemSenhaCounter
+     * @example
+     * // Get one TotemSenhaCounter
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TotemSenhaCounterFindUniqueOrThrowArgs>(args: SelectSubset<T, TotemSenhaCounterFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemSenhaCounter that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterFindFirstArgs} args - Arguments to find a TotemSenhaCounter
+     * @example
+     * // Get one TotemSenhaCounter
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TotemSenhaCounterFindFirstArgs>(args?: SelectSubset<T, TotemSenhaCounterFindFirstArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemSenhaCounter that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterFindFirstOrThrowArgs} args - Arguments to find a TotemSenhaCounter
+     * @example
+     * // Get one TotemSenhaCounter
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TotemSenhaCounterFindFirstOrThrowArgs>(args?: SelectSubset<T, TotemSenhaCounterFindFirstOrThrowArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TotemSenhaCounters that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TotemSenhaCounters
+     * const totemSenhaCounters = await prisma.totemSenhaCounter.findMany()
+     * 
+     * // Get first 10 TotemSenhaCounters
+     * const totemSenhaCounters = await prisma.totemSenhaCounter.findMany({ take: 10 })
+     * 
+     * // Only select the `date`
+     * const totemSenhaCounterWithDateOnly = await prisma.totemSenhaCounter.findMany({ select: { date: true } })
+     * 
+     */
+    findMany<T extends TotemSenhaCounterFindManyArgs>(args?: SelectSubset<T, TotemSenhaCounterFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TotemSenhaCounter.
+     * @param {TotemSenhaCounterCreateArgs} args - Arguments to create a TotemSenhaCounter.
+     * @example
+     * // Create one TotemSenhaCounter
+     * const TotemSenhaCounter = await prisma.totemSenhaCounter.create({
+     *   data: {
+     *     // ... data to create a TotemSenhaCounter
+     *   }
+     * })
+     * 
+     */
+    create<T extends TotemSenhaCounterCreateArgs>(args: SelectSubset<T, TotemSenhaCounterCreateArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TotemSenhaCounters.
+     * @param {TotemSenhaCounterCreateManyArgs} args - Arguments to create many TotemSenhaCounters.
+     * @example
+     * // Create many TotemSenhaCounters
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TotemSenhaCounterCreateManyArgs>(args?: SelectSubset<T, TotemSenhaCounterCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TotemSenhaCounters and returns the data saved in the database.
+     * @param {TotemSenhaCounterCreateManyAndReturnArgs} args - Arguments to create many TotemSenhaCounters.
+     * @example
+     * // Create many TotemSenhaCounters
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TotemSenhaCounters and only return the `date`
+     * const totemSenhaCounterWithDateOnly = await prisma.totemSenhaCounter.createManyAndReturn({
+     *   select: { date: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TotemSenhaCounterCreateManyAndReturnArgs>(args?: SelectSubset<T, TotemSenhaCounterCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TotemSenhaCounter.
+     * @param {TotemSenhaCounterDeleteArgs} args - Arguments to delete one TotemSenhaCounter.
+     * @example
+     * // Delete one TotemSenhaCounter
+     * const TotemSenhaCounter = await prisma.totemSenhaCounter.delete({
+     *   where: {
+     *     // ... filter to delete one TotemSenhaCounter
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TotemSenhaCounterDeleteArgs>(args: SelectSubset<T, TotemSenhaCounterDeleteArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TotemSenhaCounter.
+     * @param {TotemSenhaCounterUpdateArgs} args - Arguments to update one TotemSenhaCounter.
+     * @example
+     * // Update one TotemSenhaCounter
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TotemSenhaCounterUpdateArgs>(args: SelectSubset<T, TotemSenhaCounterUpdateArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TotemSenhaCounters.
+     * @param {TotemSenhaCounterDeleteManyArgs} args - Arguments to filter TotemSenhaCounters to delete.
+     * @example
+     * // Delete a few TotemSenhaCounters
+     * const { count } = await prisma.totemSenhaCounter.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TotemSenhaCounterDeleteManyArgs>(args?: SelectSubset<T, TotemSenhaCounterDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemSenhaCounters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TotemSenhaCounters
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TotemSenhaCounterUpdateManyArgs>(args: SelectSubset<T, TotemSenhaCounterUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemSenhaCounters and returns the data updated in the database.
+     * @param {TotemSenhaCounterUpdateManyAndReturnArgs} args - Arguments to update many TotemSenhaCounters.
+     * @example
+     * // Update many TotemSenhaCounters
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TotemSenhaCounters and only return the `date`
+     * const totemSenhaCounterWithDateOnly = await prisma.totemSenhaCounter.updateManyAndReturn({
+     *   select: { date: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TotemSenhaCounterUpdateManyAndReturnArgs>(args: SelectSubset<T, TotemSenhaCounterUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TotemSenhaCounter.
+     * @param {TotemSenhaCounterUpsertArgs} args - Arguments to update or create a TotemSenhaCounter.
+     * @example
+     * // Update or create a TotemSenhaCounter
+     * const totemSenhaCounter = await prisma.totemSenhaCounter.upsert({
+     *   create: {
+     *     // ... data to create a TotemSenhaCounter
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TotemSenhaCounter we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TotemSenhaCounterUpsertArgs>(args: SelectSubset<T, TotemSenhaCounterUpsertArgs<ExtArgs>>): Prisma__TotemSenhaCounterClient<$Result.GetResult<Prisma.$TotemSenhaCounterPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TotemSenhaCounters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterCountArgs} args - Arguments to filter TotemSenhaCounters to count.
+     * @example
+     * // Count the number of TotemSenhaCounters
+     * const count = await prisma.totemSenhaCounter.count({
+     *   where: {
+     *     // ... the filter for the TotemSenhaCounters we want to count
+     *   }
+     * })
+    **/
+    count<T extends TotemSenhaCounterCountArgs>(
+      args?: Subset<T, TotemSenhaCounterCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TotemSenhaCounterCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TotemSenhaCounter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TotemSenhaCounterAggregateArgs>(args: Subset<T, TotemSenhaCounterAggregateArgs>): Prisma.PrismaPromise<GetTotemSenhaCounterAggregateType<T>>
+
+    /**
+     * Group by TotemSenhaCounter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemSenhaCounterGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TotemSenhaCounterGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TotemSenhaCounterGroupByArgs['orderBy'] }
+        : { orderBy?: TotemSenhaCounterGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TotemSenhaCounterGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTotemSenhaCounterGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TotemSenhaCounter model
+   */
+  readonly fields: TotemSenhaCounterFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TotemSenhaCounter.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TotemSenhaCounterClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TotemSenhaCounter model
+   */
+  interface TotemSenhaCounterFieldRefs {
+    readonly date: FieldRef<"TotemSenhaCounter", 'DateTime'>
+    readonly number: FieldRef<"TotemSenhaCounter", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TotemSenhaCounter findUnique
+   */
+  export type TotemSenhaCounterFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemSenhaCounter to fetch.
+     */
+    where: TotemSenhaCounterWhereUniqueInput
+  }
+
+  /**
+   * TotemSenhaCounter findUniqueOrThrow
+   */
+  export type TotemSenhaCounterFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemSenhaCounter to fetch.
+     */
+    where: TotemSenhaCounterWhereUniqueInput
+  }
+
+  /**
+   * TotemSenhaCounter findFirst
+   */
+  export type TotemSenhaCounterFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemSenhaCounter to fetch.
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemSenhaCounters to fetch.
+     */
+    orderBy?: TotemSenhaCounterOrderByWithRelationInput | TotemSenhaCounterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemSenhaCounters.
+     */
+    cursor?: TotemSenhaCounterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemSenhaCounters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemSenhaCounters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemSenhaCounters.
+     */
+    distinct?: TotemSenhaCounterScalarFieldEnum | TotemSenhaCounterScalarFieldEnum[]
+  }
+
+  /**
+   * TotemSenhaCounter findFirstOrThrow
+   */
+  export type TotemSenhaCounterFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemSenhaCounter to fetch.
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemSenhaCounters to fetch.
+     */
+    orderBy?: TotemSenhaCounterOrderByWithRelationInput | TotemSenhaCounterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemSenhaCounters.
+     */
+    cursor?: TotemSenhaCounterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemSenhaCounters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemSenhaCounters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemSenhaCounters.
+     */
+    distinct?: TotemSenhaCounterScalarFieldEnum | TotemSenhaCounterScalarFieldEnum[]
+  }
+
+  /**
+   * TotemSenhaCounter findMany
+   */
+  export type TotemSenhaCounterFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemSenhaCounters to fetch.
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemSenhaCounters to fetch.
+     */
+    orderBy?: TotemSenhaCounterOrderByWithRelationInput | TotemSenhaCounterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TotemSenhaCounters.
+     */
+    cursor?: TotemSenhaCounterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemSenhaCounters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemSenhaCounters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemSenhaCounters.
+     */
+    distinct?: TotemSenhaCounterScalarFieldEnum | TotemSenhaCounterScalarFieldEnum[]
+  }
+
+  /**
+   * TotemSenhaCounter create
+   */
+  export type TotemSenhaCounterCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * The data needed to create a TotemSenhaCounter.
+     */
+    data: XOR<TotemSenhaCounterCreateInput, TotemSenhaCounterUncheckedCreateInput>
+  }
+
+  /**
+   * TotemSenhaCounter createMany
+   */
+  export type TotemSenhaCounterCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TotemSenhaCounters.
+     */
+    data: TotemSenhaCounterCreateManyInput | TotemSenhaCounterCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemSenhaCounter createManyAndReturn
+   */
+  export type TotemSenhaCounterCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * The data used to create many TotemSenhaCounters.
+     */
+    data: TotemSenhaCounterCreateManyInput | TotemSenhaCounterCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemSenhaCounter update
+   */
+  export type TotemSenhaCounterUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * The data needed to update a TotemSenhaCounter.
+     */
+    data: XOR<TotemSenhaCounterUpdateInput, TotemSenhaCounterUncheckedUpdateInput>
+    /**
+     * Choose, which TotemSenhaCounter to update.
+     */
+    where: TotemSenhaCounterWhereUniqueInput
+  }
+
+  /**
+   * TotemSenhaCounter updateMany
+   */
+  export type TotemSenhaCounterUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TotemSenhaCounters.
+     */
+    data: XOR<TotemSenhaCounterUpdateManyMutationInput, TotemSenhaCounterUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemSenhaCounters to update
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * Limit how many TotemSenhaCounters to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemSenhaCounter updateManyAndReturn
+   */
+  export type TotemSenhaCounterUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * The data used to update TotemSenhaCounters.
+     */
+    data: XOR<TotemSenhaCounterUpdateManyMutationInput, TotemSenhaCounterUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemSenhaCounters to update
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * Limit how many TotemSenhaCounters to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemSenhaCounter upsert
+   */
+  export type TotemSenhaCounterUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * The filter to search for the TotemSenhaCounter to update in case it exists.
+     */
+    where: TotemSenhaCounterWhereUniqueInput
+    /**
+     * In case the TotemSenhaCounter found by the `where` argument doesn't exist, create a new TotemSenhaCounter with this data.
+     */
+    create: XOR<TotemSenhaCounterCreateInput, TotemSenhaCounterUncheckedCreateInput>
+    /**
+     * In case the TotemSenhaCounter was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TotemSenhaCounterUpdateInput, TotemSenhaCounterUncheckedUpdateInput>
+  }
+
+  /**
+   * TotemSenhaCounter delete
+   */
+  export type TotemSenhaCounterDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+    /**
+     * Filter which TotemSenhaCounter to delete.
+     */
+    where: TotemSenhaCounterWhereUniqueInput
+  }
+
+  /**
+   * TotemSenhaCounter deleteMany
+   */
+  export type TotemSenhaCounterDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemSenhaCounters to delete
+     */
+    where?: TotemSenhaCounterWhereInput
+    /**
+     * Limit how many TotemSenhaCounters to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemSenhaCounter without action
+   */
+  export type TotemSenhaCounterDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemSenhaCounter
+     */
+    select?: TotemSenhaCounterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemSenhaCounter
+     */
+    omit?: TotemSenhaCounterOmit<ExtArgs> | null
+  }
+
 
   /**
    * Model TtsDailyUsage
@@ -16766,6 +18246,4335 @@ export namespace Prisma {
 
 
   /**
+   * Model TotemAccessSettings
+   */
+
+  export type AggregateTotemAccessSettings = {
+    _count: TotemAccessSettingsCountAggregateOutputType | null
+    _avg: TotemAccessSettingsAvgAggregateOutputType | null
+    _sum: TotemAccessSettingsSumAggregateOutputType | null
+    _min: TotemAccessSettingsMinAggregateOutputType | null
+    _max: TotemAccessSettingsMaxAggregateOutputType | null
+  }
+
+  export type TotemAccessSettingsAvgAggregateOutputType = {
+    id: number | null
+    pinValidityDays: number | null
+    sessionHours: number | null
+  }
+
+  export type TotemAccessSettingsSumAggregateOutputType = {
+    id: number | null
+    pinValidityDays: number | null
+    sessionHours: number | null
+  }
+
+  export type TotemAccessSettingsMinAggregateOutputType = {
+    id: number | null
+    enabled: boolean | null
+    pinValidityDays: number | null
+    sessionHours: number | null
+  }
+
+  export type TotemAccessSettingsMaxAggregateOutputType = {
+    id: number | null
+    enabled: boolean | null
+    pinValidityDays: number | null
+    sessionHours: number | null
+  }
+
+  export type TotemAccessSettingsCountAggregateOutputType = {
+    id: number
+    enabled: number
+    pinValidityDays: number
+    sessionHours: number
+    _all: number
+  }
+
+
+  export type TotemAccessSettingsAvgAggregateInputType = {
+    id?: true
+    pinValidityDays?: true
+    sessionHours?: true
+  }
+
+  export type TotemAccessSettingsSumAggregateInputType = {
+    id?: true
+    pinValidityDays?: true
+    sessionHours?: true
+  }
+
+  export type TotemAccessSettingsMinAggregateInputType = {
+    id?: true
+    enabled?: true
+    pinValidityDays?: true
+    sessionHours?: true
+  }
+
+  export type TotemAccessSettingsMaxAggregateInputType = {
+    id?: true
+    enabled?: true
+    pinValidityDays?: true
+    sessionHours?: true
+  }
+
+  export type TotemAccessSettingsCountAggregateInputType = {
+    id?: true
+    enabled?: true
+    pinValidityDays?: true
+    sessionHours?: true
+    _all?: true
+  }
+
+  export type TotemAccessSettingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemAccessSettings to aggregate.
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemAccessSettings to fetch.
+     */
+    orderBy?: TotemAccessSettingsOrderByWithRelationInput | TotemAccessSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TotemAccessSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemAccessSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemAccessSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TotemAccessSettings
+    **/
+    _count?: true | TotemAccessSettingsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TotemAccessSettingsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TotemAccessSettingsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TotemAccessSettingsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TotemAccessSettingsMaxAggregateInputType
+  }
+
+  export type GetTotemAccessSettingsAggregateType<T extends TotemAccessSettingsAggregateArgs> = {
+        [P in keyof T & keyof AggregateTotemAccessSettings]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTotemAccessSettings[P]>
+      : GetScalarType<T[P], AggregateTotemAccessSettings[P]>
+  }
+
+
+
+
+  export type TotemAccessSettingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotemAccessSettingsWhereInput
+    orderBy?: TotemAccessSettingsOrderByWithAggregationInput | TotemAccessSettingsOrderByWithAggregationInput[]
+    by: TotemAccessSettingsScalarFieldEnum[] | TotemAccessSettingsScalarFieldEnum
+    having?: TotemAccessSettingsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TotemAccessSettingsCountAggregateInputType | true
+    _avg?: TotemAccessSettingsAvgAggregateInputType
+    _sum?: TotemAccessSettingsSumAggregateInputType
+    _min?: TotemAccessSettingsMinAggregateInputType
+    _max?: TotemAccessSettingsMaxAggregateInputType
+  }
+
+  export type TotemAccessSettingsGroupByOutputType = {
+    id: number
+    enabled: boolean
+    pinValidityDays: number
+    sessionHours: number
+    _count: TotemAccessSettingsCountAggregateOutputType | null
+    _avg: TotemAccessSettingsAvgAggregateOutputType | null
+    _sum: TotemAccessSettingsSumAggregateOutputType | null
+    _min: TotemAccessSettingsMinAggregateOutputType | null
+    _max: TotemAccessSettingsMaxAggregateOutputType | null
+  }
+
+  type GetTotemAccessSettingsGroupByPayload<T extends TotemAccessSettingsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TotemAccessSettingsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TotemAccessSettingsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TotemAccessSettingsGroupByOutputType[P]>
+            : GetScalarType<T[P], TotemAccessSettingsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TotemAccessSettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    enabled?: boolean
+    pinValidityDays?: boolean
+    sessionHours?: boolean
+  }, ExtArgs["result"]["totemAccessSettings"]>
+
+  export type TotemAccessSettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    enabled?: boolean
+    pinValidityDays?: boolean
+    sessionHours?: boolean
+  }, ExtArgs["result"]["totemAccessSettings"]>
+
+  export type TotemAccessSettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    enabled?: boolean
+    pinValidityDays?: boolean
+    sessionHours?: boolean
+  }, ExtArgs["result"]["totemAccessSettings"]>
+
+  export type TotemAccessSettingsSelectScalar = {
+    id?: boolean
+    enabled?: boolean
+    pinValidityDays?: boolean
+    sessionHours?: boolean
+  }
+
+  export type TotemAccessSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "enabled" | "pinValidityDays" | "sessionHours", ExtArgs["result"]["totemAccessSettings"]>
+
+  export type $TotemAccessSettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TotemAccessSettings"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      enabled: boolean
+      pinValidityDays: number
+      sessionHours: number
+    }, ExtArgs["result"]["totemAccessSettings"]>
+    composites: {}
+  }
+
+  type TotemAccessSettingsGetPayload<S extends boolean | null | undefined | TotemAccessSettingsDefaultArgs> = $Result.GetResult<Prisma.$TotemAccessSettingsPayload, S>
+
+  type TotemAccessSettingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TotemAccessSettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TotemAccessSettingsCountAggregateInputType | true
+    }
+
+  export interface TotemAccessSettingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TotemAccessSettings'], meta: { name: 'TotemAccessSettings' } }
+    /**
+     * Find zero or one TotemAccessSettings that matches the filter.
+     * @param {TotemAccessSettingsFindUniqueArgs} args - Arguments to find a TotemAccessSettings
+     * @example
+     * // Get one TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TotemAccessSettingsFindUniqueArgs>(args: SelectSubset<T, TotemAccessSettingsFindUniqueArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TotemAccessSettings that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TotemAccessSettingsFindUniqueOrThrowArgs} args - Arguments to find a TotemAccessSettings
+     * @example
+     * // Get one TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TotemAccessSettingsFindUniqueOrThrowArgs>(args: SelectSubset<T, TotemAccessSettingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemAccessSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsFindFirstArgs} args - Arguments to find a TotemAccessSettings
+     * @example
+     * // Get one TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TotemAccessSettingsFindFirstArgs>(args?: SelectSubset<T, TotemAccessSettingsFindFirstArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemAccessSettings that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsFindFirstOrThrowArgs} args - Arguments to find a TotemAccessSettings
+     * @example
+     * // Get one TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TotemAccessSettingsFindFirstOrThrowArgs>(args?: SelectSubset<T, TotemAccessSettingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TotemAccessSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.findMany()
+     * 
+     * // Get first 10 TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const totemAccessSettingsWithIdOnly = await prisma.totemAccessSettings.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TotemAccessSettingsFindManyArgs>(args?: SelectSubset<T, TotemAccessSettingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TotemAccessSettings.
+     * @param {TotemAccessSettingsCreateArgs} args - Arguments to create a TotemAccessSettings.
+     * @example
+     * // Create one TotemAccessSettings
+     * const TotemAccessSettings = await prisma.totemAccessSettings.create({
+     *   data: {
+     *     // ... data to create a TotemAccessSettings
+     *   }
+     * })
+     * 
+     */
+    create<T extends TotemAccessSettingsCreateArgs>(args: SelectSubset<T, TotemAccessSettingsCreateArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TotemAccessSettings.
+     * @param {TotemAccessSettingsCreateManyArgs} args - Arguments to create many TotemAccessSettings.
+     * @example
+     * // Create many TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TotemAccessSettingsCreateManyArgs>(args?: SelectSubset<T, TotemAccessSettingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TotemAccessSettings and returns the data saved in the database.
+     * @param {TotemAccessSettingsCreateManyAndReturnArgs} args - Arguments to create many TotemAccessSettings.
+     * @example
+     * // Create many TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TotemAccessSettings and only return the `id`
+     * const totemAccessSettingsWithIdOnly = await prisma.totemAccessSettings.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TotemAccessSettingsCreateManyAndReturnArgs>(args?: SelectSubset<T, TotemAccessSettingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TotemAccessSettings.
+     * @param {TotemAccessSettingsDeleteArgs} args - Arguments to delete one TotemAccessSettings.
+     * @example
+     * // Delete one TotemAccessSettings
+     * const TotemAccessSettings = await prisma.totemAccessSettings.delete({
+     *   where: {
+     *     // ... filter to delete one TotemAccessSettings
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TotemAccessSettingsDeleteArgs>(args: SelectSubset<T, TotemAccessSettingsDeleteArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TotemAccessSettings.
+     * @param {TotemAccessSettingsUpdateArgs} args - Arguments to update one TotemAccessSettings.
+     * @example
+     * // Update one TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TotemAccessSettingsUpdateArgs>(args: SelectSubset<T, TotemAccessSettingsUpdateArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TotemAccessSettings.
+     * @param {TotemAccessSettingsDeleteManyArgs} args - Arguments to filter TotemAccessSettings to delete.
+     * @example
+     * // Delete a few TotemAccessSettings
+     * const { count } = await prisma.totemAccessSettings.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TotemAccessSettingsDeleteManyArgs>(args?: SelectSubset<T, TotemAccessSettingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemAccessSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TotemAccessSettingsUpdateManyArgs>(args: SelectSubset<T, TotemAccessSettingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemAccessSettings and returns the data updated in the database.
+     * @param {TotemAccessSettingsUpdateManyAndReturnArgs} args - Arguments to update many TotemAccessSettings.
+     * @example
+     * // Update many TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TotemAccessSettings and only return the `id`
+     * const totemAccessSettingsWithIdOnly = await prisma.totemAccessSettings.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TotemAccessSettingsUpdateManyAndReturnArgs>(args: SelectSubset<T, TotemAccessSettingsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TotemAccessSettings.
+     * @param {TotemAccessSettingsUpsertArgs} args - Arguments to update or create a TotemAccessSettings.
+     * @example
+     * // Update or create a TotemAccessSettings
+     * const totemAccessSettings = await prisma.totemAccessSettings.upsert({
+     *   create: {
+     *     // ... data to create a TotemAccessSettings
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TotemAccessSettings we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TotemAccessSettingsUpsertArgs>(args: SelectSubset<T, TotemAccessSettingsUpsertArgs<ExtArgs>>): Prisma__TotemAccessSettingsClient<$Result.GetResult<Prisma.$TotemAccessSettingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TotemAccessSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsCountArgs} args - Arguments to filter TotemAccessSettings to count.
+     * @example
+     * // Count the number of TotemAccessSettings
+     * const count = await prisma.totemAccessSettings.count({
+     *   where: {
+     *     // ... the filter for the TotemAccessSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends TotemAccessSettingsCountArgs>(
+      args?: Subset<T, TotemAccessSettingsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TotemAccessSettingsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TotemAccessSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TotemAccessSettingsAggregateArgs>(args: Subset<T, TotemAccessSettingsAggregateArgs>): Prisma.PrismaPromise<GetTotemAccessSettingsAggregateType<T>>
+
+    /**
+     * Group by TotemAccessSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemAccessSettingsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TotemAccessSettingsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TotemAccessSettingsGroupByArgs['orderBy'] }
+        : { orderBy?: TotemAccessSettingsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TotemAccessSettingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTotemAccessSettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TotemAccessSettings model
+   */
+  readonly fields: TotemAccessSettingsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TotemAccessSettings.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TotemAccessSettingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TotemAccessSettings model
+   */
+  interface TotemAccessSettingsFieldRefs {
+    readonly id: FieldRef<"TotemAccessSettings", 'Int'>
+    readonly enabled: FieldRef<"TotemAccessSettings", 'Boolean'>
+    readonly pinValidityDays: FieldRef<"TotemAccessSettings", 'Int'>
+    readonly sessionHours: FieldRef<"TotemAccessSettings", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TotemAccessSettings findUnique
+   */
+  export type TotemAccessSettingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemAccessSettings to fetch.
+     */
+    where: TotemAccessSettingsWhereUniqueInput
+  }
+
+  /**
+   * TotemAccessSettings findUniqueOrThrow
+   */
+  export type TotemAccessSettingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemAccessSettings to fetch.
+     */
+    where: TotemAccessSettingsWhereUniqueInput
+  }
+
+  /**
+   * TotemAccessSettings findFirst
+   */
+  export type TotemAccessSettingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemAccessSettings to fetch.
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemAccessSettings to fetch.
+     */
+    orderBy?: TotemAccessSettingsOrderByWithRelationInput | TotemAccessSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemAccessSettings.
+     */
+    cursor?: TotemAccessSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemAccessSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemAccessSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemAccessSettings.
+     */
+    distinct?: TotemAccessSettingsScalarFieldEnum | TotemAccessSettingsScalarFieldEnum[]
+  }
+
+  /**
+   * TotemAccessSettings findFirstOrThrow
+   */
+  export type TotemAccessSettingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemAccessSettings to fetch.
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemAccessSettings to fetch.
+     */
+    orderBy?: TotemAccessSettingsOrderByWithRelationInput | TotemAccessSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemAccessSettings.
+     */
+    cursor?: TotemAccessSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemAccessSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemAccessSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemAccessSettings.
+     */
+    distinct?: TotemAccessSettingsScalarFieldEnum | TotemAccessSettingsScalarFieldEnum[]
+  }
+
+  /**
+   * TotemAccessSettings findMany
+   */
+  export type TotemAccessSettingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemAccessSettings to fetch.
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemAccessSettings to fetch.
+     */
+    orderBy?: TotemAccessSettingsOrderByWithRelationInput | TotemAccessSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TotemAccessSettings.
+     */
+    cursor?: TotemAccessSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemAccessSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemAccessSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemAccessSettings.
+     */
+    distinct?: TotemAccessSettingsScalarFieldEnum | TotemAccessSettingsScalarFieldEnum[]
+  }
+
+  /**
+   * TotemAccessSettings create
+   */
+  export type TotemAccessSettingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * The data needed to create a TotemAccessSettings.
+     */
+    data?: XOR<TotemAccessSettingsCreateInput, TotemAccessSettingsUncheckedCreateInput>
+  }
+
+  /**
+   * TotemAccessSettings createMany
+   */
+  export type TotemAccessSettingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TotemAccessSettings.
+     */
+    data: TotemAccessSettingsCreateManyInput | TotemAccessSettingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemAccessSettings createManyAndReturn
+   */
+  export type TotemAccessSettingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * The data used to create many TotemAccessSettings.
+     */
+    data: TotemAccessSettingsCreateManyInput | TotemAccessSettingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemAccessSettings update
+   */
+  export type TotemAccessSettingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * The data needed to update a TotemAccessSettings.
+     */
+    data: XOR<TotemAccessSettingsUpdateInput, TotemAccessSettingsUncheckedUpdateInput>
+    /**
+     * Choose, which TotemAccessSettings to update.
+     */
+    where: TotemAccessSettingsWhereUniqueInput
+  }
+
+  /**
+   * TotemAccessSettings updateMany
+   */
+  export type TotemAccessSettingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TotemAccessSettings.
+     */
+    data: XOR<TotemAccessSettingsUpdateManyMutationInput, TotemAccessSettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemAccessSettings to update
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * Limit how many TotemAccessSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemAccessSettings updateManyAndReturn
+   */
+  export type TotemAccessSettingsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * The data used to update TotemAccessSettings.
+     */
+    data: XOR<TotemAccessSettingsUpdateManyMutationInput, TotemAccessSettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemAccessSettings to update
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * Limit how many TotemAccessSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemAccessSettings upsert
+   */
+  export type TotemAccessSettingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * The filter to search for the TotemAccessSettings to update in case it exists.
+     */
+    where: TotemAccessSettingsWhereUniqueInput
+    /**
+     * In case the TotemAccessSettings found by the `where` argument doesn't exist, create a new TotemAccessSettings with this data.
+     */
+    create: XOR<TotemAccessSettingsCreateInput, TotemAccessSettingsUncheckedCreateInput>
+    /**
+     * In case the TotemAccessSettings was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TotemAccessSettingsUpdateInput, TotemAccessSettingsUncheckedUpdateInput>
+  }
+
+  /**
+   * TotemAccessSettings delete
+   */
+  export type TotemAccessSettingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+    /**
+     * Filter which TotemAccessSettings to delete.
+     */
+    where: TotemAccessSettingsWhereUniqueInput
+  }
+
+  /**
+   * TotemAccessSettings deleteMany
+   */
+  export type TotemAccessSettingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemAccessSettings to delete
+     */
+    where?: TotemAccessSettingsWhereInput
+    /**
+     * Limit how many TotemAccessSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemAccessSettings without action
+   */
+  export type TotemAccessSettingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemAccessSettings
+     */
+    select?: TotemAccessSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemAccessSettings
+     */
+    omit?: TotemAccessSettingsOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TotemOperator
+   */
+
+  export type AggregateTotemOperator = {
+    _count: TotemOperatorCountAggregateOutputType | null
+    _avg: TotemOperatorAvgAggregateOutputType | null
+    _sum: TotemOperatorSumAggregateOutputType | null
+    _min: TotemOperatorMinAggregateOutputType | null
+    _max: TotemOperatorMaxAggregateOutputType | null
+  }
+
+  export type TotemOperatorAvgAggregateOutputType = {
+    id: number | null
+    version: number | null
+  }
+
+  export type TotemOperatorSumAggregateOutputType = {
+    id: number | null
+    version: number | null
+  }
+
+  export type TotemOperatorMinAggregateOutputType = {
+    id: number | null
+    username: string | null
+    displayName: string | null
+    cardId: string | null
+    pinHash: string | null
+    pinExpiresAt: Date | null
+    mustChangePin: boolean | null
+    active: boolean | null
+    version: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TotemOperatorMaxAggregateOutputType = {
+    id: number | null
+    username: string | null
+    displayName: string | null
+    cardId: string | null
+    pinHash: string | null
+    pinExpiresAt: Date | null
+    mustChangePin: boolean | null
+    active: boolean | null
+    version: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TotemOperatorCountAggregateOutputType = {
+    id: number
+    username: number
+    displayName: number
+    cardId: number
+    pinHash: number
+    pinExpiresAt: number
+    mustChangePin: number
+    active: number
+    version: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TotemOperatorAvgAggregateInputType = {
+    id?: true
+    version?: true
+  }
+
+  export type TotemOperatorSumAggregateInputType = {
+    id?: true
+    version?: true
+  }
+
+  export type TotemOperatorMinAggregateInputType = {
+    id?: true
+    username?: true
+    displayName?: true
+    cardId?: true
+    pinHash?: true
+    pinExpiresAt?: true
+    mustChangePin?: true
+    active?: true
+    version?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TotemOperatorMaxAggregateInputType = {
+    id?: true
+    username?: true
+    displayName?: true
+    cardId?: true
+    pinHash?: true
+    pinExpiresAt?: true
+    mustChangePin?: true
+    active?: true
+    version?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TotemOperatorCountAggregateInputType = {
+    id?: true
+    username?: true
+    displayName?: true
+    cardId?: true
+    pinHash?: true
+    pinExpiresAt?: true
+    mustChangePin?: true
+    active?: true
+    version?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TotemOperatorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemOperator to aggregate.
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperators to fetch.
+     */
+    orderBy?: TotemOperatorOrderByWithRelationInput | TotemOperatorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TotemOperatorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperators from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperators.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TotemOperators
+    **/
+    _count?: true | TotemOperatorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TotemOperatorAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TotemOperatorSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TotemOperatorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TotemOperatorMaxAggregateInputType
+  }
+
+  export type GetTotemOperatorAggregateType<T extends TotemOperatorAggregateArgs> = {
+        [P in keyof T & keyof AggregateTotemOperator]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTotemOperator[P]>
+      : GetScalarType<T[P], AggregateTotemOperator[P]>
+  }
+
+
+
+
+  export type TotemOperatorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotemOperatorWhereInput
+    orderBy?: TotemOperatorOrderByWithAggregationInput | TotemOperatorOrderByWithAggregationInput[]
+    by: TotemOperatorScalarFieldEnum[] | TotemOperatorScalarFieldEnum
+    having?: TotemOperatorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TotemOperatorCountAggregateInputType | true
+    _avg?: TotemOperatorAvgAggregateInputType
+    _sum?: TotemOperatorSumAggregateInputType
+    _min?: TotemOperatorMinAggregateInputType
+    _max?: TotemOperatorMaxAggregateInputType
+  }
+
+  export type TotemOperatorGroupByOutputType = {
+    id: number
+    username: string
+    displayName: string
+    cardId: string
+    pinHash: string
+    pinExpiresAt: Date
+    mustChangePin: boolean
+    active: boolean
+    version: number
+    createdAt: Date
+    updatedAt: Date
+    _count: TotemOperatorCountAggregateOutputType | null
+    _avg: TotemOperatorAvgAggregateOutputType | null
+    _sum: TotemOperatorSumAggregateOutputType | null
+    _min: TotemOperatorMinAggregateOutputType | null
+    _max: TotemOperatorMaxAggregateOutputType | null
+  }
+
+  type GetTotemOperatorGroupByPayload<T extends TotemOperatorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TotemOperatorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TotemOperatorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TotemOperatorGroupByOutputType[P]>
+            : GetScalarType<T[P], TotemOperatorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TotemOperatorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    username?: boolean
+    displayName?: boolean
+    cardId?: boolean
+    pinHash?: boolean
+    pinExpiresAt?: boolean
+    mustChangePin?: boolean
+    active?: boolean
+    version?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    sessions?: boolean | TotemOperator$sessionsArgs<ExtArgs>
+    _count?: boolean | TotemOperatorCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totemOperator"]>
+
+  export type TotemOperatorSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    username?: boolean
+    displayName?: boolean
+    cardId?: boolean
+    pinHash?: boolean
+    pinExpiresAt?: boolean
+    mustChangePin?: boolean
+    active?: boolean
+    version?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["totemOperator"]>
+
+  export type TotemOperatorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    username?: boolean
+    displayName?: boolean
+    cardId?: boolean
+    pinHash?: boolean
+    pinExpiresAt?: boolean
+    mustChangePin?: boolean
+    active?: boolean
+    version?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["totemOperator"]>
+
+  export type TotemOperatorSelectScalar = {
+    id?: boolean
+    username?: boolean
+    displayName?: boolean
+    cardId?: boolean
+    pinHash?: boolean
+    pinExpiresAt?: boolean
+    mustChangePin?: boolean
+    active?: boolean
+    version?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TotemOperatorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "displayName" | "cardId" | "pinHash" | "pinExpiresAt" | "mustChangePin" | "active" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["totemOperator"]>
+  export type TotemOperatorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    sessions?: boolean | TotemOperator$sessionsArgs<ExtArgs>
+    _count?: boolean | TotemOperatorCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type TotemOperatorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type TotemOperatorIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $TotemOperatorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TotemOperator"
+    objects: {
+      sessions: Prisma.$TotemOperatorSessionPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      username: string
+      displayName: string
+      cardId: string
+      pinHash: string
+      pinExpiresAt: Date
+      mustChangePin: boolean
+      active: boolean
+      version: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["totemOperator"]>
+    composites: {}
+  }
+
+  type TotemOperatorGetPayload<S extends boolean | null | undefined | TotemOperatorDefaultArgs> = $Result.GetResult<Prisma.$TotemOperatorPayload, S>
+
+  type TotemOperatorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TotemOperatorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TotemOperatorCountAggregateInputType | true
+    }
+
+  export interface TotemOperatorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TotemOperator'], meta: { name: 'TotemOperator' } }
+    /**
+     * Find zero or one TotemOperator that matches the filter.
+     * @param {TotemOperatorFindUniqueArgs} args - Arguments to find a TotemOperator
+     * @example
+     * // Get one TotemOperator
+     * const totemOperator = await prisma.totemOperator.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TotemOperatorFindUniqueArgs>(args: SelectSubset<T, TotemOperatorFindUniqueArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TotemOperator that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TotemOperatorFindUniqueOrThrowArgs} args - Arguments to find a TotemOperator
+     * @example
+     * // Get one TotemOperator
+     * const totemOperator = await prisma.totemOperator.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TotemOperatorFindUniqueOrThrowArgs>(args: SelectSubset<T, TotemOperatorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemOperator that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorFindFirstArgs} args - Arguments to find a TotemOperator
+     * @example
+     * // Get one TotemOperator
+     * const totemOperator = await prisma.totemOperator.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TotemOperatorFindFirstArgs>(args?: SelectSubset<T, TotemOperatorFindFirstArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemOperator that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorFindFirstOrThrowArgs} args - Arguments to find a TotemOperator
+     * @example
+     * // Get one TotemOperator
+     * const totemOperator = await prisma.totemOperator.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TotemOperatorFindFirstOrThrowArgs>(args?: SelectSubset<T, TotemOperatorFindFirstOrThrowArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TotemOperators that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TotemOperators
+     * const totemOperators = await prisma.totemOperator.findMany()
+     * 
+     * // Get first 10 TotemOperators
+     * const totemOperators = await prisma.totemOperator.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const totemOperatorWithIdOnly = await prisma.totemOperator.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TotemOperatorFindManyArgs>(args?: SelectSubset<T, TotemOperatorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TotemOperator.
+     * @param {TotemOperatorCreateArgs} args - Arguments to create a TotemOperator.
+     * @example
+     * // Create one TotemOperator
+     * const TotemOperator = await prisma.totemOperator.create({
+     *   data: {
+     *     // ... data to create a TotemOperator
+     *   }
+     * })
+     * 
+     */
+    create<T extends TotemOperatorCreateArgs>(args: SelectSubset<T, TotemOperatorCreateArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TotemOperators.
+     * @param {TotemOperatorCreateManyArgs} args - Arguments to create many TotemOperators.
+     * @example
+     * // Create many TotemOperators
+     * const totemOperator = await prisma.totemOperator.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TotemOperatorCreateManyArgs>(args?: SelectSubset<T, TotemOperatorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TotemOperators and returns the data saved in the database.
+     * @param {TotemOperatorCreateManyAndReturnArgs} args - Arguments to create many TotemOperators.
+     * @example
+     * // Create many TotemOperators
+     * const totemOperator = await prisma.totemOperator.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TotemOperators and only return the `id`
+     * const totemOperatorWithIdOnly = await prisma.totemOperator.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TotemOperatorCreateManyAndReturnArgs>(args?: SelectSubset<T, TotemOperatorCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TotemOperator.
+     * @param {TotemOperatorDeleteArgs} args - Arguments to delete one TotemOperator.
+     * @example
+     * // Delete one TotemOperator
+     * const TotemOperator = await prisma.totemOperator.delete({
+     *   where: {
+     *     // ... filter to delete one TotemOperator
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TotemOperatorDeleteArgs>(args: SelectSubset<T, TotemOperatorDeleteArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TotemOperator.
+     * @param {TotemOperatorUpdateArgs} args - Arguments to update one TotemOperator.
+     * @example
+     * // Update one TotemOperator
+     * const totemOperator = await prisma.totemOperator.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TotemOperatorUpdateArgs>(args: SelectSubset<T, TotemOperatorUpdateArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TotemOperators.
+     * @param {TotemOperatorDeleteManyArgs} args - Arguments to filter TotemOperators to delete.
+     * @example
+     * // Delete a few TotemOperators
+     * const { count } = await prisma.totemOperator.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TotemOperatorDeleteManyArgs>(args?: SelectSubset<T, TotemOperatorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemOperators.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TotemOperators
+     * const totemOperator = await prisma.totemOperator.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TotemOperatorUpdateManyArgs>(args: SelectSubset<T, TotemOperatorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemOperators and returns the data updated in the database.
+     * @param {TotemOperatorUpdateManyAndReturnArgs} args - Arguments to update many TotemOperators.
+     * @example
+     * // Update many TotemOperators
+     * const totemOperator = await prisma.totemOperator.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TotemOperators and only return the `id`
+     * const totemOperatorWithIdOnly = await prisma.totemOperator.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TotemOperatorUpdateManyAndReturnArgs>(args: SelectSubset<T, TotemOperatorUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TotemOperator.
+     * @param {TotemOperatorUpsertArgs} args - Arguments to update or create a TotemOperator.
+     * @example
+     * // Update or create a TotemOperator
+     * const totemOperator = await prisma.totemOperator.upsert({
+     *   create: {
+     *     // ... data to create a TotemOperator
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TotemOperator we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TotemOperatorUpsertArgs>(args: SelectSubset<T, TotemOperatorUpsertArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TotemOperators.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorCountArgs} args - Arguments to filter TotemOperators to count.
+     * @example
+     * // Count the number of TotemOperators
+     * const count = await prisma.totemOperator.count({
+     *   where: {
+     *     // ... the filter for the TotemOperators we want to count
+     *   }
+     * })
+    **/
+    count<T extends TotemOperatorCountArgs>(
+      args?: Subset<T, TotemOperatorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TotemOperatorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TotemOperator.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TotemOperatorAggregateArgs>(args: Subset<T, TotemOperatorAggregateArgs>): Prisma.PrismaPromise<GetTotemOperatorAggregateType<T>>
+
+    /**
+     * Group by TotemOperator.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TotemOperatorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TotemOperatorGroupByArgs['orderBy'] }
+        : { orderBy?: TotemOperatorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TotemOperatorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTotemOperatorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TotemOperator model
+   */
+  readonly fields: TotemOperatorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TotemOperator.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TotemOperatorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    sessions<T extends TotemOperator$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, TotemOperator$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TotemOperator model
+   */
+  interface TotemOperatorFieldRefs {
+    readonly id: FieldRef<"TotemOperator", 'Int'>
+    readonly username: FieldRef<"TotemOperator", 'String'>
+    readonly displayName: FieldRef<"TotemOperator", 'String'>
+    readonly cardId: FieldRef<"TotemOperator", 'String'>
+    readonly pinHash: FieldRef<"TotemOperator", 'String'>
+    readonly pinExpiresAt: FieldRef<"TotemOperator", 'DateTime'>
+    readonly mustChangePin: FieldRef<"TotemOperator", 'Boolean'>
+    readonly active: FieldRef<"TotemOperator", 'Boolean'>
+    readonly version: FieldRef<"TotemOperator", 'Int'>
+    readonly createdAt: FieldRef<"TotemOperator", 'DateTime'>
+    readonly updatedAt: FieldRef<"TotemOperator", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TotemOperator findUnique
+   */
+  export type TotemOperatorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperator to fetch.
+     */
+    where: TotemOperatorWhereUniqueInput
+  }
+
+  /**
+   * TotemOperator findUniqueOrThrow
+   */
+  export type TotemOperatorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperator to fetch.
+     */
+    where: TotemOperatorWhereUniqueInput
+  }
+
+  /**
+   * TotemOperator findFirst
+   */
+  export type TotemOperatorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperator to fetch.
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperators to fetch.
+     */
+    orderBy?: TotemOperatorOrderByWithRelationInput | TotemOperatorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemOperators.
+     */
+    cursor?: TotemOperatorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperators from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperators.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemOperators.
+     */
+    distinct?: TotemOperatorScalarFieldEnum | TotemOperatorScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperator findFirstOrThrow
+   */
+  export type TotemOperatorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperator to fetch.
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperators to fetch.
+     */
+    orderBy?: TotemOperatorOrderByWithRelationInput | TotemOperatorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemOperators.
+     */
+    cursor?: TotemOperatorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperators from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperators.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemOperators.
+     */
+    distinct?: TotemOperatorScalarFieldEnum | TotemOperatorScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperator findMany
+   */
+  export type TotemOperatorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperators to fetch.
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperators to fetch.
+     */
+    orderBy?: TotemOperatorOrderByWithRelationInput | TotemOperatorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TotemOperators.
+     */
+    cursor?: TotemOperatorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperators from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperators.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemOperators.
+     */
+    distinct?: TotemOperatorScalarFieldEnum | TotemOperatorScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperator create
+   */
+  export type TotemOperatorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TotemOperator.
+     */
+    data: XOR<TotemOperatorCreateInput, TotemOperatorUncheckedCreateInput>
+  }
+
+  /**
+   * TotemOperator createMany
+   */
+  export type TotemOperatorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TotemOperators.
+     */
+    data: TotemOperatorCreateManyInput | TotemOperatorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemOperator createManyAndReturn
+   */
+  export type TotemOperatorCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * The data used to create many TotemOperators.
+     */
+    data: TotemOperatorCreateManyInput | TotemOperatorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemOperator update
+   */
+  export type TotemOperatorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TotemOperator.
+     */
+    data: XOR<TotemOperatorUpdateInput, TotemOperatorUncheckedUpdateInput>
+    /**
+     * Choose, which TotemOperator to update.
+     */
+    where: TotemOperatorWhereUniqueInput
+  }
+
+  /**
+   * TotemOperator updateMany
+   */
+  export type TotemOperatorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TotemOperators.
+     */
+    data: XOR<TotemOperatorUpdateManyMutationInput, TotemOperatorUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemOperators to update
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * Limit how many TotemOperators to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemOperator updateManyAndReturn
+   */
+  export type TotemOperatorUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * The data used to update TotemOperators.
+     */
+    data: XOR<TotemOperatorUpdateManyMutationInput, TotemOperatorUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemOperators to update
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * Limit how many TotemOperators to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemOperator upsert
+   */
+  export type TotemOperatorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TotemOperator to update in case it exists.
+     */
+    where: TotemOperatorWhereUniqueInput
+    /**
+     * In case the TotemOperator found by the `where` argument doesn't exist, create a new TotemOperator with this data.
+     */
+    create: XOR<TotemOperatorCreateInput, TotemOperatorUncheckedCreateInput>
+    /**
+     * In case the TotemOperator was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TotemOperatorUpdateInput, TotemOperatorUncheckedUpdateInput>
+  }
+
+  /**
+   * TotemOperator delete
+   */
+  export type TotemOperatorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+    /**
+     * Filter which TotemOperator to delete.
+     */
+    where: TotemOperatorWhereUniqueInput
+  }
+
+  /**
+   * TotemOperator deleteMany
+   */
+  export type TotemOperatorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemOperators to delete
+     */
+    where?: TotemOperatorWhereInput
+    /**
+     * Limit how many TotemOperators to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemOperator.sessions
+   */
+  export type TotemOperator$sessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    where?: TotemOperatorSessionWhereInput
+    orderBy?: TotemOperatorSessionOrderByWithRelationInput | TotemOperatorSessionOrderByWithRelationInput[]
+    cursor?: TotemOperatorSessionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TotemOperatorSessionScalarFieldEnum | TotemOperatorSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperator without action
+   */
+  export type TotemOperatorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperator
+     */
+    select?: TotemOperatorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperator
+     */
+    omit?: TotemOperatorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TotemOperatorSession
+   */
+
+  export type AggregateTotemOperatorSession = {
+    _count: TotemOperatorSessionCountAggregateOutputType | null
+    _avg: TotemOperatorSessionAvgAggregateOutputType | null
+    _sum: TotemOperatorSessionSumAggregateOutputType | null
+    _min: TotemOperatorSessionMinAggregateOutputType | null
+    _max: TotemOperatorSessionMaxAggregateOutputType | null
+  }
+
+  export type TotemOperatorSessionAvgAggregateOutputType = {
+    operatorId: number | null
+    version: number | null
+  }
+
+  export type TotemOperatorSessionSumAggregateOutputType = {
+    operatorId: number | null
+    version: number | null
+  }
+
+  export type TotemOperatorSessionMinAggregateOutputType = {
+    tokenHash: string | null
+    operatorId: number | null
+    version: number | null
+    restricted: boolean | null
+    expiresAt: Date | null
+  }
+
+  export type TotemOperatorSessionMaxAggregateOutputType = {
+    tokenHash: string | null
+    operatorId: number | null
+    version: number | null
+    restricted: boolean | null
+    expiresAt: Date | null
+  }
+
+  export type TotemOperatorSessionCountAggregateOutputType = {
+    tokenHash: number
+    operatorId: number
+    version: number
+    restricted: number
+    expiresAt: number
+    _all: number
+  }
+
+
+  export type TotemOperatorSessionAvgAggregateInputType = {
+    operatorId?: true
+    version?: true
+  }
+
+  export type TotemOperatorSessionSumAggregateInputType = {
+    operatorId?: true
+    version?: true
+  }
+
+  export type TotemOperatorSessionMinAggregateInputType = {
+    tokenHash?: true
+    operatorId?: true
+    version?: true
+    restricted?: true
+    expiresAt?: true
+  }
+
+  export type TotemOperatorSessionMaxAggregateInputType = {
+    tokenHash?: true
+    operatorId?: true
+    version?: true
+    restricted?: true
+    expiresAt?: true
+  }
+
+  export type TotemOperatorSessionCountAggregateInputType = {
+    tokenHash?: true
+    operatorId?: true
+    version?: true
+    restricted?: true
+    expiresAt?: true
+    _all?: true
+  }
+
+  export type TotemOperatorSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemOperatorSession to aggregate.
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperatorSessions to fetch.
+     */
+    orderBy?: TotemOperatorSessionOrderByWithRelationInput | TotemOperatorSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TotemOperatorSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperatorSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperatorSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TotemOperatorSessions
+    **/
+    _count?: true | TotemOperatorSessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TotemOperatorSessionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TotemOperatorSessionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TotemOperatorSessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TotemOperatorSessionMaxAggregateInputType
+  }
+
+  export type GetTotemOperatorSessionAggregateType<T extends TotemOperatorSessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateTotemOperatorSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTotemOperatorSession[P]>
+      : GetScalarType<T[P], AggregateTotemOperatorSession[P]>
+  }
+
+
+
+
+  export type TotemOperatorSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotemOperatorSessionWhereInput
+    orderBy?: TotemOperatorSessionOrderByWithAggregationInput | TotemOperatorSessionOrderByWithAggregationInput[]
+    by: TotemOperatorSessionScalarFieldEnum[] | TotemOperatorSessionScalarFieldEnum
+    having?: TotemOperatorSessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TotemOperatorSessionCountAggregateInputType | true
+    _avg?: TotemOperatorSessionAvgAggregateInputType
+    _sum?: TotemOperatorSessionSumAggregateInputType
+    _min?: TotemOperatorSessionMinAggregateInputType
+    _max?: TotemOperatorSessionMaxAggregateInputType
+  }
+
+  export type TotemOperatorSessionGroupByOutputType = {
+    tokenHash: string
+    operatorId: number
+    version: number
+    restricted: boolean
+    expiresAt: Date
+    _count: TotemOperatorSessionCountAggregateOutputType | null
+    _avg: TotemOperatorSessionAvgAggregateOutputType | null
+    _sum: TotemOperatorSessionSumAggregateOutputType | null
+    _min: TotemOperatorSessionMinAggregateOutputType | null
+    _max: TotemOperatorSessionMaxAggregateOutputType | null
+  }
+
+  type GetTotemOperatorSessionGroupByPayload<T extends TotemOperatorSessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TotemOperatorSessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TotemOperatorSessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TotemOperatorSessionGroupByOutputType[P]>
+            : GetScalarType<T[P], TotemOperatorSessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TotemOperatorSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    tokenHash?: boolean
+    operatorId?: boolean
+    version?: boolean
+    restricted?: boolean
+    expiresAt?: boolean
+    operator?: boolean | TotemOperatorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totemOperatorSession"]>
+
+  export type TotemOperatorSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    tokenHash?: boolean
+    operatorId?: boolean
+    version?: boolean
+    restricted?: boolean
+    expiresAt?: boolean
+    operator?: boolean | TotemOperatorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totemOperatorSession"]>
+
+  export type TotemOperatorSessionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    tokenHash?: boolean
+    operatorId?: boolean
+    version?: boolean
+    restricted?: boolean
+    expiresAt?: boolean
+    operator?: boolean | TotemOperatorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totemOperatorSession"]>
+
+  export type TotemOperatorSessionSelectScalar = {
+    tokenHash?: boolean
+    operatorId?: boolean
+    version?: boolean
+    restricted?: boolean
+    expiresAt?: boolean
+  }
+
+  export type TotemOperatorSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"tokenHash" | "operatorId" | "version" | "restricted" | "expiresAt", ExtArgs["result"]["totemOperatorSession"]>
+  export type TotemOperatorSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    operator?: boolean | TotemOperatorDefaultArgs<ExtArgs>
+  }
+  export type TotemOperatorSessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    operator?: boolean | TotemOperatorDefaultArgs<ExtArgs>
+  }
+  export type TotemOperatorSessionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    operator?: boolean | TotemOperatorDefaultArgs<ExtArgs>
+  }
+
+  export type $TotemOperatorSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TotemOperatorSession"
+    objects: {
+      operator: Prisma.$TotemOperatorPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      tokenHash: string
+      operatorId: number
+      version: number
+      restricted: boolean
+      expiresAt: Date
+    }, ExtArgs["result"]["totemOperatorSession"]>
+    composites: {}
+  }
+
+  type TotemOperatorSessionGetPayload<S extends boolean | null | undefined | TotemOperatorSessionDefaultArgs> = $Result.GetResult<Prisma.$TotemOperatorSessionPayload, S>
+
+  type TotemOperatorSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TotemOperatorSessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TotemOperatorSessionCountAggregateInputType | true
+    }
+
+  export interface TotemOperatorSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TotemOperatorSession'], meta: { name: 'TotemOperatorSession' } }
+    /**
+     * Find zero or one TotemOperatorSession that matches the filter.
+     * @param {TotemOperatorSessionFindUniqueArgs} args - Arguments to find a TotemOperatorSession
+     * @example
+     * // Get one TotemOperatorSession
+     * const totemOperatorSession = await prisma.totemOperatorSession.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TotemOperatorSessionFindUniqueArgs>(args: SelectSubset<T, TotemOperatorSessionFindUniqueArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TotemOperatorSession that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TotemOperatorSessionFindUniqueOrThrowArgs} args - Arguments to find a TotemOperatorSession
+     * @example
+     * // Get one TotemOperatorSession
+     * const totemOperatorSession = await prisma.totemOperatorSession.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TotemOperatorSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, TotemOperatorSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemOperatorSession that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionFindFirstArgs} args - Arguments to find a TotemOperatorSession
+     * @example
+     * // Get one TotemOperatorSession
+     * const totemOperatorSession = await prisma.totemOperatorSession.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TotemOperatorSessionFindFirstArgs>(args?: SelectSubset<T, TotemOperatorSessionFindFirstArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemOperatorSession that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionFindFirstOrThrowArgs} args - Arguments to find a TotemOperatorSession
+     * @example
+     * // Get one TotemOperatorSession
+     * const totemOperatorSession = await prisma.totemOperatorSession.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TotemOperatorSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, TotemOperatorSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TotemOperatorSessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TotemOperatorSessions
+     * const totemOperatorSessions = await prisma.totemOperatorSession.findMany()
+     * 
+     * // Get first 10 TotemOperatorSessions
+     * const totemOperatorSessions = await prisma.totemOperatorSession.findMany({ take: 10 })
+     * 
+     * // Only select the `tokenHash`
+     * const totemOperatorSessionWithTokenHashOnly = await prisma.totemOperatorSession.findMany({ select: { tokenHash: true } })
+     * 
+     */
+    findMany<T extends TotemOperatorSessionFindManyArgs>(args?: SelectSubset<T, TotemOperatorSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TotemOperatorSession.
+     * @param {TotemOperatorSessionCreateArgs} args - Arguments to create a TotemOperatorSession.
+     * @example
+     * // Create one TotemOperatorSession
+     * const TotemOperatorSession = await prisma.totemOperatorSession.create({
+     *   data: {
+     *     // ... data to create a TotemOperatorSession
+     *   }
+     * })
+     * 
+     */
+    create<T extends TotemOperatorSessionCreateArgs>(args: SelectSubset<T, TotemOperatorSessionCreateArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TotemOperatorSessions.
+     * @param {TotemOperatorSessionCreateManyArgs} args - Arguments to create many TotemOperatorSessions.
+     * @example
+     * // Create many TotemOperatorSessions
+     * const totemOperatorSession = await prisma.totemOperatorSession.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TotemOperatorSessionCreateManyArgs>(args?: SelectSubset<T, TotemOperatorSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TotemOperatorSessions and returns the data saved in the database.
+     * @param {TotemOperatorSessionCreateManyAndReturnArgs} args - Arguments to create many TotemOperatorSessions.
+     * @example
+     * // Create many TotemOperatorSessions
+     * const totemOperatorSession = await prisma.totemOperatorSession.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TotemOperatorSessions and only return the `tokenHash`
+     * const totemOperatorSessionWithTokenHashOnly = await prisma.totemOperatorSession.createManyAndReturn({
+     *   select: { tokenHash: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TotemOperatorSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, TotemOperatorSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TotemOperatorSession.
+     * @param {TotemOperatorSessionDeleteArgs} args - Arguments to delete one TotemOperatorSession.
+     * @example
+     * // Delete one TotemOperatorSession
+     * const TotemOperatorSession = await prisma.totemOperatorSession.delete({
+     *   where: {
+     *     // ... filter to delete one TotemOperatorSession
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TotemOperatorSessionDeleteArgs>(args: SelectSubset<T, TotemOperatorSessionDeleteArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TotemOperatorSession.
+     * @param {TotemOperatorSessionUpdateArgs} args - Arguments to update one TotemOperatorSession.
+     * @example
+     * // Update one TotemOperatorSession
+     * const totemOperatorSession = await prisma.totemOperatorSession.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TotemOperatorSessionUpdateArgs>(args: SelectSubset<T, TotemOperatorSessionUpdateArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TotemOperatorSessions.
+     * @param {TotemOperatorSessionDeleteManyArgs} args - Arguments to filter TotemOperatorSessions to delete.
+     * @example
+     * // Delete a few TotemOperatorSessions
+     * const { count } = await prisma.totemOperatorSession.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TotemOperatorSessionDeleteManyArgs>(args?: SelectSubset<T, TotemOperatorSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemOperatorSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TotemOperatorSessions
+     * const totemOperatorSession = await prisma.totemOperatorSession.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TotemOperatorSessionUpdateManyArgs>(args: SelectSubset<T, TotemOperatorSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemOperatorSessions and returns the data updated in the database.
+     * @param {TotemOperatorSessionUpdateManyAndReturnArgs} args - Arguments to update many TotemOperatorSessions.
+     * @example
+     * // Update many TotemOperatorSessions
+     * const totemOperatorSession = await prisma.totemOperatorSession.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TotemOperatorSessions and only return the `tokenHash`
+     * const totemOperatorSessionWithTokenHashOnly = await prisma.totemOperatorSession.updateManyAndReturn({
+     *   select: { tokenHash: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TotemOperatorSessionUpdateManyAndReturnArgs>(args: SelectSubset<T, TotemOperatorSessionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TotemOperatorSession.
+     * @param {TotemOperatorSessionUpsertArgs} args - Arguments to update or create a TotemOperatorSession.
+     * @example
+     * // Update or create a TotemOperatorSession
+     * const totemOperatorSession = await prisma.totemOperatorSession.upsert({
+     *   create: {
+     *     // ... data to create a TotemOperatorSession
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TotemOperatorSession we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TotemOperatorSessionUpsertArgs>(args: SelectSubset<T, TotemOperatorSessionUpsertArgs<ExtArgs>>): Prisma__TotemOperatorSessionClient<$Result.GetResult<Prisma.$TotemOperatorSessionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TotemOperatorSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionCountArgs} args - Arguments to filter TotemOperatorSessions to count.
+     * @example
+     * // Count the number of TotemOperatorSessions
+     * const count = await prisma.totemOperatorSession.count({
+     *   where: {
+     *     // ... the filter for the TotemOperatorSessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends TotemOperatorSessionCountArgs>(
+      args?: Subset<T, TotemOperatorSessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TotemOperatorSessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TotemOperatorSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TotemOperatorSessionAggregateArgs>(args: Subset<T, TotemOperatorSessionAggregateArgs>): Prisma.PrismaPromise<GetTotemOperatorSessionAggregateType<T>>
+
+    /**
+     * Group by TotemOperatorSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemOperatorSessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TotemOperatorSessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TotemOperatorSessionGroupByArgs['orderBy'] }
+        : { orderBy?: TotemOperatorSessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TotemOperatorSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTotemOperatorSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TotemOperatorSession model
+   */
+  readonly fields: TotemOperatorSessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TotemOperatorSession.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TotemOperatorSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    operator<T extends TotemOperatorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TotemOperatorDefaultArgs<ExtArgs>>): Prisma__TotemOperatorClient<$Result.GetResult<Prisma.$TotemOperatorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TotemOperatorSession model
+   */
+  interface TotemOperatorSessionFieldRefs {
+    readonly tokenHash: FieldRef<"TotemOperatorSession", 'String'>
+    readonly operatorId: FieldRef<"TotemOperatorSession", 'Int'>
+    readonly version: FieldRef<"TotemOperatorSession", 'Int'>
+    readonly restricted: FieldRef<"TotemOperatorSession", 'Boolean'>
+    readonly expiresAt: FieldRef<"TotemOperatorSession", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TotemOperatorSession findUnique
+   */
+  export type TotemOperatorSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperatorSession to fetch.
+     */
+    where: TotemOperatorSessionWhereUniqueInput
+  }
+
+  /**
+   * TotemOperatorSession findUniqueOrThrow
+   */
+  export type TotemOperatorSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperatorSession to fetch.
+     */
+    where: TotemOperatorSessionWhereUniqueInput
+  }
+
+  /**
+   * TotemOperatorSession findFirst
+   */
+  export type TotemOperatorSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperatorSession to fetch.
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperatorSessions to fetch.
+     */
+    orderBy?: TotemOperatorSessionOrderByWithRelationInput | TotemOperatorSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemOperatorSessions.
+     */
+    cursor?: TotemOperatorSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperatorSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperatorSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemOperatorSessions.
+     */
+    distinct?: TotemOperatorSessionScalarFieldEnum | TotemOperatorSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperatorSession findFirstOrThrow
+   */
+  export type TotemOperatorSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperatorSession to fetch.
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperatorSessions to fetch.
+     */
+    orderBy?: TotemOperatorSessionOrderByWithRelationInput | TotemOperatorSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemOperatorSessions.
+     */
+    cursor?: TotemOperatorSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperatorSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperatorSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemOperatorSessions.
+     */
+    distinct?: TotemOperatorSessionScalarFieldEnum | TotemOperatorSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperatorSession findMany
+   */
+  export type TotemOperatorSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which TotemOperatorSessions to fetch.
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemOperatorSessions to fetch.
+     */
+    orderBy?: TotemOperatorSessionOrderByWithRelationInput | TotemOperatorSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TotemOperatorSessions.
+     */
+    cursor?: TotemOperatorSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemOperatorSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemOperatorSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemOperatorSessions.
+     */
+    distinct?: TotemOperatorSessionScalarFieldEnum | TotemOperatorSessionScalarFieldEnum[]
+  }
+
+  /**
+   * TotemOperatorSession create
+   */
+  export type TotemOperatorSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TotemOperatorSession.
+     */
+    data: XOR<TotemOperatorSessionCreateInput, TotemOperatorSessionUncheckedCreateInput>
+  }
+
+  /**
+   * TotemOperatorSession createMany
+   */
+  export type TotemOperatorSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TotemOperatorSessions.
+     */
+    data: TotemOperatorSessionCreateManyInput | TotemOperatorSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemOperatorSession createManyAndReturn
+   */
+  export type TotemOperatorSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * The data used to create many TotemOperatorSessions.
+     */
+    data: TotemOperatorSessionCreateManyInput | TotemOperatorSessionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TotemOperatorSession update
+   */
+  export type TotemOperatorSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TotemOperatorSession.
+     */
+    data: XOR<TotemOperatorSessionUpdateInput, TotemOperatorSessionUncheckedUpdateInput>
+    /**
+     * Choose, which TotemOperatorSession to update.
+     */
+    where: TotemOperatorSessionWhereUniqueInput
+  }
+
+  /**
+   * TotemOperatorSession updateMany
+   */
+  export type TotemOperatorSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TotemOperatorSessions.
+     */
+    data: XOR<TotemOperatorSessionUpdateManyMutationInput, TotemOperatorSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemOperatorSessions to update
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * Limit how many TotemOperatorSessions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemOperatorSession updateManyAndReturn
+   */
+  export type TotemOperatorSessionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * The data used to update TotemOperatorSessions.
+     */
+    data: XOR<TotemOperatorSessionUpdateManyMutationInput, TotemOperatorSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemOperatorSessions to update
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * Limit how many TotemOperatorSessions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TotemOperatorSession upsert
+   */
+  export type TotemOperatorSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TotemOperatorSession to update in case it exists.
+     */
+    where: TotemOperatorSessionWhereUniqueInput
+    /**
+     * In case the TotemOperatorSession found by the `where` argument doesn't exist, create a new TotemOperatorSession with this data.
+     */
+    create: XOR<TotemOperatorSessionCreateInput, TotemOperatorSessionUncheckedCreateInput>
+    /**
+     * In case the TotemOperatorSession was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TotemOperatorSessionUpdateInput, TotemOperatorSessionUncheckedUpdateInput>
+  }
+
+  /**
+   * TotemOperatorSession delete
+   */
+  export type TotemOperatorSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+    /**
+     * Filter which TotemOperatorSession to delete.
+     */
+    where: TotemOperatorSessionWhereUniqueInput
+  }
+
+  /**
+   * TotemOperatorSession deleteMany
+   */
+  export type TotemOperatorSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemOperatorSessions to delete
+     */
+    where?: TotemOperatorSessionWhereInput
+    /**
+     * Limit how many TotemOperatorSessions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemOperatorSession without action
+   */
+  export type TotemOperatorSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemOperatorSession
+     */
+    select?: TotemOperatorSessionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemOperatorSession
+     */
+    omit?: TotemOperatorSessionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotemOperatorSessionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TotemLoginAttempt
+   */
+
+  export type AggregateTotemLoginAttempt = {
+    _count: TotemLoginAttemptCountAggregateOutputType | null
+    _avg: TotemLoginAttemptAvgAggregateOutputType | null
+    _sum: TotemLoginAttemptSumAggregateOutputType | null
+    _min: TotemLoginAttemptMinAggregateOutputType | null
+    _max: TotemLoginAttemptMaxAggregateOutputType | null
+  }
+
+  export type TotemLoginAttemptAvgAggregateOutputType = {
+    count: number | null
+  }
+
+  export type TotemLoginAttemptSumAggregateOutputType = {
+    count: number | null
+  }
+
+  export type TotemLoginAttemptMinAggregateOutputType = {
+    key: string | null
+    count: number | null
+    expiresAt: Date | null
+  }
+
+  export type TotemLoginAttemptMaxAggregateOutputType = {
+    key: string | null
+    count: number | null
+    expiresAt: Date | null
+  }
+
+  export type TotemLoginAttemptCountAggregateOutputType = {
+    key: number
+    count: number
+    expiresAt: number
+    _all: number
+  }
+
+
+  export type TotemLoginAttemptAvgAggregateInputType = {
+    count?: true
+  }
+
+  export type TotemLoginAttemptSumAggregateInputType = {
+    count?: true
+  }
+
+  export type TotemLoginAttemptMinAggregateInputType = {
+    key?: true
+    count?: true
+    expiresAt?: true
+  }
+
+  export type TotemLoginAttemptMaxAggregateInputType = {
+    key?: true
+    count?: true
+    expiresAt?: true
+  }
+
+  export type TotemLoginAttemptCountAggregateInputType = {
+    key?: true
+    count?: true
+    expiresAt?: true
+    _all?: true
+  }
+
+  export type TotemLoginAttemptAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemLoginAttempt to aggregate.
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemLoginAttempts to fetch.
+     */
+    orderBy?: TotemLoginAttemptOrderByWithRelationInput | TotemLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TotemLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TotemLoginAttempts
+    **/
+    _count?: true | TotemLoginAttemptCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TotemLoginAttemptAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TotemLoginAttemptSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TotemLoginAttemptMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TotemLoginAttemptMaxAggregateInputType
+  }
+
+  export type GetTotemLoginAttemptAggregateType<T extends TotemLoginAttemptAggregateArgs> = {
+        [P in keyof T & keyof AggregateTotemLoginAttempt]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTotemLoginAttempt[P]>
+      : GetScalarType<T[P], AggregateTotemLoginAttempt[P]>
+  }
+
+
+
+
+  export type TotemLoginAttemptGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotemLoginAttemptWhereInput
+    orderBy?: TotemLoginAttemptOrderByWithAggregationInput | TotemLoginAttemptOrderByWithAggregationInput[]
+    by: TotemLoginAttemptScalarFieldEnum[] | TotemLoginAttemptScalarFieldEnum
+    having?: TotemLoginAttemptScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TotemLoginAttemptCountAggregateInputType | true
+    _avg?: TotemLoginAttemptAvgAggregateInputType
+    _sum?: TotemLoginAttemptSumAggregateInputType
+    _min?: TotemLoginAttemptMinAggregateInputType
+    _max?: TotemLoginAttemptMaxAggregateInputType
+  }
+
+  export type TotemLoginAttemptGroupByOutputType = {
+    key: string
+    count: number
+    expiresAt: Date
+    _count: TotemLoginAttemptCountAggregateOutputType | null
+    _avg: TotemLoginAttemptAvgAggregateOutputType | null
+    _sum: TotemLoginAttemptSumAggregateOutputType | null
+    _min: TotemLoginAttemptMinAggregateOutputType | null
+    _max: TotemLoginAttemptMaxAggregateOutputType | null
+  }
+
+  type GetTotemLoginAttemptGroupByPayload<T extends TotemLoginAttemptGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TotemLoginAttemptGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TotemLoginAttemptGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TotemLoginAttemptGroupByOutputType[P]>
+            : GetScalarType<T[P], TotemLoginAttemptGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TotemLoginAttemptSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    count?: boolean
+    expiresAt?: boolean
+  }, ExtArgs["result"]["totemLoginAttempt"]>
+
+  export type TotemLoginAttemptSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    count?: boolean
+    expiresAt?: boolean
+  }, ExtArgs["result"]["totemLoginAttempt"]>
+
+  export type TotemLoginAttemptSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    count?: boolean
+    expiresAt?: boolean
+  }, ExtArgs["result"]["totemLoginAttempt"]>
+
+  export type TotemLoginAttemptSelectScalar = {
+    key?: boolean
+    count?: boolean
+    expiresAt?: boolean
+  }
+
+  export type TotemLoginAttemptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"key" | "count" | "expiresAt", ExtArgs["result"]["totemLoginAttempt"]>
+
+  export type $TotemLoginAttemptPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TotemLoginAttempt"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      key: string
+      count: number
+      expiresAt: Date
+    }, ExtArgs["result"]["totemLoginAttempt"]>
+    composites: {}
+  }
+
+  type TotemLoginAttemptGetPayload<S extends boolean | null | undefined | TotemLoginAttemptDefaultArgs> = $Result.GetResult<Prisma.$TotemLoginAttemptPayload, S>
+
+  type TotemLoginAttemptCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TotemLoginAttemptFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TotemLoginAttemptCountAggregateInputType | true
+    }
+
+  export interface TotemLoginAttemptDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TotemLoginAttempt'], meta: { name: 'TotemLoginAttempt' } }
+    /**
+     * Find zero or one TotemLoginAttempt that matches the filter.
+     * @param {TotemLoginAttemptFindUniqueArgs} args - Arguments to find a TotemLoginAttempt
+     * @example
+     * // Get one TotemLoginAttempt
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TotemLoginAttemptFindUniqueArgs>(args: SelectSubset<T, TotemLoginAttemptFindUniqueArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TotemLoginAttempt that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TotemLoginAttemptFindUniqueOrThrowArgs} args - Arguments to find a TotemLoginAttempt
+     * @example
+     * // Get one TotemLoginAttempt
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TotemLoginAttemptFindUniqueOrThrowArgs>(args: SelectSubset<T, TotemLoginAttemptFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemLoginAttempt that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptFindFirstArgs} args - Arguments to find a TotemLoginAttempt
+     * @example
+     * // Get one TotemLoginAttempt
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TotemLoginAttemptFindFirstArgs>(args?: SelectSubset<T, TotemLoginAttemptFindFirstArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotemLoginAttempt that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptFindFirstOrThrowArgs} args - Arguments to find a TotemLoginAttempt
+     * @example
+     * // Get one TotemLoginAttempt
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TotemLoginAttemptFindFirstOrThrowArgs>(args?: SelectSubset<T, TotemLoginAttemptFindFirstOrThrowArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TotemLoginAttempts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TotemLoginAttempts
+     * const totemLoginAttempts = await prisma.totemLoginAttempt.findMany()
+     * 
+     * // Get first 10 TotemLoginAttempts
+     * const totemLoginAttempts = await prisma.totemLoginAttempt.findMany({ take: 10 })
+     * 
+     * // Only select the `key`
+     * const totemLoginAttemptWithKeyOnly = await prisma.totemLoginAttempt.findMany({ select: { key: true } })
+     * 
+     */
+    findMany<T extends TotemLoginAttemptFindManyArgs>(args?: SelectSubset<T, TotemLoginAttemptFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TotemLoginAttempt.
+     * @param {TotemLoginAttemptCreateArgs} args - Arguments to create a TotemLoginAttempt.
+     * @example
+     * // Create one TotemLoginAttempt
+     * const TotemLoginAttempt = await prisma.totemLoginAttempt.create({
+     *   data: {
+     *     // ... data to create a TotemLoginAttempt
+     *   }
+     * })
+     * 
+     */
+    create<T extends TotemLoginAttemptCreateArgs>(args: SelectSubset<T, TotemLoginAttemptCreateArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TotemLoginAttempts.
+     * @param {TotemLoginAttemptCreateManyArgs} args - Arguments to create many TotemLoginAttempts.
+     * @example
+     * // Create many TotemLoginAttempts
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TotemLoginAttemptCreateManyArgs>(args?: SelectSubset<T, TotemLoginAttemptCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TotemLoginAttempts and returns the data saved in the database.
+     * @param {TotemLoginAttemptCreateManyAndReturnArgs} args - Arguments to create many TotemLoginAttempts.
+     * @example
+     * // Create many TotemLoginAttempts
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TotemLoginAttempts and only return the `key`
+     * const totemLoginAttemptWithKeyOnly = await prisma.totemLoginAttempt.createManyAndReturn({
+     *   select: { key: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TotemLoginAttemptCreateManyAndReturnArgs>(args?: SelectSubset<T, TotemLoginAttemptCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TotemLoginAttempt.
+     * @param {TotemLoginAttemptDeleteArgs} args - Arguments to delete one TotemLoginAttempt.
+     * @example
+     * // Delete one TotemLoginAttempt
+     * const TotemLoginAttempt = await prisma.totemLoginAttempt.delete({
+     *   where: {
+     *     // ... filter to delete one TotemLoginAttempt
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TotemLoginAttemptDeleteArgs>(args: SelectSubset<T, TotemLoginAttemptDeleteArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TotemLoginAttempt.
+     * @param {TotemLoginAttemptUpdateArgs} args - Arguments to update one TotemLoginAttempt.
+     * @example
+     * // Update one TotemLoginAttempt
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TotemLoginAttemptUpdateArgs>(args: SelectSubset<T, TotemLoginAttemptUpdateArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TotemLoginAttempts.
+     * @param {TotemLoginAttemptDeleteManyArgs} args - Arguments to filter TotemLoginAttempts to delete.
+     * @example
+     * // Delete a few TotemLoginAttempts
+     * const { count } = await prisma.totemLoginAttempt.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TotemLoginAttemptDeleteManyArgs>(args?: SelectSubset<T, TotemLoginAttemptDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemLoginAttempts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TotemLoginAttempts
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TotemLoginAttemptUpdateManyArgs>(args: SelectSubset<T, TotemLoginAttemptUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotemLoginAttempts and returns the data updated in the database.
+     * @param {TotemLoginAttemptUpdateManyAndReturnArgs} args - Arguments to update many TotemLoginAttempts.
+     * @example
+     * // Update many TotemLoginAttempts
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TotemLoginAttempts and only return the `key`
+     * const totemLoginAttemptWithKeyOnly = await prisma.totemLoginAttempt.updateManyAndReturn({
+     *   select: { key: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TotemLoginAttemptUpdateManyAndReturnArgs>(args: SelectSubset<T, TotemLoginAttemptUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TotemLoginAttempt.
+     * @param {TotemLoginAttemptUpsertArgs} args - Arguments to update or create a TotemLoginAttempt.
+     * @example
+     * // Update or create a TotemLoginAttempt
+     * const totemLoginAttempt = await prisma.totemLoginAttempt.upsert({
+     *   create: {
+     *     // ... data to create a TotemLoginAttempt
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TotemLoginAttempt we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TotemLoginAttemptUpsertArgs>(args: SelectSubset<T, TotemLoginAttemptUpsertArgs<ExtArgs>>): Prisma__TotemLoginAttemptClient<$Result.GetResult<Prisma.$TotemLoginAttemptPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TotemLoginAttempts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptCountArgs} args - Arguments to filter TotemLoginAttempts to count.
+     * @example
+     * // Count the number of TotemLoginAttempts
+     * const count = await prisma.totemLoginAttempt.count({
+     *   where: {
+     *     // ... the filter for the TotemLoginAttempts we want to count
+     *   }
+     * })
+    **/
+    count<T extends TotemLoginAttemptCountArgs>(
+      args?: Subset<T, TotemLoginAttemptCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TotemLoginAttemptCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TotemLoginAttempt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TotemLoginAttemptAggregateArgs>(args: Subset<T, TotemLoginAttemptAggregateArgs>): Prisma.PrismaPromise<GetTotemLoginAttemptAggregateType<T>>
+
+    /**
+     * Group by TotemLoginAttempt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotemLoginAttemptGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TotemLoginAttemptGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TotemLoginAttemptGroupByArgs['orderBy'] }
+        : { orderBy?: TotemLoginAttemptGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TotemLoginAttemptGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTotemLoginAttemptGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TotemLoginAttempt model
+   */
+  readonly fields: TotemLoginAttemptFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TotemLoginAttempt.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TotemLoginAttemptClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TotemLoginAttempt model
+   */
+  interface TotemLoginAttemptFieldRefs {
+    readonly key: FieldRef<"TotemLoginAttempt", 'String'>
+    readonly count: FieldRef<"TotemLoginAttempt", 'Int'>
+    readonly expiresAt: FieldRef<"TotemLoginAttempt", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TotemLoginAttempt findUnique
+   */
+  export type TotemLoginAttemptFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemLoginAttempt to fetch.
+     */
+    where: TotemLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * TotemLoginAttempt findUniqueOrThrow
+   */
+  export type TotemLoginAttemptFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemLoginAttempt to fetch.
+     */
+    where: TotemLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * TotemLoginAttempt findFirst
+   */
+  export type TotemLoginAttemptFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemLoginAttempt to fetch.
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemLoginAttempts to fetch.
+     */
+    orderBy?: TotemLoginAttemptOrderByWithRelationInput | TotemLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemLoginAttempts.
+     */
+    cursor?: TotemLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemLoginAttempts.
+     */
+    distinct?: TotemLoginAttemptScalarFieldEnum | TotemLoginAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * TotemLoginAttempt findFirstOrThrow
+   */
+  export type TotemLoginAttemptFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemLoginAttempt to fetch.
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemLoginAttempts to fetch.
+     */
+    orderBy?: TotemLoginAttemptOrderByWithRelationInput | TotemLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotemLoginAttempts.
+     */
+    cursor?: TotemLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemLoginAttempts.
+     */
+    distinct?: TotemLoginAttemptScalarFieldEnum | TotemLoginAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * TotemLoginAttempt findMany
+   */
+  export type TotemLoginAttemptFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Filter, which TotemLoginAttempts to fetch.
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotemLoginAttempts to fetch.
+     */
+    orderBy?: TotemLoginAttemptOrderByWithRelationInput | TotemLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TotemLoginAttempts.
+     */
+    cursor?: TotemLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotemLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotemLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotemLoginAttempts.
+     */
+    distinct?: TotemLoginAttemptScalarFieldEnum | TotemLoginAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * TotemLoginAttempt create
+   */
+  export type TotemLoginAttemptCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The data needed to create a TotemLoginAttempt.
+     */
+    data: XOR<TotemLoginAttemptCreateInput, TotemLoginAttemptUncheckedCreateInput>
+  }
+
+  /**
+   * TotemLoginAttempt createMany
+   */
+  export type TotemLoginAttemptCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TotemLoginAttempts.
+     */
+    data: TotemLoginAttemptCreateManyInput | TotemLoginAttemptCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemLoginAttempt createManyAndReturn
+   */
+  export type TotemLoginAttemptCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The data used to create many TotemLoginAttempts.
+     */
+    data: TotemLoginAttemptCreateManyInput | TotemLoginAttemptCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotemLoginAttempt update
+   */
+  export type TotemLoginAttemptUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The data needed to update a TotemLoginAttempt.
+     */
+    data: XOR<TotemLoginAttemptUpdateInput, TotemLoginAttemptUncheckedUpdateInput>
+    /**
+     * Choose, which TotemLoginAttempt to update.
+     */
+    where: TotemLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * TotemLoginAttempt updateMany
+   */
+  export type TotemLoginAttemptUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TotemLoginAttempts.
+     */
+    data: XOR<TotemLoginAttemptUpdateManyMutationInput, TotemLoginAttemptUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemLoginAttempts to update
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * Limit how many TotemLoginAttempts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemLoginAttempt updateManyAndReturn
+   */
+  export type TotemLoginAttemptUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The data used to update TotemLoginAttempts.
+     */
+    data: XOR<TotemLoginAttemptUpdateManyMutationInput, TotemLoginAttemptUncheckedUpdateManyInput>
+    /**
+     * Filter which TotemLoginAttempts to update
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * Limit how many TotemLoginAttempts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemLoginAttempt upsert
+   */
+  export type TotemLoginAttemptUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The filter to search for the TotemLoginAttempt to update in case it exists.
+     */
+    where: TotemLoginAttemptWhereUniqueInput
+    /**
+     * In case the TotemLoginAttempt found by the `where` argument doesn't exist, create a new TotemLoginAttempt with this data.
+     */
+    create: XOR<TotemLoginAttemptCreateInput, TotemLoginAttemptUncheckedCreateInput>
+    /**
+     * In case the TotemLoginAttempt was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TotemLoginAttemptUpdateInput, TotemLoginAttemptUncheckedUpdateInput>
+  }
+
+  /**
+   * TotemLoginAttempt delete
+   */
+  export type TotemLoginAttemptDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Filter which TotemLoginAttempt to delete.
+     */
+    where: TotemLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * TotemLoginAttempt deleteMany
+   */
+  export type TotemLoginAttemptDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotemLoginAttempts to delete
+     */
+    where?: TotemLoginAttemptWhereInput
+    /**
+     * Limit how many TotemLoginAttempts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotemLoginAttempt without action
+   */
+  export type TotemLoginAttemptDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotemLoginAttempt
+     */
+    select?: TotemLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotemLoginAttempt
+     */
+    omit?: TotemLoginAttemptOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model AuditLog
    */
 
@@ -17848,6 +23657,14 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const TotemSenhaCounterScalarFieldEnum: {
+    date: 'date',
+    number: 'number'
+  };
+
+  export type TotemSenhaCounterScalarFieldEnum = (typeof TotemSenhaCounterScalarFieldEnum)[keyof typeof TotemSenhaCounterScalarFieldEnum]
+
+
   export const TtsDailyUsageScalarFieldEnum: {
     id: 'id',
     date: 'date',
@@ -18013,6 +23830,53 @@ export namespace Prisma {
   export type AdminUserScalarFieldEnum = (typeof AdminUserScalarFieldEnum)[keyof typeof AdminUserScalarFieldEnum]
 
 
+  export const TotemAccessSettingsScalarFieldEnum: {
+    id: 'id',
+    enabled: 'enabled',
+    pinValidityDays: 'pinValidityDays',
+    sessionHours: 'sessionHours'
+  };
+
+  export type TotemAccessSettingsScalarFieldEnum = (typeof TotemAccessSettingsScalarFieldEnum)[keyof typeof TotemAccessSettingsScalarFieldEnum]
+
+
+  export const TotemOperatorScalarFieldEnum: {
+    id: 'id',
+    username: 'username',
+    displayName: 'displayName',
+    cardId: 'cardId',
+    pinHash: 'pinHash',
+    pinExpiresAt: 'pinExpiresAt',
+    mustChangePin: 'mustChangePin',
+    active: 'active',
+    version: 'version',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TotemOperatorScalarFieldEnum = (typeof TotemOperatorScalarFieldEnum)[keyof typeof TotemOperatorScalarFieldEnum]
+
+
+  export const TotemOperatorSessionScalarFieldEnum: {
+    tokenHash: 'tokenHash',
+    operatorId: 'operatorId',
+    version: 'version',
+    restricted: 'restricted',
+    expiresAt: 'expiresAt'
+  };
+
+  export type TotemOperatorSessionScalarFieldEnum = (typeof TotemOperatorSessionScalarFieldEnum)[keyof typeof TotemOperatorSessionScalarFieldEnum]
+
+
+  export const TotemLoginAttemptScalarFieldEnum: {
+    key: 'key',
+    count: 'count',
+    expiresAt: 'expiresAt'
+  };
+
+  export type TotemLoginAttemptScalarFieldEnum = (typeof TotemLoginAttemptScalarFieldEnum)[keyof typeof TotemLoginAttemptScalarFieldEnum]
+
+
   export const AuditLogScalarFieldEnum: {
     id: 'id',
     sessionId: 'sessionId',
@@ -18081,20 +23945,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -18105,6 +23955,20 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -18187,6 +24051,45 @@ export namespace Prisma {
    * Deep Input Types
    */
 
+
+  export type TotemSenhaCounterWhereInput = {
+    AND?: TotemSenhaCounterWhereInput | TotemSenhaCounterWhereInput[]
+    OR?: TotemSenhaCounterWhereInput[]
+    NOT?: TotemSenhaCounterWhereInput | TotemSenhaCounterWhereInput[]
+    date?: DateTimeFilter<"TotemSenhaCounter"> | Date | string
+    number?: IntFilter<"TotemSenhaCounter"> | number
+  }
+
+  export type TotemSenhaCounterOrderByWithRelationInput = {
+    date?: SortOrder
+    number?: SortOrder
+  }
+
+  export type TotemSenhaCounterWhereUniqueInput = Prisma.AtLeast<{
+    date?: Date | string
+    AND?: TotemSenhaCounterWhereInput | TotemSenhaCounterWhereInput[]
+    OR?: TotemSenhaCounterWhereInput[]
+    NOT?: TotemSenhaCounterWhereInput | TotemSenhaCounterWhereInput[]
+    number?: IntFilter<"TotemSenhaCounter"> | number
+  }, "date">
+
+  export type TotemSenhaCounterOrderByWithAggregationInput = {
+    date?: SortOrder
+    number?: SortOrder
+    _count?: TotemSenhaCounterCountOrderByAggregateInput
+    _avg?: TotemSenhaCounterAvgOrderByAggregateInput
+    _max?: TotemSenhaCounterMaxOrderByAggregateInput
+    _min?: TotemSenhaCounterMinOrderByAggregateInput
+    _sum?: TotemSenhaCounterSumOrderByAggregateInput
+  }
+
+  export type TotemSenhaCounterScalarWhereWithAggregatesInput = {
+    AND?: TotemSenhaCounterScalarWhereWithAggregatesInput | TotemSenhaCounterScalarWhereWithAggregatesInput[]
+    OR?: TotemSenhaCounterScalarWhereWithAggregatesInput[]
+    NOT?: TotemSenhaCounterScalarWhereWithAggregatesInput | TotemSenhaCounterScalarWhereWithAggregatesInput[]
+    date?: DateTimeWithAggregatesFilter<"TotemSenhaCounter"> | Date | string
+    number?: IntWithAggregatesFilter<"TotemSenhaCounter"> | number
+  }
 
   export type TtsDailyUsageWhereInput = {
     AND?: TtsDailyUsageWhereInput | TtsDailyUsageWhereInput[]
@@ -19000,6 +24903,243 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"AdminUser"> | Date | string
   }
 
+  export type TotemAccessSettingsWhereInput = {
+    AND?: TotemAccessSettingsWhereInput | TotemAccessSettingsWhereInput[]
+    OR?: TotemAccessSettingsWhereInput[]
+    NOT?: TotemAccessSettingsWhereInput | TotemAccessSettingsWhereInput[]
+    id?: IntFilter<"TotemAccessSettings"> | number
+    enabled?: BoolFilter<"TotemAccessSettings"> | boolean
+    pinValidityDays?: IntFilter<"TotemAccessSettings"> | number
+    sessionHours?: IntFilter<"TotemAccessSettings"> | number
+  }
+
+  export type TotemAccessSettingsOrderByWithRelationInput = {
+    id?: SortOrder
+    enabled?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+  }
+
+  export type TotemAccessSettingsWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: TotemAccessSettingsWhereInput | TotemAccessSettingsWhereInput[]
+    OR?: TotemAccessSettingsWhereInput[]
+    NOT?: TotemAccessSettingsWhereInput | TotemAccessSettingsWhereInput[]
+    enabled?: BoolFilter<"TotemAccessSettings"> | boolean
+    pinValidityDays?: IntFilter<"TotemAccessSettings"> | number
+    sessionHours?: IntFilter<"TotemAccessSettings"> | number
+  }, "id">
+
+  export type TotemAccessSettingsOrderByWithAggregationInput = {
+    id?: SortOrder
+    enabled?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+    _count?: TotemAccessSettingsCountOrderByAggregateInput
+    _avg?: TotemAccessSettingsAvgOrderByAggregateInput
+    _max?: TotemAccessSettingsMaxOrderByAggregateInput
+    _min?: TotemAccessSettingsMinOrderByAggregateInput
+    _sum?: TotemAccessSettingsSumOrderByAggregateInput
+  }
+
+  export type TotemAccessSettingsScalarWhereWithAggregatesInput = {
+    AND?: TotemAccessSettingsScalarWhereWithAggregatesInput | TotemAccessSettingsScalarWhereWithAggregatesInput[]
+    OR?: TotemAccessSettingsScalarWhereWithAggregatesInput[]
+    NOT?: TotemAccessSettingsScalarWhereWithAggregatesInput | TotemAccessSettingsScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"TotemAccessSettings"> | number
+    enabled?: BoolWithAggregatesFilter<"TotemAccessSettings"> | boolean
+    pinValidityDays?: IntWithAggregatesFilter<"TotemAccessSettings"> | number
+    sessionHours?: IntWithAggregatesFilter<"TotemAccessSettings"> | number
+  }
+
+  export type TotemOperatorWhereInput = {
+    AND?: TotemOperatorWhereInput | TotemOperatorWhereInput[]
+    OR?: TotemOperatorWhereInput[]
+    NOT?: TotemOperatorWhereInput | TotemOperatorWhereInput[]
+    id?: IntFilter<"TotemOperator"> | number
+    username?: StringFilter<"TotemOperator"> | string
+    displayName?: StringFilter<"TotemOperator"> | string
+    cardId?: UuidFilter<"TotemOperator"> | string
+    pinHash?: StringFilter<"TotemOperator"> | string
+    pinExpiresAt?: DateTimeFilter<"TotemOperator"> | Date | string
+    mustChangePin?: BoolFilter<"TotemOperator"> | boolean
+    active?: BoolFilter<"TotemOperator"> | boolean
+    version?: IntFilter<"TotemOperator"> | number
+    createdAt?: DateTimeFilter<"TotemOperator"> | Date | string
+    updatedAt?: DateTimeFilter<"TotemOperator"> | Date | string
+    sessions?: TotemOperatorSessionListRelationFilter
+  }
+
+  export type TotemOperatorOrderByWithRelationInput = {
+    id?: SortOrder
+    username?: SortOrder
+    displayName?: SortOrder
+    cardId?: SortOrder
+    pinHash?: SortOrder
+    pinExpiresAt?: SortOrder
+    mustChangePin?: SortOrder
+    active?: SortOrder
+    version?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    sessions?: TotemOperatorSessionOrderByRelationAggregateInput
+  }
+
+  export type TotemOperatorWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    username?: string
+    cardId?: string
+    AND?: TotemOperatorWhereInput | TotemOperatorWhereInput[]
+    OR?: TotemOperatorWhereInput[]
+    NOT?: TotemOperatorWhereInput | TotemOperatorWhereInput[]
+    displayName?: StringFilter<"TotemOperator"> | string
+    pinHash?: StringFilter<"TotemOperator"> | string
+    pinExpiresAt?: DateTimeFilter<"TotemOperator"> | Date | string
+    mustChangePin?: BoolFilter<"TotemOperator"> | boolean
+    active?: BoolFilter<"TotemOperator"> | boolean
+    version?: IntFilter<"TotemOperator"> | number
+    createdAt?: DateTimeFilter<"TotemOperator"> | Date | string
+    updatedAt?: DateTimeFilter<"TotemOperator"> | Date | string
+    sessions?: TotemOperatorSessionListRelationFilter
+  }, "id" | "username" | "cardId">
+
+  export type TotemOperatorOrderByWithAggregationInput = {
+    id?: SortOrder
+    username?: SortOrder
+    displayName?: SortOrder
+    cardId?: SortOrder
+    pinHash?: SortOrder
+    pinExpiresAt?: SortOrder
+    mustChangePin?: SortOrder
+    active?: SortOrder
+    version?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TotemOperatorCountOrderByAggregateInput
+    _avg?: TotemOperatorAvgOrderByAggregateInput
+    _max?: TotemOperatorMaxOrderByAggregateInput
+    _min?: TotemOperatorMinOrderByAggregateInput
+    _sum?: TotemOperatorSumOrderByAggregateInput
+  }
+
+  export type TotemOperatorScalarWhereWithAggregatesInput = {
+    AND?: TotemOperatorScalarWhereWithAggregatesInput | TotemOperatorScalarWhereWithAggregatesInput[]
+    OR?: TotemOperatorScalarWhereWithAggregatesInput[]
+    NOT?: TotemOperatorScalarWhereWithAggregatesInput | TotemOperatorScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"TotemOperator"> | number
+    username?: StringWithAggregatesFilter<"TotemOperator"> | string
+    displayName?: StringWithAggregatesFilter<"TotemOperator"> | string
+    cardId?: UuidWithAggregatesFilter<"TotemOperator"> | string
+    pinHash?: StringWithAggregatesFilter<"TotemOperator"> | string
+    pinExpiresAt?: DateTimeWithAggregatesFilter<"TotemOperator"> | Date | string
+    mustChangePin?: BoolWithAggregatesFilter<"TotemOperator"> | boolean
+    active?: BoolWithAggregatesFilter<"TotemOperator"> | boolean
+    version?: IntWithAggregatesFilter<"TotemOperator"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"TotemOperator"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TotemOperator"> | Date | string
+  }
+
+  export type TotemOperatorSessionWhereInput = {
+    AND?: TotemOperatorSessionWhereInput | TotemOperatorSessionWhereInput[]
+    OR?: TotemOperatorSessionWhereInput[]
+    NOT?: TotemOperatorSessionWhereInput | TotemOperatorSessionWhereInput[]
+    tokenHash?: StringFilter<"TotemOperatorSession"> | string
+    operatorId?: IntFilter<"TotemOperatorSession"> | number
+    version?: IntFilter<"TotemOperatorSession"> | number
+    restricted?: BoolFilter<"TotemOperatorSession"> | boolean
+    expiresAt?: DateTimeFilter<"TotemOperatorSession"> | Date | string
+    operator?: XOR<TotemOperatorScalarRelationFilter, TotemOperatorWhereInput>
+  }
+
+  export type TotemOperatorSessionOrderByWithRelationInput = {
+    tokenHash?: SortOrder
+    operatorId?: SortOrder
+    version?: SortOrder
+    restricted?: SortOrder
+    expiresAt?: SortOrder
+    operator?: TotemOperatorOrderByWithRelationInput
+  }
+
+  export type TotemOperatorSessionWhereUniqueInput = Prisma.AtLeast<{
+    tokenHash?: string
+    AND?: TotemOperatorSessionWhereInput | TotemOperatorSessionWhereInput[]
+    OR?: TotemOperatorSessionWhereInput[]
+    NOT?: TotemOperatorSessionWhereInput | TotemOperatorSessionWhereInput[]
+    operatorId?: IntFilter<"TotemOperatorSession"> | number
+    version?: IntFilter<"TotemOperatorSession"> | number
+    restricted?: BoolFilter<"TotemOperatorSession"> | boolean
+    expiresAt?: DateTimeFilter<"TotemOperatorSession"> | Date | string
+    operator?: XOR<TotemOperatorScalarRelationFilter, TotemOperatorWhereInput>
+  }, "tokenHash">
+
+  export type TotemOperatorSessionOrderByWithAggregationInput = {
+    tokenHash?: SortOrder
+    operatorId?: SortOrder
+    version?: SortOrder
+    restricted?: SortOrder
+    expiresAt?: SortOrder
+    _count?: TotemOperatorSessionCountOrderByAggregateInput
+    _avg?: TotemOperatorSessionAvgOrderByAggregateInput
+    _max?: TotemOperatorSessionMaxOrderByAggregateInput
+    _min?: TotemOperatorSessionMinOrderByAggregateInput
+    _sum?: TotemOperatorSessionSumOrderByAggregateInput
+  }
+
+  export type TotemOperatorSessionScalarWhereWithAggregatesInput = {
+    AND?: TotemOperatorSessionScalarWhereWithAggregatesInput | TotemOperatorSessionScalarWhereWithAggregatesInput[]
+    OR?: TotemOperatorSessionScalarWhereWithAggregatesInput[]
+    NOT?: TotemOperatorSessionScalarWhereWithAggregatesInput | TotemOperatorSessionScalarWhereWithAggregatesInput[]
+    tokenHash?: StringWithAggregatesFilter<"TotemOperatorSession"> | string
+    operatorId?: IntWithAggregatesFilter<"TotemOperatorSession"> | number
+    version?: IntWithAggregatesFilter<"TotemOperatorSession"> | number
+    restricted?: BoolWithAggregatesFilter<"TotemOperatorSession"> | boolean
+    expiresAt?: DateTimeWithAggregatesFilter<"TotemOperatorSession"> | Date | string
+  }
+
+  export type TotemLoginAttemptWhereInput = {
+    AND?: TotemLoginAttemptWhereInput | TotemLoginAttemptWhereInput[]
+    OR?: TotemLoginAttemptWhereInput[]
+    NOT?: TotemLoginAttemptWhereInput | TotemLoginAttemptWhereInput[]
+    key?: StringFilter<"TotemLoginAttempt"> | string
+    count?: IntFilter<"TotemLoginAttempt"> | number
+    expiresAt?: DateTimeFilter<"TotemLoginAttempt"> | Date | string
+  }
+
+  export type TotemLoginAttemptOrderByWithRelationInput = {
+    key?: SortOrder
+    count?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemLoginAttemptWhereUniqueInput = Prisma.AtLeast<{
+    key?: string
+    AND?: TotemLoginAttemptWhereInput | TotemLoginAttemptWhereInput[]
+    OR?: TotemLoginAttemptWhereInput[]
+    NOT?: TotemLoginAttemptWhereInput | TotemLoginAttemptWhereInput[]
+    count?: IntFilter<"TotemLoginAttempt"> | number
+    expiresAt?: DateTimeFilter<"TotemLoginAttempt"> | Date | string
+  }, "key">
+
+  export type TotemLoginAttemptOrderByWithAggregationInput = {
+    key?: SortOrder
+    count?: SortOrder
+    expiresAt?: SortOrder
+    _count?: TotemLoginAttemptCountOrderByAggregateInput
+    _avg?: TotemLoginAttemptAvgOrderByAggregateInput
+    _max?: TotemLoginAttemptMaxOrderByAggregateInput
+    _min?: TotemLoginAttemptMinOrderByAggregateInput
+    _sum?: TotemLoginAttemptSumOrderByAggregateInput
+  }
+
+  export type TotemLoginAttemptScalarWhereWithAggregatesInput = {
+    AND?: TotemLoginAttemptScalarWhereWithAggregatesInput | TotemLoginAttemptScalarWhereWithAggregatesInput[]
+    OR?: TotemLoginAttemptScalarWhereWithAggregatesInput[]
+    NOT?: TotemLoginAttemptScalarWhereWithAggregatesInput | TotemLoginAttemptScalarWhereWithAggregatesInput[]
+    key?: StringWithAggregatesFilter<"TotemLoginAttempt"> | string
+    count?: IntWithAggregatesFilter<"TotemLoginAttempt"> | number
+    expiresAt?: DateTimeWithAggregatesFilter<"TotemLoginAttempt"> | Date | string
+  }
+
   export type AuditLogWhereInput = {
     AND?: AuditLogWhereInput | AuditLogWhereInput[]
     OR?: AuditLogWhereInput[]
@@ -19067,6 +25207,41 @@ export namespace Prisma {
     step?: StringNullableWithAggregatesFilter<"AuditLog"> | string | null
     metadata?: JsonNullableWithAggregatesFilter<"AuditLog">
     createdAt?: DateTimeWithAggregatesFilter<"AuditLog"> | Date | string
+  }
+
+  export type TotemSenhaCounterCreateInput = {
+    date: Date | string
+    number: number
+  }
+
+  export type TotemSenhaCounterUncheckedCreateInput = {
+    date: Date | string
+    number: number
+  }
+
+  export type TotemSenhaCounterUpdateInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    number?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemSenhaCounterUncheckedUpdateInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    number?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemSenhaCounterCreateManyInput = {
+    date: Date | string
+    number: number
+  }
+
+  export type TotemSenhaCounterUpdateManyMutationInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    number?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemSenhaCounterUncheckedUpdateManyInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    number?: IntFieldUpdateOperationsInput | number
   }
 
   export type TtsDailyUsageCreateInput = {
@@ -19903,6 +26078,251 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type TotemAccessSettingsCreateInput = {
+    id?: number
+    enabled?: boolean
+    pinValidityDays?: number
+    sessionHours?: number
+  }
+
+  export type TotemAccessSettingsUncheckedCreateInput = {
+    id?: number
+    enabled?: boolean
+    pinValidityDays?: number
+    sessionHours?: number
+  }
+
+  export type TotemAccessSettingsUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    pinValidityDays?: IntFieldUpdateOperationsInput | number
+    sessionHours?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemAccessSettingsUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    pinValidityDays?: IntFieldUpdateOperationsInput | number
+    sessionHours?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemAccessSettingsCreateManyInput = {
+    id?: number
+    enabled?: boolean
+    pinValidityDays?: number
+    sessionHours?: number
+  }
+
+  export type TotemAccessSettingsUpdateManyMutationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    pinValidityDays?: IntFieldUpdateOperationsInput | number
+    sessionHours?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemAccessSettingsUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    pinValidityDays?: IntFieldUpdateOperationsInput | number
+    sessionHours?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TotemOperatorCreateInput = {
+    username: string
+    displayName: string
+    cardId?: string
+    pinHash: string
+    pinExpiresAt: Date | string
+    mustChangePin?: boolean
+    active?: boolean
+    version?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sessions?: TotemOperatorSessionCreateNestedManyWithoutOperatorInput
+  }
+
+  export type TotemOperatorUncheckedCreateInput = {
+    id?: number
+    username: string
+    displayName: string
+    cardId?: string
+    pinHash: string
+    pinExpiresAt: Date | string
+    mustChangePin?: boolean
+    active?: boolean
+    version?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sessions?: TotemOperatorSessionUncheckedCreateNestedManyWithoutOperatorInput
+  }
+
+  export type TotemOperatorUpdateInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    cardId?: StringFieldUpdateOperationsInput | string
+    pinHash?: StringFieldUpdateOperationsInput | string
+    pinExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mustChangePin?: BoolFieldUpdateOperationsInput | boolean
+    active?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: TotemOperatorSessionUpdateManyWithoutOperatorNestedInput
+  }
+
+  export type TotemOperatorUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    cardId?: StringFieldUpdateOperationsInput | string
+    pinHash?: StringFieldUpdateOperationsInput | string
+    pinExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mustChangePin?: BoolFieldUpdateOperationsInput | boolean
+    active?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: TotemOperatorSessionUncheckedUpdateManyWithoutOperatorNestedInput
+  }
+
+  export type TotemOperatorCreateManyInput = {
+    id?: number
+    username: string
+    displayName: string
+    cardId?: string
+    pinHash: string
+    pinExpiresAt: Date | string
+    mustChangePin?: boolean
+    active?: boolean
+    version?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TotemOperatorUpdateManyMutationInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    cardId?: StringFieldUpdateOperationsInput | string
+    pinHash?: StringFieldUpdateOperationsInput | string
+    pinExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mustChangePin?: BoolFieldUpdateOperationsInput | boolean
+    active?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    cardId?: StringFieldUpdateOperationsInput | string
+    pinHash?: StringFieldUpdateOperationsInput | string
+    pinExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mustChangePin?: BoolFieldUpdateOperationsInput | boolean
+    active?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorSessionCreateInput = {
+    tokenHash: string
+    version: number
+    restricted?: boolean
+    expiresAt: Date | string
+    operator: TotemOperatorCreateNestedOneWithoutSessionsInput
+  }
+
+  export type TotemOperatorSessionUncheckedCreateInput = {
+    tokenHash: string
+    operatorId: number
+    version: number
+    restricted?: boolean
+    expiresAt: Date | string
+  }
+
+  export type TotemOperatorSessionUpdateInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    operator?: TotemOperatorUpdateOneRequiredWithoutSessionsNestedInput
+  }
+
+  export type TotemOperatorSessionUncheckedUpdateInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    operatorId?: IntFieldUpdateOperationsInput | number
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorSessionCreateManyInput = {
+    tokenHash: string
+    operatorId: number
+    version: number
+    restricted?: boolean
+    expiresAt: Date | string
+  }
+
+  export type TotemOperatorSessionUpdateManyMutationInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorSessionUncheckedUpdateManyInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    operatorId?: IntFieldUpdateOperationsInput | number
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemLoginAttemptCreateInput = {
+    key: string
+    count?: number
+    expiresAt: Date | string
+  }
+
+  export type TotemLoginAttemptUncheckedCreateInput = {
+    key: string
+    count?: number
+    expiresAt: Date | string
+  }
+
+  export type TotemLoginAttemptUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemLoginAttemptUncheckedUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemLoginAttemptCreateManyInput = {
+    key: string
+    count?: number
+    expiresAt: Date | string
+  }
+
+  export type TotemLoginAttemptUpdateManyMutationInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemLoginAttemptUncheckedUpdateManyInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AuditLogCreateInput = {
     id?: bigint | number
     sessionId?: string | null
@@ -19980,6 +26400,17 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -19991,7 +26422,30 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
+  export type TotemSenhaCounterCountOrderByAggregateInput = {
+    date?: SortOrder
+    number?: SortOrder
+  }
+
+  export type TotemSenhaCounterAvgOrderByAggregateInput = {
+    number?: SortOrder
+  }
+
+  export type TotemSenhaCounterMaxOrderByAggregateInput = {
+    date?: SortOrder
+    number?: SortOrder
+  }
+
+  export type TotemSenhaCounterMinOrderByAggregateInput = {
+    date?: SortOrder
+    number?: SortOrder
+  }
+
+  export type TotemSenhaCounterSumOrderByAggregateInput = {
+    number?: SortOrder
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -19999,7 +26453,26 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type TtsDailyUsageCountOrderByAggregateInput = {
@@ -20033,36 +26506,6 @@ export namespace Prisma {
     id?: SortOrder
     chars?: SortOrder
     requests?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -20751,6 +27194,193 @@ export namespace Prisma {
   export type AdminUserSumOrderByAggregateInput = {
     id?: SortOrder
   }
+
+  export type TotemAccessSettingsCountOrderByAggregateInput = {
+    id?: SortOrder
+    enabled?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+  }
+
+  export type TotemAccessSettingsAvgOrderByAggregateInput = {
+    id?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+  }
+
+  export type TotemAccessSettingsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    enabled?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+  }
+
+  export type TotemAccessSettingsMinOrderByAggregateInput = {
+    id?: SortOrder
+    enabled?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+  }
+
+  export type TotemAccessSettingsSumOrderByAggregateInput = {
+    id?: SortOrder
+    pinValidityDays?: SortOrder
+    sessionHours?: SortOrder
+  }
+
+  export type UuidFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidFilter<$PrismaModel> | string
+  }
+
+  export type TotemOperatorSessionListRelationFilter = {
+    every?: TotemOperatorSessionWhereInput
+    some?: TotemOperatorSessionWhereInput
+    none?: TotemOperatorSessionWhereInput
+  }
+
+  export type TotemOperatorSessionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TotemOperatorCountOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    displayName?: SortOrder
+    cardId?: SortOrder
+    pinHash?: SortOrder
+    pinExpiresAt?: SortOrder
+    mustChangePin?: SortOrder
+    active?: SortOrder
+    version?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TotemOperatorAvgOrderByAggregateInput = {
+    id?: SortOrder
+    version?: SortOrder
+  }
+
+  export type TotemOperatorMaxOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    displayName?: SortOrder
+    cardId?: SortOrder
+    pinHash?: SortOrder
+    pinExpiresAt?: SortOrder
+    mustChangePin?: SortOrder
+    active?: SortOrder
+    version?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TotemOperatorMinOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    displayName?: SortOrder
+    cardId?: SortOrder
+    pinHash?: SortOrder
+    pinExpiresAt?: SortOrder
+    mustChangePin?: SortOrder
+    active?: SortOrder
+    version?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TotemOperatorSumOrderByAggregateInput = {
+    id?: SortOrder
+    version?: SortOrder
+  }
+
+  export type UuidWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type TotemOperatorScalarRelationFilter = {
+    is?: TotemOperatorWhereInput
+    isNot?: TotemOperatorWhereInput
+  }
+
+  export type TotemOperatorSessionCountOrderByAggregateInput = {
+    tokenHash?: SortOrder
+    operatorId?: SortOrder
+    version?: SortOrder
+    restricted?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemOperatorSessionAvgOrderByAggregateInput = {
+    operatorId?: SortOrder
+    version?: SortOrder
+  }
+
+  export type TotemOperatorSessionMaxOrderByAggregateInput = {
+    tokenHash?: SortOrder
+    operatorId?: SortOrder
+    version?: SortOrder
+    restricted?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemOperatorSessionMinOrderByAggregateInput = {
+    tokenHash?: SortOrder
+    operatorId?: SortOrder
+    version?: SortOrder
+    restricted?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemOperatorSessionSumOrderByAggregateInput = {
+    operatorId?: SortOrder
+    version?: SortOrder
+  }
+
+  export type TotemLoginAttemptCountOrderByAggregateInput = {
+    key?: SortOrder
+    count?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemLoginAttemptAvgOrderByAggregateInput = {
+    count?: SortOrder
+  }
+
+  export type TotemLoginAttemptMaxOrderByAggregateInput = {
+    key?: SortOrder
+    count?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemLoginAttemptMinOrderByAggregateInput = {
+    key?: SortOrder
+    count?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type TotemLoginAttemptSumOrderByAggregateInput = {
+    count?: SortOrder
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -20893,15 +27523,60 @@ export namespace Prisma {
     push?: string | string[]
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+  export type TotemOperatorSessionCreateNestedManyWithoutOperatorInput = {
+    create?: XOR<TotemOperatorSessionCreateWithoutOperatorInput, TotemOperatorSessionUncheckedCreateWithoutOperatorInput> | TotemOperatorSessionCreateWithoutOperatorInput[] | TotemOperatorSessionUncheckedCreateWithoutOperatorInput[]
+    connectOrCreate?: TotemOperatorSessionCreateOrConnectWithoutOperatorInput | TotemOperatorSessionCreateOrConnectWithoutOperatorInput[]
+    createMany?: TotemOperatorSessionCreateManyOperatorInputEnvelope
+    connect?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+  }
+
+  export type TotemOperatorSessionUncheckedCreateNestedManyWithoutOperatorInput = {
+    create?: XOR<TotemOperatorSessionCreateWithoutOperatorInput, TotemOperatorSessionUncheckedCreateWithoutOperatorInput> | TotemOperatorSessionCreateWithoutOperatorInput[] | TotemOperatorSessionUncheckedCreateWithoutOperatorInput[]
+    connectOrCreate?: TotemOperatorSessionCreateOrConnectWithoutOperatorInput | TotemOperatorSessionCreateOrConnectWithoutOperatorInput[]
+    createMany?: TotemOperatorSessionCreateManyOperatorInputEnvelope
+    connect?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+  }
+
+  export type TotemOperatorSessionUpdateManyWithoutOperatorNestedInput = {
+    create?: XOR<TotemOperatorSessionCreateWithoutOperatorInput, TotemOperatorSessionUncheckedCreateWithoutOperatorInput> | TotemOperatorSessionCreateWithoutOperatorInput[] | TotemOperatorSessionUncheckedCreateWithoutOperatorInput[]
+    connectOrCreate?: TotemOperatorSessionCreateOrConnectWithoutOperatorInput | TotemOperatorSessionCreateOrConnectWithoutOperatorInput[]
+    upsert?: TotemOperatorSessionUpsertWithWhereUniqueWithoutOperatorInput | TotemOperatorSessionUpsertWithWhereUniqueWithoutOperatorInput[]
+    createMany?: TotemOperatorSessionCreateManyOperatorInputEnvelope
+    set?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    disconnect?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    delete?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    connect?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    update?: TotemOperatorSessionUpdateWithWhereUniqueWithoutOperatorInput | TotemOperatorSessionUpdateWithWhereUniqueWithoutOperatorInput[]
+    updateMany?: TotemOperatorSessionUpdateManyWithWhereWithoutOperatorInput | TotemOperatorSessionUpdateManyWithWhereWithoutOperatorInput[]
+    deleteMany?: TotemOperatorSessionScalarWhereInput | TotemOperatorSessionScalarWhereInput[]
+  }
+
+  export type TotemOperatorSessionUncheckedUpdateManyWithoutOperatorNestedInput = {
+    create?: XOR<TotemOperatorSessionCreateWithoutOperatorInput, TotemOperatorSessionUncheckedCreateWithoutOperatorInput> | TotemOperatorSessionCreateWithoutOperatorInput[] | TotemOperatorSessionUncheckedCreateWithoutOperatorInput[]
+    connectOrCreate?: TotemOperatorSessionCreateOrConnectWithoutOperatorInput | TotemOperatorSessionCreateOrConnectWithoutOperatorInput[]
+    upsert?: TotemOperatorSessionUpsertWithWhereUniqueWithoutOperatorInput | TotemOperatorSessionUpsertWithWhereUniqueWithoutOperatorInput[]
+    createMany?: TotemOperatorSessionCreateManyOperatorInputEnvelope
+    set?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    disconnect?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    delete?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    connect?: TotemOperatorSessionWhereUniqueInput | TotemOperatorSessionWhereUniqueInput[]
+    update?: TotemOperatorSessionUpdateWithWhereUniqueWithoutOperatorInput | TotemOperatorSessionUpdateWithWhereUniqueWithoutOperatorInput[]
+    updateMany?: TotemOperatorSessionUpdateManyWithWhereWithoutOperatorInput | TotemOperatorSessionUpdateManyWithWhereWithoutOperatorInput[]
+    deleteMany?: TotemOperatorSessionScalarWhereInput | TotemOperatorSessionScalarWhereInput[]
+  }
+
+  export type TotemOperatorCreateNestedOneWithoutSessionsInput = {
+    create?: XOR<TotemOperatorCreateWithoutSessionsInput, TotemOperatorUncheckedCreateWithoutSessionsInput>
+    connectOrCreate?: TotemOperatorCreateOrConnectWithoutSessionsInput
+    connect?: TotemOperatorWhereUniqueInput
+  }
+
+  export type TotemOperatorUpdateOneRequiredWithoutSessionsNestedInput = {
+    create?: XOR<TotemOperatorCreateWithoutSessionsInput, TotemOperatorUncheckedCreateWithoutSessionsInput>
+    connectOrCreate?: TotemOperatorCreateOrConnectWithoutSessionsInput
+    upsert?: TotemOperatorUpsertWithoutSessionsInput
+    connect?: TotemOperatorWhereUniqueInput
+    update?: XOR<XOR<TotemOperatorUpdateToOneWithWhereWithoutSessionsInput, TotemOperatorUpdateWithoutSessionsInput>, TotemOperatorUncheckedUpdateWithoutSessionsInput>
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -20913,6 +27588,31 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -20940,20 +27640,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -21124,6 +27810,31 @@ export namespace Prisma {
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
+
+  export type NestedUuidFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidFilter<$PrismaModel> | string
+  }
+
+  export type NestedUuidWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -21146,6 +27857,155 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type TotemOperatorSessionCreateWithoutOperatorInput = {
+    tokenHash: string
+    version: number
+    restricted?: boolean
+    expiresAt: Date | string
+  }
+
+  export type TotemOperatorSessionUncheckedCreateWithoutOperatorInput = {
+    tokenHash: string
+    version: number
+    restricted?: boolean
+    expiresAt: Date | string
+  }
+
+  export type TotemOperatorSessionCreateOrConnectWithoutOperatorInput = {
+    where: TotemOperatorSessionWhereUniqueInput
+    create: XOR<TotemOperatorSessionCreateWithoutOperatorInput, TotemOperatorSessionUncheckedCreateWithoutOperatorInput>
+  }
+
+  export type TotemOperatorSessionCreateManyOperatorInputEnvelope = {
+    data: TotemOperatorSessionCreateManyOperatorInput | TotemOperatorSessionCreateManyOperatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TotemOperatorSessionUpsertWithWhereUniqueWithoutOperatorInput = {
+    where: TotemOperatorSessionWhereUniqueInput
+    update: XOR<TotemOperatorSessionUpdateWithoutOperatorInput, TotemOperatorSessionUncheckedUpdateWithoutOperatorInput>
+    create: XOR<TotemOperatorSessionCreateWithoutOperatorInput, TotemOperatorSessionUncheckedCreateWithoutOperatorInput>
+  }
+
+  export type TotemOperatorSessionUpdateWithWhereUniqueWithoutOperatorInput = {
+    where: TotemOperatorSessionWhereUniqueInput
+    data: XOR<TotemOperatorSessionUpdateWithoutOperatorInput, TotemOperatorSessionUncheckedUpdateWithoutOperatorInput>
+  }
+
+  export type TotemOperatorSessionUpdateManyWithWhereWithoutOperatorInput = {
+    where: TotemOperatorSessionScalarWhereInput
+    data: XOR<TotemOperatorSessionUpdateManyMutationInput, TotemOperatorSessionUncheckedUpdateManyWithoutOperatorInput>
+  }
+
+  export type TotemOperatorSessionScalarWhereInput = {
+    AND?: TotemOperatorSessionScalarWhereInput | TotemOperatorSessionScalarWhereInput[]
+    OR?: TotemOperatorSessionScalarWhereInput[]
+    NOT?: TotemOperatorSessionScalarWhereInput | TotemOperatorSessionScalarWhereInput[]
+    tokenHash?: StringFilter<"TotemOperatorSession"> | string
+    operatorId?: IntFilter<"TotemOperatorSession"> | number
+    version?: IntFilter<"TotemOperatorSession"> | number
+    restricted?: BoolFilter<"TotemOperatorSession"> | boolean
+    expiresAt?: DateTimeFilter<"TotemOperatorSession"> | Date | string
+  }
+
+  export type TotemOperatorCreateWithoutSessionsInput = {
+    username: string
+    displayName: string
+    cardId?: string
+    pinHash: string
+    pinExpiresAt: Date | string
+    mustChangePin?: boolean
+    active?: boolean
+    version?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TotemOperatorUncheckedCreateWithoutSessionsInput = {
+    id?: number
+    username: string
+    displayName: string
+    cardId?: string
+    pinHash: string
+    pinExpiresAt: Date | string
+    mustChangePin?: boolean
+    active?: boolean
+    version?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TotemOperatorCreateOrConnectWithoutSessionsInput = {
+    where: TotemOperatorWhereUniqueInput
+    create: XOR<TotemOperatorCreateWithoutSessionsInput, TotemOperatorUncheckedCreateWithoutSessionsInput>
+  }
+
+  export type TotemOperatorUpsertWithoutSessionsInput = {
+    update: XOR<TotemOperatorUpdateWithoutSessionsInput, TotemOperatorUncheckedUpdateWithoutSessionsInput>
+    create: XOR<TotemOperatorCreateWithoutSessionsInput, TotemOperatorUncheckedCreateWithoutSessionsInput>
+    where?: TotemOperatorWhereInput
+  }
+
+  export type TotemOperatorUpdateToOneWithWhereWithoutSessionsInput = {
+    where?: TotemOperatorWhereInput
+    data: XOR<TotemOperatorUpdateWithoutSessionsInput, TotemOperatorUncheckedUpdateWithoutSessionsInput>
+  }
+
+  export type TotemOperatorUpdateWithoutSessionsInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    cardId?: StringFieldUpdateOperationsInput | string
+    pinHash?: StringFieldUpdateOperationsInput | string
+    pinExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mustChangePin?: BoolFieldUpdateOperationsInput | boolean
+    active?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorUncheckedUpdateWithoutSessionsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    cardId?: StringFieldUpdateOperationsInput | string
+    pinHash?: StringFieldUpdateOperationsInput | string
+    pinExpiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mustChangePin?: BoolFieldUpdateOperationsInput | boolean
+    active?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorSessionCreateManyOperatorInput = {
+    tokenHash: string
+    version: number
+    restricted?: boolean
+    expiresAt: Date | string
+  }
+
+  export type TotemOperatorSessionUpdateWithoutOperatorInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorSessionUncheckedUpdateWithoutOperatorInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotemOperatorSessionUncheckedUpdateManyWithoutOperatorInput = {
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    version?: IntFieldUpdateOperationsInput | number
+    restricted?: BoolFieldUpdateOperationsInput | boolean
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

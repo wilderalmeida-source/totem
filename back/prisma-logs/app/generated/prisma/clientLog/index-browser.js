@@ -120,6 +120,11 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.TotemSenhaCounterScalarFieldEnum = {
+  date: 'date',
+  number: 'number'
+};
+
 exports.Prisma.TtsDailyUsageScalarFieldEnum = {
   id: 'id',
   date: 'date',
@@ -243,6 +248,41 @@ exports.Prisma.AdminUserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.TotemAccessSettingsScalarFieldEnum = {
+  id: 'id',
+  enabled: 'enabled',
+  pinValidityDays: 'pinValidityDays',
+  sessionHours: 'sessionHours'
+};
+
+exports.Prisma.TotemOperatorScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  displayName: 'displayName',
+  cardId: 'cardId',
+  pinHash: 'pinHash',
+  pinExpiresAt: 'pinExpiresAt',
+  mustChangePin: 'mustChangePin',
+  active: 'active',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TotemOperatorSessionScalarFieldEnum = {
+  tokenHash: 'tokenHash',
+  operatorId: 'operatorId',
+  version: 'version',
+  restricted: 'restricted',
+  expiresAt: 'expiresAt'
+};
+
+exports.Prisma.TotemLoginAttemptScalarFieldEnum = {
+  key: 'key',
+  count: 'count',
+  expiresAt: 'expiresAt'
+};
+
 exports.Prisma.AuditLogScalarFieldEnum = {
   id: 'id',
   sessionId: 'sessionId',
@@ -286,6 +326,7 @@ exports.Prisma.JsonNullValueFilter = {
 
 
 exports.Prisma.ModelName = {
+  TotemSenhaCounter: 'TotemSenhaCounter',
   TtsDailyUsage: 'TtsDailyUsage',
   TtsWeekVoice: 'TtsWeekVoice',
   TtsSettings: 'TtsSettings',
@@ -300,6 +341,10 @@ exports.Prisma.ModelName = {
   configuracao_atraso: 'configuracao_atraso',
   configuracao_midia: 'configuracao_midia',
   AdminUser: 'AdminUser',
+  TotemAccessSettings: 'TotemAccessSettings',
+  TotemOperator: 'TotemOperator',
+  TotemOperatorSession: 'TotemOperatorSession',
+  TotemLoginAttempt: 'TotemLoginAttempt',
   AuditLog: 'AuditLog'
 };
 
