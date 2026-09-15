@@ -7,6 +7,13 @@ export function auditContextHeaders(): Record<string, string> {
     return { 'x-flow-id': flow, 'x-device-id': device }
   } catch { return {} }
 }
+let failedDeliveries = 0
+function deliveryFailed() {
+  failedDeliveries += 1
+  if (failedDeliveries === 1 || failedDeliveries % 50 === 0) {
+    console.error('AUDIT_BROWSER_DELIVERY_FAILED', { failedDeliveries })
+  }
+}
 export function auditTotem(action: string, step: string, metadata?: Record<string, unknown>) {
   const context = auditContextHeaders()
   try {
@@ -14,8 +21,17 @@ export function auditTotem(action: string, step: string, metadata?: Record<strin
       body: JSON.stringify({ sessionId: context['x-flow-id'], action, step, metadata: {
         ...metadata, device: context['x-device-id'], deviceLabel: localStorage.getItem('totemDeviceLabel') ?? undefined,
         source: 'browser', version: process.env.NEXT_PUBLIC_APP_VERSION ?? 'nao_informada',
-      } }), keepalive: true, signal: AbortSignal.timeout(5000) }).catch(() => undefined)
-  } catch { /* Auditoria nao interrompe o fluxo. */ }
+      } }), keepalive: true, signal: AbortSignal.timeout(5000) }).then(response => {
+        if (!response.ok) { deliveryFailed(); return }
+        if (failedDeliveries > 0) {
+          const count = failedDeliveries
+          failedDeliveries = 0
+          auditTotem('auditoria_envio_recuperado', 'comunicacao', {
+            code: 'AUDIT_BROWSER_RECOVERED', failedDeliveries: count, outcome: 'CONCLUIDO',
+          })
+        }
+      }).catch(deliveryFailed)
+  } catch { deliveryFailed() }
 }
 
 function createSessionId() {

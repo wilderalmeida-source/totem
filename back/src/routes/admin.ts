@@ -1,3 +1,5 @@
+import { persistAudit, auditOutbox } from '../lib/persistent-audit'
+import { auditQuery, auditExtraFilters } from '../lib/audit-filters'
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
@@ -42,6 +44,10 @@ const auditGroups = {
 } satisfies Record<string, Prisma.AuditLogWhereInput>
 
 export async function adminRoutes(fastify: FastifyInstance) {
+  fastify.get('/clinux/audit/health', async (_request, reply) => {
+    reply.header('Cache-Control', 'no-store')
+    return auditOutbox.health()
+  })
   fastify.post('/clinux/admin/users/session', async (request, reply) => {
     const body = z.object({ username: z.string().min(1).max(100), version: z.string() }).strict().parse(request.body)
     const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
@@ -101,20 +107,20 @@ export async function adminRoutes(fastify: FastifyInstance) {
   })
 
   fastify.post('/clinux/audit', async (request, reply) => {
-    const body = z.object({ sessionId: z.string().max(100).optional(), actor: z.string().max(100).optional(), category: z.enum(['TOTEM', 'ADMIN']), action: z.string().min(1).max(100), step: z.string().max(100).optional(), metadata: z.record(z.unknown()).optional() }).parse(request.body)
-    await PrismaLog.auditLog.create({ data: { ...body, metadata: body.metadata as Prisma.InputJsonValue | undefined } })
+    const body = z.object({ eventId: z.string().uuid().optional(), createdAt: z.string().datetime().optional(), sessionId: z.string().max(100).optional(), actor: z.string().max(100).optional(), category: z.enum(['TOTEM', 'ADMIN']), action: z.string().min(1).max(100), step: z.string().max(100).optional(), metadata: z.record(z.unknown()).optional() }).parse(request.body)
+    persistAudit(body)
     return reply.code(201).send({ ok: true })
   })
 
   fastify.get('/clinux/audit', async (request) => {
-    const query = z.object({ group: z.enum(['EMISSAO', 'SESSAO', 'COMUNICACAO', 'AUDIO', 'PACIENTES']).optional(), category: z.enum(['TOTEM', 'ADMIN']).optional(), flow: z.string().max(100).optional(), device: z.string().max(100).optional(), page: z.coerce.number().int().positive().default(1), limit: z.coerce.number().int().min(1).max(200).default(50) }).parse(request.query)
+    const query = auditQuery.parse(request.query)
     const where: Prisma.AuditLogWhereInput = {
       ...(query.category ? { category: query.category } : {}),
       ...(query.flow ? { OR: [{ sessionId: query.flow }, { metadata: { path: ['traceId'], equals: query.flow } }] } : {}),
       ...(query.device ? { metadata: { path: ['device'], equals: query.device } } : {}),
-      ...(query.group ? { AND: [auditGroups[query.group]] } : {}),
+      AND: [...auditExtraFilters(query), ...(query.group ? [auditGroups[query.group]] : [])],
     }
-    const [items, total] = await Promise.all([PrismaLog.auditLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (query.page - 1) * query.limit, take: query.limit }), PrismaLog.auditLog.count({ where })])
+    const [items, total] = await Promise.all([PrismaLog.auditLog.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: (query.page - 1) * query.limit, take: query.limit }), PrismaLog.auditLog.count({ where })])
     return { items: items.map((item) => ({ ...item, id: item.id.toString() })), total, page: query.page }
   })
 }

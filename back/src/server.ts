@@ -1,3 +1,6 @@
+import { auditOutbox } from './lib/persistent-audit'
+import { registerAdminAudit } from './lib/admin-audit'
+import { startAuditRetention } from './lib/audit-retention'
 import Fastify from "fastify";
 import { randomUUID } from 'node:crypto'
 import { auditContext, auditIdentifier, flowAudit } from './lib/flow-audit'
@@ -28,7 +31,10 @@ import { configuracoesTotemRoutes } from "./routes/configuracoes-totem";
 import { atendimentosTotemRoute } from './routes/atendimentos-totem';
 
 async function bootstrap() {
+  auditOutbox.start()
   const fastify = Fastify({ logger: true, })
+  const stopRetention = startAuditRetention()
+  fastify.addHook('onClose', async () => { stopRetention() })
   fastify.addHook('onRequest', (request, _reply, done) => {
     auditContext.run({ flowId: auditIdentifier(request.headers['x-flow-id']) ?? randomUUID(),
       device: auditIdentifier(request.headers['x-device-id']) ?? 'nao_informado' }, done)
@@ -58,6 +64,7 @@ async function bootstrap() {
     },
   })
   fastify.addHook('preHandler', authenticate)
+  registerAdminAudit(fastify)
 
   await fastify.register(painelClinux);
   await fastify.register(fastifyStatic, {

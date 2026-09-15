@@ -1,3 +1,4 @@
+import { recordAudit } from '@/lib/persistent-audit'
 import { NextRequest, NextResponse } from 'next/server'
 import { ADMIN_SESSION_COOKIE, ADMIN_SESSION_TTL_SECONDS, createAdminSession, readAdminSession } from '@/lib/admin-session'
 
@@ -23,11 +24,7 @@ export async function POST(request: NextRequest) {
   const result = await backend.json().catch(() => ({ error: 'Não foi possível trocar a senha.' }))
   if (!backend.ok) return NextResponse.json(result, { status: backend.status })
 
-  void fetch(`${apiBase}/clinux/audit`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` },
-    body: JSON.stringify({ category: 'ADMIN', actor: session.sub, action: 'senha_alterada', step: 'seguranca' }),
-  }).catch(() => undefined)
+  recordAudit({ category: 'ADMIN', actor: session.sub, action: 'senha_alterada', step: 'seguranca' })
 
   const response = NextResponse.json({ ok: true })
   response.cookies.set({ name: ADMIN_SESSION_COOKIE, value: await createAdminSession(session.sub, secret, false, result.permissions, { source: 'database', version: result.version }), httpOnly: true, secure: request.headers.get('x-forwarded-proto') === 'https' || request.nextUrl.protocol === 'https:', sameSite: 'strict', path: '/', maxAge: ADMIN_SESSION_TTL_SECONDS })

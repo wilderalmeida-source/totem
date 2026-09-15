@@ -10,6 +10,7 @@ function environment() {
   const root = path.resolve(__dirname, '..');
   let now = Date.now();
   const calls = [];
+  const auditEvents = [];
   const context = vm.createContext({
     URL, URLSearchParams, Response, Headers, AbortSignal, console,
     Date: class extends Date { static now() { return now; } },
@@ -35,6 +36,7 @@ function environment() {
     const source = fs.readFileSync(filename, 'utf8');
     const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
     const localRequire = name => {
+      if (name.includes('persistent-audit')) return { auditOutbox: { enqueue: event => { auditEvents.push(event); return 'test-event'; } } };
       if (name === '@/lib/require-totem-operator') return { requireTotemOperator: async () => null };
       if (name.startsWith('@/')) return load(name.slice(2) + '.ts');
       if (name.startsWith('.')) return load(path.resolve(path.dirname(filename), name) + '.ts');
@@ -44,7 +46,7 @@ function environment() {
     return exports;
   }
   return {
-    load, calls, context, advance: ms => { now += ms; },
+    load, calls, context, auditEvents, advance: ms => { now += ms; },
     session: load('app/api/patient-session/route.ts'),
     store: load('lib/patient-session-store.ts'),
     proxy: load('app/api/backend/[...path]/route.ts'),
@@ -63,6 +65,32 @@ async function identify(env, body = { tipo: 'ID', ds_cpf: '12345678901', dt_nasc
   assert.equal(response.status, 200);
   return response.cookies.get('totem_patient_session').value;
 }
+
+test('diagnostico liga nome recebido, normalizado, retorno e resposta final sem cookie', async () => {
+  const env = environment();
+  const req = request('/api/patient-session', 'POST', { tipo: 'NOMEDATA', ds_paciente: ' Fulano da Silva ', dt_nascimento: '1980-01-01' });
+  req.headers.set('x-flow-id', 'homologacao-123');
+  const response = await env.session.POST(req);
+  assert.equal(response.status, 200);
+  const find = action => env.auditEvents.find(event => event.action === action);
+  assert.equal(find('identificacao_recebida').metadata.nomeRecebido, ' Fulano da Silva ');
+  assert.equal(find('identificacao_enviada_backend').metadata.enviado.ds_paciente, 'Fulano da Silva');
+  assert.equal(find('identificacao_retorno_backend').metadata.resposta.quantidade, 1);
+  const final = find('identificacao_resposta_final');
+  assert.equal(final.sessionId, 'homologacao-123');
+  assert.equal(final.metadata.resposta.patient.cd_paciente, 123);
+  assert.equal(JSON.stringify(env.auditEvents).includes(response.cookies.get('totem_patient_session').value), false);
+});
+
+test('diagnostico registra resposta final quando data e invalida', async () => {
+  const env = environment();
+  const response = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'NOMEDATA', ds_paciente: 'Fulano', dt_nascimento: 'data-incorreta' }));
+  assert.equal(response.status, 400);
+  const final = env.auditEvents.find(event => event.action === 'identificacao_resposta_final');
+  assert.equal(final.metadata.status, 400);
+  assert.equal(final.metadata.resposta.error, (await response.json()).error);
+  assert.equal(env.calls.length, 0);
+});
 
 test('confirma no backend e emite cookie opaco HttpOnly com Secure em HTTPS', async () => {
   const env = environment();

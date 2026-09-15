@@ -1,4 +1,5 @@
 import { auditServer } from '@/lib/flow-audit-server'
+import { identificationValues, identificationResult } from '@/lib/identification-diagnostic'
 import { requireTotemOperator } from '@/lib/require-totem-operator'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
@@ -25,12 +26,16 @@ export async function POST(request: NextRequest) {
   if (denied) return denied
   if (!sameOrigin(request)) return patientJson({ error: 'Origem inválida.' }, 403)
   revokePatientSession(request.cookies.get(PATIENT_SESSION_COOKIE)?.value)
-  const fail = (error: string, status: number) => sessionCookie(request, patientJson({ error }, status))
+  const fail = (error: string, status: number) => {
+    auditServer(request, 'identificacao_resposta_final', 'patientSession.POST', { status, resposta: { error }, outcome: 'FALHOU' })
+    return sessionCookie(request, patientJson({ error }, status))
+  }
   const raw = await request.json().catch(() => null)
   const parsed = confirmation.safeParse(raw)
   const rawName = typeof raw?.ds_paciente === 'string' ? raw.ds_paciente.slice(0, 150) : undefined
   auditServer(request, parsed.success ? 'identificacao_recebida' : 'identificacao_rejeitada', 'patientSession.POST', {
     tipo: typeof raw?.tipo === 'string' ? raw.tipo.slice(0, 30) : undefined,
+    codigoRecebido: raw?.tipo === 'QR' && typeof raw.cd_paciente === 'number' ? raw.cd_paciente : undefined,
     nomeRecebido: rawName, tamanhoNome: rawName?.length, espacosNasPontas: rawName !== undefined && rawName !== rawName.trim(),
     nomeNormalizado: rawName?.trim(), nascimento: typeof raw?.dt_nascimento === 'string' ? raw.dt_nascimento.slice(0, 100) : undefined,
     code: parsed.success ? 'IDENTIFICATION_VALIDATED' : 'INVALID_IDENTIFICATION',
@@ -38,6 +43,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return fail('Dados de identificação inválidos.', 400)
   try {
     const input = parsed.data
+    auditServer(request, 'identificacao_enviada_backend', 'patientSession.POST', { rota: '/clinux/pacientes', method: input.tipo === 'NEW' ? 'POST' : 'GET', enviado: identificationValues(input) })
     let upstream: Response
     if (input.tipo === 'NEW') {
       upstream = await patientBackend('/clinux/pacientes', { method: 'POST', body: JSON.stringify({ ds_paciente: input.ds_paciente, dt_nascimento: input.dt_nascimento }) }, request)
@@ -45,7 +51,17 @@ export async function POST(request: NextRequest) {
       const params = new URLSearchParams()
       if (input.tipo === 'QR') params.set('cd_paciente', String(input.cd_paciente))
       else Object.entries(input).forEach(([key, value]) => params.set(key, value))
+      if (input.tipo === 'QR') auditServer(request, 'qr_consulta_backend', 'patientSession.POST', { codigoPesquisado: input.cd_paciente, rota: '/clinux/pacientes', parametro: params.get('cd_paciente') })
       upstream = await patientBackend(`/clinux/pacientes?${params}`, {}, request)
+    }
+    {
+      const result = await upstream.clone().json().catch(() => null)
+      auditServer(request, 'identificacao_retorno_backend', 'patientSession.POST', { tipo: input.tipo, resposta: identificationResult(result),
+        codigoPesquisado: input.tipo === 'QR' ? input.cd_paciente : undefined, status: upstream.status, formato: Array.isArray(result) ? 'lista' : result === null ? 'json_invalido_ou_nulo' : 'objeto',
+        quantidade: Array.isArray(result) ? result.length : undefined,
+        pacientes: Array.isArray(result) ? result.slice(0, 10).map(p => ({ cd_paciente: p?.cd_paciente, ds_paciente: p?.ds_paciente, dt_nascimento: p?.dt_nascimento, tentativas: p?.tentativas })) : undefined,
+        erro: !Array.isArray(result) && typeof result?.error === 'string' ? result.error.slice(0, 300) : undefined,
+      })
     }
     if (!upstream.ok) return fail('Não foi possível confirmar o paciente.', 502)
     const body = await upstream.json()
@@ -59,6 +75,8 @@ export async function POST(request: NextRequest) {
     }
     const patient = patients[0]
     const session = createPatientSession(patient.cd_paciente)
+    auditServer(request, 'identificacao_resposta_final', 'patientSession.POST', { status: 200,
+      resposta: identificationResult({ patient }), outcome: 'CONCLUIDO' })
     return sessionCookie(request, patientJson({
       patient: { cd_paciente: patient.cd_paciente, ds_paciente: patient.ds_paciente, dt_nascimento: patient.dt_nascimento },
       expiresAt: session.expiresAt, absoluteExpiresAt: session.absoluteExpiresAt,

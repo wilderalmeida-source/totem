@@ -19,7 +19,7 @@ test('cliente serializa troca de paciente e ignora resposta de identificação s
   const removed = [];
   vm.runInNewContext(compile('lib/patient-session-client.ts'), {
     exports, AbortSignal, Event, CustomEvent,
-    require: () => ({ auditContextHeaders: () => ({}), auditTotem: () => {} }),
+    require: () => ({ auditContextHeaders: () => ({}), auditTotem: () => {}, closingOutcome: () => 'CANCELADO' }),
     window: { dispatchEvent: event => events.push(event.type) },
     sessionStorage: { removeItem: key => removed.push(key) },
     fetch: (url, options) => new Promise(resolve => requests.push({ url, options, resolve })),

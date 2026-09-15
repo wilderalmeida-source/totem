@@ -1,3 +1,4 @@
+import { recordAudit } from '@/lib/persistent-audit'
 import { auditServer } from '@/lib/flow-audit-server';
 import { requireTotemOperator } from '@/lib/require-totem-operator';
 import { NextRequest, NextResponse } from "next/server";
@@ -32,7 +33,7 @@ function requiresAdmin(pathname: string, method: string) {
   if ((pathname.startsWith("/clinux/atrasos-config") || pathname.startsWith("/clinux/midias-config")) && method !== "GET") return true;
   if (pathname.startsWith("/clinux/recepcoes-modalidades") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/admin")) return true;
-  if (pathname === "/clinux/audit" && method === "GET") return true;
+  if (pathname.startsWith("/clinux/audit") && method === "GET") return true;
   return false;
 }
 
@@ -108,6 +109,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
   }
 
   const headers = new Headers({ Authorization: `Bearer ${apiToken}` });
+  if (adminSession) headers.set('x-admin-actor', adminSession.sub);
   for (const name of ['x-flow-id', 'x-device-id']) { const value = request.headers.get(name); if (value && /^[a-zA-Z0-9_.:-]{1,100}$/.test(value)) headers.set(name, value) }
   const contentType = request.headers.get("content-type");
   const accept = request.headers.get("accept");
@@ -133,12 +135,14 @@ async function proxy(request: NextRequest, context: RouteContext) {
       if (value) responseHeaders.set(name, value);
     }
     if (pathname === '/clinux/totem/atendimentos' || pathname === '/clinux/pacientes') responseHeaders.set('Cache-Control', 'no-store');
+    if (pathname === '/clinux/audit') {
+      responseHeaders.set('Cache-Control', 'private, no-store');
+      if (adminSession && request.method === 'GET') recordAudit({ category: 'ADMIN', actor: adminSession.sub,
+        action: 'logs_consultados', step: 'administracao', metadata: { status: upstream.status,
+          outcome: upstream.ok ? 'CONCLUIDO' : 'FALHOU' } });
+    }
     if (adminSession && request.method !== "GET" && upstream.ok) {
-      void fetch(new URL('/clinux/audit', apiBase), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` },
-        body: JSON.stringify({ category: 'ADMIN', actor: adminSession.sub, action: `${request.method} ${pathname}`, step: 'administracao' }),
-      }).catch(() => undefined);
+      recordAudit({ category: 'ADMIN', actor: adminSession.sub, action: `${request.method} ${pathname}`, step: 'administracao' });
     }
     return new Response(upstream.body, { status: upstream.status, headers: responseHeaders });
   } catch (error) {

@@ -1,3 +1,4 @@
+import { adminAuditHeaders } from '@/lib/admin-audit-headers'
 import { NextResponse } from 'next/server'
 
 const API_INTERNA = process.env.LINK_API_INTERNA
@@ -13,6 +14,7 @@ export async function GET() {
   const response = await fetch(`${API_INTERNA}/clinux/paineis-config`, {
     cache: 'no-store',
     headers: {
+      ...await adminAuditHeaders(),
         'Authorization': `Bearer ${INTERNAL_TOKEN}`
       }
   })
@@ -37,6 +39,7 @@ export async function POST(request: Request) {
   const response = await fetch(`${API_INTERNA}/clinux/paineis-config`, {
     method: 'POST',
     headers: {
+      ...await adminAuditHeaders(),
       'Authorization': `Bearer ${INTERNAL_TOKEN}`,
       'Content-Type': 'application/json',
     },

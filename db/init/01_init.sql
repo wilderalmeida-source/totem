@@ -252,6 +252,9 @@ CREATE TABLE IF NOT EXISTS "AuditLog" (
 );
 
 CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt");
+-- Aplicar no banco de logs antes de publicar a fila persistente.
+ALTER TABLE "AuditLog" ADD COLUMN IF NOT EXISTS "eventId" UUID;
+CREATE UNIQUE INDEX IF NOT EXISTS "AuditLog_eventId_key" ON "AuditLog"("eventId");
 CREATE INDEX IF NOT EXISTS "AuditLog_sessionId_idx" ON "AuditLog"("sessionId");
 CREATE INDEX IF NOT EXISTS "AuditLog_category_idx" ON "AuditLog"("category");
 

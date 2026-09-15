@@ -44,6 +44,7 @@ services:
       - "2345:2345"
     volumes:
       - ./public/audios:/app/public/audios
+      - audit_backend:/app/data/audit-outbox
       - ./export/modelos-rtf:/app/export/modelos-rtf
     depends_on:
       postgres_infra:
@@ -71,8 +72,11 @@ services:
       - totem-net
     volumes:
       - ./public/videos:/app/public/videos
+      - audit_frontend:/app/data/audit-outbox
 
 volumes:
+  audit_backend:
+  audit_frontend:
   pgdata:
   postgres_logs_data:
 

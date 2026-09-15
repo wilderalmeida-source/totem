@@ -1,3 +1,4 @@
+import { adminAuditHeaders } from '@/lib/admin-audit-headers'
 import { NextResponse } from "next/server";
 
 const API_INTERNA = process.env.LINK_API_INTERNA;
@@ -13,6 +14,7 @@ export async function PUT(
     const response = await fetch(`${API_INTERNA}/clinux/guiches/${id}`, {
         method: "PUT",
         headers: {
+      ...await adminAuditHeaders(),
             Authorization: `Bearer ${INTERNAL_TOKEN}`,
             "Content-Type": "application/json",
         },
@@ -41,6 +43,7 @@ export async function DELETE(
     const response = await fetch(`${API_INTERNA}/clinux/guiches/${id}`, {
         method: "DELETE",
         headers: {
+      ...await adminAuditHeaders(),
             Authorization: `Bearer ${INTERNAL_TOKEN}`,
         },
     });

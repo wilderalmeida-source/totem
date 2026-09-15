@@ -1,4 +1,6 @@
 import { useCallback, useRef, useState } from "react";
+import { auditTotem } from '@/lib/audit-client';
+import { identificationValues } from '@/lib/identification-diagnostic';
 
 import { buscaPaciente, Paciente } from "@/services/api";
 import {
@@ -52,6 +54,9 @@ export function usePatientSearch(tipo: TipoBusca) {
 
       try {
         setLoading(true);
+        auditTotem('identificacao_entrada_original', 'busca', { tipo, entrada: identificationValues(
+          tipo === 'NOME' ? { ds_paciente: valor } : tipo === 'DATA' ? { dt_nascimento: valor } : { ds_cpf: valor }
+        ) });
 
         const result = await buscaPaciente(
           tipo === "NOME"

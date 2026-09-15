@@ -34,7 +34,7 @@ async function setup(t) {
   db.$transaction = fn => fn(db);
   const exports = {};
   const code = ts.transpileModule(fs.readFileSync(require.resolve('../src/routes/totem-access.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  vm.runInNewContext(code, { exports, Date, require: name => name.includes('prismalog') ? { PrismaLog: db } : name.includes('totem-pin') ? crypto : require(name) });
+  vm.runInNewContext(code, { exports, Date, require: name => name.includes('persistent-audit') ? { recordAudit: data => { void db.auditLog.create({ data }); } } : name.includes('prismalog') ? { PrismaLog: db } : name.includes('totem-pin') ? crypto : require(name) });
   const app = Fastify();
   app.register(exports.totemAccessRoutes);
   t.after(() => app.close());

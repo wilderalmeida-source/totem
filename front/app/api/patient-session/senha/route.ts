@@ -31,15 +31,20 @@ export async function POST(request: NextRequest) {
     const upstream = await patientBackend('/clinux/senhas', {
       method: 'POST', body: JSON.stringify({ ...parsed.data, cd_paciente: session.patientId, preferencial: parsed.data.preferencial ?? 0, cd_modalidade: parsed.data.cd_modalidade ?? undefined }),
     }, request)
-    if (!upstream.ok) return patientJson({ error: 'Não foi possível gerar a senha. Procure a recepção se o problema persistir.' }, 502)
+    if (!upstream.ok) {
+      auditServer(request, 'emissao_sem_confirmacao', 'patientSession.senha', { outcome: 'DESCONHECIDO', status: upstream.status, code: 'BACKEND_REJECTED_ISSUANCE' })
+      return patientJson({ error: 'Não foi possível gerar a senha. Procure a recepção se o problema persistir.' }, 502)
+    }
     const receipt = await upstream.json().catch(() => null)
     if (!Number.isSafeInteger(receipt?.cd_senha) || receipt.cd_senha <= 0) {
+      auditServer(request, 'emissao_sem_confirmacao', 'patientSession.senha', { outcome: 'DESCONHECIDO', code: 'INVALID_RECEIPT' })
       return patientJson({ error: 'Emissão não confirmada. Consulte a recepção antes de tentar novamente.' }, 502)
     }
-    auditServer(request, 'emissao_confirmada', 'patientSession.senha', { cd_senha: receipt.cd_senha, code: 'TICKET_CONFIRMED' })
+    auditServer(request, 'emissao_confirmada', 'patientSession.senha', { cd_senha: receipt.cd_senha, outcome: 'CONCLUIDO', code: 'TICKET_CONFIRMED' })
     revokePatientSession(token)
     return sessionCookie(request, patientJson({ ok: true }))
   } catch {
+    auditServer(request, 'emissao_sem_confirmacao', 'patientSession.senha', { outcome: 'DESCONHECIDO', code: 'RECEIPT_UNAVAILABLE' })
     return patientJson({ error: 'Não foi possível confirmar a emissão. Consulte a recepção antes de tentar novamente.' }, 502)
   } finally { unlockPatientSession(token) }
 }

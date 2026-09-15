@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminRoutes = adminRoutes;
+const persistent_audit_1 = require("../lib/persistent-audit");
+const audit_filters_1 = require("../lib/audit-filters");
 const node_crypto_1 = require("node:crypto");
 const zod_1 = require("zod");
 const prismalog_1 = require("../../config/prismalog");
@@ -38,6 +40,10 @@ const auditGroups = {
         ] },
 };
 async function adminRoutes(fastify) {
+    fastify.get('/clinux/audit/health', async (_request, reply) => {
+        reply.header('Cache-Control', 'no-store');
+        return persistent_audit_1.auditOutbox.health();
+    });
     fastify.post('/clinux/admin/users/session', async (request, reply) => {
         const body = zod_1.z.object({ username: zod_1.z.string().min(1).max(100), version: zod_1.z.string() }).strict().parse(request.body);
         const user = await prismalog_1.PrismaLog.adminUser.findUnique({ where: { username: body.username } });
@@ -96,19 +102,19 @@ async function adminRoutes(fastify) {
         return { ok: true };
     });
     fastify.post('/clinux/audit', async (request, reply) => {
-        const body = zod_1.z.object({ sessionId: zod_1.z.string().max(100).optional(), actor: zod_1.z.string().max(100).optional(), category: zod_1.z.enum(['TOTEM', 'ADMIN']), action: zod_1.z.string().min(1).max(100), step: zod_1.z.string().max(100).optional(), metadata: zod_1.z.record(zod_1.z.unknown()).optional() }).parse(request.body);
-        await prismalog_1.PrismaLog.auditLog.create({ data: { ...body, metadata: body.metadata } });
+        const body = zod_1.z.object({ eventId: zod_1.z.string().uuid().optional(), createdAt: zod_1.z.string().datetime().optional(), sessionId: zod_1.z.string().max(100).optional(), actor: zod_1.z.string().max(100).optional(), category: zod_1.z.enum(['TOTEM', 'ADMIN']), action: zod_1.z.string().min(1).max(100), step: zod_1.z.string().max(100).optional(), metadata: zod_1.z.record(zod_1.z.unknown()).optional() }).parse(request.body);
+        (0, persistent_audit_1.persistAudit)(body);
         return reply.code(201).send({ ok: true });
     });
     fastify.get('/clinux/audit', async (request) => {
-        const query = zod_1.z.object({ group: zod_1.z.enum(['EMISSAO', 'SESSAO', 'COMUNICACAO', 'AUDIO', 'PACIENTES']).optional(), category: zod_1.z.enum(['TOTEM', 'ADMIN']).optional(), flow: zod_1.z.string().max(100).optional(), device: zod_1.z.string().max(100).optional(), page: zod_1.z.coerce.number().int().positive().default(1), limit: zod_1.z.coerce.number().int().min(1).max(200).default(50) }).parse(request.query);
+        const query = audit_filters_1.auditQuery.parse(request.query);
         const where = {
             ...(query.category ? { category: query.category } : {}),
             ...(query.flow ? { OR: [{ sessionId: query.flow }, { metadata: { path: ['traceId'], equals: query.flow } }] } : {}),
             ...(query.device ? { metadata: { path: ['device'], equals: query.device } } : {}),
-            ...(query.group ? { AND: [auditGroups[query.group]] } : {}),
+            AND: [...(0, audit_filters_1.auditExtraFilters)(query), ...(query.group ? [auditGroups[query.group]] : [])],
         };
-        const [items, total] = await Promise.all([prismalog_1.PrismaLog.auditLog.findMany({ where, orderBy: { createdAt: 'desc' }, skip: (query.page - 1) * query.limit, take: query.limit }), prismalog_1.PrismaLog.auditLog.count({ where })]);
+        const [items, total] = await Promise.all([prismalog_1.PrismaLog.auditLog.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: (query.page - 1) * query.limit, take: query.limit }), prismalog_1.PrismaLog.auditLog.count({ where })]);
         return { items: items.map((item) => ({ ...item, id: item.id.toString() })), total, page: query.page };
     });
 }

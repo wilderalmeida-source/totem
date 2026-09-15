@@ -122,6 +122,6 @@ export async function gerarSenhaAtendimento({
 
     return senha
   }, { isolationLevel: 'ReadCommitted', maxWait: 5000, timeout: 10000 }))
-  flowAudit('senha_e_vinculo_confirmados', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, atendimentos: exameAtendimento.map(item => item.cd_atendimento), code: 'TICKET_COMMITTED' })
+  flowAudit('senha_e_vinculo_confirmados', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, atendimentos: exameAtendimento.map(item => item.cd_atendimento), outcome: 'CONCLUIDO', code: 'TICKET_COMMITTED' })
   return result
 }

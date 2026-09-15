@@ -254,19 +254,27 @@ export function DialogPatient({
     auditTotem('confirmacao_senha', 'confirmacao', { servico: dados?.servico, preferencial: dados?.preferencial, pacienteId: dados?.cd_paciente, viaQr: Boolean(valorQR) });
     // Fluxo QR
     if (dados?.qr) {
-      if (processandoRef.current) return;
+      if (processandoRef.current) {
+        auditTotem('qr_ignorado', 'patientSession.POST', { motivo: 'consulta_em_andamento' });
+        return;
+      }
       if (!valorQR) {
         window.alert("PACIENTE NÃO ENCONTRADO");
         return;
       }
 
-      if (!/^[1-9]\d*$/.test(valorQR.trim())) { window.alert('QR Code inválido.'); return; }
+      if (!/^[1-9]\d*$/.test(valorQR.trim()) || !Number.isSafeInteger(Number(valorQR.trim()))) {
+        auditTotem('qr_invalido', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), motivo: 'codigo_deve_ser_inteiro_positivo_seguro' });
+        window.alert('QR Code inválido.'); return;
+      }
       processandoRef.current = true;
       setLoading(true);
       try {
+      auditTotem('qr_pesquisa_enviada', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), codigoPesquisado: Number(valorQR.trim()) });
       const listpaciente = await buscaPaciente({
         cd_paciente: Number(valorQR.trim()),
       });
+      auditTotem('qr_resposta_recebida', 'patientSession.POST', { codigoPesquisado: Number(valorQR.trim()), quantidade: listpaciente?.length ?? 0, pacientes: listpaciente?.map(p => ({ cd_paciente: p.cd_paciente, ds_paciente: p.ds_paciente, dt_nascimento: p.dt_nascimento })) });
       if (!listpaciente?.length) {
         window.alert("PACIENTE NÃO ENCONTRADO");
         return;
@@ -288,6 +296,7 @@ export function DialogPatient({
 
       setDados(newDados);
       } catch (error) {
+        auditTotem('qr_pesquisa_falhou', 'patientSession.POST', { codigoPesquisado: Number(valorQR.trim()), erro: error instanceof Error ? error.message.slice(0, 300) : 'erro_desconhecido' });
         window.alert(error instanceof Error ? error.message : 'Não foi possível identificar o paciente.');
       } finally {
         processandoRef.current = false;
@@ -381,7 +390,7 @@ export function DialogPatient({
         recepcao: destino.recepcao,
         localizacao: destino.localizacao,
       });
-    } catch (error) {
+      } catch (error) {
       console.error("Erro ao buscar recepção da modalidade:", error);
       irParaInicio();
     }
@@ -576,6 +585,7 @@ export function DialogPatient({
                   const valor = (
                     e.currentTarget.elements.namedItem("ID") as HTMLInputElement
                   ).value;
+                  auditTotem('qr_lido', 'patientSession.POST', { codigoLido: valor.slice(0, 200), tamanho: valor.length, truncado: valor.length > 200 });
                   void gerarSenha(valor);
                 }}
               >

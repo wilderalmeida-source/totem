@@ -7,7 +7,7 @@ function load(create) {
   const exports = {};
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/lib/flow-audit.js'), 'utf8'), {
     exports, process: { env: { APP_VERSION: 'test' } }, console: { error: () => {} },
-    require: name => name.startsWith('node:') ? require(name) : { PrismaLog: { auditLog: { create } } },
+    require: name => name.startsWith('node:') ? require(name) : { recordAudit: data => { void Promise.resolve().then(() => create({ data })).catch(() => {}) } },
   });
   return exports;
 }

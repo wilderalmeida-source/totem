@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auditOutbox } from './persistent-audit'
 import { auditServer, flowHeaders } from './flow-audit-server'
 import { PATIENT_MAX_MS, PATIENT_SESSION_COOKIE } from './patient-session-config'
 
@@ -23,6 +24,10 @@ export function patientJson(body: unknown, status = 200) {
 }
 
 export async function patientBackend(path: string, init: RequestInit = {}, request?: NextRequest) {
+  if (path === '/clinux/audit' && init.method === 'POST' && typeof init.body === 'string') {
+    auditOutbox.enqueue(JSON.parse(init.body))
+    return new Response(null, { status: 204 })
+  }
   const base = process.env.LINK_API_INTERNA
   const token = process.env.TOKEN_API_INT
   if (!base || !token) throw new Error('Backend indisponível')

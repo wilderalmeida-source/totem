@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.totemAccessRoutes = totemAccessRoutes;
+const persistent_audit_1 = require("../lib/persistent-audit");
 const node_crypto_1 = require("node:crypto");
 const zod_1 = require("zod");
 const prismalog_1 = require("../../config/prismalog");
@@ -12,7 +13,7 @@ const fields = { id: true, username: true, displayName: true, cardId: true, acti
 const tokenSchema = zod_1.z.string().regex(/^[A-Za-z0-9_-]{43}$/);
 const settings = () => prismalog_1.PrismaLog.totemAccessSettings.upsert({ where: { id: 1 }, create: { id: 1 }, update: {} });
 async function audit(actor, action, category = 'TOTEM') {
-    await prismalog_1.PrismaLog.auditLog.create({ data: { actor, action, category, step: 'acesso_totem' } });
+    (0, persistent_audit_1.recordAudit)({ actor, action, category, step: 'acesso_totem' });
 }
 async function limit(key, max) {
     const window = Math.floor(Date.now() / 900000);

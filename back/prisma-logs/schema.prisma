@@ -183,6 +183,7 @@ model TotemLoginAttempt {
 }
 
 model AuditLog {
+  eventId   String?  @unique @logs.Uuid
   id        BigInt   @id @default(autoincrement())
   sessionId String?  @logs.VarChar(100)
   actor     String?  @logs.VarChar(100)

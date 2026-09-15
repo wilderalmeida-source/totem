@@ -69,6 +69,6 @@ async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) 
             cd_funcionario: FUNCIONARIO,
         },
     }));
-    (0, flow_audit_1.flowAudit)('senha_entrega_confirmada', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, nr_controle: nrControle, code: 'TICKET_COMMITTED' });
+    (0, flow_audit_1.flowAudit)('senha_entrega_confirmada', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, nr_controle: nrControle, outcome: 'CONCLUIDO', code: 'TICKET_COMMITTED' });
     return result;
 }

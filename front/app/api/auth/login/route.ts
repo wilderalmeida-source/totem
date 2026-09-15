@@ -1,3 +1,4 @@
+import { recordAudit } from '@/lib/persistent-audit'
 import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
 
   attempts.delete(address);
   if (apiBase && apiToken) {
-    void fetch(`${apiBase}/clinux/audit`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` }, body: JSON.stringify({ category: 'ADMIN', actor: authenticatedUser?.username ?? username, action: 'login_realizado', step: 'autenticacao' }) }).catch(() => undefined);
+    recordAudit({ category: 'ADMIN', actor: authenticatedUser?.username ?? username, action: 'login_realizado', step: 'autenticacao' });
   }
   const mustChangePassword = authenticatedUser?.mustChangePassword === true;
   const response = NextResponse.json({ ok: true, mustChangePassword });

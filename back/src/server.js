@@ -3,6 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const persistent_audit_1 = require("./lib/persistent-audit");
+const admin_audit_1 = require("./lib/admin-audit");
+const audit_retention_1 = require("./lib/audit-retention");
 const fastify_1 = __importDefault(require("fastify"));
 const node_crypto_1 = require("node:crypto");
 const flow_audit_1 = require("./lib/flow-audit");
@@ -31,7 +34,10 @@ const totem_access_1 = require("./routes/totem-access");
 const configuracoes_totem_1 = require("./routes/configuracoes-totem");
 const atendimentos_totem_1 = require("./routes/atendimentos-totem");
 async function bootstrap() {
+    persistent_audit_1.auditOutbox.start();
     const fastify = (0, fastify_1.default)({ logger: true, });
+    const stopRetention = (0, audit_retention_1.startAuditRetention)();
+    fastify.addHook('onClose', async () => { stopRetention(); });
     fastify.addHook('onRequest', (request, _reply, done) => {
         flow_audit_1.auditContext.run({ flowId: (0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) ?? (0, node_crypto_1.randomUUID)(),
             device: (0, flow_audit_1.auditIdentifier)(request.headers['x-device-id']) ?? 'nao_informado' }, done);
@@ -59,6 +65,7 @@ async function bootstrap() {
         },
     });
     fastify.addHook('preHandler', autenticate_1.authenticate);
+    (0, admin_audit_1.registerAdminAudit)(fastify);
     await fastify.register(painel_1.default);
     await fastify.register(static_1.default, {
         root: node_path_1.default.join(__dirname, '../public/audios'), // Onde os arquivos estão fisicamente

@@ -9,6 +9,7 @@ import { PatientSearchInput } from '@/components/totem/patientSearchInput'
 import { VirtualKeyboard } from '@/components/totem/virtualKeyboard'
 import { DatePatientList } from '@/components/totem/datePatientList'
 import { useDatePatientSearch } from '@/hooks/useDatePatientSearch'
+import { identificationValues } from '@/lib/identification-diagnostic'
 import { TipoBusca, isValidDateBR, toISODateBR } from '@/lib/patientUtils'
 import { buscarPacienteNomeData } from '@/services/buscaNomeData'
 import type { Paciente } from '@/services/api'
@@ -65,7 +66,9 @@ export default function DataNasc() {
     filtroNascimento: tipo === 'NOME' && isValidDateBR(text) ? toISODateBR(text) : undefined,
   })
 
+  const originalInput = useRef('')
   const updateSearchText = useCallback((value: string) => {
+    originalInput.current = value
     setText((value ?? '').toUpperCase())
   }, [])
 
@@ -89,6 +92,10 @@ export default function DataNasc() {
     try {
       const dsPaciente = tipo === 'DATA' ? paciente.ds_paciente ?? text : nome
       const dtNascimento = tipo === 'DATA' ? nome : paciente.dt_nascimento ?? text
+      auditTotem('identificacao_confirmacao_original', 'busca_complementar', {
+        tipo, entrada: identificationValues(tipo === 'DATA' ? { ds_paciente: originalInput.current } : { dt_nascimento: originalInput.current }),
+        selecionado: identificationValues({ ds_paciente: dsPaciente, dt_nascimento: dtNascimento }),
+      })
 
       const result = await buscarPacienteNomeData({
         ds_paciente: dsPaciente,

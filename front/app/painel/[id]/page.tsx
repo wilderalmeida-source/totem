@@ -188,7 +188,17 @@ export default function Page() {
       audio.preload = "auto";
       currentTtsRef.current = audio;
 
+      let settled = false;
+      const watchdog = window.setTimeout(() => {
+        if (settled) return;
+        auditTotem('audio_sem_confirmacao', 'painel.audio', { traceId, code: 'AUDIO_TIMEOUT', outcome: 'FALHOU', timeoutMs: 60000 });
+        audio.pause();
+        done();
+      }, 60000);
       const done = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(watchdog);
         if (currentTtsRef.current === audio) currentTtsRef.current = null;
         resolve();
       };
@@ -216,7 +226,10 @@ export default function Page() {
       utterance.pitch = 1;
       utterance.volume = 1;
       utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
+      utterance.onerror = event => {
+        auditTotem('audio_falhou', 'painel.speech', { traceId, code: 'SPEECH_FAILED', outcome: 'FALHOU', reason: event.error });
+        resolve();
+      };
 
       const trySpeak = () => {
         const voz = window.speechSynthesis

@@ -39,7 +39,7 @@ export default function Totem() {
     (value: string) => {
       const nextValue = (value ?? "").toUpperCase();
       setText(nextValue);
-      pesquisar(nextValue);
+      pesquisar(value);
     },
     [pesquisar]
   );

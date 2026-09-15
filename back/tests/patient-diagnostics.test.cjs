@@ -6,7 +6,7 @@ const vm = require('node:vm');
 function load(create) {
   const exports = {};
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/lib/patient-diagnostics.js'), 'utf8'), {
-    exports, Date, process: { env: {} }, console: { error: () => {} }, require: name => name.includes('flow-audit') ? { auditContext: { getStore: () => undefined } } : ({ PrismaLog: { auditLog: { create } } }),
+    exports, Date, process: { env: {} }, console: { error: () => {} }, require: name => name.includes('flow-audit') ? { auditContext: { getStore: () => undefined } } : ({ recordAudit: data => { void Promise.resolve().then(() => create({ data })).catch(() => {}) } }),
   });
   return exports;
 }
@@ -23,4 +23,11 @@ test('falha no banco de logs nao propaga erro para a consulta', async () => {
   const env = load(async () => { throw Error('offline'); });
   assert.doesNotThrow(() => env.patientDiagnostic('request-1', { resultado: 'teste' }));
   await new Promise(resolve => setImmediate(resolve));
+});
+
+
+test('diagnostico preserva codigo pesquisado e codigo retornado', () => {
+  const env = load(async () => {});
+  assert.equal(env.describePatientInput({ cd_paciente: '12345' }).cd_paciente, '12345');
+  assert.equal(env.describePatientInput({ cd_paciente: 12345 }).cd_paciente, 12345);
 });

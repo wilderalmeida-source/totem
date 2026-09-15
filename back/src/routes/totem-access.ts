@@ -1,3 +1,4 @@
+import { recordAudit } from '../lib/persistent-audit'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
@@ -11,7 +12,7 @@ const fields = { id: true, username: true, displayName: true, cardId: true, acti
 const tokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/)
 const settings = () => db.totemAccessSettings.upsert({ where: { id: 1 }, create: { id: 1 }, update: {} })
 async function audit(actor: string, action: string, category = 'TOTEM') {
-  await db.auditLog.create({ data: { actor, action, category, step: 'acesso_totem' } })
+  recordAudit({ actor, action, category, step: 'acesso_totem' })
 }
 async function limit(key: string, max: number) {
   const window = Math.floor(Date.now() / 900000)

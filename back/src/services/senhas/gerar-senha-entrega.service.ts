@@ -101,6 +101,6 @@ export async function gerarSenhaEntrega({
       cd_funcionario: FUNCIONARIO,
     },
   }))
-  flowAudit('senha_entrega_confirmada', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, nr_controle: nrControle, code: 'TICKET_COMMITTED' })
+  flowAudit('senha_entrega_confirmada', 'emissao', { cd_senha: result.cd_senha, nr_senha: result.nr_senha, nr_controle: nrControle, outcome: 'CONCLUIDO', code: 'TICKET_COMMITTED' })
   return result
 }

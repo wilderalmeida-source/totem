@@ -6,27 +6,15 @@ exports.flowAudit = flowAudit;
 exports.auditOperation = auditOperation;
 const node_async_hooks_1 = require("node:async_hooks");
 const node_crypto_1 = require("node:crypto");
-const prismalog_1 = require("../../config/prismalog");
+const persistent_audit_1 = require("./persistent-audit");
 exports.auditContext = new node_async_hooks_1.AsyncLocalStorage();
 function auditIdentifier(value) {
     return typeof value === 'string' && /^[a-zA-Z0-9_.:-]{1,100}$/.test(value) ? value : undefined;
 }
-let pending = 0;
-let dropped = 0;
 function flowAudit(action, step, metadata = {}) {
-    if (pending >= 100) {
-        dropped++;
-        return;
-    }
     const context = exports.auditContext.getStore();
-    const discarded = dropped;
-    dropped = 0;
-    pending++;
-    void Promise.resolve().then(() => prismalog_1.PrismaLog.auditLog.create({ data: {
-            category: 'TOTEM', action, step, sessionId: context?.flowId ?? (0, node_crypto_1.randomUUID)(),
-            metadata: JSON.parse(JSON.stringify({ ...metadata, device: context?.device, source: 'backend',
-                version: process.env.APP_VERSION ?? 'nao_informada', droppedEvents: discarded })),
-        } })).catch(() => console.error('AUDIT_WRITE_FAILED')).finally(() => { pending--; });
+    (0, persistent_audit_1.recordAudit)({ category: 'TOTEM', action, step, sessionId: context?.flowId ?? (0, node_crypto_1.randomUUID)(),
+        metadata: { ...metadata, device: context?.device, source: 'backend', version: process.env.APP_VERSION ?? 'nao_informada' } });
 }
 async function auditOperation(step, operation) {
     const start = Date.now();
