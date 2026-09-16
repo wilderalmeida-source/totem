@@ -72,6 +72,17 @@ test('busca ampla não devolve lista truncada; reset não consulta o banco', asy
   assert.equal(calls.length, 1);
 });
 
+test('DATA preserva ate 100 pacientes sem enviar distinct vazio ao Prisma', async t => {
+  const rows = Array.from({ length: 101 }, (_, i) => ({ cd_paciente: i + 1, ds_paciente: `TESTE ${i}`, dt_nascimento: new Date('1980-01-01') }));
+  const { calls, get } = await setup(t, 'pacientes.js', 'pacientesRoute', rows);
+  const response = await get('/clinux/pacientes', { tipo: 'DATA', dt_nascimento: '1980-01-01T00:00:00.000Z' });
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().length, 100);
+  assert.equal(new Set(response.json().map(p => p.cd_paciente)).size, 100);
+  assert.equal(Object.hasOwn(calls[0], 'distinct'), false);
+  assert.equal(calls[0].take, 101);
+});
+
 test('nascimento inicial elimina repetições e refinamento por nome/data continua disponível', async t => {
   const { calls, get } = await setup(t, 'pacientes.js', 'pacientesRoute');
   await get('/clinux/pacientes', { dt_nascimento: '1980-01-01' });

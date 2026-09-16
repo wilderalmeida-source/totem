@@ -18,7 +18,8 @@ export const buscaPaciente = async ({
   if (!ds_paciente && !cd_paciente && !dt_nascimento && !ds_cpf && !tipo) return []
 
   if (tipo === 'ID' || tipo === 'NOMEDATA' || cd_paciente !== undefined) {
-    const body = cd_paciente !== undefined ? { tipo: 'QR', cd_paciente }
+    const body = tipo === 'NOMEDATA' ? { tipo, ds_paciente, dt_nascimento, ...(cd_paciente !== undefined ? { cd_paciente } : {}) }
+      : cd_paciente !== undefined ? { tipo: 'QR', cd_paciente }
       : tipo === 'ID' ? { tipo, ds_cpf, dt_nascimento } : { tipo, ds_paciente, dt_nascimento }
     const result = await patientSessionRequest<{ patient: Paciente }>('POST', body)
     return [result.patient]

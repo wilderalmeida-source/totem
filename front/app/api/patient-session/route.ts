@@ -15,7 +15,7 @@ const birth = z.string().regex(/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d{1
 const name = z.string().trim().min(1).max(150)
 const confirmation = z.discriminatedUnion('tipo', [
   z.object({ tipo: z.literal('ID'), ds_cpf: z.string().regex(/^\d{11}$/), dt_nascimento: birth }).strict(),
-  z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: name, dt_nascimento: birth }).strict(),
+  z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: name, dt_nascimento: birth, cd_paciente: z.number().int().positive().safe().optional() }).strict(),
   // O QR legado é um código numérico, aceito como identificação pela operação interna.
   z.object({ tipo: z.literal('QR'), cd_paciente: z.number().int().positive().safe() }).strict(),
   z.object({ tipo: z.literal('NEW'), ds_paciente: name, dt_nascimento: birth }).strict(),
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     } else {
       const params = new URLSearchParams()
       if (input.tipo === 'QR') params.set('cd_paciente', String(input.cd_paciente))
-      else Object.entries(input).forEach(([key, value]) => params.set(key, value))
+      else Object.entries(input).forEach(([key, value]) => { if (value !== undefined) params.set(key, String(value)) })
       if (input.tipo === 'QR') auditServer(request, 'qr_consulta_backend', 'patientSession.POST', { codigoPesquisado: input.cd_paciente, rota: '/clinux/pacientes', parametro: params.get('cd_paciente') })
       upstream = await patientBackend(`/clinux/pacientes?${params}`, {}, request)
     }
@@ -74,6 +74,11 @@ export async function POST(request: NextRequest) {
       return fail('Paciente não confirmado. Confira os dados ou procure a recepção.', 401)
     }
     const patient = patients[0]
+    if (input.tipo === 'NOMEDATA' && (
+      (input.cd_paciente !== undefined && patient.cd_paciente !== input.cd_paciente) ||
+      typeof patient.ds_paciente !== 'string' || patient.ds_paciente.trim().toUpperCase() !== input.ds_paciente.trim().toUpperCase() ||
+      typeof patient.dt_nascimento !== 'string' || patient.dt_nascimento.slice(0, 10) !== input.dt_nascimento.slice(0, 10)
+    )) return fail('O cadastro não corresponde ao paciente selecionado.', 401)
     const session = createPatientSession(patient.cd_paciente)
     auditServer(request, 'identificacao_resposta_final', 'patientSession.POST', { status: 200,
       resposta: identificationResult({ patient }), outcome: 'CONCLUIDO' })

@@ -98,6 +98,7 @@ export default function DataNasc() {
       })
 
       const result = await buscarPacienteNomeData({
+        cd_paciente: tipo === 'DATA' ? paciente.cd_paciente : undefined,
         ds_paciente: dsPaciente,
         dt_nascimento: dtNascimento,
         servico,
@@ -132,6 +133,9 @@ export default function DataNasc() {
       setExames(result.exames)
       setTentativas(result.tentativas)
       setInvalido(result.invalido)
+      setShowModal(true)
+    } catch (error) {
+      setInvalido(error instanceof Error ? error.message : 'Não foi possível confirmar o paciente.')
       setShowModal(true)
     } finally {
       setLoading(false)

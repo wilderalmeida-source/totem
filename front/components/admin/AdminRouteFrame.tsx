@@ -6,10 +6,10 @@ import { BellRing, BookOpenText, Clock3, Gauge, ImagePlay, KeyRound, LayoutDashb
 import { ReactNode, useEffect, useState } from "react";
 
 const sections = [
+  { href: "/configuracoes", label: "Central", icon: LayoutDashboard, permission: null },
   { href: '/acesso-totem', label: 'Acesso ao totem', icon: KeyRound, permission: 'USUARIOS' },
   { href: "/configuracao-atrasos", label: "Atrasos", icon: Clock3, permission: 'PAINEIS' },
   { href: "/midias", label: "Mídias", icon: ImagePlay, permission: 'PAINEIS' },
-  { href: "/configuracoes", label: "Central", icon: LayoutDashboard, permission: null },
   { href: "/atencao", label: "Aviso de atenção", icon: BellRing, permission: 'ATENCAO' },
   { href: "/configuracao", label: "Voz e áudio", icon: SlidersHorizontal, permission: 'VOZ' },
   { href: "/dic", label: "Dicionário", icon: BookOpenText, permission: 'DICIONARIO' },

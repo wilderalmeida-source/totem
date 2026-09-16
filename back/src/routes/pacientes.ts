@@ -11,7 +11,7 @@ const patientQuery = z.union([
   z.object({ tipo: z.literal('RESET'), ds_paciente: z.string().max(150).optional() }).strict(),
   z.object({ tipo: z.undefined().optional(), cd_paciente: positiveId }).strict(),
   z.object({ tipo: z.literal('ID'), ds_cpf: cpf, dt_nascimento: birthDate }).strict(),
-  z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: patientName, dt_nascimento: birthDate }).strict(),
+  z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: patientName, dt_nascimento: birthDate, cd_paciente: positiveId.optional() }).strict(),
   z.object({ tipo: z.literal('NOME'), ds_paciente: patientName, dt_nascimento: birthDate.optional() }).strict(),
   z.object({ tipo: z.literal('MASK').optional(), ds_cpf: cpf }).strict(),
   z.object({ tipo: z.literal('DATA').optional(), dt_nascimento: birthDate, ds_paciente: patientName.optional() }).strict(),
@@ -105,7 +105,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     }
     const where: Prisma.pacientesWhereInput = {}
     let select: Prisma.pacientesSelect
-    if ('cd_paciente' in input) {
+    if ('cd_paciente' in input && input.tipo !== 'NOMEDATA') {
       where.cd_paciente = input.cd_paciente
       select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true }
     } else if (input.tipo === 'ID') {
@@ -113,6 +113,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
       where.dt_nascimento = input.dt_nascimento
       select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true }
     } else if (input.tipo === 'NOMEDATA' || input.tipo === 'NOME') {
+      if (input.tipo === 'NOMEDATA' && input.cd_paciente !== undefined) where.cd_paciente = input.cd_paciente
       // Busca candidatos; a igualdade do nome completo normalizado é conferida abaixo.
       // Escapa os curingas LIKE para que caracteres do nome sejam literais.
       where.ds_paciente = { contains: input.ds_paciente.replace(/[\\%_]/g, '\\$&'), mode: 'insensitive' }
@@ -138,7 +139,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
         ? ('dt_nascimento' in input || 'ds_cpf' in input || input.tipo === 'NOME' ? ['dt_nascimento'] : ['ds_paciente'])
         : []
     if (input.tipo === 'NOME') distinct.splice(0, distinct.length, 'ds_paciente', 'dt_nascimento')
-    const consultar = () => prisma.pacientes.findMany({ where, select, distinct, orderBy: { ds_paciente: 'asc' }, take: SEARCH_LIMIT + 1 })
+    const consultar = () => prisma.pacientes.findMany({ where, select, ...(distinct.length ? { distinct } : {}), orderBy: { ds_paciente: 'asc' }, take: SEARCH_LIMIT + 1 })
     let pacientes: Awaited<ReturnType<typeof consultar>>
     try { pacientes = await consultar() } catch (error) {
       patientDiagnostic(request.id, { recebido, normalizado: describePatientInput(input), ramo: input.tipo ?? 'FILTRO',

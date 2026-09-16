@@ -76,5 +76,7 @@ test('cartao exige permissao administrativa, contem QR e nome escapado, nunca PI
   const svg = await response.text();
   assert.match(svg, /Nome &lt;Teste&gt;/);
   assert.match(svg, /<path/);
+  assert.match(svg, /width="85mm" height="38mm" viewBox="0 0 85 38"/);
+  assert.match(svg, /x="2" y="4" width="30" height="30"/);
   assert.doesNotMatch(svg, /pinHash|1234/);
 });

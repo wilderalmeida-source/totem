@@ -137,7 +137,7 @@ async function pacientesRoute(fastify) {
             : [];
         if (input.tipo === 'NOME')
             distinct.splice(0, distinct.length, 'ds_paciente', 'dt_nascimento');
-        const consultar = () => prismaDB_1.prisma.pacientes.findMany({ where, select, distinct, orderBy: { ds_paciente: 'asc' }, take: search_validation_1.SEARCH_LIMIT + 1 });
+        const consultar = () => prismaDB_1.prisma.pacientes.findMany({ where, select, ...(distinct.length ? { distinct } : {}), orderBy: { ds_paciente: 'asc' }, take: search_validation_1.SEARCH_LIMIT + 1 });
         let pacientes;
         try {
             pacientes = await consultar();

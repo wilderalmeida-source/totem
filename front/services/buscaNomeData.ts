@@ -5,6 +5,7 @@ import type { DadosPaciente } from '@/components/modals/patientModal'
 const STATUS_VALIDOS = [2, 3, 7]
 
 interface BuscarPacienteNomeDataParams {
+  cd_paciente?: number
   ds_paciente: string
   dt_nascimento: string
   servico: string
@@ -19,12 +20,14 @@ interface BuscarPacienteNomeDataResult {
 }
 
 export async function buscarPacienteNomeData({
+  cd_paciente,
   ds_paciente,
   dt_nascimento,
   servico,
   preferencial,
 }: BuscarPacienteNomeDataParams): Promise<BuscarPacienteNomeDataResult> {
   const listpaciente = await buscaPaciente({
+    cd_paciente,
     ds_paciente,
     dt_nascimento,
     tipo: 'NOMEDATA',
