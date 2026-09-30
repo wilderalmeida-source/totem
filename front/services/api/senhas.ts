@@ -2,10 +2,12 @@ import { apiFetch } from "./client"
 import { Senha, SenhasResponse } from "./types"
 import { patientSessionRequest } from '@/lib/patient-session-client'
 
-export const buscaSenhas = async (): Promise<SenhasResponse> => {
+export const buscaSenhas = async (signal?: AbortSignal): Promise<SenhasResponse> => {
   const res = await apiFetch('/clinux/senhas', {
     tags: ['pacientes'],
+    signal,
   })
+  if (!res.ok) throw new Error('Não foi possível carregar o histórico de senhas.')
   return res.json() as Promise<SenhasResponse>
 }
 

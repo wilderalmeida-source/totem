@@ -114,30 +114,43 @@ export default function Historic() {
 
   const [loading, setLoading] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const requestRef = useRef<AbortController | null>(null)
+  const stoppedRef = useRef(false)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    void buscaPaciente({ ds_paciente: 'RE', tipo: 'RESET' })
+    void buscaPaciente({ ds_paciente: 'RE', tipo: 'RESET' }).catch(() => {})
   }, [])
 
   const fetchData = useCallback(async () => {
+    if (stoppedRef.current || requestRef.current) return
+    const controller = new AbortController()
+    requestRef.current = controller
+    const timeout = window.setTimeout(() => controller.abort(), 10000)
     try {
       setLoading(true)
-
-      const response = await buscaSenhas()
+      const response = await buscaSenhas(controller.signal)
+      if (controller.signal.aborted || stoppedRef.current) return
+      setError(false)
 
       startTransition(() => {
         setDados(response)
       })
-    } catch (error) {
-      console.error('[Historic] fetchData error:', error)
+    } catch {
+      if (!stoppedRef.current) setError(true)
     } finally {
-      setLoading(false)
+      clearTimeout(timeout)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        if (!stoppedRef.current) setLoading(false)
+      }
     }
   }, [startTransition])
 
   const throttleRef = useRef<number | null>(null)
 
   const scheduleFetch = useCallback(() => {
+    if (stoppedRef.current) return
     if (throttleRef.current !== null) return
 
     throttleRef.current = window.setTimeout(() => {
@@ -148,6 +161,7 @@ export default function Historic() {
 
   useEffect(() => {
     let aborted = false
+    stoppedRef.current = false
 
     void fetchData()
 
@@ -166,8 +180,11 @@ export default function Historic() {
       }
     }
 
-    return () => {
+    const stop = () => {
       aborted = true
+      stoppedRef.current = true
+      requestRef.current?.abort()
+      requestRef.current = null
 
       if (throttleRef.current) {
         clearTimeout(throttleRef.current)
@@ -175,6 +192,11 @@ export default function Historic() {
       }
 
       eventSource.close()
+    }
+    window.addEventListener('totem-service-selected', stop)
+    return () => {
+      stop()
+      window.removeEventListener('totem-service-selected', stop)
     }
   }, [fetchData, scheduleFetch])
 
@@ -202,6 +224,7 @@ export default function Historic() {
 
   return (
     <>
+      {error && <p role="status" className="ml-3 text-sm text-gray-500">Histórico indisponível no momento. Você pode selecionar um serviço normalmente.</p>}
       <div className="ml-3 flex">
         <TabelaSenhas
           titulo="Atendimento"
