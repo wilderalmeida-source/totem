@@ -1,5 +1,5 @@
 import { buscaAtendimentos, buscaPaciente, type Atendimento, type Paciente } from '@/services/api'
-import { entregaDeExames } from '@/services/entregadeexames'
+import { contextoEntrega } from '@/services/entregadeexames'
 import type { DadosPaciente } from '@/components/modals/patientModal'
 
 const STATUS_VALIDOS = [2, 3, 7]
@@ -54,13 +54,13 @@ export async function buscarPacienteNomeData({
   }
 
   let exames: Atendimento[] | null = null
+  let requerSelecaoModalidade = false
 
   if (servico === 'C') {
 
-    const entrega = await entregaDeExames(paciente.cd_paciente)
-    exames = entrega
-      ? entrega.slice(0, 10)
-      : []
+    const entrega = await contextoEntrega(paciente.cd_paciente)
+    exames = entrega.exames
+    requerSelecaoModalidade = entrega.requerSelecaoModalidade
   } else {
   const agora = new Date()
 
@@ -85,6 +85,7 @@ export async function buscarPacienteNomeData({
   return {
     dados: {
       ...paciente,
+      requerSelecaoModalidade,
       ds_paciente: paciente.ds_paciente ?? paciente.ds_nome ?? ds_paciente,
       dt_nascimento: paciente.dt_nascimento ?? dt_nascimento,
       servico,

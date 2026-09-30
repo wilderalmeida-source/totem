@@ -19,6 +19,10 @@ function servicoParaConfig(servico: string): ServicoPainel {
   return 'atendimento'
 }
 
+export function deveSelecionarModalidadeAoAvancar(configuracao: ConfiguracaoPaineis | null | undefined) {
+  return configuracao?.ativo === true && configuracao.paineis?.some(painel => painel.ativo === true) === true
+}
+
 export function deveSelecionarModalidade(
   configuracao: ConfiguracaoPaineis | null | undefined,
   servico: string

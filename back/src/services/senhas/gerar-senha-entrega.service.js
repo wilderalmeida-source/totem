@@ -6,6 +6,7 @@ const prismaDB_1 = require("../../../config/prismaDB");
 const senha_helpers_1 = require("./senha.helpers");
 async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) {
     const dateNow = (0, senha_helpers_1.getAgoraBrasil)();
+    const hoje = new Date(dateNow.toISOString().slice(0, 10));
     const EMPRESA = process.env.IDEMPRESA ? Number(process.env.IDEMPRESA) : 0;
     const FUNCIONARIO = process.env.IDFUNCIONARIO
         ? Number(process.env.IDFUNCIONARIO)
@@ -13,15 +14,15 @@ async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) 
     const modalidadeTotem = process.env.IDMODALIDADE
         ? Number(process.env.IDMODALIDADE)
         : 0;
-    const tresMesesAtras = new Date(dateNow);
-    tresMesesAtras.setMonth(tresMesesAtras.getMonth() - 3);
+    const tresMesesAtras = new Date(hoje);
+    tresMesesAtras.setUTCMonth(tresMesesAtras.getUTCMonth() - 3);
     const atendimentos = await prismaDB_1.prisma.atendimentos.findMany({
         where: {
             cd_paciente,
             ds_status: 5,
             dt_data: {
                 gte: tresMesesAtras,
-                lte: dateNow,
+                lte: hoje,
             },
         },
         include: {
@@ -49,7 +50,7 @@ async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) 
         atendimento = await (0, senha_helpers_1.novoAtendimentoTotem)(cd_paciente);
     }
     const nrControle = atendimento.nr_controle ?? atendimento.cd_atendimento;
-    const modalidadeSenha = atendimento.salas?.cd_modalidade ?? cd_modalidade ?? modalidadeTotem;
+    const modalidadeSenha = cd_modalidade ?? atendimento.salas?.cd_modalidade ?? modalidadeTotem;
     const IP_PAINEL = await (0, senha_helpers_1.resolverIpPainelPorModalidade)('C', modalidadeSenha);
     const dsModalidade = await (0, senha_helpers_1.resolveModalidade)(modalidadeSenha);
     const result = await (0, flow_audit_1.auditOperation)('clinico.gravar_senha_entrega', () => prismaDB_1.prisma.atendimentos_senhas.create({

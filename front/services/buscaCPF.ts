@@ -1,5 +1,5 @@
 import { buscaAtendimentos, buscaPaciente, type Atendimento, type Paciente } from "@/services/api";
-import { entregaDeExames } from "@/services/entregadeexames";
+import { contextoEntrega } from "@/services/entregadeexames";
 import { DadosPaciente } from "@/components/modals/patientModal";
 
 interface RetornoPacienteCPF {
@@ -42,12 +42,12 @@ export async function buscarPacienteCPF(
   }
 
   let exames: Atendimento[] | null = null;
+  let requerSelecaoModalidade = false;
 
   if (servico === "C") {
-    const entrega = await entregaDeExames(paciente.cd_paciente);
-    exames = entrega
-      ? entrega.slice(0, 10)
-      : [];
+    const entrega = await contextoEntrega(paciente.cd_paciente);
+    exames = entrega.exames;
+    requerSelecaoModalidade = entrega.requerSelecaoModalidade;
   } else {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -72,6 +72,7 @@ export async function buscarPacienteCPF(
 
   return {
     dados: {
+      requerSelecaoModalidade,
       cd_paciente: listpaciente[0].cd_paciente,
       ds_paciente: listpaciente[0].ds_paciente,
       dt_nascimento: listpaciente[0].dt_nascimento,

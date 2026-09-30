@@ -28,7 +28,7 @@ async function atendimentosTotemRoute(fastify) {
         return rows;
     });
     fastify.get('/clinux/totem/atendimentos', async (request, reply) => {
-        const parsed = zod_1.z.object({ cd_paciente: search_validation_1.positiveId, tipo: zod_1.z.enum(['hoje', 'entrega']).default('hoje') }).strict().safeParse(request.query);
+        const parsed = zod_1.z.object({ cd_paciente: search_validation_1.positiveId, tipo: zod_1.z.enum(['hoje', 'entrega']).default('hoje'), contexto: zod_1.z.literal('true').optional() }).strict().safeParse(request.query);
         if (!parsed.success)
             return reply.code(400).send({ error: 'Informe um paciente válido.' });
         const { cd_paciente, tipo } = parsed.data;
@@ -53,6 +53,19 @@ async function atendimentosTotemRoute(fastify) {
         });
         if (rows.length > search_validation_1.SEARCH_LIMIT)
             return reply.code(422).send({ error: 'Muitos atendimentos. Procure a recepção.' });
+        if (tipo === 'entrega' && parsed.data.contexto === 'true') {
+            // Consulta todo o período, não apenas os dez itens exibidos no modal.
+            const modalidadeTotem = Number(process.env.IDMODALIDADE ?? 0);
+            const elegivel = await prismaDB_1.prisma.atendimentos.findFirst({
+                where: {
+                    cd_paciente, ds_status: 5, nr_controle: { not: null },
+                    dt_data: { gte: inicio, lte: hoje },
+                    salas: { cd_modalidade: { gt: 0, not: modalidadeTotem } },
+                },
+                select: { cd_atendimento: true },
+            });
+            return { exames: rows, requerSelecaoModalidade: !elegivel };
+        }
         return rows;
     });
 }

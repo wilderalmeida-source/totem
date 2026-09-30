@@ -6,17 +6,17 @@ const vm = require('node:vm');
 const { createRequire } = require('node:module');
 const Fastify = require('fastify');
 
-async function setup(t, file, exportName, result = []) {
+async function setup(t, file, exportName, result = [], eligible = null) {
   const calls = [];
   const diagnostics = [];
   const findMany = async args => { calls.push(args); return result; };
-  const prisma = { pacientes: { findMany }, atendimentos: { findMany } };
+  const prisma = { pacientes: { findMany }, atendimentos: { findMany, findFirst: async args => { calls.push(args); return eligible; } } };
   const filename = path.join(__dirname, '../src/routes', file);
   const realRequire = createRequire(filename);
   const exports = {};
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), {
     exports, require: name => name === '../../config/prismaDB' ? { prisma } : name === '../lib/patient-diagnostics' ? { describePatientInput: value => value, patientDiagnostic: (id, metadata) => diagnostics.push(metadata) } : realRequire(name),
-    console, process: { env: {} }, Date,
+    console, process: { env: { IDMODALIDADE: '10000' } }, Date,
   });
   const app = Fastify();
   t.after(() => app.close());
@@ -125,6 +125,22 @@ test('atendimentos do totem exigem paciente e não aceitam ampliação de perío
   assert.ok(calls[1].where.dt_data.lte - calls[1].where.dt_data.gte <= 93 * 86400000);
   assert.equal(calls[0].select.ds_observacao, undefined);
   assert.equal(calls[0].select.pacientes_atendimentos_cd_pacienteTopacientes, undefined);
+});
+
+test('entrega pede modalidade sem exame real e consulta alem dos dez itens exibidos', async t => {
+  for (const eligible of [null, { cd_atendimento: 99 }]) {
+    const rows = Array.from({ length: 10 }, (_, i) => ({ cd_atendimento: i, salas: { cd_modalidade: 10000 } }));
+    const { calls, get } = await setup(t, 'atendimentos-totem.js', 'atendimentosTotemRoute', rows, eligible);
+    const response = await get('/clinux/totem/atendimentos', { cd_paciente: '123', tipo: 'entrega', contexto: 'true' });
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.json().requerSelecaoModalidade, !eligible);
+    assert.equal(response.json().exames.length, 10);
+    assert.equal(calls[1].where.cd_paciente, 123);
+    assert.equal(calls[1].where.ds_status, 5);
+    assert.equal(calls[1].where.nr_controle.not, null);
+    assert.equal(calls[1].where.salas.cd_modalidade.not, 10000);
+    assert.equal(calls[1].where.dt_data.gte.getTime(), calls[0].where.dt_data.gte.getTime());
+  }
 });
 
 test('agenda geral valida intervalo e limita consulta', async t => {

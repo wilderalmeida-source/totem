@@ -17,7 +17,7 @@ import {
   buscarRecepcoesModalidades,
   type Atendimento,
 } from "@/services/api";
-import { entregaDeExames } from "@/services/entregadeexames";
+import { contextoEntrega } from "@/services/entregadeexames";
 import ok from "@/assets/icons/ok.png";
 import atention from "@/assets/icons/atention.png";
 import { formatarDataNascimento } from "@/lib/formatdate";
@@ -27,6 +27,7 @@ import { endPatientSession } from '@/lib/patient-session-client';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 export interface DadosPaciente {
+  requerSelecaoModalidade?: boolean;
   ds_paciente?: string;
   ds_telefone?: string;
   ds_celular?: string;
@@ -288,10 +289,14 @@ export function DialogPatient({
       };
 
       if (dados.servico === "C" && listpaciente[0].cd_paciente) {
-        const entrega = await entregaDeExames(listpaciente[0].cd_paciente);
-        setExames(
-          entrega.filter((i) => i.ds_status === 5).slice(0, 10),
-        );
+        const entrega = await contextoEntrega(listpaciente[0].cd_paciente);
+        if (entrega.requerSelecaoModalidade && !newDados.cd_modalidade) {
+          sessionStorage.setItem('pacienteModalidade', JSON.stringify({ dados: newDados, exames: entrega.exames, tentativas: null, invalido: null }));
+          setShowModal(false);
+          window.location.assign(`/modalidades?servico=C&preferencial=${dados.preferencial ?? 0}`);
+          return;
+        }
+        setExames(entrega.exames);
       }
 
       setDados(newDados);
@@ -309,17 +314,16 @@ export function DialogPatient({
     // Fluxo normal
     if (!dados) return;
 
-    // Para agendamento, usa a modalidade do próximo atendimento do dia.
-    // Para os demais serviços, mantém a modalidade já presente em dados.
+    // A escolha explícita tem prioridade; sem escolha, usa o exame do dia.
     const atendimentoMaisProximo =
       dados.servico === "D" || dados.servico === "B"
       ? obterAtendimentoMaisProximo(exames)
       : null;
 
     const cdModalidade = Number(
-      atendimentoMaisProximo?.salas?.cd_modalidade ??
-        dados.cd_modalidade ??
+      dados.cd_modalidade ??
         dados.modalidade ??
+        atendimentoMaisProximo?.salas?.cd_modalidade ??
         0,
     );
     

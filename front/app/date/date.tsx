@@ -17,7 +17,7 @@ import type { DadosPaciente } from '@/components/modals/patientModal'
 import { buscarConfiguracaoPaineis } from '@/services/api'
 import { formatarDataNascimento } from '@/lib/formatdate'
 import { auditTotem } from '@/lib/audit-client'
-import { deveSelecionarModalidade } from '@/lib/painel-selection'
+import { deveSelecionarModalidade, deveSelecionarModalidadeAoAvancar } from '@/lib/painel-selection'
 import { endPatientSession } from '@/lib/patient-session-client'
 
 const SERVICO_LABEL: Record<string, string> = {
@@ -112,7 +112,7 @@ export default function DataNasc() {
 
       const naoTemExames = !result.exames || result.exames.length === 0
 
-      if (temSelecaoModalidadeAtiva && naoTemExames && result.dados) {
+      if (result.dados && (servico === 'C' ? result.dados.requerSelecaoModalidade : temSelecaoModalidadeAtiva && naoTemExames)) {
         sessionStorage.setItem(
           'pacienteModalidade',
           JSON.stringify({
@@ -173,9 +173,7 @@ export default function DataNasc() {
       const configPainel = await buscarConfiguracaoPaineis()
       if (saindoRef.current) return
 
-      const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico)
-
-      if (temSelecaoModalidadeAtiva) {
+      if (deveSelecionarModalidadeAoAvancar(configPainel)) {
         sessionStorage.setItem(
           'pacienteModalidade',
           JSON.stringify({

@@ -14,6 +14,7 @@ export async function gerarSenhaEntrega({
   cd_modalidade,
 }: GerarSenhaBody) {
   const dateNow = getAgoraBrasil()
+  const hoje = new Date(dateNow.toISOString().slice(0, 10))
 
   const EMPRESA = process.env.IDEMPRESA ? Number(process.env.IDEMPRESA) : 0
   const FUNCIONARIO = process.env.IDFUNCIONARIO
@@ -23,8 +24,8 @@ export async function gerarSenhaEntrega({
     ? Number(process.env.IDMODALIDADE)
     : 0
 
-  const tresMesesAtras = new Date(dateNow)
-  tresMesesAtras.setMonth(tresMesesAtras.getMonth() - 3)
+  const tresMesesAtras = new Date(hoje)
+  tresMesesAtras.setUTCMonth(tresMesesAtras.getUTCMonth() - 3)
 
   const atendimentos = await prisma.atendimentos.findMany({
     where: {
@@ -32,7 +33,7 @@ export async function gerarSenhaEntrega({
       ds_status: 5,
       dt_data: {
         gte: tresMesesAtras,
-        lte: dateNow,
+        lte: hoje,
       },
     },
     include: {
@@ -76,7 +77,7 @@ export async function gerarSenhaEntrega({
 
 
   const modalidadeSenha =
-    atendimento.salas?.cd_modalidade ?? cd_modalidade ?? modalidadeTotem
+    cd_modalidade ?? atendimento.salas?.cd_modalidade ?? modalidadeTotem
 
   const IP_PAINEL = await resolverIpPainelPorModalidade(
     'C',

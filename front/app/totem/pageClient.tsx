@@ -14,7 +14,7 @@ import { buscarConfiguracaoPaineis, Paciente } from "@/services/api";
 import { onlyNumbers, TipoBusca } from "@/lib/patientUtils";
 import { buscarPacienteCPF } from "@/services/buscaCPF";
 import { auditTotem } from "@/lib/audit-client";
-import { deveSelecionarModalidade } from "@/lib/painel-selection";
+import { deveSelecionarModalidade, deveSelecionarModalidadeAoAvancar } from "@/lib/painel-selection";
 export default function Totem() {
   const url = useSearchParams();
   const { setShowModal, setDados, setExames, setInvalido, setLoading, setTentativas } = useContext(modalContext);
@@ -60,7 +60,7 @@ export default function Totem() {
 
     const naoTemExames = !result.exames || result.exames.length === 0;
 
-    if (tipo === "CPF" && temSelecaoModalidadeAtiva && naoTemExames && result.dados) {
+    if (tipo === "CPF" && result.dados && (servico === 'C' ? result.dados.requerSelecaoModalidade : temSelecaoModalidadeAtiva && naoTemExames)) {
       sessionStorage.setItem(
         "pacienteModalidade",
         JSON.stringify({
@@ -129,7 +129,7 @@ export default function Totem() {
 
       const configPainel = await buscarConfiguracaoPaineis();
 
-      const temSelecaoModalidadeAtiva = deveSelecionarModalidade(configPainel, servico);
+      const temSelecaoModalidadeAtiva = deveSelecionarModalidadeAoAvancar(configPainel);
 
       if (temSelecaoModalidadeAtiva) {
         sessionStorage.setItem(

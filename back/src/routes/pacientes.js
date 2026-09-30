@@ -10,7 +10,7 @@ const patientQuery = zod_1.z.union([
     zod_1.z.object({ tipo: zod_1.z.literal('RESET'), ds_paciente: zod_1.z.string().max(150).optional() }).strict(),
     zod_1.z.object({ tipo: zod_1.z.undefined().optional(), cd_paciente: search_validation_1.positiveId }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('ID'), ds_cpf: search_validation_1.cpf, dt_nascimento: search_validation_1.birthDate }).strict(),
-    zod_1.z.object({ tipo: zod_1.z.literal('NOMEDATA'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate }).strict(),
+    zod_1.z.object({ tipo: zod_1.z.literal('NOMEDATA'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate, cd_paciente: search_validation_1.positiveId.optional() }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('NOME'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate.optional() }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('MASK').optional(), ds_cpf: search_validation_1.cpf }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('DATA').optional(), dt_nascimento: search_validation_1.birthDate, ds_paciente: search_validation_1.patientName.optional() }).strict(),
@@ -97,7 +97,7 @@ async function pacientesRoute(fastify) {
         }
         const where = {};
         let select;
-        if ('cd_paciente' in input) {
+        if ('cd_paciente' in input && input.tipo !== 'NOMEDATA') {
             where.cd_paciente = input.cd_paciente;
             select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true };
         }
@@ -107,6 +107,8 @@ async function pacientesRoute(fastify) {
             select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true };
         }
         else if (input.tipo === 'NOMEDATA' || input.tipo === 'NOME') {
+            if (input.tipo === 'NOMEDATA' && input.cd_paciente !== undefined)
+                where.cd_paciente = input.cd_paciente;
             // Busca candidatos; a igualdade do nome completo normalizado é conferida abaixo.
             // Escapa os curingas LIKE para que caracteres do nome sejam literais.
             where.ds_paciente = { contains: input.ds_paciente.replace(/[\\%_]/g, '\\$&'), mode: 'insensitive' };
