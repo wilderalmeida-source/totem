@@ -9,12 +9,13 @@ const crypto = require('../src/lib/totem-pin.js');
 
 async function setup(t) {
   let user;
+  let settingsReads = 0, failSettings = false, now = Date.now();
   const sessions = new Map(), attempts = new Map();
   const policy = { id: 1, enabled: true, sessionHours: 12, pinValidityDays: 90 };
   const select = (row, fields) => fields ? Object.fromEntries(Object.keys(fields).map(k => [k, row[k]])) : { ...row };
   const db = {
     auditLog: { create: async () => ({}) },
-    totemAccessSettings: { upsert: async ({ update }) => Object.assign(policy, update) },
+    totemAccessSettings: { upsert: async ({ update }) => { settingsReads++; if (failSettings) throw Error('offline'); return { ...Object.assign(policy, update) }; } },
     totemOperator: {
       count: async () => user?.active ? 1 : 0,
       create: async ({ data, select: fields }) => { user = { id: 1, cardId: randomUUID(), active: true, version: 1, mustChangePin: true, ...data }; return select(user, fields); },
@@ -34,7 +35,7 @@ async function setup(t) {
   db.$transaction = fn => fn(db);
   const exports = {};
   const code = ts.transpileModule(fs.readFileSync(require.resolve('../src/routes/totem-access.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  vm.runInNewContext(code, { exports, Date, require: name => name.includes('persistent-audit') ? { recordAudit: data => { void db.auditLog.create({ data }); } } : name.includes('prismalog') ? { PrismaLog: db } : name.includes('totem-pin') ? crypto : require(name) });
+  vm.runInNewContext(code, { exports, Date: class extends Date { static now() { return now; } }, require: name => name.includes('persistent-audit') ? { recordAudit: data => { void db.auditLog.create({ data }); } } : name.includes('prismalog') ? { PrismaLog: db } : name.includes('totem-pin') ? crypto : require(name) });
   const app = Fastify();
   app.register(exports.totemAccessRoutes);
   t.after(() => app.close());
@@ -42,10 +43,32 @@ async function setup(t) {
     const response = await app.inject({ method, url: `/clinux/totem-access/${action}`, payload: body });
     return { status: response.statusCode, ...response.json() };
   };
-  return { call, policy, get user() { return user; }, sessions };
+  return { call, policy, get user() { return user; }, sessions, get settingsReads() { return settingsReads; }, advance: ms => { now += ms; }, failSettings: value => { failSettings = value; } };
 }
 const clientKey = 'a'.repeat(64);
 const input = () => ({ username: 'colaborador.teste', displayName: 'Colaborador Teste', pin: '1234', pinExpiresAt: new Date(Date.now() + 86400000).toISOString() });
+
+test('configuracao compartilhada expira em 30s e falha nao libera acesso com cache vencido', async t => {
+  const e = await setup(t);
+  e.policy.enabled = false;
+  const results = await Promise.all([e.call('check', {}), e.call('check', {}), e.call('check', {})]);
+  assert.ok(results.every(result => result.allowed));
+  assert.equal(e.settingsReads, 1);
+  e.advance(30001); e.failSettings(true);
+  assert.equal((await e.call('check', {})).status, 503);
+  e.failSettings(false); e.policy.enabled = true;
+  assert.equal((await e.call('check', {})).allowed, false);
+  assert.equal(e.settingsReads, 3);
+});
+
+test('alteracao administrativa invalida configuracao imediatamente', async t => {
+  const e = await setup(t);
+  e.policy.enabled = false;
+  assert.equal((await e.call('check', {})).allowed, true);
+  await e.call('users', input());
+  assert.equal((await e.call('settings', { enabled: true, pinValidityDays: 90, sessionHours: 12 }, 'PUT')).status, 200);
+  assert.equal((await e.call('check', {})).allowed, false);
+});
 
 test('PIN de quatro digitos, primeira troca, sessao reutilizavel e revogacao', async t => {
   const e = await setup(t);

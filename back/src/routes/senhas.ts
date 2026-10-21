@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify"
 import { z } from "zod"
 import { prisma } from '../../config/prismaDB'
 import { gerarSenhaService } from '../services/senhas/gerar-senha.service'
+import { sharedHistory } from '../lib/shared-history'
 // Função para mascarar o nome mantendo apenas o Primeiro e Último visíveis
 function aplicarMascaraNome(nomeCompleto: string | null | undefined): string {
   if (!nomeCompleto) return "Paciente Oculto";
@@ -22,6 +23,7 @@ function aplicarMascaraNome(nomeCompleto: string | null | undefined): string {
   return `${primeiroNome} *** ${ultimoNome}`;
 }
 export async function senhaRoute(fastify: FastifyInstance) {
+  const history = sharedHistory<unknown>()
   fastify.get('/clinux/senhas', async (request, reply) => {
     const createbody = z.object({
       filtroControle: z.string().optional(),
@@ -29,6 +31,7 @@ export async function senhaRoute(fastify: FastifyInstance) {
 
     try {
       const { filtroControle } = createbody.parse(request.query)
+      const load = async () => {
 
       const dateInitial = new Date()
       dateInitial.setUTCHours(dateInitial.getUTCHours() - 3)
@@ -174,10 +177,13 @@ export async function senhaRoute(fastify: FastifyInstance) {
           : null,
       }))
 
-      return reply.send({
+      return {
         senhas,
         senhasnr,
-      })
+      }
+      }
+      reply.header('Cache-Control', 'no-store')
+      return reply.send(filtroControle ? await load() : await history(load))
     } catch (err: any) {
       return reply.status(400).send({
         error: 'Requisição inválida',

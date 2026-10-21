@@ -4,6 +4,7 @@ exports.senhaRoute = senhaRoute;
 const zod_1 = require("zod");
 const prismaDB_1 = require("../../config/prismaDB");
 const gerar_senha_service_1 = require("../services/senhas/gerar-senha.service");
+const shared_history_1 = require("../lib/shared-history");
 // Função para mascarar o nome mantendo apenas o Primeiro e Último visíveis
 function aplicarMascaraNome(nomeCompleto) {
     if (!nomeCompleto)
@@ -22,55 +23,57 @@ function aplicarMascaraNome(nomeCompleto) {
     return `${primeiroNome} *** ${ultimoNome}`;
 }
 async function senhaRoute(fastify) {
+    const history = (0, shared_history_1.sharedHistory)();
     fastify.get('/clinux/senhas', async (request, reply) => {
         const createbody = zod_1.z.object({
             filtroControle: zod_1.z.string().optional(),
         });
         try {
             const { filtroControle } = createbody.parse(request.query);
-            const dateInitial = new Date();
-            dateInitial.setUTCHours(dateInitial.getUTCHours() - 3);
-            dateInitial.setHours(0, 1, 0, 0);
-            const dateFinal = new Date();
-            dateFinal.setUTCHours(dateFinal.getUTCHours() - 3);
-            dateFinal.setHours(23, 59, 59, 999);
-            const senhasRawORM = await prismaDB_1.prisma.atendimentos_senhas.findMany({
-                where: {
-                    dt_entrada: {
-                        gte: dateInitial,
-                        lte: dateFinal,
+            const load = async () => {
+                const dateInitial = new Date();
+                dateInitial.setUTCHours(dateInitial.getUTCHours() - 3);
+                dateInitial.setHours(0, 1, 0, 0);
+                const dateFinal = new Date();
+                dateFinal.setUTCHours(dateFinal.getUTCHours() - 3);
+                dateFinal.setHours(23, 59, 59, 999);
+                const senhasRawORM = await prismaDB_1.prisma.atendimentos_senhas.findMany({
+                    where: {
+                        dt_entrada: {
+                            gte: dateInitial,
+                            lte: dateFinal,
+                        },
+                        ds_opcao: {
+                            not: 'C',
+                        },
                     },
-                    ds_opcao: {
-                        not: 'C',
+                    orderBy: {
+                        dt_entrada: 'desc',
                     },
-                },
-                orderBy: {
-                    dt_entrada: 'desc',
-                },
-                include: {
-                    atendimentos: {
-                        select: {
-                            cd_atendimento: true,
-                            ds_senha: true,
-                            dt_hora_senha: true,
-                            cd_paciente: true,
-                            nr_controle: true,
-                            pacientes_atendimentos_cd_pacienteTopacientes: {
-                                select: {
-                                    ds_paciente: true,
-                                    cd_paciente: true,
+                    include: {
+                        atendimentos: {
+                            select: {
+                                cd_atendimento: true,
+                                ds_senha: true,
+                                dt_hora_senha: true,
+                                cd_paciente: true,
+                                nr_controle: true,
+                                pacientes_atendimentos_cd_pacienteTopacientes: {
+                                    select: {
+                                        ds_paciente: true,
+                                        cd_paciente: true,
+                                    },
                                 },
                             },
                         },
                     },
-                },
-            });
-            let senhasEntregaRaw = [];
-            const tail = (filtroControle ?? '').replace(/\D/g, '');
-            if (tail.length > 0) {
-                const modBase = 10 ** tail.length;
-                const target = Number(tail);
-                senhasEntregaRaw = await prismaDB_1.prisma.$queryRaw `
+                });
+                let senhasEntregaRaw = [];
+                const tail = (filtroControle ?? '').replace(/\D/g, '');
+                if (tail.length > 0) {
+                    const modBase = 10 ** tail.length;
+                    const target = Number(tail);
+                    senhasEntregaRaw = await prismaDB_1.prisma.$queryRaw `
           SELECT
             s.cd_senha,
             s.nr_controle,
@@ -96,9 +99,9 @@ async function senhaRoute(fastify) {
             AND (a.cd_atendimento % ${modBase}) = ${target}
           ORDER BY s.dt_entrada DESC
         `;
-            }
-            else {
-                senhasEntregaRaw = await prismaDB_1.prisma.$queryRaw `
+                }
+                else {
+                    senhasEntregaRaw = await prismaDB_1.prisma.$queryRaw `
           SELECT
             s.cd_senha,
             s.nr_controle,
@@ -122,33 +125,36 @@ async function senhaRoute(fastify) {
             AND s.ds_opcao = 'C'
           ORDER BY s.dt_entrada DESC
         `;
-            }
-            const mascararObjeto = (item) => {
-                const objetoTratado = JSON.parse(JSON.stringify(item));
-                const varrerEMascarar = (obj) => {
-                    for (const key in obj) {
-                        if (typeof obj[key] === 'object' && obj[key] !== null) {
-                            varrerEMascarar(obj[key]);
+                }
+                const mascararObjeto = (item) => {
+                    const objetoTratado = JSON.parse(JSON.stringify(item));
+                    const varrerEMascarar = (obj) => {
+                        for (const key in obj) {
+                            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                                varrerEMascarar(obj[key]);
+                            }
+                            else if (key === 'ds_paciente' && typeof obj[key] === 'string') {
+                                obj[key] = aplicarMascaraNome(obj[key]);
+                            }
                         }
-                        else if (key === 'ds_paciente' && typeof obj[key] === 'string') {
-                            obj[key] = aplicarMascaraNome(obj[key]);
-                        }
-                    }
+                    };
+                    varrerEMascarar(objetoTratado);
+                    return objetoTratado;
                 };
-                varrerEMascarar(objetoTratado);
-                return objetoTratado;
+                const senhas = senhasRawORM.map(mascararObjeto);
+                const senhasnr = senhasEntregaRaw.map((senha) => ({
+                    ...senha,
+                    ds_paciente: senha.ds_paciente
+                        ? aplicarMascaraNome(senha.ds_paciente)
+                        : null,
+                }));
+                return {
+                    senhas,
+                    senhasnr,
+                };
             };
-            const senhas = senhasRawORM.map(mascararObjeto);
-            const senhasnr = senhasEntregaRaw.map((senha) => ({
-                ...senha,
-                ds_paciente: senha.ds_paciente
-                    ? aplicarMascaraNome(senha.ds_paciente)
-                    : null,
-            }));
-            return reply.send({
-                senhas,
-                senhasnr,
-            });
+            reply.header('Cache-Control', 'no-store');
+            return reply.send(filtroControle ? await load() : await history(load));
         }
         catch (err) {
             return reply.status(400).send({

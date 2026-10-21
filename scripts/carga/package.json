@@ -1,0 +1,6 @@
+{
+  "name": "totem-carga-homologacao",
+  "private": true,
+  "scripts": { "test": "node --test metrics.test.cjs", "start": "node run.cjs" },
+  "devDependencies": { "playwright": "1.56.1" }
+}

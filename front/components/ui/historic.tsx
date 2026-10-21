@@ -68,7 +68,7 @@ function TabelaSenhas({ titulo, itens, getNome, getKey, loading }: TabelaSenhasP
       <div className="overflow-y-auto h-80 no-scrollbar xl:h-36 lg:h-44">
         {loading && <div className="p-2 text-sm text-gray-500">Atualizando…</div>}
 
-        {!loading && (
+        {(
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 h-4">
             <thead className="text-xs text-gray-700 uppercase sticky top-0">
               <tr>

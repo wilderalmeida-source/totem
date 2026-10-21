@@ -11,7 +11,32 @@ const cardId = zod_1.z.string().uuid().transform(value => value.toLowerCase());
 const idSchema = zod_1.z.object({ id: zod_1.z.coerce.number().int().positive() });
 const fields = { id: true, username: true, displayName: true, cardId: true, active: true, mustChangePin: true, pinExpiresAt: true };
 const tokenSchema = zod_1.z.string().regex(/^[A-Za-z0-9_-]{43}$/);
-const settings = () => prismalog_1.PrismaLog.totemAccessSettings.upsert({ where: { id: 1 }, create: { id: 1 }, update: {} });
+const loadSettings = () => prismalog_1.PrismaLog.totemAccessSettings.upsert({ where: { id: 1 }, create: { id: 1 }, update: {} });
+let settingsCache;
+let settingsPending;
+let settingsVersion = 0;
+function invalidateSettings() {
+    settingsVersion++;
+    settingsCache = undefined;
+    settingsPending = undefined;
+}
+async function settings() {
+    if (settingsCache && Date.now() < settingsCache.expires)
+        return settingsCache.value;
+    if (settingsPending)
+        return settingsPending;
+    const version = settingsVersion;
+    const pending = loadSettings().then(async (value) => {
+        // A read started before an administrative update must not repopulate the cache.
+        if (version !== settingsVersion)
+            return settings();
+        settingsCache = { value: { ...value }, expires: Date.now() + 30000 };
+        return settingsCache.value;
+    }).finally(() => { if (settingsPending === pending)
+        settingsPending = undefined; });
+    settingsPending = pending;
+    return pending;
+}
 async function audit(actor, action, category = 'TOTEM') {
     (0, persistent_audit_1.recordAudit)({ actor, action, category, step: 'acesso_totem' });
 }
@@ -46,6 +71,7 @@ async function totemAccessRoutes(app) {
             await tx.totemAccessSettings.upsert({ where: { id: 1 }, create: { id: 1, ...data }, update: data });
             await tx.totemOperatorSession.deleteMany({});
         });
+        invalidateSettings();
         return data;
     });
     app.get('/clinux/totem-access/users', () => prismalog_1.PrismaLog.totemOperator.findMany({ select: fields, orderBy: { username: 'asc' } }));
