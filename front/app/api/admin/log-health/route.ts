@@ -19,5 +19,5 @@ export async function GET(request: NextRequest) {
     })
     if (response.ok) backend = await response.json()
   } catch { /* Return local health even when the backend is unavailable. */ }
-  return NextResponse.json({ frontend: auditOutbox.health(), backend }, { headers })
+  return NextResponse.json({ frontend: await auditOutbox.health(), backend }, { headers })
 }

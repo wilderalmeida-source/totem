@@ -14,7 +14,7 @@ export const buscaPaciente = async ({
   dt_nascimento?: string
   ds_cpf?: string
   tipo?: string
-}): Promise<Paciente[]> => {
+}, signal?: AbortSignal): Promise<Paciente[]> => {
   if (!ds_paciente && !cd_paciente && !dt_nascimento && !ds_cpf && !tipo) return []
 
   if (tipo === 'ID' || tipo === 'NOMEDATA' || cd_paciente !== undefined) {
@@ -34,6 +34,7 @@ export const buscaPaciente = async ({
 
   const res = await apiFetch(`/clinux/pacientes?${params.toString()}`, {
     tags: ['pacientes'],
+    signal,
   })
   if (!res.ok) {
     const error = await res.json().catch(() => null)

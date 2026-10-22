@@ -139,7 +139,14 @@ async function pacientesRoute(fastify) {
             : [];
         if (input.tipo === 'NOME')
             distinct.splice(0, distinct.length, 'ds_paciente', 'dt_nascimento');
-        const consultar = () => prismaDB_1.prisma.pacientes.findMany({ where, select, ...(distinct.length ? { distinct } : {}), orderBy: { ds_paciente: 'asc' }, take: search_validation_1.SEARCH_LIMIT + 1 });
+        // A busca inicial por data só precisa confirmar a existência daquela data.
+        const somenteData = 'dt_nascimento' in input && input.tipo === undefined && !('ds_paciente' in input);
+        const porCodigo = where.cd_paciente !== undefined;
+        const limite = somenteData || porCodigo ? 1 : input.tipo === 'ID' ? 2 : search_validation_1.SEARCH_LIMIT + 1;
+        const ordenarPorNome = !somenteData && !porCodigo && !('ds_cpf' in input);
+        const consultar = () => prismaDB_1.prisma.pacientes.findMany({ where, select,
+            ...(!somenteData && distinct.length ? { distinct } : {}),
+            ...(ordenarPorNome ? { orderBy: { ds_paciente: 'asc' } } : {}), take: limite });
         let pacientes;
         try {
             pacientes = await consultar();

@@ -108,7 +108,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
   fastify.post('/clinux/audit', async (request, reply) => {
     const body = z.object({ eventId: z.string().uuid().optional(), createdAt: z.string().datetime().optional(), sessionId: z.string().max(100).optional(), actor: z.string().max(100).optional(), category: z.enum(['TOTEM', 'ADMIN']), action: z.string().min(1).max(100), step: z.string().max(100).optional(), metadata: z.record(z.unknown()).optional() }).parse(request.body)
-    persistAudit(body)
+    await persistAudit(body)
     return reply.code(201).send({ ok: true })
   })
 

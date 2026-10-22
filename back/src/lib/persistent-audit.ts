@@ -17,6 +17,6 @@ export const auditOutbox = state.auditOutbox ??= new AuditOutbox(
 export function persistAudit(event: Omit<AuditEvent, 'eventId' | 'createdAt'> & Partial<Pick<AuditEvent, 'eventId' | 'createdAt'>>) {
   return auditOutbox.enqueue(event)
 }
-export function recordAudit(event: Parameters<typeof persistAudit>[0]) {
-  try { persistAudit(event) } catch { console.error('AUDIT_LOCAL_WRITE_FAILED: evento nao persistido') }
+export async function recordAudit(event: Parameters<typeof persistAudit>[0]) {
+  try { await persistAudit(event) } catch { console.error('AUDIT_LOCAL_WRITE_FAILED: evento nao persistido') }
 }

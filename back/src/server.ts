@@ -34,7 +34,7 @@ async function bootstrap() {
   auditOutbox.start()
   const fastify = Fastify({ logger: true, })
   const stopRetention = startAuditRetention()
-  fastify.addHook('onClose', async () => { stopRetention() })
+  fastify.addHook('onClose', async () => { stopRetention(); await auditOutbox.stop() })
   fastify.addHook('onRequest', (request, _reply, done) => {
     auditContext.run({ flowId: auditIdentifier(request.headers['x-flow-id']) ?? randomUUID(),
       device: auditIdentifier(request.headers['x-device-id']) ?? 'nao_informado' }, done)

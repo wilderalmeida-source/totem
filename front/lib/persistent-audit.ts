@@ -14,6 +14,6 @@ export const auditOutbox = state.nextAuditOutbox ??= new AuditOutbox(
     if (!response.ok) throw Error('AUDIT_BACKEND_REJECTED')
   },
 )
-export function recordAudit(event: Parameters<AuditOutbox['enqueue']>[0]) {
-  try { auditOutbox.enqueue(event) } catch { console.error('AUDIT_LOCAL_WRITE_FAILED') }
+export async function recordAudit(event: Parameters<AuditOutbox['enqueue']>[0]) {
+  try { await auditOutbox.enqueue(event) } catch { console.error('AUDIT_LOCAL_WRITE_FAILED') }
 }

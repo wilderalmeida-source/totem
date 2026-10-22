@@ -9,9 +9,9 @@ export function flowHeaders(request: Pick<NextRequest, 'headers'>) {
   }
   return headers
 }
-export function auditServer(request: Pick<NextRequest, 'headers'>, action: string, step: string, metadata: Record<string, unknown>) {
+export async function auditServer(request: Pick<NextRequest, 'headers'>, action: string, step: string, metadata: Record<string, unknown>) {
   const context = flowHeaders(request)
-  try { auditOutbox.enqueue({ category: 'TOTEM', sessionId: context['x-flow-id'], action, step,
+  try { await auditOutbox.enqueue({ category: 'TOTEM', sessionId: context['x-flow-id'], action, step,
     metadata: { ...metadata, device: context['x-device-id'], source: 'next', version: process.env.APP_VERSION ?? 'nao_informada' } }) }
   catch { console.error('AUDIT_LOCAL_WRITE_FAILED') }
 }

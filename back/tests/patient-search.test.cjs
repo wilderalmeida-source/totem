@@ -51,7 +51,9 @@ test('confirma CPF e nome com nascimento; preserva QR e pesquisa por nome', asyn
   assert.equal(calls[1].where.dt_nascimento.toISOString(), '1980-01-01T00:00:00.000Z');
   assert.equal(calls[2].where.cd_paciente, 123);
   assert.equal(calls[3].where.ds_paciente.startsWith, 'CARLOS');
-  assert.ok(calls.every(call => call.take === 101));
+  assert.deepEqual(calls.map(call => call.take), [2, 101, 1, 101]);
+  assert.equal(calls[0].orderBy, undefined);
+  assert.equal(calls[2].orderBy, undefined);
 });
 
 test('mantém as dez opções de nascimento na confirmação por CPF', async t => {
@@ -86,7 +88,9 @@ test('DATA preserva ate 100 pacientes sem enviar distinct vazio ao Prisma', asyn
 test('nascimento inicial elimina repetições e refinamento por nome/data continua disponível', async t => {
   const { calls, get } = await setup(t, 'pacientes.js', 'pacientesRoute');
   await get('/clinux/pacientes', { dt_nascimento: '1980-01-01' });
-  assert.equal(calls[0].distinct.join(), 'dt_nascimento');
+  assert.equal(calls[0].distinct, undefined);
+  assert.equal(calls[0].orderBy, undefined);
+  assert.equal(calls[0].take, 1);
   await get('/clinux/pacientes', { tipo: 'DATA', dt_nascimento: '1980-01-01', ds_paciente: 'ANA' });
   assert.equal(calls[1].where.ds_paciente.contains, 'ANA');
   assert.equal(calls[1].select.cd_paciente, true);

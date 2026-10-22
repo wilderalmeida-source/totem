@@ -11,19 +11,19 @@ const event = { category: 'TOTEM', action: 'teste', createdAt: '2026-09-12T10:00
 test('saude detecta falha e recuperacao sem expor eventos', async t => {
  const dir = directory(t); let offline = true;
  const queue = new AuditOutbox(dir, async () => { if (offline) throw Error('offline'); });
- assert.equal(queue.health().status, 'OK');
- queue.enqueue(event); queue.stop(); await new Promise(resolve => setImmediate(resolve));
- const failed = queue.health();
+ assert.equal((await queue.health()).status, 'OK');
+ await queue.enqueue(event); await queue.stop(); await queue.flush();
+ const failed = (await queue.health());
  assert.equal(failed.status, 'ATENCAO'); assert.equal(failed.pending, 1);
  assert.equal(failed.deliveryFailures, 1); assert.ok(failed.bytes > 0);
  assert.equal(JSON.stringify(failed).includes('teste'), false);
  offline = false; await queue.flush();
- assert.equal(queue.health().status, 'OK'); assert.equal(queue.health().pending, 0);
- assert.equal(queue.health().delivered, 1); assert.equal(queue.health().consecutiveFailures, 0);
+ assert.equal((await queue.health()).status, 'OK'); assert.equal((await queue.health()).pending, 0);
+ assert.equal((await queue.health()).delivered, 1); assert.equal((await queue.health()).consecutiveFailures, 0);
 });
 test('indisponibilidade preserva disco e nova instancia reenvia com horario original', async t => {
  const dir = directory(t); const first = new AuditOutbox(dir, async () => { throw Error('offline'); });
- first.enqueue(event); first.stop(); await new Promise(r => setImmediate(r));
+ await first.enqueue(event); await first.stop(); await first.flush();
  assert.equal(fs.readdirSync(dir).filter(f => f.endsWith('.json')).length, 1);
  const received = []; const second = new AuditOutbox(dir, async e => { received.push(e); });
  await second.flush();
@@ -33,11 +33,23 @@ test('indisponibilidade preserva disco e nova instancia reenvia com horario orig
 test('confirmacao perdida reenvia o mesmo ID e permite gravacao idempotente', async t => {
  const dir = directory(t); const saved = new Set(); let fail = true, count = 0;
  const q = new AuditOutbox(dir, async e => { count++; saved.add(e.eventId); if (fail) throw Error('ack perdido'); });
- q.enqueue(event); q.stop(); await new Promise(r => setImmediate(r)); fail = false;
+ await q.enqueue(event); await q.stop(); await q.flush(); fail = false;
  await q.flush(); assert.equal(count, 2); assert.equal(saved.size, 1); assert.equal(fs.readdirSync(dir).length, 0);
 });
-test('evento grande e rejeitado sem confirmar persistencia', t => {
+test('evento grande e rejeitado sem confirmar persistencia', async t => {
  const q = new AuditOutbox(directory(t), async () => {});
- assert.throws(() => q.enqueue({ ...event, metadata: 'x'.repeat(300000) }), /AUDIT_EVENT_TOO_LARGE/);
+ await assert.rejects(q.enqueue({ ...event, metadata: 'x'.repeat(300000) }), /AUDIT_EVENT_TOO_LARGE/);
  q.stop();
+});
+
+test('escritas concorrentes preservam IDs e falha local nao e confirmada', async t => {
+ const dir = directory(t); const q = new AuditOutbox(dir, async () => {});
+ const ids = await Promise.all(Array.from({length: 20}, () => q.enqueue(event)));
+ await q.stop();
+ assert.equal(new Set(ids).size, 20);
+ assert.equal(fs.readdirSync(dir).filter(n => n.endsWith('.json')).length, 20);
+ const blocked = path.join(dir, 'not-a-directory'); fs.writeFileSync(blocked, 'x');
+ const invalid = new AuditOutbox(blocked, async () => {});
+ await assert.rejects(invalid.enqueue(event));
+ await invalid.stop();
 });

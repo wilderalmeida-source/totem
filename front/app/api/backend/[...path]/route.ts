@@ -59,6 +59,8 @@ async function getAdminSession(request: NextRequest) {
 type RouteContext = { params: Promise<{ path: string[] }> };
 
 async function proxy(request: NextRequest, context: RouteContext) {
+  const requestStarted = Date.now();
+  let accessMs = 0;
   const apiBase = process.env.LINK_API_INTERNA;
   const apiToken = process.env.TOKEN_API_INT;
   if (!apiBase || !apiToken) {
@@ -71,14 +73,17 @@ async function proxy(request: NextRequest, context: RouteContext) {
   }
   const pathname = `/${segments.join("/")}`;
   if (/^\/clinux\/(pacientes|totem)(\/|$)/.test(pathname) || (pathname === '/clinux/senhas' && request.method !== 'GET')) {
+    const accessStarted = Date.now();
     const denied = await requireTotemOperator(request);
+    accessMs = Date.now() - accessStarted;
     if (denied) return denied;
   }
   if (!pathAllowed(pathname)) {
     return NextResponse.json({ error: "Rota não permitida." }, { status: 404 });
   }
 
-  const adminSession = await getAdminSession(request);
+  const patientSearch = pathname === '/clinux/pacientes' && request.method === 'GET';
+  const adminSession = patientSearch ? null : await getAdminSession(request);
   if (requiresAdmin(pathname, request.method) && !adminSession) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   }
@@ -128,8 +133,12 @@ async function proxy(request: NextRequest, context: RouteContext) {
       redirect: "manual",
     });
 
-    auditServer(request, 'proxy_resposta', target.pathname, { status: upstream.status, durationMs: Date.now() - started });
+    const backendMs = Date.now() - started;
+    const auditStarted = Date.now();
+    auditServer(request, 'proxy_resposta', target.pathname, { status: upstream.status, durationMs: backendMs, accessMs });
+    const auditMs = Date.now() - auditStarted;
     const responseHeaders = new Headers();
+    if (patientSearch) responseHeaders.set('Server-Timing', 'access;dur=' + accessMs + ', backend;dur=' + backendMs + ', audit;dur=' + auditMs + ', proxy;dur=' + (Date.now() - requestStarted));
     for (const name of ["content-type", "content-disposition", "cache-control"]) {
       const value = upstream.headers.get(name);
       if (value) responseHeaders.set(name, value);

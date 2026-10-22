@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { auditTotem } from '@/lib/audit-client';
 import { identificationValues } from '@/lib/identification-diagnostic';
 
@@ -18,17 +18,28 @@ export function usePatientSearch(tipo: TipoBusca) {
   const [error, setError] = useState<string | null>(null);
 
   const sequence = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => () => {
+    sequence.current++;
+    if (timer.current) clearTimeout(timer.current);
+    controller.current?.abort();
+  }, [tipo]);
 
   const clearPatients = useCallback(() => {
     sequence.current += 1;
+    if (timer.current) clearTimeout(timer.current);
+    controller.current?.abort();
     setLoading(false);
     setPacientes([]);
     setError(null);
   }, []);
 
-  const pesquisar = useCallback(
+  const executarPesquisa = useCallback(
     async (valor: string) => {
       const requestId = ++sequence.current;
+      const requestController = new AbortController();
+      controller.current = requestController;
       setLoading(false);
       const term = (valor ?? "").toUpperCase().trim();
       const number = onlyNumbers(valor);
@@ -63,7 +74,8 @@ export function usePatientSearch(tipo: TipoBusca) {
             ? { ds_paciente: term }
             : tipo === "CPF"
               ? { ds_cpf: number, tipo: "MASK" }
-              : { dt_nascimento: toISODateBR(number) }
+              : { dt_nascimento: toISODateBR(number) },
+          requestController.signal
         );
 
         if (requestId !== sequence.current) return;
@@ -79,6 +91,20 @@ export function usePatientSearch(tipo: TipoBusca) {
     },
     [tipo]
   );
+
+  const pesquisar = useCallback((valor: string) => {
+    sequence.current++;
+    if (timer.current) clearTimeout(timer.current);
+    controller.current?.abort();
+    setPacientes([]);
+    setError(null);
+    setLoading(false);
+    if (tipo === 'NOME') {
+      timer.current = setTimeout(() => { timer.current = null; void executarPesquisa(valor); }, 200);
+    } else {
+      void executarPesquisa(valor);
+    }
+  }, [executarPesquisa, tipo]);
 
   return {
     pacientes,

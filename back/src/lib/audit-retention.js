@@ -5,7 +5,9 @@ exports.startAuditRetention = startAuditRetention;
 const prismalog_1 = require("../../config/prismalog");
 const persistent_audit_1 = require("./persistent-audit");
 function retentionDays(value) {
-    if (!value || value === '0')
+    if (value === undefined || value === '')
+        return 15;
+    if (value === '0')
         return null;
     if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) < 1 || Number(value) > 3650) {
         throw new Error('AUDIT_RETENTION_DAYS deve ser inteiro entre 1 e 3650, ou 0 para desativar');

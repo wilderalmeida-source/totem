@@ -37,7 +37,7 @@ async function bootstrap() {
     persistent_audit_1.auditOutbox.start();
     const fastify = (0, fastify_1.default)({ logger: true, });
     const stopRetention = (0, audit_retention_1.startAuditRetention)();
-    fastify.addHook('onClose', async () => { stopRetention(); });
+    fastify.addHook('onClose', async () => { stopRetention(); await persistent_audit_1.auditOutbox.stop(); });
     fastify.addHook('onRequest', (request, _reply, done) => {
         flow_audit_1.auditContext.run({ flowId: (0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) ?? (0, node_crypto_1.randomUUID)(),
             device: (0, flow_audit_1.auditIdentifier)(request.headers['x-device-id']) ?? 'nao_informado' }, done);

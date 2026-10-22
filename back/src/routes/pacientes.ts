@@ -139,7 +139,14 @@ export async function pacientesRoute(fastify: FastifyInstance) {
         ? ('dt_nascimento' in input || 'ds_cpf' in input || input.tipo === 'NOME' ? ['dt_nascimento'] : ['ds_paciente'])
         : []
     if (input.tipo === 'NOME') distinct.splice(0, distinct.length, 'ds_paciente', 'dt_nascimento')
-    const consultar = () => prisma.pacientes.findMany({ where, select, ...(distinct.length ? { distinct } : {}), orderBy: { ds_paciente: 'asc' }, take: SEARCH_LIMIT + 1 })
+    // A busca inicial por data só precisa confirmar a existência daquela data.
+    const somenteData = 'dt_nascimento' in input && input.tipo === undefined && !('ds_paciente' in input)
+    const porCodigo = where.cd_paciente !== undefined
+    const limite = somenteData || porCodigo ? 1 : input.tipo === 'ID' ? 2 : SEARCH_LIMIT + 1
+    const ordenarPorNome = !somenteData && !porCodigo && !('ds_cpf' in input)
+    const consultar = () => prisma.pacientes.findMany({ where, select,
+      ...(!somenteData && distinct.length ? { distinct } : {}),
+      ...(ordenarPorNome ? { orderBy: { ds_paciente: 'asc' as const } } : {}), take: limite })
     let pacientes: Awaited<ReturnType<typeof consultar>>
     try { pacientes = await consultar() } catch (error) {
       patientDiagnostic(request.id, { recebido, normalizado: describePatientInput(input), ramo: input.tipo ?? 'FILTRO',

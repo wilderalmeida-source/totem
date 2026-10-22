@@ -21,9 +21,9 @@ exports.auditOutbox = state.auditOutbox ??= new audit_outbox_1.AuditOutbox(proce
 function persistAudit(event) {
     return exports.auditOutbox.enqueue(event);
 }
-function recordAudit(event) {
+async function recordAudit(event) {
     try {
-        persistAudit(event);
+        await persistAudit(event);
     }
     catch {
         console.error('AUDIT_LOCAL_WRITE_FAILED: evento nao persistido');

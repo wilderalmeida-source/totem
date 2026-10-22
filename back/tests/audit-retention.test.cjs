@@ -13,8 +13,8 @@ function setup(value) {
   vm.runInNewContext(source, context);
   return { ...context.exports, calls, events };
 }
-test('retention is opt-in and invalid settings are rejected', () => {
-  const api = setup(undefined);
+test('explicit zero disables retention and invalid settings are rejected', () => {
+  const api = setup('0');
   api.startAuditRetention();
   assert.equal(api.calls.length, 0);
   assert.equal(api.retentionDays('0'), null);
@@ -28,4 +28,16 @@ test('cleanup is bounded and records count without copying removed data', async 
   assert.match(api.calls[0][0].join(''), /LIMIT 1000 FOR UPDATE SKIP LOCKED/);
   assert.equal(api.events[0].metadata.removed, 2);
   assert.equal(api.events[0].metadata.days, 90);
+});
+
+test('default cleans existing logs older than 15 days on startup', async () => {
+  const api = setup(undefined);
+  const before = Date.now();
+  api.startAuditRetention();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(api.calls.length, 1);
+  assert.equal(api.events[0].metadata.days, 15);
+  const cutoff = new Date(api.events[0].metadata.cutoff).getTime();
+  assert.ok(cutoff >= before - 15 * 86400000 && cutoff <= Date.now() - 15 * 86400000);
+  assert.match(api.calls[0][0].join(''), /"createdAt" </);
 });

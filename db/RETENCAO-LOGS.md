@@ -1,10 +1,14 @@
 # Retenção e acesso aos logs
 
-Configure no ambiente do backend `AUDIT_RETENTION_DAYS=90` para guardar 90 dias.
-O prazo é uma escolha operacional, não uma recomendação legal. Ausente ou `0`
-desativa a exclusão. Aceita inteiros de 1 a 3650. Recrie o container para aplicar.
-Nenhum arquivo de ambiente existente foi alterado e nenhuma limpeza foi executada
-durante a implementação.
+O backend mantém **15 dias por padrão**, inclusive para registros que já existem
+no banco. A limpeza começa ao iniciar o processo e repete a cada minuto.
+Compilar a imagem não conecta nem altera o banco: é necessário iniciar/recriar
+o container com a nova imagem para aplicar.
+
+AUDIT_RETENTION_DAYS=15 explicita o prazo. Ausente ou vazio também significa 15.
+AUDIT_RETENTION_DAYS=0 desativa a exclusão; valores existentes no ambiente prevalecem
+sobre o padrão. Aceita inteiros de 1 a 3650. Nenhum arquivo de ambiente foi alterado
+e nenhuma limpeza real foi executada durante a implementação.
 
 Quando ativada, a limpeza remove até 1000 registros de AuditLog por minuto,
 anteriores ao instante atual menos o prazo. Usa apenas o banco de logs, com

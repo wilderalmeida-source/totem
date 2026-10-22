@@ -2,7 +2,8 @@ import { PrismaLog } from '../../config/prismalog'
 import { recordAudit } from './persistent-audit'
 
 export function retentionDays(value: string | undefined): number | null {
-  if (!value || value === '0') return null
+  if (value === undefined || value === '') return 15
+  if (value === '0') return null
   if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) < 1 || Number(value) > 3650) {
     throw new Error('AUDIT_RETENTION_DAYS deve ser inteiro entre 1 e 3650, ou 0 para desativar')
   }

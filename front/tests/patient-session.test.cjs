@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const { NextRequest } = require('next/server');
 
-function environment() {
+function environment(operatorDenied = false) {
   const root = path.resolve(__dirname, '..');
   let now = Date.now();
   const calls = [];
@@ -37,7 +37,7 @@ function environment() {
     const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
     const localRequire = name => {
       if (name.includes('persistent-audit')) return { auditOutbox: { enqueue: event => { auditEvents.push(event); return 'test-event'; } } };
-      if (name === '@/lib/require-totem-operator') return { requireTotemOperator: async () => null };
+      if (name === '@/lib/require-totem-operator') return { requireTotemOperator: async () => operatorDenied ? new Response('{}', { status: 401 }) : null };
       if (name.startsWith('@/')) return load(name.slice(2) + '.ts');
       if (name.startsWith('.')) return load(path.resolve(path.dirname(filename), name) + '.ts');
       return require(name);
@@ -236,4 +236,15 @@ test('falhas e respostas sem comprovacao nunca retornam sucesso de emissao', asy
     assert.notEqual((await result.json()).ok, true);
     assert.ok(env.store.readPatientSession(token));
   }
+});
+
+test('proxy de pesquisa exige operador e informa tempos sem consultar paciente quando negado', async () => {
+  const blocked = environment(true);
+  const denied = await blocked.proxy.GET(request('/api/backend/clinux/pacientes?ds_paciente=FULANO'), { params: Promise.resolve({ path: ['clinux', 'pacientes'] }) });
+  assert.equal(denied.status, 401);
+  assert.equal(blocked.calls.length, 0);
+  const allowed = environment();
+  const result = await allowed.proxy.GET(request('/api/backend/clinux/pacientes?ds_paciente=FULANO'), { params: Promise.resolve({ path: ['clinux', 'pacientes'] }) });
+  assert.equal(result.status, 200);
+  assert.match(result.headers.get('Server-Timing'), /access;dur=.*backend;dur=.*audit;dur=/);
 });

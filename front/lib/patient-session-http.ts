@@ -25,7 +25,7 @@ export function patientJson(body: unknown, status = 200) {
 
 export async function patientBackend(path: string, init: RequestInit = {}, request?: NextRequest) {
   if (path === '/clinux/audit' && init.method === 'POST' && typeof init.body === 'string') {
-    auditOutbox.enqueue(JSON.parse(init.body))
+    await auditOutbox.enqueue(JSON.parse(init.body))
     return new Response(null, { status: 204 })
   }
   const base = process.env.LINK_API_INTERNA

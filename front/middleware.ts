@@ -17,6 +17,8 @@ const routePermissions: Array<[string, string]> = [
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   if (pathname === '/api/patient-session' && request.method === 'DELETE') return NextResponse.next();
+  // Patient GETs are authenticated in the proxy; avoid duplicate checks.
+  if (pathname === '/api/backend/clinux/pacientes' && request.method === 'GET') return NextResponse.next();
   const pages = ['/', '/totem', '/date', '/preferencial', '/modalidades'];
   const operatorApi = pathname.startsWith('/api/patient-session') ||
     /^\/api\/backend\/clinux\/(pacientes|totem)(\/|$)/.test(pathname) ||

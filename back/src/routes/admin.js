@@ -103,7 +103,7 @@ async function adminRoutes(fastify) {
     });
     fastify.post('/clinux/audit', async (request, reply) => {
         const body = zod_1.z.object({ eventId: zod_1.z.string().uuid().optional(), createdAt: zod_1.z.string().datetime().optional(), sessionId: zod_1.z.string().max(100).optional(), actor: zod_1.z.string().max(100).optional(), category: zod_1.z.enum(['TOTEM', 'ADMIN']), action: zod_1.z.string().min(1).max(100), step: zod_1.z.string().max(100).optional(), metadata: zod_1.z.record(zod_1.z.unknown()).optional() }).parse(request.body);
-        (0, persistent_audit_1.persistAudit)(body);
+        await (0, persistent_audit_1.persistAudit)(body);
         return reply.code(201).send({ ok: true });
     });
     fastify.get('/clinux/audit', async (request) => {

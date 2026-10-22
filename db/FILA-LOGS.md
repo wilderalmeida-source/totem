@@ -27,3 +27,21 @@ O destino pode receber eventos fora de ordem. O painel continua usando o horario
 ## Validacao em homologacao
 
 Interrompa o banco de logs, gere eventos, confira os arquivos no volume, reinicie o backend e restaure o banco. Os eventos devem aparecer uma unica vez com o horario original. Repita interrompendo apenas o backend para verificar a fila do Next. Nao realize esse teste na recepcao em atendimento.
+
+## Escrita assíncrona
+
+A fila do Next e do backend usa fs/promises para gravar, sincronizar, renomear,
+ler e remover arquivos. As operações de disco não bloqueiam o event loop.
+Cada instância serializa suas gravações e aceita até 1000 gravações pendentes
+em memória, além do limite de arquivos em disco. Excesso gera erro de persistência.
+Os endpoints /api/audit e /clinux/audit só confirmam após arquivo sincronizado e
+renomeado. O reenvio começa no próximo ciclo de 5 segundos; dados já persistidos
+continuam disponíveis após reinício. A consulta de saúde é assíncrona e inclui
+writesPending (eventos ainda aguardando gravação).
+
+Logs internos de diagnóstico são agendados sem aguardar o disco na busca.
+Se o processo for interrompido abruptamente antes da persistência, esses eventos
+pendentes podem ser perdidos. O encerramento normal via Fastify onClose aguarda
+as gravações atuais; isso não protege contra kill forçado ou falha física.
+A fila em disco continua sendo varrida para conferir a capacidade; não há promessa
+de custo constante nem redução do volume final de logs. JSON.stringify ainda usa CPU.
