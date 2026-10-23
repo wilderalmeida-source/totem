@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     )) return fail('O cadastro não corresponde ao paciente selecionado.', 401)
     const session = createPatientSession(patient.cd_paciente)
     auditServer(request, 'identificacao_resposta_final', 'patientSession.POST', { status: 200,
-      resposta: identificationResult({ patient }), outcome: 'CONCLUIDO' })
+      nomePaciente: patient.ds_paciente, resposta: identificationResult({ patient }), outcome: 'CONCLUIDO' })
     return sessionCookie(request, patientJson({
       patient: { cd_paciente: patient.cd_paciente, ds_paciente: patient.ds_paciente, dt_nascimento: patient.dt_nascimento },
       expiresAt: session.expiresAt, absoluteExpiresAt: session.absoluteExpiresAt,

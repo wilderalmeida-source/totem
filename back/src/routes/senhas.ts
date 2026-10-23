@@ -3,6 +3,7 @@ import { z } from "zod"
 import { prisma } from '../../config/prismaDB'
 import { gerarSenhaService } from '../services/senhas/gerar-senha.service'
 import { sharedHistory } from '../lib/shared-history'
+import { flowAudit } from '../lib/flow-audit'
 // Função para mascarar o nome mantendo apenas o Primeiro e Último visíveis
 function aplicarMascaraNome(nomeCompleto: string | null | undefined): string {
   if (!nomeCompleto) return "Paciente Oculto";
@@ -202,10 +203,13 @@ export async function senhaRoute(fastify: FastifyInstance) {
 
     try {
       const body = createbody.parse(request.body)
+      flowAudit('emissao_recebida_backend', 'emissao', { cd_paciente: body.cd_paciente, servico: body.servico, cd_modalidade: body.cd_modalidade })
       const senha = await gerarSenhaService(body)
 
       return reply.send(senha)
     } catch (err: any) {
+      const code = typeof err?.code === 'string' && /^[A-Z0-9_]{1,50}$/.test(err.code) ? err.code : 'ISSUANCE_ERROR'
+      flowAudit('emissao_falhou_backend', 'emissao', { code, outcome: 'DESCONHECIDO', status: 400 })
       return reply.status(400).send({
         error: 'Erro ao gerar senha',
         details: err?.errors ?? String(err),

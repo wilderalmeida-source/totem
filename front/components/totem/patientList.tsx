@@ -59,7 +59,7 @@ export function PatientList({
             return (
               <li className="text-4xl mb-3" key={paciente.cd_paciente ?? index}>
                 <Link
-                  onClick={() => auditTotem('resultado_busca_selecionado', 'paciente', { tipo, pacienteId: paciente.cd_paciente })}
+                  onClick={() => auditTotem('resultado_busca_selecionado', 'paciente', { tipo, ...(tipo === 'NOME' ? { nomePaciente: paciente.ds_nome } : {}), pacienteId: paciente.cd_paciente })}
                   href={{
                     pathname: "/date",
                     query: {

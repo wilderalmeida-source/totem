@@ -24,7 +24,7 @@ export default function PatientSessionGuard({ children }: { children: ReactNode 
     async function initialize() {
       if (pathname === '/' || pathname === '/preferencial' || (!active && deadline.current)) {
         setReady(false)
-        try { await endPatientSession(); deadline.current = null }
+        try { await endPatientSession(pathname === '/preferencial' ? 'tela_prioridade' : 'retorno_inicio', pathname === '/preferencial'); deadline.current = null }
         catch { if (!cancelled) setError(true); return }
       } else if (!initialized.current && active) {
         try { deadline.current = await patientSessionRequest<Deadline>('GET') }

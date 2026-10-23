@@ -15,19 +15,27 @@ const schema = z.object({
 }).strict()
 
 export async function POST(request: NextRequest) {
+  const reject = (error: string, status: number, code: string) => {
+    void auditServer(request, 'emissao_rejeitada', 'patientSession.senha', { outcome: 'FALHOU', status, code, enviadoAoBackend: false })
+    return patientJson({ error }, status)
+  }
   const denied = await requireTotemOperator(request)
-  if (denied) return denied
-  if (!sameOrigin(request)) return patientJson({ error: 'Origem inválida.' }, 403)
+  if (denied) {
+    void auditServer(request, 'emissao_rejeitada', 'patientSession.senha', { outcome: 'FALHOU', status: denied.status, code: 'OPERATOR_ACCESS_DENIED', enviadoAoBackend: false })
+    return denied
+  }
+  if (!sameOrigin(request)) return reject('Origem inválida.', 403, 'INVALID_ORIGIN')
   const token = request.cookies.get(PATIENT_SESSION_COOKIE)?.value
   const session = readPatientSession(token)
-  if (!session || !token) return patientJson({ error: 'Identifique o paciente novamente.' }, 401)
+  if (!session || !token) return reject('Identifique o paciente novamente.', 401, 'PATIENT_SESSION_MISSING')
   const parsed = schema.safeParse(await request.json().catch(() => null))
-  if (!parsed.success) return patientJson({ error: 'Dados de atendimento inválidos.' }, 400)
+  if (!parsed.success) return reject('Dados de atendimento inválidos.', 400, 'INVALID_TICKET_INPUT')
   if (parsed.data.cd_paciente !== undefined && parsed.data.cd_paciente !== session.patientId) {
-    return patientJson({ error: 'O paciente não corresponde à identificação.' }, 403)
+    return reject('O paciente não corresponde à identificação.', 403, 'PATIENT_MISMATCH')
   }
-  if (!lockPatientSession(token)) return patientJson({ error: 'Atendimento em processamento ou sessão encerrada.' }, 409)
+  if (!lockPatientSession(token)) return reject('Atendimento em processamento ou sessão encerrada.', 409, 'ISSUANCE_BUSY')
   try {
+    void auditServer(request, 'emissao_encaminhada', 'patientSession.senha', { cd_paciente: session.patientId, servico: parsed.data.servico })
     const upstream = await patientBackend('/clinux/senhas', {
       method: 'POST', body: JSON.stringify({ ...parsed.data, cd_paciente: session.patientId, preferencial: parsed.data.preferencial ?? 0, cd_modalidade: parsed.data.cd_modalidade ?? undefined }),
     }, request)

@@ -71,7 +71,7 @@ export default function ModalidadePage() {
   }, [])
 
   function selecionarModalidade(modalidade: Modalidade) {
-    auditTotem('modalidade_selecionada', 'modalidade', { modalidadeId: modalidade.cd_modalidade, servico, preferencial })
+    auditTotem('modalidade_selecionada', 'modalidade', { modalidadeId: modalidade.cd_modalidade, modalidadeNome: modalidade.ds_modalidade, servico, preferencial })
     if (!pacienteStorage?.dados) {
       window.alert('Dados do paciente não encontrados.')
       router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
@@ -100,6 +100,7 @@ export default function ModalidadePage() {
 
   async function voltar() {
     if (saindoRef.current) return
+    auditTotem('voltar', 'modalidade', { destino: '/totem' })
     saindoRef.current = true
     setSaindo(true)
     setPacienteStorage(null)
@@ -109,7 +110,7 @@ export default function ModalidadePage() {
     setTentativas(null)
     setInvalido(null)
     try {
-      await endPatientSession('voltar_modalidades')
+      await endPatientSession('voltar_modalidades', true)
       router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
     } catch {
       window.location.replace('/')

@@ -1,3 +1,8 @@
+export function startTotemFlow(servico: string) {
+  try { sessionStorage.setItem('totemAuditSession', createSessionId()) } catch { /* Audit delivery reports storage failure. */ }
+  auditTotem('servico_selecionado', 'servico', { servico })
+}
+
 export function auditContextHeaders(): Record<string, string> {
   try {
     let flow = sessionStorage.getItem('totemAuditSession')

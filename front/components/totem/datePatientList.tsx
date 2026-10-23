@@ -76,7 +76,7 @@ export function DatePatientList({
               <li
                 key={`ex-${paciente.cd_paciente}`}
                 className="cursor-pointer text-4xl mb-3 text-red-500 font-bold"
-                onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, pacienteId: paciente.cd_paciente, possuiExame: true }); onPatientClick(paciente) }}
+                onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: true }); onPatientClick(paciente) }}
               >
                 {paciente.ds_paciente}
               </li>
@@ -95,7 +95,7 @@ export function DatePatientList({
               <li
                 key={`pac-${paciente.cd_paciente ?? index}`}
                 className="cursor-pointer text-4xl mb-3"
-                onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, pacienteId: paciente.cd_paciente, possuiExame: false }); onPatientClick(paciente) }}
+                onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: false }); onPatientClick(paciente) }}
               >
                 {label}
               </li>

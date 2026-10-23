@@ -5,6 +5,7 @@ import { IMaskInput } from "react-imask";
 
 import qrcode from "@/assets/icons/qrcode.png";
 import { getInputMask, getInputPlaceholder, TipoBusca } from "@/lib/patientUtils";
+import { auditTotem } from '@/lib/audit-client';
 
 interface PatientSearchInputProps {
   tipo: TipoBusca;
@@ -35,6 +36,7 @@ export function PatientSearchInput({
         className="h-16 w-full rounded-lg text-4xl px-4 border-black mr-3 border-solid border-2"
         value={value}
         onChange={onChange}
+        onClick={() => auditTotem('campo_busca_clicado', 'busca', { tipo })}
         onKeyDown={(event) => {
           if (event.key === "Enter") event.preventDefault();
         }}
@@ -43,7 +45,7 @@ export function PatientSearchInput({
       <button
         type="button"
         disabled={qrCodeDisabled}
-        onClick={onQRCodeClick}
+        onClick={() => { auditTotem('tipo_busca_selecionado', 'busca', { tipo: 'QR' }); onQRCodeClick(); }}
         aria-label={qrCodeDisabled ? "QR Code disponível apenas para entrega de exames" : "Ler QR Code"}
         title={qrCodeDisabled ? "QR Code disponível apenas para entrega de exames" : "Ler QR Code"}
         className="flex w-16 items-center justify-center disabled:cursor-not-allowed disabled:opacity-30"

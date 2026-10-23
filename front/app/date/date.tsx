@@ -93,6 +93,7 @@ export default function DataNasc() {
       const dsPaciente = tipo === 'DATA' ? paciente.ds_paciente ?? text : nome
       const dtNascimento = tipo === 'DATA' ? nome : paciente.dt_nascimento ?? text
       auditTotem('identificacao_confirmacao_original', 'busca_complementar', {
+        nomePaciente: dsPaciente,
         tipo, entrada: identificationValues(tipo === 'DATA' ? { ds_paciente: originalInput.current } : { dt_nascimento: originalInput.current }),
         selecionado: identificationValues({ ds_paciente: dsPaciente, dt_nascimento: dtNascimento }),
       })
@@ -210,7 +211,7 @@ export default function DataNasc() {
     setTentativas(null)
     setInvalido(null)
     try {
-      await endPatientSession('voltar_date')
+      await endPatientSession('voltar_date', true)
       router.replace(`/totem?servico=${servico}&preferencial=${preferencial}`)
     } catch {
       window.location.replace('/')

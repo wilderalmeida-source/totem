@@ -6,6 +6,7 @@ import type { Prisma } from '../../prisma/app/generated/prisma/client'
 import { birthDate, cpf, patientName, positiveId, prefixName, SEARCH_LIMIT } from '../lib/search-validation'
 import { describePatientInput, patientDiagnostic } from '../lib/patient-diagnostics'
 import { identificationAttempts } from '../lib/identification-attempts'
+import { flowAudit } from '../lib/flow-audit'
 
 const patientQuery = z.union([
   z.object({ tipo: z.literal('RESET'), ds_paciente: z.string().max(150).optional() }).strict(),
@@ -193,6 +194,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
   });
   try {
     const { ds_paciente, dt_nascimento } = bodySchema.parse(request.body ?? {});
+    flowAudit('cadastro_paciente_iniciado', 'cadastro', { tamanhoNome: ds_paciente.length })
 
     let pacientes = null
     let tentativas = 0
@@ -220,12 +222,16 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     }
 
     if (!pacientes) {
+      flowAudit('cadastro_paciente_falhou', 'cadastro', { code: 'P2002', outcome: 'FALHOU' })
       return reply.status(500).send({ error: 'Não foi possível gerar um ID único' })
     }
 
+    flowAudit('cadastro_paciente_confirmado', 'cadastro', { cd_paciente: pacientes.cd_paciente, outcome: 'CONCLUIDO' })
     return reply.send(pacientes);
 
   } catch (err: any) {
+    const code = typeof err?.code === 'string' && /^[A-Z0-9_]{1,50}$/.test(err.code) ? err.code : 'PATIENT_CREATE_ERROR'
+    flowAudit('cadastro_paciente_falhou', 'cadastro', { code, outcome: 'DESCONHECIDO' })
     return reply.status(400).send({
       error: "Requisição inválida",
       details: err?.errors ?? String(err),

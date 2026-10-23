@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { auditTotem } from '@/lib/audit-client';
 
 interface TotemHeaderProps {
   title: string;
@@ -10,6 +11,7 @@ interface TotemHeaderProps {
 
 export function TotemHeader({ title, onAdvance, onBack }: TotemHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const buttonClass =
     "border-2 rounded-lg w-52 h-10 font-semibold bg-[#6b7280] text-white text-center text-2xl";
@@ -25,12 +27,12 @@ export function TotemHeader({ title, onAdvance, onBack }: TotemHeaderProps) {
 
         <button
           className={buttonClass}
-          onClick={onBack}
+          onClick={() => { auditTotem('voltar', pathname); onBack(); }}
         >
           VOLTAR
         </button>
 
-        <button className={buttonClass} onClick={() => router.replace("/")}>
+        <button className={buttonClass} onClick={() => { auditTotem('inicio_clicado', pathname); router.replace("/"); }}>
           INICIO
         </button>
       </div>

@@ -19,7 +19,7 @@ test('cliente serializa troca de paciente e ignora resposta de identificação s
   const removed = [];
   vm.runInNewContext(compile('lib/patient-session-client.ts'), {
     exports, AbortSignal, Event, CustomEvent,
-    require: () => ({ auditContextHeaders: () => ({}), auditTotem: () => {}, closingOutcome: () => 'CANCELADO' }),
+    require: () => ({ auditContextHeaders: () => ({}), auditTotem: () => {}, closingOutcome: () => 'CANCELADO', identificationValues: value => value, identificationResult: value => value }),
     window: { dispatchEvent: event => events.push(event.type) },
     sessionStorage: { removeItem: key => removed.push(key) },
     fetch: (url, options) => new Promise(resolve => requests.push({ url, options, resolve })),
@@ -36,11 +36,17 @@ test('cliente serializa troca de paciente e ignora resposta de identificação s
   requests[1].resolve(new Response(JSON.stringify({ patient: { cd_paciente: 456 } })));
   assert.equal((await second).patient.cd_paciente, 456);
   assert.deepEqual(events, ['patient-session-active']);
+  const preserve = exports.endPatientSession('voltar_date', true);
+  await tick();
+  requests[2].resolve(new Response('{"ok":true}'));
+  await preserve;
+  assert.equal(removed.includes('totemAuditSession'), false);
   const end = exports.endPatientSession();
   await tick();
-  assert.equal(requests[2].options.method, 'DELETE');
-  requests[2].resolve(new Response('{"ok":true}'));
+  assert.equal(requests[3].options.method, 'DELETE');
+  requests[3].resolve(new Response('{"ok":true}'));
   await end;
+  assert.ok(removed.includes('totemAuditSession'));
   assert.ok(removed.includes('pacienteModalidade'));
   assert.equal(events.at(-1), 'patient-session-cleared');
 });

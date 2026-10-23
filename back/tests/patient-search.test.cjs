@@ -15,7 +15,7 @@ async function setup(t, file, exportName, result = [], eligible = null) {
   const realRequire = createRequire(filename);
   const exports = {};
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), {
-    exports, require: name => name === '../../config/prismaDB' ? { prisma } : name === '../lib/patient-diagnostics' ? { describePatientInput: value => value, patientDiagnostic: (id, metadata) => diagnostics.push(metadata) } : realRequire(name),
+    exports, require: name => name === '../lib/flow-audit' ? { flowAudit: () => {} } : name === '../../config/prismaDB' ? { prisma } : name === '../lib/patient-diagnostics' ? { describePatientInput: value => value, patientDiagnostic: (id, metadata) => diagnostics.push(metadata) } : realRequire(name),
     console, process: { env: { IDMODALIDADE: '10000' } }, Date,
   });
   const app = Fastify();

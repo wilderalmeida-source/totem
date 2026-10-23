@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { tocaAtencao } from '@/services/api/atencao'
-import { auditTotem } from '@/lib/audit-client'
+import { startTotemFlow } from '@/lib/audit-client'
 import DigitalClock from '@/components/DigitalClock'
 
 type Servico = {
@@ -21,7 +21,7 @@ export default function Servicos({ servicos }: ServicosProps) {
         {servicos.map((s) => (
           <Link prefetch={false} key={s.ID} onClick={() => {
             window.dispatchEvent(new Event('totem-service-selected'))
-            auditTotem('servico_selecionado', 'servico', { servico: s.ID })
+            startTotemFlow(s.ID)
           }} className="self-center flex items-center justify-center border-2 rounded-lg w-1/2 h-16 bg-gray-500 font-semibold text-white text-2xl" href={`/preferencial?servico=${s.ID}`}>
               {s.servico}
           </Link>

@@ -35,7 +35,7 @@ const auditGroups = {
             { step: 'tcp.2345' }, { step: '/clinux/voice' },
         ] },
     PACIENTES: { OR: [
-            { step: { in: ['pacientesRoute.GET', 'patientSession.POST', '/clinux/pacientes', 'busca_complementar'] } },
+            { step: { in: ['pacientesRoute.GET', 'patientSession.POST', '/clinux/pacientes', 'busca_complementar', 'cadastro'] } },
             { step: { startsWith: '/clinux/totem/' } },
         ] },
 };
@@ -106,13 +106,25 @@ async function adminRoutes(fastify) {
         await (0, persistent_audit_1.persistAudit)(body);
         return reply.code(201).send({ ok: true });
     });
-    fastify.get('/clinux/audit', async (request) => {
+    fastify.get('/clinux/audit', async (request, reply) => {
         const query = audit_filters_1.auditQuery.parse(request.query);
+        let matchingFlows;
+        if (query.patientName) {
+            const matches = await prismalog_1.PrismaLog.auditLog.findMany({
+                where: { AND: [(0, audit_filters_1.auditPatientFilter)(query.patientName),
+                        ...(query.from || query.to ? [{ createdAt: { gte: query.from, lte: query.to } }] : []),
+                        ...(query.device ? [{ metadata: { path: ['device'], equals: query.device } }] : []),
+                    ] }, select: { sessionId: true }, distinct: ['sessionId'], take: 501,
+            });
+            if (matches.length > 500)
+                return reply.code(422).send({ error: 'Muitos atendimentos encontrados. Informe um nome mais completo ou reduza o período.' });
+            matchingFlows = matches.flatMap(item => item.sessionId ? [item.sessionId] : []);
+        }
         const where = {
             ...(query.category ? { category: query.category } : {}),
             ...(query.flow ? { OR: [{ sessionId: query.flow }, { metadata: { path: ['traceId'], equals: query.flow } }] } : {}),
             ...(query.device ? { metadata: { path: ['device'], equals: query.device } } : {}),
-            AND: [...(0, audit_filters_1.auditExtraFilters)(query), ...(query.group ? [auditGroups[query.group]] : [])],
+            AND: [...(0, audit_filters_1.auditExtraFilters)(query), ...(query.group ? [auditGroups[query.group]] : []), ...(matchingFlows ? [{ sessionId: { in: matchingFlows } }] : [])],
         };
         const [items, total] = await Promise.all([prismalog_1.PrismaLog.auditLog.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: (query.page - 1) * query.limit, take: query.limit }), prismalog_1.PrismaLog.auditLog.count({ where })]);
         return { items: items.map((item) => ({ ...item, id: item.id.toString() })), total, page: query.page };

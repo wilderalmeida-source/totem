@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const { NextRequest } = require('next/server');
 
-function environment(operatorDenied = false) {
+function environment(operatorDenied = false, patientName = 'PACIENTE') {
   const root = path.resolve(__dirname, '..');
   let now = Date.now();
   const calls = [];
@@ -21,7 +21,7 @@ function environment(operatorDenied = false) {
       if (url.pathname === '/clinux/pacientes') {
         return new Response(JSON.stringify(options.method === 'POST'
           ? { cd_paciente: 999, ds_paciente: 'NOVO', dt_nascimento: '1980-01-01' }
-          : [{ cd_paciente: 123, ds_paciente: 'PACIENTE', dt_nascimento: '1980-01-01' }]), { headers: { 'Content-Type': 'application/json' } });
+          : [{ cd_paciente: 123, ds_paciente: patientName, dt_nascimento: '1980-01-01' }]), { headers: { 'Content-Type': 'application/json' } });
       }
       if (url.pathname === '/clinux/senhas') return new Response(JSON.stringify({ cd_senha: 321 }));
       return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
@@ -67,7 +67,7 @@ async function identify(env, body = { tipo: 'ID', ds_cpf: '12345678901', dt_nasc
 }
 
 test('diagnostico liga nome recebido, normalizado, retorno e resposta final sem cookie', async () => {
-  const env = environment();
+  const env = environment(false, 'Fulano da Silva');
   const req = request('/api/patient-session', 'POST', { tipo: 'NOMEDATA', ds_paciente: ' Fulano da Silva ', dt_nascimento: '1980-01-01' });
   req.headers.set('x-flow-id', 'homologacao-123');
   const response = await env.session.POST(req);
@@ -80,6 +80,13 @@ test('diagnostico liga nome recebido, normalizado, retorno e resposta final sem 
   assert.equal(final.sessionId, 'homologacao-123');
   assert.equal(final.metadata.resposta.patient.cd_paciente, 123);
   assert.equal(JSON.stringify(env.auditEvents).includes(response.cookies.get('totem_patient_session').value), false);
+});
+
+test('nome divergente do retorno do backend nao cria sessao', async () => {
+  const env = environment(false, 'OUTRO PACIENTE');
+  const response = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'NOMEDATA', ds_paciente: 'ANA', dt_nascimento: '1980-01-01' }));
+  assert.equal(response.status, 401);
+  assert.ok(!response.cookies.get('totem_patient_session')?.value);
 });
 
 test('diagnostico registra resposta final quando data e invalida', async () => {
@@ -124,7 +131,7 @@ test('rejeita identificação incompleta/forjada e origem externa antes de consu
 test('nome, QR numérico e novo cadastro criam sessão apenas com ID retornado pelo backend', async () => {
   for (const body of [{ tipo: 'NOMEDATA', ds_paciente: 'ANA', dt_nascimento: '1980-01-01' },
     { tipo: 'QR', cd_paciente: 123 }, { tipo: 'NEW', ds_paciente: 'NOVO', dt_nascimento: '1980-01-01' }]) {
-    const env = environment();
+    const env = environment(false, 'ANA');
     const token = await identify(env, body);
     assert.equal(env.store.readPatientSession(token).patientId, body.tipo === 'NEW' ? 999 : 123);
   }
@@ -210,6 +217,17 @@ test('emissões simultâneas da mesma sessão não são encaminhadas duas vezes'
   assert.equal((await env.issue.POST(request('/api/patient-session/senha', 'POST', { servico: 'B' }, token))).status, 409);
   release(new Response('{"cd_senha":321}'));
   assert.equal((await first).status, 200);
+});
+
+test('recusas de emissao registram o motivo sem chamar Clinux nem registrar cookies', async () => {
+  const env = environment();
+  const response = await env.issue.POST(request('/api/patient-session/senha', 'POST', { servico: 'B' }));
+  assert.equal(response.status, 401);
+  assert.equal(env.calls.length, 0);
+  const denied = env.auditEvents.find(e => e.action === 'emissao_rejeitada');
+  assert.equal(denied.metadata.code, 'PATIENT_SESSION_MISSING');
+  assert.equal(denied.metadata.enviadoAoBackend, false);
+  assert.equal(denied.metadata.token, undefined);
 });
 
 test('proxy não permite contornar sessão por consulta de ID ou gravações antigas', async () => {

@@ -5,6 +5,7 @@ const zod_1 = require("zod");
 const prismaDB_1 = require("../../config/prismaDB");
 const gerar_senha_service_1 = require("../services/senhas/gerar-senha.service");
 const shared_history_1 = require("../lib/shared-history");
+const flow_audit_1 = require("../lib/flow-audit");
 // Função para mascarar o nome mantendo apenas o Primeiro e Último visíveis
 function aplicarMascaraNome(nomeCompleto) {
     if (!nomeCompleto)
@@ -173,10 +174,13 @@ async function senhaRoute(fastify) {
         });
         try {
             const body = createbody.parse(request.body);
+            (0, flow_audit_1.flowAudit)('emissao_recebida_backend', 'emissao', { cd_paciente: body.cd_paciente, servico: body.servico, cd_modalidade: body.cd_modalidade });
             const senha = await (0, gerar_senha_service_1.gerarSenhaService)(body);
             return reply.send(senha);
         }
         catch (err) {
+            const code = typeof err?.code === 'string' && /^[A-Z0-9_]{1,50}$/.test(err.code) ? err.code : 'ISSUANCE_ERROR';
+            (0, flow_audit_1.flowAudit)('emissao_falhou_backend', 'emissao', { code, outcome: 'DESCONHECIDO', status: 400 });
             return reply.status(400).send({
                 error: 'Erro ao gerar senha',
                 details: err?.errors ?? String(err),

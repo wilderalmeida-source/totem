@@ -11,7 +11,10 @@ export function patientSessionRequest<T>(method: 'GET' | 'POST' | 'PATCH' | 'DEL
   const started = Date.now()
   const version = identificationVersion
   const operation = pending.then(async () => {
-    if (suffix === '/senha') emissionOutcome = 'DESCONHECIDO'
+    if (suffix === '/senha') {
+      emissionOutcome = 'DESCONHECIDO'
+      auditTotem('emissao_solicitada', 'emissao')
+    }
     if (method === 'POST' && !suffix) auditTotem('identificacao_enviada_next', 'patientSession.POST', { enviado: identificationValues(body) })
     const response = await fetch(`/api/patient-session${suffix}`, {
       method, credentials: 'same-origin', cache: 'no-store',
@@ -51,13 +54,13 @@ export function patientSessionRequest<T>(method: 'GET' | 'POST' | 'PATCH' | 'DEL
   return operation
 }
 
-export function endPatientSession(reason = 'retorno_inicio') {
-  auditTotem('sessao_encerramento_solicitado', 'sessao', { reason })
+export function endPatientSession(reason = 'retorno_inicio', preserveFlow = false) {
+  auditTotem(preserveFlow ? 'identificacao_limpeza_solicitada' : 'sessao_encerramento_solicitado', 'sessao', { reason })
   sessionStorage.removeItem('pacienteModalidade')
   return patientSessionRequest('DELETE').then(result => {
-    auditTotem('fluxo_encerrado', 'sessao', { reason, outcome: closingOutcome(reason, emissionOutcome) })
+    auditTotem(preserveFlow ? 'identificacao_limpa' : 'fluxo_encerrado', 'sessao', { reason, ...(preserveFlow ? {} : { outcome: closingOutcome(reason, emissionOutcome) }) })
     emissionOutcome = undefined
-    sessionStorage.removeItem('totemAuditSession')
+    if (!preserveFlow) sessionStorage.removeItem('totemAuditSession')
     return result
   })
 }

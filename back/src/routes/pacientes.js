@@ -6,6 +6,7 @@ const prismaDB_1 = require("../../config/prismaDB");
 const search_validation_1 = require("../lib/search-validation");
 const patient_diagnostics_1 = require("../lib/patient-diagnostics");
 const identification_attempts_1 = require("../lib/identification-attempts");
+const flow_audit_1 = require("../lib/flow-audit");
 const patientQuery = zod_1.z.union([
     zod_1.z.object({ tipo: zod_1.z.literal('RESET'), ds_paciente: zod_1.z.string().max(150).optional() }).strict(),
     zod_1.z.object({ tipo: zod_1.z.undefined().optional(), cd_paciente: search_validation_1.positiveId }).strict(),
@@ -198,6 +199,7 @@ async function pacientesRoute(fastify) {
         });
         try {
             const { ds_paciente, dt_nascimento } = bodySchema.parse(request.body ?? {});
+            (0, flow_audit_1.flowAudit)('cadastro_paciente_iniciado', 'cadastro', { tamanhoNome: ds_paciente.length });
             let pacientes = null;
             let tentativas = 0;
             while (tentativas < 3) {
@@ -222,11 +224,15 @@ async function pacientesRoute(fastify) {
                 }
             }
             if (!pacientes) {
+                (0, flow_audit_1.flowAudit)('cadastro_paciente_falhou', 'cadastro', { code: 'P2002', outcome: 'FALHOU' });
                 return reply.status(500).send({ error: 'Não foi possível gerar um ID único' });
             }
+            (0, flow_audit_1.flowAudit)('cadastro_paciente_confirmado', 'cadastro', { cd_paciente: pacientes.cd_paciente, outcome: 'CONCLUIDO' });
             return reply.send(pacientes);
         }
         catch (err) {
+            const code = typeof err?.code === 'string' && /^[A-Z0-9_]{1,50}$/.test(err.code) ? err.code : 'PATIENT_CREATE_ERROR';
+            (0, flow_audit_1.flowAudit)('cadastro_paciente_falhou', 'cadastro', { code, outcome: 'DESCONHECIDO' });
             return reply.status(400).send({
                 error: "Requisição inválida",
                 details: err?.errors ?? String(err),

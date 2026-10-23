@@ -208,7 +208,7 @@ export function DialogPatient({
       return;
     }
 
-    if (aberturaRegistradaRef.current || !dados?.ds_paciente) return;
+    if (aberturaRegistradaRef.current || !dados?.ds_paciente || dados.qr) return;
 
     auditTotem('modal_paciente_aberto', 'modal', {
       nomePaciente: dados.ds_paciente,
@@ -402,6 +402,7 @@ export function DialogPatient({
 
   const handleCancelar = () => {
     if (loading) return;
+    auditTotem('modal_cancelado', 'modal');
     const semPacienteNovo =
       !dados?.cd_paciente && !dados?.qr && dados?.tipo !== "NEW";
     if (tentativas && tentativas <= 0 && semPacienteNovo) {
@@ -410,7 +411,7 @@ export function DialogPatient({
       setShowModal(false);
       setDados(null);
       setExames(null);
-      void endPatientSession('cancelar_modal').catch(() => window.location.replace('/'));
+      void endPatientSession('cancelar_modal', true).catch(() => window.location.replace('/'));
     }
   };
 
