@@ -10,10 +10,15 @@ test('fluxo persiste na navegacao e equipamento persiste entre atendimentos', ()
   const exports = {};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(__dirname, '../lib/audit-client.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, {
     exports, sessionStorage: storage(session), localStorage: storage(local), crypto: require('node:crypto').webcrypto,
+    process: { env: {} }, AbortSignal, fetch: async () => ({ ok: true }),
   });
+  assert.equal(exports.auditContextHeaders()['x-flow-id'], undefined);
+  exports.startTotemFlow('C');
   const first = exports.auditContextHeaders();
   assert.equal(exports.auditContextHeaders()['x-flow-id'], first['x-flow-id']);
   session.delete('totemAuditSession');
+  assert.equal(exports.auditContextHeaders()['x-flow-id'], undefined);
+  exports.startTotemFlow('B');
   const next = exports.auditContextHeaders();
   assert.notEqual(next['x-flow-id'], first['x-flow-id']);
   assert.equal(next['x-device-id'], first['x-device-id']);
@@ -28,6 +33,10 @@ test('clique no servico inicia fluxo novo e os cliques seguintes usam o mesmo ID
     process: { env: {} }, AbortSignal, console,
     fetch: async (_url, options) => { events.push(JSON.parse(options.body)); return { ok: true }; },
   });
+  exports.auditTotem('resposta_next', 'historico');
+  exports.auditContextHeaders();
+  assert.equal(events.length, 0);
+  assert.equal(session.size, 0);
   exports.startTotemFlow('D');
   exports.auditTotem('prioridade_selecionada', 'prioridade', { preferencial: 0 });
   exports.auditTotem('voltar', '/date');

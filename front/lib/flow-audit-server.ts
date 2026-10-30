@@ -11,6 +11,8 @@ export function flowHeaders(request: Pick<NextRequest, 'headers'>) {
 }
 export async function auditServer(request: Pick<NextRequest, 'headers'>, action: string, step: string, metadata: Record<string, unknown>) {
   const context = flowHeaders(request)
+  if (!context['x-flow-id']) return
+  if (action === 'proxy_resposta' && step.replace(/\/$/, '') === '/clinux/senhas') return
   try { await auditOutbox.enqueue({ category: 'TOTEM', sessionId: context['x-flow-id'], action, step,
     metadata: { ...metadata, device: context['x-device-id'], source: 'next', version: process.env.APP_VERSION ?? 'nao_informada' } }) }
   catch { console.error('AUDIT_LOCAL_WRITE_FAILED') }

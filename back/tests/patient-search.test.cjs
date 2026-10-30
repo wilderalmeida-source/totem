@@ -126,7 +126,9 @@ test('atendimentos do totem exigem paciente e não aceitam ampliação de perío
   assert.equal(calls[0].where.dt_data.gte.getTime(), calls[0].where.dt_data.lte.getTime());
   assert.equal(calls[1].where.ds_status, 5);
   assert.equal(calls[1].take, 10);
-  assert.ok(calls[1].where.dt_data.lte - calls[1].where.dt_data.gte <= 93 * 86400000);
+  const expectedStart = new Date(calls[1].where.dt_data.lte);
+  expectedStart.setUTCMonth(expectedStart.getUTCMonth() - 6);
+  assert.equal(calls[1].where.dt_data.gte.getTime(), expectedStart.getTime());
   assert.equal(calls[0].select.ds_observacao, undefined);
   assert.equal(calls[0].select.pacientes_atendimentos_cd_pacienteTopacientes, undefined);
 });

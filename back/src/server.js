@@ -7,7 +7,6 @@ const persistent_audit_1 = require("./lib/persistent-audit");
 const admin_audit_1 = require("./lib/admin-audit");
 const audit_retention_1 = require("./lib/audit-retention");
 const fastify_1 = __importDefault(require("fastify"));
-const node_crypto_1 = require("node:crypto");
 const flow_audit_1 = require("./lib/flow-audit");
 const cors_1 = __importDefault(require("@fastify/cors"));
 const static_1 = __importDefault(require("@fastify/static"));
@@ -39,11 +38,11 @@ async function bootstrap() {
     const stopRetention = (0, audit_retention_1.startAuditRetention)();
     fastify.addHook('onClose', async () => { stopRetention(); await persistent_audit_1.auditOutbox.stop(); });
     fastify.addHook('onRequest', (request, _reply, done) => {
-        flow_audit_1.auditContext.run({ flowId: (0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) ?? (0, node_crypto_1.randomUUID)(),
+        flow_audit_1.auditContext.run({ flowId: (0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) ?? '',
             device: (0, flow_audit_1.auditIdentifier)(request.headers['x-device-id']) ?? 'nao_informado' }, done);
     });
     fastify.addHook('onResponse', async (request, reply) => {
-        if (!request.url.startsWith('/clinux/audit') && /^\/clinux\/(pacientes|totem|senhas|voice)/.test(request.url)) {
+        if ((0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) && !(request.method === 'GET' && request.url.split('?')[0].replace(/\/$/, '') === '/clinux/senhas') && !request.url.startsWith('/clinux/audit') && /^\/clinux\/(pacientes|totem|senhas|voice)/.test(request.url)) {
             (0, flow_audit_1.flowAudit)('resposta_backend', request.url.split('?')[0], { status: reply.statusCode, durationMs: reply.elapsedTime });
         }
     });

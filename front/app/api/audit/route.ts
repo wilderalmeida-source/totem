@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
   if (!apiBase || !apiToken) return NextResponse.json({ error: 'Serviço indisponível.' }, { status: 503 })
   const body = await request.json().catch(() => null) as Record<string, unknown> | null
   if (!body || typeof body.action !== 'string') return NextResponse.json({ error: 'Evento inválido.' }, { status: 400 })
+  if (typeof body.sessionId !== 'string' || !/^[a-zA-Z0-9_.:-]{1,100}$/.test(body.sessionId)) return new NextResponse(null, { status: 204 })
   const payload = { category: 'TOTEM', sessionId: typeof body.sessionId === 'string' ? body.sessionId.slice(0, 100) : undefined, action: body.action.slice(0, 100), step: typeof body.step === 'string' ? body.step.slice(0, 100) : undefined, metadata: typeof body.metadata === 'object' && body.metadata ? body.metadata : undefined }
   try {
     await auditOutbox.enqueue(payload)

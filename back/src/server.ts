@@ -2,7 +2,6 @@ import { auditOutbox } from './lib/persistent-audit'
 import { registerAdminAudit } from './lib/admin-audit'
 import { startAuditRetention } from './lib/audit-retention'
 import Fastify from "fastify";
-import { randomUUID } from 'node:crypto'
 import { auditContext, auditIdentifier, flowAudit } from './lib/flow-audit'
 import cors from "@fastify/cors"
 import fastifyStatic from '@fastify/static';
@@ -36,11 +35,11 @@ async function bootstrap() {
   const stopRetention = startAuditRetention()
   fastify.addHook('onClose', async () => { stopRetention(); await auditOutbox.stop() })
   fastify.addHook('onRequest', (request, _reply, done) => {
-    auditContext.run({ flowId: auditIdentifier(request.headers['x-flow-id']) ?? randomUUID(),
+    auditContext.run({ flowId: auditIdentifier(request.headers['x-flow-id']) ?? '',
       device: auditIdentifier(request.headers['x-device-id']) ?? 'nao_informado' }, done)
   })
   fastify.addHook('onResponse', async (request, reply) => {
-    if (!request.url.startsWith('/clinux/audit') && /^\/clinux\/(pacientes|totem|senhas|voice)/.test(request.url)) {
+    if (auditIdentifier(request.headers['x-flow-id']) && !(request.method === 'GET' && request.url.split('?')[0].replace(/\/$/, '') === '/clinux/senhas') && !request.url.startsWith('/clinux/audit') && /^\/clinux\/(pacientes|totem|senhas|voice)/.test(request.url)) {
       flowAudit('resposta_backend', request.url.split('?')[0], { status: reply.statusCode, durationMs: reply.elapsedTime })
     }
   })

@@ -9,6 +9,7 @@ export function auditIdentifier(value: unknown) {
 }
 export function flowAudit(action: string, step: string, metadata: Record<string, unknown> = {}) {
   const context = auditContext.getStore()
+  if (context && !context.flowId) return
   recordAudit({ category: 'TOTEM', action, step, sessionId: context?.flowId ?? randomUUID(),
     metadata: { ...metadata, device: context?.device, source: 'backend', version: process.env.APP_VERSION ?? 'nao_informada' } })
 }

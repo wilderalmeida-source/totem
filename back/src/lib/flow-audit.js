@@ -13,6 +13,8 @@ function auditIdentifier(value) {
 }
 function flowAudit(action, step, metadata = {}) {
     const context = exports.auditContext.getStore();
+    if (context && !context.flowId)
+        return;
     (0, persistent_audit_1.recordAudit)({ category: 'TOTEM', action, step, sessionId: context?.flowId ?? (0, node_crypto_1.randomUUID)(),
         metadata: { ...metadata, device: context?.device, source: 'backend', version: process.env.APP_VERSION ?? 'nao_informada' } });
 }

@@ -21,6 +21,8 @@ function describePatientInput(value) {
 }
 function patientDiagnostic(requestId, metadata) {
     const context = flow_audit_1.auditContext.getStore();
+    if (!context?.flowId)
+        return;
     (0, persistent_audit_1.recordAudit)({ category: 'TOTEM', action: 'diagnostico_identificacao', step: 'pacientesRoute.GET',
         sessionId: context?.flowId ?? requestId,
         metadata: { ...metadata, requestId, device: context?.device, version: process.env.APP_VERSION ?? 'nao_informada' } });

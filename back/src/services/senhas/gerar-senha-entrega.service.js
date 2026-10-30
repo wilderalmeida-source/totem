@@ -14,14 +14,14 @@ async function gerarSenhaEntrega({ cd_paciente, preferencial, cd_modalidade, }) 
     const modalidadeTotem = process.env.IDMODALIDADE
         ? Number(process.env.IDMODALIDADE)
         : 0;
-    const tresMesesAtras = new Date(hoje);
-    tresMesesAtras.setUTCMonth(tresMesesAtras.getUTCMonth() - 3);
+    const seisMesesAtras = new Date(hoje);
+    seisMesesAtras.setUTCMonth(seisMesesAtras.getUTCMonth() - 6);
     const atendimentos = await prismaDB_1.prisma.atendimentos.findMany({
         where: {
             cd_paciente,
             ds_status: 5,
             dt_data: {
-                gte: tresMesesAtras,
+                gte: seisMesesAtras,
                 lte: hoje,
             },
         },

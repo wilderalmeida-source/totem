@@ -35,7 +35,7 @@ async function atendimentosTotemRoute(fastify) {
         const hoje = (0, search_validation_1.todayBrazil)();
         const inicio = new Date(hoje);
         if (tipo === 'entrega')
-            inicio.setUTCMonth(inicio.getUTCMonth() - 3);
+            inicio.setUTCMonth(inicio.getUTCMonth() - 6);
         const rows = await prismaDB_1.prisma.atendimentos.findMany({
             where: {
                 cd_paciente,

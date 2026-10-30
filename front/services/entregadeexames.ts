@@ -15,12 +15,12 @@ export async function contextoEntrega(cd_paciente: number): Promise<{ exames: At
 export async function entregaDeExames(cd_paciente: number): Promise<Atendimento[]> {
   const hoje = new Date()
 
-  const tresMesesAtras = new Date(hoje)
-  tresMesesAtras.setMonth(hoje.getMonth() - 3)
+  const seisMesesAtras = new Date(hoje)
+  seisMesesAtras.setMonth(hoje.getMonth() - 6)
 
   return buscaAtendimentos({
     cd_paciente,
-    date: { from: tresMesesAtras, to: hoje },
+    date: { from: seisMesesAtras, to: hoje },
     buscaStatus: "5",
     tipo: "entrega",
   })

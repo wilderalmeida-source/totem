@@ -31,7 +31,7 @@ export async function atendimentosTotemRoute(fastify: FastifyInstance) {
     const { cd_paciente, tipo } = parsed.data
     const hoje = todayBrazil()
     const inicio = new Date(hoje)
-    if (tipo === 'entrega') inicio.setUTCMonth(inicio.getUTCMonth() - 3)
+    if (tipo === 'entrega') inicio.setUTCMonth(inicio.getUTCMonth() - 6)
     const rows = await prisma.atendimentos.findMany({
       where: {
         cd_paciente,

@@ -20,6 +20,7 @@ export function describePatientInput(value: unknown) {
 
 export function patientDiagnostic(requestId: string, metadata: Record<string, unknown>) {
   const context = auditContext.getStore()
+  if (!context?.flowId) return
   recordAudit({ category: 'TOTEM', action: 'diagnostico_identificacao', step: 'pacientesRoute.GET',
     sessionId: context?.flowId ?? requestId,
     metadata: { ...metadata, requestId, device: context?.device, version: process.env.APP_VERSION ?? 'nao_informada' } })

@@ -1,12 +1,13 @@
 export function startTotemFlow(servico: string) {
+  if (!['B', 'C', 'D'].includes(servico)) return
   try { sessionStorage.setItem('totemAuditSession', createSessionId()) } catch { /* Audit delivery reports storage failure. */ }
   auditTotem('servico_selecionado', 'servico', { servico })
 }
 
 export function auditContextHeaders(): Record<string, string> {
   try {
-    let flow = sessionStorage.getItem('totemAuditSession')
-    if (!flow) { flow = createSessionId(); sessionStorage.setItem('totemAuditSession', flow) }
+    const flow = sessionStorage.getItem('totemAuditSession')
+    if (!flow) return {}
     let device = localStorage.getItem('totemDeviceId')
     if (!device) { device = createSessionId(); localStorage.setItem('totemDeviceId', device) }
     return { 'x-flow-id': flow, 'x-device-id': device }
@@ -21,6 +22,7 @@ function deliveryFailed() {
 }
 export function auditTotem(action: string, step: string, metadata?: Record<string, unknown>) {
   const context = auditContextHeaders()
+  if (!context['x-flow-id']) return
   try {
     void fetch('/api/audit', { method: 'POST', headers: { 'Content-Type': 'application/json', ...context },
       body: JSON.stringify({ sessionId: context['x-flow-id'], action, step, metadata: {
