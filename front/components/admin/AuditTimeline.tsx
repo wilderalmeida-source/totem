@@ -43,6 +43,7 @@ function FlowCard({ events, onSelectFlow }: { events: AuditLogEntry[]; onSelectF
         <span aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-800">{initials}</span>
         <div className="min-w-0">
           <h2 className="break-words text-lg font-bold text-slate-900">{summary.name}</h2>
+          {first.category !== 'ADMIN' && <p className="my-1 inline-block rounded-lg bg-blue-50 px-3 py-1 text-sm font-bold text-blue-800" aria-label="Serviço do atendimento">{summary.service}</p>}
           <p className="text-sm text-slate-500">{summary.ticket ? 'Senha ' + summary.ticket + ' · ' : ''}{new Date(first.createdAt).toLocaleDateString('pt-BR')} · {events.length} registros nesta página</p>
           {first.sessionId && <button type="button" onClick={() => onSelectFlow(first.sessionId!)} title={first.sessionId} className="mt-1 text-sm font-medium text-blue-700 underline underline-offset-4">Filtrar este atendimento</button>}
         </div>

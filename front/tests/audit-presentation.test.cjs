@@ -15,6 +15,13 @@ function load(file) {
 }
 const api = load('lib/audit-presentation.ts');
 const event = (action, metadata = {}) => ({ id: action, category: 'TOTEM', sessionId: 'flow-1', action, metadata, createdAt: '2026-10-23T15:40:00Z' });
+test('cabecalho identifica servico mesmo sem clique inicial e nao adivinha quando ausente', () => {
+  for (const [code, label] of [['B', 'Atendimento'], ['C', 'Entrega de exames'], ['D', 'Agendar exames']]) {
+    assert.equal(api.flowSummary([event('prioridade_selecionada', { servico: code })]).service, label);
+  }
+  assert.equal(api.flowSummary([event('prioridade_selecionada', { opcao: 'ATENDIMENTO NORMAL' })]).service, 'Serviço não informado neste recorte');
+  assert.match(api.flowSummary([event('x', { servico: 'B' }), event('y', { servico: 'C' })]).service, /Serviços registrados/);
+});
 test('servico, prioridade, navegacao e codigo de barras possuem nomes legiveis', () => {
   assert.equal(api.stageTitle(event('servico_selecionado', { servico: 'C' })), 'Serviço: Entrega de exames');
   assert.equal(api.stageTitle(event('prioridade_selecionada', { preferencial: 0 })), 'Prioridade: Atendimento normal');

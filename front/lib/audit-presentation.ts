@@ -93,6 +93,10 @@ export function visibleStages(events: AuditLogEntry[]) {
   return events.filter(e => hasProblem(e) || (!intermediate.has(e.action) && (!isTechnicalEvent(e) || stageDetails(e).results.length > 0)))
 }
 export function flowSummary(events: AuditLogEntry[]) {
+  const serviceCodes = [...new Set(events.map(e => text(e.metadata?.servico).toUpperCase()).filter(code => Object.hasOwn(services, code)))]
+  const service = serviceCodes.length === 1 ? services[serviceCodes[0]]
+    : serviceCodes.length > 1 ? `Serviços registrados: ${serviceCodes.map(code => services[code]).join(' / ')}`
+    : 'Serviço não informado neste recorte'
   const commits = events.filter(e => confirmed.has(e.action) && !hasProblem(e))
   const commit = commits.at(-1)
   const names = [...new Set(events.map(patientName).filter(Boolean))]
@@ -102,6 +106,6 @@ export function flowSummary(events: AuditLogEntry[]) {
   const status = events[0]?.category === 'ADMIN' ? 'Atividade administrativa' : commit ? 'Envio confirmado' : rejected ? 'Envio rejeitado' : emission ? 'Envio sem confirmação' : 'Sem confirmação de envio'
   const ticketEvent = [...commits].reverse().find(e => e.metadata?.nr_senha !== undefined)
   return { name: names.join(' / ') || (events[0]?.category === 'ADMIN' ? 'Atividade administrativa' : 'Paciente não identificado neste recorte'),
-    status, tone: commit ? 'success' : rejected ? 'failure' : 'neutral', audioFailure, otherFailure: events.some(e => hasProblem(e) && !/audio|speech|tcp/.test(`${e.action} ${e.step}`)),
+    service, status, tone: commit ? 'success' : rejected ? 'failure' : 'neutral', audioFailure, otherFailure: events.some(e => hasProblem(e) && !/audio|speech|tcp/.test(`${e.action} ${e.step}`)),
     ticket: ticketEvent ? String(ticketEvent.metadata?.nr_senha) : undefined }
 }
