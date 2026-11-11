@@ -3,6 +3,19 @@
 -- Gerado a partir do schema Prisma
 -- ============================================================
 
+CREATE TABLE IF NOT EXISTS configuracao_visual (
+  id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  tema TEXT NOT NULL DEFAULT 'theme2' CHECK (tema IN ('theme1', 'theme2')),
+  modo TEXT NOT NULL DEFAULT 'light' CHECK (modo IN ('light', 'dark'))
+);
+INSERT INTO configuracao_visual (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS configuracao_informativos (
+  id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  config JSONB NOT NULL DEFAULT '{"enabled":true,"items":[]}'::jsonb
+);
+INSERT INTO configuracao_informativos (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS "TtsDailyUsage" (
   "id"       SERIAL PRIMARY KEY,
   "date"     TIMESTAMP(3) NOT NULL UNIQUE,

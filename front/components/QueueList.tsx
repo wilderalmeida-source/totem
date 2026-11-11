@@ -5,6 +5,9 @@ export type QueuePerson = {
   name: string;
   active?: boolean; // destacado
   instruction?:string;
+  modalidade?: string;
+  localizacao?: string;
+  calledAt?: string;
 };
 
 export default function QueueList({ people }: { people: QueuePerson[] }) {

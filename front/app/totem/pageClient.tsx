@@ -172,7 +172,7 @@ export default function Totem() {
     setShowModal(true);
   }
   return (
-    <div className="overflow-hidden h-screen">
+    <div className="search-screen overflow-hidden h-screen" data-search-type={tipo}>
       <TotemHeader title={title} onAdvance={avancar} onBack={voltar} />
 
       <Base type="totem">

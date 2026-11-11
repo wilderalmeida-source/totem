@@ -71,7 +71,6 @@ export default function ConfiguracaoPaineisPage() {
   const [ativo, setAtivo] = useState(false)
   const [modalidades, setModalidades] = useState<Modalidade[]>([])
   const [config, setConfig] = useState<ConfigPainel[]>(criarConfigInicial())
-  const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([])
 
   useEffect(() => {
   async function carregar() {
@@ -80,17 +79,12 @@ export default function ConfiguracaoPaineisPage() {
       setModalidades(responseModalidades ?? [])
 
       const responseConfig = await buscarConfiguracaoPaineis()
-      const responseMidias = await fetch('/api/media', { cache: 'no-store' })
-      const dadosMidias = responseMidias.ok ? await responseMidias.json() : null
-      const playlistsDisponiveis = dadosMidias?.playlists ?? []
-      const playlistIds = new Set(playlistsDisponiveis.map((playlist: { id: string }) => playlist.id))
-      setPlaylists(playlistsDisponiveis)
 
       if (responseConfig) {
         setAtivo(responseConfig.ativo ?? false)
 
         if (Array.isArray(responseConfig.paineis) && responseConfig.paineis.length > 0) {
-          setConfig(responseConfig.paineis.map((painel: ConfigPainel) => ({ ...painel, playlistId: painel.playlistId && playlistIds.has(painel.playlistId) ? painel.playlistId : null })))
+          setConfig(responseConfig.paineis)
         }
       }
     } catch (error) {
@@ -309,9 +303,6 @@ export default function ConfiguracaoPaineisPage() {
 
     return true
   }
-  function atualizarPlaylist(painelNumero: number, playlistId: string) {
-    setConfig((old) => old.map((painel) => painel.painel === painelNumero ? { ...painel, playlistId: playlistId || null } : painel))
-  }
 
 async function salvarConfiguracao() {
   if (!validarConfiguracao()) return
@@ -410,18 +401,6 @@ async function salvarConfiguracao() {
                     placeholder="IP do painel. Ex: 192.168.0.10"
                     className="h-12 w-full rounded-xl border px-4 text-lg font-semibold outline-none focus:border-blue-500 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
                   />
-                  <label className="text-sm font-bold text-gray-600">
-                    Playlist do painel
-                    <select
-                      value={painel.playlistId ?? ''}
-                      onChange={(e) => atualizarPlaylist(painel.painel, e.target.value)}
-                      className="mt-1 h-12 w-full rounded-xl border bg-white px-4 text-base font-semibold outline-none focus:border-blue-500"
-                    >
-                      <option value="">Automática (primeira playlist)</option>
-                      {playlists.map((playlist) => <option key={playlist.id} value={playlist.id}>{playlist.name}</option>)}
-                    </select>
-                  </label>
-                  {playlists.length === 0 && <p className="text-xs text-amber-700">Sem playlists: os arquivos serão exibidos em ordem.</p>}
                 </div>
               </div>
 

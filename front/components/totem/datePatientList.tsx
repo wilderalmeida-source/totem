@@ -60,7 +60,7 @@ export function DatePatientList({
   })
 
   return (
-    <div className="flex mt-2">
+    <div className="search-results flex mt-2">
       <ul className="px-3 h-48 w-full overflow-y-auto mb-5 rounded-lg border-2 border-gray-500">
         {loading && <li className="text-3xl mb-3">Buscando...</li>}
 

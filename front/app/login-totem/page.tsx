@@ -56,7 +56,7 @@ export default function TotemLogin() {
     finally { lock.current = false; setBusy(false) }
   }
   const setValue = field === 'confirmation' ? setConfirmation : setPin
-  return <main className="min-h-screen bg-slate-100 p-4 text-slate-950">
+  return <main className="system-theme auth-theme min-h-screen bg-slate-100 p-4 text-slate-950">
     <header className="flex justify-end"><Link href="/login" className="rounded-xl bg-slate-900 px-6 py-3 font-bold text-white">Admin</Link></header>
     <section className="mx-auto my-4 max-w-lg rounded-3xl bg-white p-6 shadow-lg">
       <h1 className="text-center text-3xl font-bold">Liberar totem</h1>

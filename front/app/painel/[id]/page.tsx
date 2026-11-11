@@ -5,10 +5,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import NowCard from "@/components/NowCard";
 import QueueList, { QueuePerson } from "@/components/QueueList";
-import Video from "@/components/Video";
-import PartnerCallOverlay from '@/components/PartnerCallOverlay';
-import { usePartnerCall } from '@/hooks/usePartnerCall';
 import { parsePanelCall, type PanelCall } from '@/lib/panel-call';
+import ThemeOnePanel from '@/components/panel/ThemeOnePanel';
 
 type TtsBody = { audioContent: string } | { errorTTS: string };
 
@@ -108,7 +106,6 @@ type QueueItem =
 export default function Page() {
   const params = useParams();
   const painelId = Number(params.id ?? 1);
-  const { view: partnerCall, show: showPartnerCall, finish: finishPartnerCall } = usePartnerCall(painelId);
 
   const [atencaoVisible, setAtencaoVisible] = useState(false);
   const [guiche, setGuiche] = useState("");
@@ -116,6 +113,8 @@ export default function Page() {
   const [hora, setHora] = useState("");
   const [queue, setQueue] = useState<QueuePerson[]>([]);
   const [soundReady, setSoundReady] = useState(false);
+  const [currentCall, setCurrentCall] = useState<PanelCall | null>(null);
+  const previousCall = useRef<PanelCall | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const soundReadyRef = useRef(false);
@@ -288,11 +287,12 @@ export default function Page() {
 
   const REREAD_DELAY_MS = 4000;
 
-  const presentCall = useCallback((call: PanelCall, hasAudio: boolean) => {
+  const presentCall = useCallback((call: PanelCall) => {
     const prevNome = nomeRef.current;
     const prevGuiche = guicheRef.current;
     if (prevNome && prevNome !== 'SEM NOME') {
-      setQueue(q => prependAndReindex(q, { name: prevNome, instruction: prevGuiche || 'GUICHÊ' }).slice(0, 30));
+      const previous = previousCall.current;
+      setQueue(q => prependAndReindex(q, { name: prevNome, instruction: prevGuiche || 'GUICHÊ', modalidade: previous?.modalidade, localizacao: previous?.localizacao, calledAt: previous?.calledAt }).slice(0, 30));
     }
     // Update refs synchronously: multiple queued calls need not wait for a render.
     nomeRef.current = call.name;
@@ -300,8 +300,9 @@ export default function Page() {
     setNome(call.name);
     setGuiche(call.guicheNome);
     setHora(call.calledAt);
-    showPartnerCall(call, hasAudio);
-  }, [prependAndReindex, showPartnerCall]);
+    previousCall.current = call;
+    setCurrentCall(call);
+  }, [prependAndReindex]);
 
   const runWorker = useCallback(async () => {
     if (workerRunningRef.current) return;
@@ -325,7 +326,7 @@ export default function Page() {
       }
 
       try {
-        if ((item.kind === 'tts-mp3' || item.kind === 'tts-speech') && item.call) presentCall(item.call, true);
+        if ((item.kind === 'tts-mp3' || item.kind === 'tts-speech') && item.call) presentCall(item.call);
         if (item.kind === "atencao-mp3") {
           setAtencaoVisible(true);
 
@@ -376,7 +377,7 @@ export default function Page() {
           setAtencaoVisible(false);
         } else if (item.kind === "tcp") {
           presentCall(item.call ?? { id: item.key, name: item.nome, guicheNumero: item.guicheNumero,
-            guicheNome: item.guicheNome, recepcao: `Recepção ${painelId}`, calledAt: item.hora }, false);
+            guicheNome: item.guicheNome, recepcao: `Recepção ${painelId}`, calledAt: item.hora });
           await playDing();
         } else if (item.kind === "tts-mp3") {
           await playDing();
@@ -387,8 +388,6 @@ export default function Page() {
         }
       } catch (err) {
         console.warn("Audio queue item error:", err);
-      } finally {
-        if ((item.kind === 'tts-mp3' || item.kind === 'tts-speech') && item.call) finishPartnerCall(item.call.id);
       }
 
       lastPlayedRef.current = {
@@ -409,7 +408,7 @@ export default function Page() {
     }
 
     workerRunningRef.current = false;
-  }, [playDing, playAudioUrl, speakText, presentCall, finishPartnerCall, painelId]);
+  }, [playDing, playAudioUrl, speakText, presentCall, painelId]);
 
   const enqueue = useCallback(
     (item: QueueItem) => {
@@ -565,8 +564,7 @@ export default function Page() {
   }, [enqueue, painelId]);
 
   return (
-    <div className="h-dvh w-screen max-w-none mx-auto px-6 pt-8 pb-4 bg-slate-200 bg-cover bg-center bg-no-repeat flex flex-col">
-      {partnerCall && <PartnerCallOverlay key={partnerCall.call.id} {...partnerCall} />}
+    <div className="call-panel h-dvh w-screen max-w-none mx-auto px-6 pt-8 pb-4 bg-slate-200 bg-cover bg-center bg-no-repeat flex flex-col">
       {atencaoVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-600">
           <span
@@ -578,7 +576,7 @@ export default function Page() {
         </div>
       )}
 
-      <header className="text-center mb-6">
+      <header className="panel-sound-controls text-center mb-6">
         {!soundReady && (
           <button
             onClick={enableSound}
@@ -589,7 +587,8 @@ export default function Page() {
         )}
       </header>
 
-      <main className="flex-1 min-h-0 grid grid-cols-[3fr,1fr] grid-rows-[1fr,1fr] gap-6 pr-2">
+      <ThemeOnePanel current={currentCall} people={queue} painelId={painelId} />
+      <main className="panel-classic-content flex-1 min-h-0 grid grid-cols-[3fr,1fr] grid-rows-1 gap-6 pr-2">
         <NowCard
           painelId={painelId}
           name={nome}
@@ -597,7 +596,6 @@ export default function Page() {
           instruction={guiche || "GUICHÊ"}
         />
 
-        <Video painelId={painelId} />
 
         <QueueList people={queue} />
       </main>

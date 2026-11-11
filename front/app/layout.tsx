@@ -5,6 +5,7 @@ import "./globals.css";
 import AdminRouteFrame from "@/components/admin/AdminRouteFrame";
 import PatientSessionGuard from '@/components/totem/PatientSessionGuard';
 import OperatorSessionGuard from '@/components/totem/OperatorSessionGuard';
+import ThemeProvider from '@/components/ThemeProvider';
 
 // fontes locais
 const geistSans = localFont({
@@ -36,11 +37,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
       >
-        <OperatorSessionGuard><PatientSessionGuard><AdminRouteFrame>{children}</AdminRouteFrame></PatientSessionGuard></OperatorSessionGuard>
+        <ThemeProvider><OperatorSessionGuard><PatientSessionGuard><AdminRouteFrame>{children}</AdminRouteFrame></PatientSessionGuard></OperatorSessionGuard></ThemeProvider>
       </body>
     </html>
   );

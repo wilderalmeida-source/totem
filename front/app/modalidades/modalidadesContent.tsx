@@ -7,6 +7,7 @@ import { buscaModalidades, Modalidade, Paciente, Atendimento } from '@/services/
 import { modalContext } from '@/components/modals/providers'
 import { auditTotem } from '@/lib/audit-client'
 import { endPatientSession } from '@/lib/patient-session-client'
+import { Home, ArrowLeft, ChevronRight, ScanLine } from 'lucide-react'
 
 interface PacienteModalidadeStorage {
   dados: Paciente | null
@@ -121,7 +122,12 @@ export default function ModalidadePage() {
 
   return (
     <Base>
-      <div className="flex h-full flex-col items-center justify-center px-6">
+      <div className="modality-screen flex h-full flex-col items-center justify-center px-6">
+        <nav className="modality-modern-nav">
+          <button type="button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', 'modalidade'); router.replace('/'); }}><Home size={19} /></button>
+          <button type="button" onClick={voltar}><ArrowLeft size={19} />Voltar</button>
+          <span className="search-steps"><i /><i /><i />Etapa 2 de 3</span>
+        </nav>
         <h1 className="mb-4 text-4xl font-bold">
           Escolha a modalidade
         </h1>
@@ -140,9 +146,9 @@ export default function ModalidadePage() {
               <button
                 key={modalidade.cd_modalidade}
                 onClick={() => selecionarModalidade(modalidade)}
-                className="h-32 rounded-xl bg-gray-600 text-3xl font-bold text-white hover:bg-gray-700"
+                className="modality-card h-32 rounded-xl bg-gray-600 text-3xl font-bold text-white hover:bg-gray-700"
               >
-                {modalidade.ds_modalidade}
+                <span className="modality-icon"><ScanLine size={27} /></span><span>{modalidade.ds_modalidade}</span><ChevronRight className="modality-arrow" size={22} />
               </button>
             ))}
           </div>
@@ -157,7 +163,7 @@ export default function ModalidadePage() {
         <button
           type="button"
           onClick={voltar}
-          className="mt-8 h-14 rounded-xl bg-red-600 px-10 text-xl font-bold text-white hover:bg-red-700"
+          className="modality-legacy-back mt-8 h-14 rounded-xl bg-red-600 px-10 text-xl font-bold text-white hover:bg-red-700"
         >
           Voltar
         </button>

@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback, useRef, useTransition } from
 import Image from 'next/image'
 import ok from '@/assets/icons/ok.png'
 import atention from '@/assets/icons/atention.png'
+import { UserRoundCheck, FileCheck2 } from 'lucide-react'
 import { buscaPaciente, buscaSenhas, SenhasResponse, Senha } from '@/services/api'
 
 function uniqBy<T>(arr: T[], keyFn: (x: T) => string): T[] {
@@ -56,11 +57,12 @@ function TabelaSenhas({ titulo, itens, getNome, getKey, loading }: TabelaSenhasP
   const atendidos = itens.filter((s) => s.dt_saida).length
 
   return (
-    <div className="mr-5">
+    <div className="home-history-card mr-5">
       <div className="ml-3">
-        <h1 className="text-xl font-semibold">{titulo}</h1>
+        <h1 className="text-xl font-semibold"><span className="home-history-heading-icon" aria-hidden="true">{titulo === 'Entrega' ? <FileCheck2 size={20} /> : <UserRoundCheck size={20} />}</span>{titulo}<span className="home-history-count">{atendidos} / {itens.length}</span></h1>
+        <progress className="home-history-progress" value={atendidos} max={Math.max(1, itens.length)} aria-label={`${titulo}: ${atendidos} de ${itens.length} finalizados`} />
         <h2>
-          Total: {itens.length} | Atendidos: {atendidos} | Restantes:{' '}
+          Total: {itens.length} | {titulo === 'Entrega' ? 'Entregues' : 'Atendidos'}: {atendidos} | Restantes:{' '}
           {itens.length - atendidos}
         </h2>
       </div>
@@ -93,7 +95,8 @@ function TabelaSenhas({ titulo, itens, getNome, getKey, loading }: TabelaSenhasP
                     </td>
 
                     <td className="px-3 py-2 w-1/5">
-                      <StatusIcon done={!!senha.dt_saida} />
+                      <span className="home-status-legacy"><StatusIcon done={!!senha.dt_saida} /></span>
+                      <span className={`home-status-badge ${senha.dt_saida ? 'home-status-done' : 'home-status-waiting'}`}>{senha.dt_saida ? `✓ ${titulo === 'Entrega' ? 'Entregue' : 'Atendido'}` : 'Aguardando'}</span>
                     </td>
                   </tr>
                 )
@@ -225,7 +228,7 @@ export default function Historic() {
   return (
     <>
       {error && <p role="status" className="ml-3 text-sm text-gray-500">Histórico indisponível no momento. Você pode selecionar um serviço normalmente.</p>}
-      <div className="ml-3 flex">
+      <div className="home-history-grid ml-3 flex">
         <TabelaSenhas
           titulo="Atendimento"
           itens={senhasAtendimento}

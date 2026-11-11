@@ -48,7 +48,7 @@ function LoginForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
+    <main className="system-theme auth-theme flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white p-8 shadow-2xl">
         <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white">
           <LockKeyhole size={28} />

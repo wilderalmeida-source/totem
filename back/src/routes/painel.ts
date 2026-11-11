@@ -26,6 +26,7 @@ type PainelConfig = {
 let cachePaineis: PainelConfig[] = [];
 let cacheNomeModalidadeParaId = new Map<string, number>();
 let cacheRecepcoes = new Map<string, string>();
+let cacheLocalizacoes = new Map<string, string>();
 let recepcoesLoadedAt = 0;
 let recepcoesPending: Promise<void> | undefined;
 
@@ -33,9 +34,10 @@ async function refreshRecepcoes() {
   if (Date.now() - recepcoesLoadedAt < 30000) return;
   if (!recepcoesPending) {
     recepcoesPending = PrismaLog.recepcoes_modalidades.findMany({
-      where: { ativo: true }, select: { cd_modalidade: true, servico: true, recepcao: true },
+      where: { ativo: true }, select: { cd_modalidade: true, servico: true, recepcao: true, localizacao: true },
     }).then(recepcoes => {
       cacheRecepcoes = new Map(recepcoes.map(item => [`${item.cd_modalidade}:${item.servico}`, item.recepcao]));
+      cacheLocalizacoes = new Map(recepcoes.map(item => [`${item.cd_modalidade}:${item.servico}`, item.localizacao || '']));
       recepcoesLoadedAt = Date.now();
     }).finally(() => { recepcoesPending = undefined; });
   }
@@ -305,6 +307,9 @@ async function tratarMensagemTcp(
     const receptionService = servico === 'C' || servico === 'D' ? servico : 'B';
     const call = {
       id: auditContext.getStore()?.flowId ?? randomUUID(), name: nomeAux,
+      fullName: dsPaciente || nomeAux,
+      modalidade: extrairDadosTcp(out).modalidadeNome,
+      localizacao: cacheLocalizacoes.get(`${modalidade}:${receptionService}`) || '',
       guicheNumero: numeroGuiche, guicheNome: nomeGuiche,
       recepcao: cacheRecepcoes.get(`${modalidade}:${receptionService}`) || `Recepção ${painelId}`,
       calledAt: date.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }),

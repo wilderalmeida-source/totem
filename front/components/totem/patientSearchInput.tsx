@@ -25,7 +25,7 @@ export function PatientSearchInput({
   qrCodeDisabled = false,
 }: PatientSearchInputProps) {
   return (
-    <div className="flex w-full">
+    <div className="search-input-row flex w-full">
       <IMaskInput
         inputRef={inputRef}
         mask={getInputMask(tipo)}

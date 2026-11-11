@@ -42,3 +42,13 @@ test('different calls retain their own patient, counter and reception', () => {
   assert.equal(second.guicheNumero, '03');
   assert.equal(second.recepcao, 'Recepção 3');
 });
+
+test('preserva nome completo, modalidade e localizacao sem exigir campos novos de eventos antigos', () => {
+  const extended = parsePanelCall({ ...call, fullName: 'PACIENTE COM NOME COMPLETO', modalidade: 'Ultrassonografia', localizacao: 'Sala 3 · 2º andar' });
+  assert.equal(extended.fullName, 'PACIENTE COM NOME COMPLETO');
+  assert.equal(extended.modalidade, 'Ultrassonografia');
+  assert.equal(extended.localizacao, 'Sala 3 · 2º andar');
+  assert.equal(parsePanelCall(call).fullName, undefined);
+  assert.equal(parsePanelCall({ ...call, modalidade: {} }), null);
+  assert.equal(parsePanelCall({ ...call, fullName: 'X'.repeat(201) }), null);
+});

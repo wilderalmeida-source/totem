@@ -3,6 +3,7 @@ import Servicos from '@/components/ui/servicos'
 import Historic from '@/components/ui/historic'
 import AdminAccessTrigger from '@/components/AdminAccessTrigger'
 import LicenseAvailability from '@/components/totem/LicenseAvailability'
+import HomeThemeHeader from '@/components/totem/HomeThemeHeader'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,15 +18,16 @@ export default function Home() {
 
   return (
     <Base type="home">
-      <div className="flex w-full h-full flex-col">
-        <div>
+      <div className="home-screen flex w-full h-full flex-col">
+        <HomeThemeHeader company={empresa} description={process.env.EMPRESA_DESCRICAO || 'Atendimento e resultados'} />
+        <div className="home-welcome">
           <h2 className="text-6xl text-center">
             Olá, seja bem vindo ao <AdminAccessTrigger companyName={empresa} />!
           </h2>
           <h6 className="text-4xl text-center mt-4">Escolha uma opção abaixo.</h6>
         </div>
         <LicenseAvailability><Servicos servicos={services} /></LicenseAvailability>
-        <div className="flex flex-col h-full justify-end mb-5 xl:h-[700px]">
+        <div className="home-history flex flex-col h-full justify-end mb-5 xl:h-[700px]">
           <Historic />
         </div>
       </div>

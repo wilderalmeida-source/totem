@@ -15,16 +15,14 @@ import {
   UserCog,
   KeyRound,
   Clock3,
-  ImagePlay,
-  Handshake,
 } from "lucide-react";
 
 const sections = [
+  { href: '/informativos', title: 'Informativos', description: 'Cadastre, ordene e programe os avisos de texto dos painéis do Tema 1.', icon: ScrollText, color: 'bg-blue-600', permission: 'PAINEIS' },
+  { href: '/temas', title: 'Temas', description: 'Escolha o visual do sistema e a aparência clara ou escura.', icon: MonitorCog, color: 'bg-blue-600', permission: 'PAINEIS' },
   { href: '/licenca', title: 'Licença do sistema', description: 'Envie o arquivo de licença e consulte a ativação desta instalação.', icon: KeyRound, color: 'bg-blue-600', permission: 'USUARIOS' },
-  { href: '/parcerias', title: 'Parcerias', description: 'Organize logos, playlists e a apresentação dos parceiros nas chamadas.', icon: Handshake, color: 'bg-teal-600', permission: 'PAINEIS' },
   { href: '/acesso-totem', title: 'Acesso ao totem', description: 'Cadastre colaboradores, cartões e PINs para liberar os terminais.', icon: KeyRound, color: 'bg-teal-600', permission: 'USUARIOS' },
   { href: "/configuracao-atrasos", title: "Atrasos", description: "Defina a tolerância e o horário usado para destacar exames atrasados.", icon: Clock3, color: "bg-red-600", permission: 'PAINEIS' },
-  { href: "/midias", title: "Mídias e playlists", description: "Envie imagens e vídeos e organize a sequência exibida nos painéis.", icon: ImagePlay, color: "bg-fuchsia-600", permission: 'PAINEIS' },
   { href: "/atencao", title: "Aviso de atenção", description: "Configure e reproduza o aviso sonoro da recepção.", icon: BellRing, color: "bg-amber-500", permission: 'ATENCAO' },
   { href: "/configuracao", title: "Voz e áudio", description: "Escolha vozes, velocidade, volume e regras automáticas.", icon: SlidersHorizontal, color: "bg-violet-600", permission: 'VOZ' },
   { href: "/dic", title: "Dicionário", description: "Ajuste a pronúncia de nomes e termos usados nas chamadas.", icon: BookOpenText, color: "bg-emerald-600", permission: 'DICIONARIO' },

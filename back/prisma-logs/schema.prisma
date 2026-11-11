@@ -31,6 +31,17 @@ model TtsWeekVoice {
   @@unique([year, week])
 }
 
+model configuracao_visual {
+  id   Int    @id @default(1)
+  tema String @default("theme2")
+  modo String @default("light")
+}
+
+model configuracao_informativos {
+  id     Int  @id @default(1)
+  config Json @default("{\"enabled\":true,\"items\":[]}")
+}
+
 model TtsSettings {
   id          Int      @id @default(autoincrement())
   rate        Float    @default(1.0)

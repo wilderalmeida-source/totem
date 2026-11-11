@@ -428,7 +428,7 @@ export function DialogPatient({
         else setShowModal(true);
       }}
     >
-      <DialogContent>
+      <DialogContent className="patient-dialog" data-scanning={dados?.qr ? 'true' : 'false'}>
         {falhaEmissao ? (
           <div className="flex flex-col gap-6 py-4 text-center" role="alert">
             <DialogHeader>
@@ -484,10 +484,10 @@ export function DialogPatient({
             {/* Header */}
             {!invalido && (
               <DialogHeader>
-                <DialogTitle className="text-xl font-normal">
+                <DialogTitle className="patient-service-title text-xl font-normal">
                   {SERVICO_LABEL[dados?.servico ?? ""] ?? "Atendimento"}
                 </DialogTitle>
-                <DialogDescription className="text-3xl font-bold text-black">
+                <DialogDescription className="patient-legacy-name text-3xl font-bold text-black">
                   {dados?.qr
                     ? dados.ds_paciente
                     : `NOME: ${dados?.ds_paciente}`}
@@ -496,6 +496,7 @@ export function DialogPatient({
             )}
 
             {/* Conteúdo principal */}
+            {!invalido && !dados?.qr && <div className="patient-modern-name"><span className="patient-avatar" aria-hidden="true">{dados?.ds_paciente?.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('')}</span><div><small>Paciente</small><strong>{dados?.ds_paciente}</strong></div></div>}
             {invalido ? (
               <div>
                 <h2 className="font-bold text-xl">{invalido}</h2>
@@ -526,13 +527,12 @@ export function DialogPatient({
                 )}
                 {dados?.cd_paciente && (
                   <h2 className="font-bold text-xl">
-                    ID Paciente: {dados.cd_paciente}
+                    <span className="patient-field-label">ID do paciente: </span><strong>{dados.cd_paciente}</strong>
                   </h2>
                 )}
                 {dados?.dt_nascimento && (
                   <h2 className="font-bold text-xl">
-                    Data de Nascimento:{" "}
-                    {formatarDataNascimento(dados.dt_nascimento)}
+                    <span className="patient-field-label">Nascimento: </span><strong>{formatarDataNascimento(dados.dt_nascimento)}</strong>
                   </h2>
                 )}
               </div>
@@ -540,7 +540,8 @@ export function DialogPatient({
 
             {/* Tabela de exames */}
             {!invalido && exames && exames.length > 0 && (
-              <div className="w-full overflow-hidden rounded-lg border border-slate-300">
+              <div className="patient-exams w-full overflow-hidden rounded-lg border border-slate-300">
+              <div className="patient-exams-heading"><span>{dados?.servico === 'C' ? 'Exames para retirada' : 'Exames do atendimento'}</span><span>{exames.flatMap(a => a.exames ?? []).filter(e => e.dt_assinado).length} laudados</span></div>
               <table className="w-full table-fixed border-collapse text-left text-sm text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase sticky top-0">
                   <tr>
@@ -571,7 +572,7 @@ export function DialogPatient({
                         <td className={`px-4 py-3 ${mostraHorarioPrevisto ? "font-bold text-gray-800" : ""}`}>
                           {mostraHorarioPrevisto
                             ? formatarHoraChegada(atend)
-                            : <StatusIcon done={!!exame.dt_assinado} />}
+                            : <><span className="patient-status-legacy"><StatusIcon done={!!exame.dt_assinado} /></span><span className={`patient-status-badge ${exame.dt_assinado ? 'patient-status-done' : 'patient-status-pending'}`}>{exame.dt_assinado ? '✓ Laudado' : 'Pendente'}</span></>}
                         </td>
                       </tr>
                     )),
@@ -604,11 +605,11 @@ export function DialogPatient({
               <Button
                 type="button"
                 variant="outline"
-                className="bg-green-400"
+                className="patient-confirm bg-green-400"
                 onClick={() => void gerarSenha()}
                 disabled={loading}
               >
-                {loading ? <OrbitProgress /> : "OK"}
+                {loading ? <OrbitProgress /> : <><span className="patient-confirm-legacy">OK</span><span className="patient-confirm-modern">{dados?.servico === 'C' ? 'Confirmar entrega' : 'Confirmar atendimento'}</span></>}
               </Button>
             )}
 
@@ -616,7 +617,7 @@ export function DialogPatient({
             <Button
               type="button"
               variant="outline"
-              className="bg-red-400"
+              className="patient-cancel bg-red-400"
               onClick={handleCancelar}
             >
               Cancelar

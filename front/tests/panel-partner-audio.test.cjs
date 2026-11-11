@@ -5,8 +5,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
 
-test('each popup follows its own queued audio; TCP metadata and attention do not duplicate logos', async () => {
-  const effects = [], shown = [], finished = [], audios = [], timers = new Map();
+test('panel keeps queued patient calls and audio without partner popups', async () => {
+  const effects = [], shown = [], audios = [], timers = new Map();
   let stream, timerId = 0;
   const tick = () => new Promise(resolve => setImmediate(resolve));
   class Audio {
@@ -22,13 +22,13 @@ test('each popup follows its own queued audio; TCP metadata and attention do not
     exports, Audio, Date, console, setTimeout: fn => { timers.set(++timerId, fn); return timerId; }, clearTimeout: id => timers.delete(id),
     window: { setTimeout: fn => { timers.set(++timerId, fn); return timerId; }, clearTimeout: id => timers.delete(id) },
     EventSource: class { constructor() { stream = this; } close() {} },
-    require: name => name === 'react' ? { useState: initial => [initial, () => {}], useRef: current => ({ current }), useCallback: fn => fn, useEffect: fn => effects.push(fn) }
+    require: name => name === 'react' ? { useState: initial => [initial, value => { if (value === "A" || value === "B") shown.push(value); }], useRef: current => ({ current }), useCallback: fn => fn, useEffect: fn => effects.push(fn) }
       : name === 'react/jsx-runtime' ? require(name)
       : name === 'next/navigation' ? { useParams: () => ({ id: '1' }) }
-      : name.includes('usePartnerCall') ? { usePartnerCall: () => ({ view: null, show: call => shown.push(call.id), finish: id => finished.push(id) }) }
       : name.includes('panel-call') ? { parsePanelCall: value => value ?? null }
       : name.includes('audit-client') ? { auditTotem() {} } : () => null,
   });
+  assert.doesNotMatch(source, /PartnerCallOverlay|usePartnerCall|api\/partnerships/);
   exports.default(); effects.forEach(fn => fn());
   const send = message => stream.onmessage({ data: JSON.stringify({ message: JSON.stringify({ painelId: 1, ...message }) }) });
   const call = id => ({ id, name: id, guicheNumero: '01', guicheNome: 'Guichê 01', recepcao: 'Recepção 1', calledAt: '10:00' });
@@ -40,7 +40,7 @@ test('each popup follows its own queued audio; TCP metadata and attention do not
   send({ type: 'tts:audio', payload: { call: call('B'), eventId: 'same-cache-key', ttsBody: { audioContent: 'b.mp3' } } });
   assert.deepEqual(shown, ['A']);
   audios.at(-1).events.ended(); await tick();
-  assert.deepEqual(finished, ['A']);
+  assert.deepEqual(shown, ['A']);
   timers.get(timerId)(); await tick();
   assert.deepEqual(shown, ['A', 'B']);
   audios.at(-1).events.ended(); await tick();
@@ -48,5 +48,5 @@ test('each popup follows its own queued audio; TCP metadata and attention do not
   await tick();
   assert.deepEqual(shown, ['A', 'B']);
   audios.at(-1).events.ended(); await tick();
-  assert.deepEqual(finished, ['A', 'B']);
+  assert.deepEqual(shown, ['A', 'B']);
 });

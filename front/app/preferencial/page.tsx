@@ -42,8 +42,8 @@ export default async function Preferencial({ searchParams }: PageProps) {
 
       return (
             <Base type="preferencial">
-                  <div className="flex mx-auto flex-col">
-                        <div>
+                  <div className="priority-screen flex mx-auto flex-col">
+                        <div className="priority-legacy-heading">
                               <h2 className="text-5xl text-center">Prioridade de Atendimento</h2>
                               <h6 className="text-2xl text-center mt-4">Escolha uma opção abaixo</h6>
                         </div>

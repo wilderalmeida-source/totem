@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BellRing, BookOpenText, Clock3, Gauge, ImagePlay, KeyRound, LayoutDashboard, LogOut, MapPin, Menu, MonitorCog, ScrollText, SlidersHorizontal, UserCog, UsersRound, X } from "lucide-react";
+import { BellRing, BookOpenText, Clock3, Gauge, KeyRound, LayoutDashboard, LogOut, MapPin, Menu, MonitorCog, ScrollText, SlidersHorizontal, UserCog, UsersRound, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 
 const sections = [
   { href: '/licenca', label: 'Licença do sistema', icon: KeyRound, permission: 'USUARIOS' },
   { href: "/configuracoes", label: "Central", icon: LayoutDashboard, permission: null },
+  { href: '/temas', label: 'Temas', icon: MonitorCog, permission: 'PAINEIS' },
+  { href: '/informativos', label: 'Informativos', icon: ScrollText, permission: 'PAINEIS' },
   { href: '/acesso-totem', label: 'Acesso ao totem', icon: KeyRound, permission: 'USUARIOS' },
   { href: "/configuracao-atrasos", label: "Atrasos", icon: Clock3, permission: 'PAINEIS' },
-  { href: "/midias", label: "Mídias", icon: ImagePlay, permission: 'PAINEIS' },
   { href: "/atencao", label: "Aviso de atenção", icon: BellRing, permission: 'ATENCAO' },
   { href: "/configuracao", label: "Voz e áudio", icon: SlidersHorizontal, permission: 'VOZ' },
   { href: "/dic", label: "Dicionário", icon: BookOpenText, permission: 'DICIONARIO' },
@@ -40,7 +41,7 @@ export default function AdminRouteFrame({ children }: { children: ReactNode }) {
   const current = sections.find((section) => section.href === pathname);
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
+    <div className="system-theme admin-theme min-h-screen bg-slate-100 text-slate-900">
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-4 px-4 md:px-8">
           <Link href="/configuracoes" className="flex items-center gap-3 font-bold text-slate-950">

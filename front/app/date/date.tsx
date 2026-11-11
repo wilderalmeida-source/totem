@@ -230,7 +230,7 @@ export default function DataNasc() {
   if (saindo) return <div role="status">Encerrando atendimento...</div>
 
   return (
-    <div className="overflow-hidden h-screen">
+    <div className="search-screen search-confirmation overflow-hidden h-screen" data-search-type={tipo === 'DATA' ? 'NOME' : 'DATA'}>
       <TotemHeader
         title={title}
         onAdvance={avancar}

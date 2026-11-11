@@ -6,6 +6,8 @@ import {
 } from "@/lib/admin-session";
 
 const routePermissions: Array<[string, string]> = [
+  ['/informativos', 'PAINEIS'],
+  ['/temas', 'PAINEIS'],
   ['/licenca', 'USUARIOS'],
   ['/atencao', 'ATENCAO'], ['/configuracao', 'VOZ'], ['/dic', 'DICIONARIO'],
   ['/guiche', 'GUICHES'], ['/recepcao', 'RECEPCOES'], ['/setup-painel', 'PAINEIS'],
@@ -66,6 +68,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/informativos/:path*',
+    '/temas/:path*',
     '/licenca/:path*',
     '/', '/totem/:path*', '/date/:path*', '/preferencial/:path*', '/modalidades/:path*',
     '/api/patient-session/:path*', '/api/backend/clinux/pacientes/:path*',
