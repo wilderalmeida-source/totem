@@ -25,6 +25,22 @@ type PainelConfig = {
 
 let cachePaineis: PainelConfig[] = [];
 let cacheNomeModalidadeParaId = new Map<string, number>();
+let cacheRecepcoes = new Map<string, string>();
+let recepcoesLoadedAt = 0;
+let recepcoesPending: Promise<void> | undefined;
+
+async function refreshRecepcoes() {
+  if (Date.now() - recepcoesLoadedAt < 30000) return;
+  if (!recepcoesPending) {
+    recepcoesPending = PrismaLog.recepcoes_modalidades.findMany({
+      where: { ativo: true }, select: { cd_modalidade: true, servico: true, recepcao: true },
+    }).then(recepcoes => {
+      cacheRecepcoes = new Map(recepcoes.map(item => [`${item.cd_modalidade}:${item.servico}`, item.recepcao]));
+      recepcoesLoadedAt = Date.now();
+    }).finally(() => { recepcoesPending = undefined; });
+  }
+  return recepcoesPending;
+}
 
 function normalizarTexto(valor: string): string {
   return String(valor ?? "")
@@ -139,6 +155,8 @@ async function carregarCachePainel(fastify: FastifyInstance) {
         Number(modalidade.cd_modalidade)
       );
     }
+
+    await refreshRecepcoes();
 
     fastify.log.info(
       {
@@ -282,6 +300,15 @@ async function tratarMensagemTcp(
     const datecomplete = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 
     const eventId = `${textoChamada}-${datecomplete}`;
+    await refreshRecepcoes().catch(() => fastify.log.warn('Não foi possível atualizar as recepções da chamada'));
+    const modalidade = cacheNomeModalidadeParaId.get(normalizarTexto(extrairDadosTcp(out).modalidadeNome));
+    const receptionService = servico === 'C' || servico === 'D' ? servico : 'B';
+    const call = {
+      id: auditContext.getStore()?.flowId ?? randomUUID(), name: nomeAux,
+      guicheNumero: numeroGuiche, guicheNome: nomeGuiche,
+      recepcao: cacheRecepcoes.get(`${modalidade}:${receptionService}`) || `Recepção ${painelId}`,
+      calledAt: date.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }),
+    };
 
     flowAudit('tts_iniciado', 'audio.geracao', { painelId, code: 'TTS_REQUESTED' });
     const ttsStart = Date.now();
@@ -308,6 +335,8 @@ async function tratarMensagemTcp(
       ts: Date.now(),
       data: out,
       payload: {
+        call,
+        followsAudio: true,
         guiche: {
           numero: numeroGuiche,
           nome: nomeGuiche,
@@ -316,14 +345,23 @@ async function tratarMensagemTcp(
     });
 
     flowAudit('tts_resposta', 'audio.geracao', { painelId, status: ttsRes.statusCode, durationMs: Date.now() - ttsStart });
-    if (ttsRes.statusCode === 200) {
-      const ttsBody = ttsRes.json() as TtsBody;
+    {
+      // Preserve the call and speech fallback even if the TTS service rejects it.
+      let ttsBody: TtsBody = { errorTTS: textoChamada };
+      if (ttsRes.statusCode === 200) {
+        try {
+          const candidate = ttsRes.json();
+          if (typeof candidate?.audioContent === 'string' || typeof candidate?.errorTTS === 'string') ttsBody = candidate;
+        } catch { /* Use browser speech for a malformed TTS response. */ }
+      }
 
       fastify.broadcast({
         type: "tts:audio",
         painelId,
         ts: Date.now(),
         payload: {
+          call,
+          traceId: call.id,
           eventId,
           ttsBody,
           guiche: {

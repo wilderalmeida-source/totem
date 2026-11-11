@@ -6,9 +6,10 @@ import {
 } from "@/lib/admin-session";
 
 const routePermissions: Array<[string, string]> = [
+  ['/licenca', 'USUARIOS'],
   ['/atencao', 'ATENCAO'], ['/configuracao', 'VOZ'], ['/dic', 'DICIONARIO'],
   ['/guiche', 'GUICHES'], ['/recepcao', 'RECEPCOES'], ['/setup-painel', 'PAINEIS'],
-  ['/configuracao-atrasos', 'PAINEIS'], ['/midias', 'PAINEIS'],
+  ['/configuracao-atrasos', 'PAINEIS'], ['/midias', 'PAINEIS'], ['/parcerias', 'PAINEIS'],
   ['/status', 'STATUS'], ['/logs', 'LOGS'], ['/usuarios', 'USUARIOS'],
   ['/api/guiches', 'GUICHES'], ['/api/paineis-config', 'PAINEIS'],
   ['/acesso-totem', 'USUARIOS'],
@@ -65,6 +66,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/licenca/:path*',
     '/', '/totem/:path*', '/date/:path*', '/preferencial/:path*', '/modalidades/:path*',
     '/api/patient-session/:path*', '/api/backend/clinux/pacientes/:path*',
     '/api/backend/clinux/totem/:path*', '/api/backend/clinux/senhas', '/acesso-totem/:path*',
@@ -78,6 +80,7 @@ export const config = {
     "/setup-painel/:path*",
     "/configuracao-atrasos/:path*",
     "/midias/:path*",
+    "/parcerias/:path*",
     "/status/:path*",
     "/logs/:path*",
     "/usuarios/:path*",

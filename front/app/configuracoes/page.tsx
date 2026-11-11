@@ -16,9 +16,12 @@ import {
   KeyRound,
   Clock3,
   ImagePlay,
+  Handshake,
 } from "lucide-react";
 
 const sections = [
+  { href: '/licenca', title: 'Licença do sistema', description: 'Envie o arquivo de licença e consulte a ativação desta instalação.', icon: KeyRound, color: 'bg-blue-600', permission: 'USUARIOS' },
+  { href: '/parcerias', title: 'Parcerias', description: 'Organize logos, playlists e a apresentação dos parceiros nas chamadas.', icon: Handshake, color: 'bg-teal-600', permission: 'PAINEIS' },
   { href: '/acesso-totem', title: 'Acesso ao totem', description: 'Cadastre colaboradores, cartões e PINs para liberar os terminais.', icon: KeyRound, color: 'bg-teal-600', permission: 'USUARIOS' },
   { href: "/configuracao-atrasos", title: "Atrasos", description: "Defina a tolerância e o horário usado para destacar exames atrasados.", icon: Clock3, color: "bg-red-600", permission: 'PAINEIS' },
   { href: "/midias", title: "Mídias e playlists", description: "Envie imagens e vídeos e organize a sequência exibida nos painéis.", icon: ImagePlay, color: "bg-fuchsia-600", permission: 'PAINEIS' },

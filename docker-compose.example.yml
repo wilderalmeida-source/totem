@@ -45,6 +45,7 @@ services:
     volumes:
       - ./public/audios:/app/public/audios
       - audit_backend:/app/data/audit-outbox
+      - license_backend:/app/data/license
       - ./export/modelos-rtf:/app/export/modelos-rtf
     depends_on:
       postgres_infra:
@@ -75,6 +76,7 @@ services:
       - audit_frontend:/app/data/audit-outbox
 
 volumes:
+  license_backend:
   audit_backend:
   audit_frontend:
   pgdata:

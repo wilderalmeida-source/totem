@@ -2,6 +2,7 @@ import Base from '@/components/ui/base'
 import Servicos from '@/components/ui/servicos'
 import Historic from '@/components/ui/historic'
 import AdminAccessTrigger from '@/components/AdminAccessTrigger'
+import LicenseAvailability from '@/components/totem/LicenseAvailability'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ export default function Home() {
           </h2>
           <h6 className="text-4xl text-center mt-4">Escolha uma opção abaixo.</h6>
         </div>
-        <Servicos servicos={services} />
+        <LicenseAvailability><Servicos servicos={services} /></LicenseAvailability>
         <div className="flex flex-col h-full justify-end mb-5 xl:h-[700px]">
           <Historic />
         </div>

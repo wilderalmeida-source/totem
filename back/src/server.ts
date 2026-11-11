@@ -1,6 +1,9 @@
 import { auditOutbox } from './lib/persistent-audit'
 import { registerAdminAudit } from './lib/admin-audit'
 import { startAuditRetention } from './lib/audit-retention'
+import { LicenseManager } from './lib/license-manager'
+import { licensingRoutes } from './routes/license'
+import { recordAudit } from './lib/persistent-audit'
 import Fastify from "fastify";
 import { auditContext, auditIdentifier, flowAudit } from './lib/flow-audit'
 import cors from "@fastify/cors"
@@ -32,8 +35,14 @@ import { atendimentosTotemRoute } from './routes/atendimentos-totem';
 async function bootstrap() {
   auditOutbox.start()
   const fastify = Fastify({ logger: true, })
+  const licenseManager = new LicenseManager({
+    directory: process.env.LICENSE_STATE_DIRECTORY || path.join(process.cwd(), 'data/license'),
+    event: (action, metadata) => recordAudit({ category: 'ADMIN', actor: 'sistema', action, step: 'licenciamento', metadata }),
+  })
+  await licenseManager.initialize()
+  licenseManager.start()
   const stopRetention = startAuditRetention()
-  fastify.addHook('onClose', async () => { stopRetention(); await auditOutbox.stop() })
+  fastify.addHook('onClose', async () => { stopRetention(); await licenseManager.stop(); await auditOutbox.stop() })
   fastify.addHook('onRequest', (request, _reply, done) => {
     auditContext.run({ flowId: auditIdentifier(request.headers['x-flow-id']) ?? '',
       device: auditIdentifier(request.headers['x-device-id']) ?? 'nao_informado' }, done)
@@ -63,6 +72,7 @@ async function bootstrap() {
     },
   })
   fastify.addHook('preHandler', authenticate)
+  await licensingRoutes(fastify, licenseManager)
   registerAdminAudit(fastify)
 
   await fastify.register(painelClinux);

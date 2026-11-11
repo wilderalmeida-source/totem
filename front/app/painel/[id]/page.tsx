@@ -6,6 +6,9 @@ import { useParams } from "next/navigation";
 import NowCard from "@/components/NowCard";
 import QueueList, { QueuePerson } from "@/components/QueueList";
 import Video from "@/components/Video";
+import PartnerCallOverlay from '@/components/PartnerCallOverlay';
+import { usePartnerCall } from '@/hooks/usePartnerCall';
+import { parsePanelCall, type PanelCall } from '@/lib/panel-call';
 
 type TtsBody = { audioContent: string } | { errorTTS: string };
 
@@ -16,6 +19,8 @@ type WsMsg =
     ts?: number;
     data: string;
     payload?: {
+      call?: unknown;
+      followsAudio?: boolean;
       guiche?: {
         numero?: string;
         nome?: string;
@@ -27,6 +32,7 @@ type WsMsg =
     painelId?: number;
     ts?: number;
     payload: {
+      call?: unknown;
       traceId?: string;
       eventId?: string;
       eventID?: string;
@@ -74,6 +80,7 @@ type QueueItem =
   }
   | {
     kind: "tcp";
+    call?: PanelCall;
     raw: string;
     guicheNumero: string;
     guicheNome: string;
@@ -83,6 +90,7 @@ type QueueItem =
   }
   | {
     kind: "tts-mp3";
+    call?: PanelCall;
     traceId?: string;
     proxyUrl: string;
     key: string;
@@ -90,6 +98,7 @@ type QueueItem =
   }
   | {
     kind: "tts-speech";
+    call?: PanelCall;
     traceId?: string;
     text: string;
     key: string;
@@ -99,6 +108,7 @@ type QueueItem =
 export default function Page() {
   const params = useParams();
   const painelId = Number(params.id ?? 1);
+  const { view: partnerCall, show: showPartnerCall, finish: finishPartnerCall } = usePartnerCall(painelId);
 
   const [atencaoVisible, setAtencaoVisible] = useState(false);
   const [guiche, setGuiche] = useState("");
@@ -221,30 +231,49 @@ export default function Page() {
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
+      let settled = false;
+      let started = false;
+      let voiceTimer: ReturnType<typeof setTimeout>;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(watchdog);
+        clearTimeout(voiceTimer);
+        window.speechSynthesis.removeEventListener('voiceschanged', trySpeak);
+        resolve();
+      };
+      const watchdog = setTimeout(() => {
+        auditTotem('audio_sem_confirmacao', 'painel.speech', { traceId, code: 'SPEECH_TIMEOUT', outcome: 'FALHOU' });
+        done();
+        window.speechSynthesis.cancel();
+      }, 60000);
       utterance.lang = "pt-BR";
       utterance.rate = 1;
       utterance.pitch = 1;
       utterance.volume = 1;
-      utterance.onend = () => resolve();
+      utterance.onend = done;
       utterance.onerror = event => {
         auditTotem('audio_falhou', 'painel.speech', { traceId, code: 'SPEECH_FAILED', outcome: 'FALHOU', reason: event.error });
-        resolve();
+        done();
       };
 
       const trySpeak = () => {
+        if (settled || started) return;
+        started = true;
         const voz = window.speechSynthesis
           .getVoices()
           .find((v) => v.lang === "pt-BR");
 
         if (voz) utterance.voice = voz;
 
-        window.speechSynthesis.speak(utterance);
+        try { window.speechSynthesis.speak(utterance); } catch { done(); }
       };
 
       if (window.speechSynthesis.getVoices().length > 0) {
         trySpeak();
       } else {
-        window.speechSynthesis.onvoiceschanged = trySpeak;
+        window.speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true });
+        voiceTimer = setTimeout(trySpeak, 1000);
       }
     });
   }, []);
@@ -258,6 +287,21 @@ export default function Page() {
   );
 
   const REREAD_DELAY_MS = 4000;
+
+  const presentCall = useCallback((call: PanelCall, hasAudio: boolean) => {
+    const prevNome = nomeRef.current;
+    const prevGuiche = guicheRef.current;
+    if (prevNome && prevNome !== 'SEM NOME') {
+      setQueue(q => prependAndReindex(q, { name: prevNome, instruction: prevGuiche || 'GUICHÊ' }).slice(0, 30));
+    }
+    // Update refs synchronously: multiple queued calls need not wait for a render.
+    nomeRef.current = call.name;
+    guicheRef.current = call.guicheNome;
+    setNome(call.name);
+    setGuiche(call.guicheNome);
+    setHora(call.calledAt);
+    showPartnerCall(call, hasAudio);
+  }, [prependAndReindex, showPartnerCall]);
 
   const runWorker = useCallback(async () => {
     if (workerRunningRef.current) return;
@@ -281,6 +325,7 @@ export default function Page() {
       }
 
       try {
+        if ((item.kind === 'tts-mp3' || item.kind === 'tts-speech') && item.call) presentCall(item.call, true);
         if (item.kind === "atencao-mp3") {
           setAtencaoVisible(true);
 
@@ -330,23 +375,8 @@ export default function Page() {
           await speakText(item.text);
           setAtencaoVisible(false);
         } else if (item.kind === "tcp") {
-          const prevNome = nomeRef.current;
-          const prevGuiche = guicheRef.current;
-
-          if (prevNome && prevNome !== "SEM NOME") {
-            setQueue((q) =>
-              prependAndReindex(q, {
-                name: prevNome,
-                instruction:
-                  prevGuiche || "GUICHÊ",
-              })
-            );
-          }
-
-          setNome(item.nome);
-          setGuiche(item.guicheNome);
-          setHora(item.hora);
-
+          presentCall(item.call ?? { id: item.key, name: item.nome, guicheNumero: item.guicheNumero,
+            guicheNome: item.guicheNome, recepcao: `Recepção ${painelId}`, calledAt: item.hora }, false);
           await playDing();
         } else if (item.kind === "tts-mp3") {
           await playDing();
@@ -357,6 +387,8 @@ export default function Page() {
         }
       } catch (err) {
         console.warn("Audio queue item error:", err);
+      } finally {
+        if ((item.kind === 'tts-mp3' || item.kind === 'tts-speech') && item.call) finishPartnerCall(item.call.id);
       }
 
       lastPlayedRef.current = {
@@ -377,7 +409,7 @@ export default function Page() {
     }
 
     workerRunningRef.current = false;
-  }, [playDing, playAudioUrl, speakText, prependAndReindex]);
+  }, [playDing, playAudioUrl, speakText, presentCall, finishPartnerCall, painelId]);
 
   const enqueue = useCallback(
     (item: QueueItem) => {
@@ -432,6 +464,10 @@ export default function Page() {
         }
 
         if (isTcpMsg(msg)) {
+          const call = parsePanelCall(msg.payload?.call);
+          // New backends attach the same call to the audio event. Present it when
+          // that queued audio starts, instead of displaying another patient's name.
+          if (call && msg.payload?.followsAudio === true) return;
           const raw = msg.data;
           const parts = raw.split("-").map((p: string) => p.trim());
 
@@ -452,6 +488,7 @@ export default function Page() {
 
           enqueue({
             kind: "tcp",
+            call: call ?? undefined,
             raw,
             guicheNumero,
             guicheNome,
@@ -465,6 +502,7 @@ export default function Page() {
 
         if (isTtsAudioMsg(msg)) {
           const { ttsBody, eventID, eventId, traceId } = msg.payload;
+          const call = parsePanelCall(msg.payload.call) ?? undefined;
           auditTotem('audio_evento_recebido', 'painel.websocket', { traceId, painelId: msg.painelId, code: 'AUDIO_EVENT_RECEIVED' });
           const id = eventID ?? eventId ?? "";
 
@@ -485,9 +523,10 @@ export default function Page() {
 
             enqueue({
               kind: "tts-mp3",
+              call,
               traceId,
               proxyUrl,
-              key: String(id) || proxyUrl,
+              key: call?.id || String(id) || proxyUrl,
               enqueuedAt: Date.now(),
             });
 
@@ -507,9 +546,10 @@ export default function Page() {
 
             enqueue({
               kind: "tts-speech",
+              call,
               traceId,
               text: ttsBody.errorTTS,
-              key: String(id) || ttsBody.errorTTS,
+              key: call?.id || String(id) || ttsBody.errorTTS,
               enqueuedAt: Date.now(),
             });
 
@@ -526,6 +566,7 @@ export default function Page() {
 
   return (
     <div className="h-dvh w-screen max-w-none mx-auto px-6 pt-8 pb-4 bg-slate-200 bg-cover bg-center bg-no-repeat flex flex-col">
+      {partnerCall && <PartnerCallOverlay key={partnerCall.call.id} {...partnerCall} />}
       {atencaoVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-600">
           <span

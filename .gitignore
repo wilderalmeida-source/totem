@@ -5,3 +5,4 @@ docker-compose.yml
 public/
 docs/
 /back/prisma/app/generated/
+/back/data/license/

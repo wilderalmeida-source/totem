@@ -6,6 +6,7 @@ import { BellRing, BookOpenText, Clock3, Gauge, ImagePlay, KeyRound, LayoutDashb
 import { ReactNode, useEffect, useState } from "react";
 
 const sections = [
+  { href: '/licenca', label: 'Licença do sistema', icon: KeyRound, permission: 'USUARIOS' },
   { href: "/configuracoes", label: "Central", icon: LayoutDashboard, permission: null },
   { href: '/acesso-totem', label: 'Acesso ao totem', icon: KeyRound, permission: 'USUARIOS' },
   { href: "/configuracao-atrasos", label: "Atrasos", icon: Clock3, permission: 'PAINEIS' },

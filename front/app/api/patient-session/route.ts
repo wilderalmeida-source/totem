@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
         pacientes: Array.isArray(result) ? result.slice(0, 10).map(p => ({ cd_paciente: p?.cd_paciente, ds_paciente: p?.ds_paciente, dt_nascimento: p?.dt_nascimento, tentativas: p?.tentativas })) : undefined,
         erro: !Array.isArray(result) && typeof result?.error === 'string' ? result.error.slice(0, 300) : undefined,
       })
+      if (!upstream.ok && result?.code === 'LICENSE_UNAVAILABLE') return fail('Totem temporariamente indisponível. Procure a recepção.', 503)
     }
     if (!upstream.ok) return fail('Não foi possível confirmar o paciente.', 502)
     const body = await upstream.json()

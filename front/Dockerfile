@@ -34,14 +34,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # O segredo do 'standalone': ele copia apenas o necessário para rodar
 # Setamos as permissões para o usuário que criamos
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-RUN mkdir -p /app/data/audit-outbox && chown -R nextjs:nodejs /app/data
+RUN mkdir -p /app/data/audit-outbox /app/public/videos && chown -R nextjs:nodejs /app/data /app/public/videos
 USER nextjs
 
 EXPOSE 3000

@@ -12,6 +12,22 @@ const prismalog_1 = require("../../config/prismalog");
 const prismaDB_1 = require("../../config/prismaDB");
 let cachePaineis = [];
 let cacheNomeModalidadeParaId = new Map();
+let cacheRecepcoes = new Map();
+let recepcoesLoadedAt = 0;
+let recepcoesPending;
+async function refreshRecepcoes() {
+    if (Date.now() - recepcoesLoadedAt < 30000)
+        return;
+    if (!recepcoesPending) {
+        recepcoesPending = prismalog_1.PrismaLog.recepcoes_modalidades.findMany({
+            where: { ativo: true }, select: { cd_modalidade: true, servico: true, recepcao: true },
+        }).then(recepcoes => {
+            cacheRecepcoes = new Map(recepcoes.map(item => [`${item.cd_modalidade}:${item.servico}`, item.recepcao]));
+            recepcoesLoadedAt = Date.now();
+        }).finally(() => { recepcoesPending = undefined; });
+    }
+    return recepcoesPending;
+}
 function normalizarTexto(valor) {
     return String(valor ?? "")
         .trim()
@@ -99,6 +115,7 @@ async function carregarCachePainel(fastify) {
         for (const modalidade of modalidades) {
             cacheNomeModalidadeParaId.set(normalizarTexto(modalidade.ds_modalidade), Number(modalidade.cd_modalidade));
         }
+        await refreshRecepcoes();
         fastify.log.info({
             totalPaineis: cachePaineis.length,
             totalModalidades: cacheNomeModalidadeParaId.size,
@@ -192,6 +209,15 @@ async function tratarMensagemTcp(fastify, raw, painelId) {
         const date = new Date();
         const datecomplete = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         const eventId = `${textoChamada}-${datecomplete}`;
+        await refreshRecepcoes().catch(() => fastify.log.warn('Não foi possível atualizar as recepções da chamada'));
+        const modalidade = cacheNomeModalidadeParaId.get(normalizarTexto(extrairDadosTcp(out).modalidadeNome));
+        const receptionService = servico === 'C' || servico === 'D' ? servico : 'B';
+        const call = {
+            id: flow_audit_1.auditContext.getStore()?.flowId ?? (0, node_crypto_1.randomUUID)(), name: nomeAux,
+            guicheNumero: numeroGuiche, guicheNome: nomeGuiche,
+            recepcao: cacheRecepcoes.get(`${modalidade}:${receptionService}`) || `Recepção ${painelId}`,
+            calledAt: date.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }),
+        };
         (0, flow_audit_1.flowAudit)('tts_iniciado', 'audio.geracao', { painelId, code: 'TTS_REQUESTED' });
         const ttsStart = Date.now();
         const ttsRes = await fastify.inject({
@@ -216,6 +242,8 @@ async function tratarMensagemTcp(fastify, raw, painelId) {
             ts: Date.now(),
             data: out,
             payload: {
+                call,
+                followsAudio: true,
                 guiche: {
                     numero: numeroGuiche,
                     nome: nomeGuiche,
@@ -223,13 +251,24 @@ async function tratarMensagemTcp(fastify, raw, painelId) {
             },
         });
         (0, flow_audit_1.flowAudit)('tts_resposta', 'audio.geracao', { painelId, status: ttsRes.statusCode, durationMs: Date.now() - ttsStart });
-        if (ttsRes.statusCode === 200) {
-            const ttsBody = ttsRes.json();
+        {
+            // Preserve the call and speech fallback even if the TTS service rejects it.
+            let ttsBody = { errorTTS: textoChamada };
+            if (ttsRes.statusCode === 200) {
+                try {
+                    const candidate = ttsRes.json();
+                    if (typeof candidate?.audioContent === 'string' || typeof candidate?.errorTTS === 'string')
+                        ttsBody = candidate;
+                }
+                catch { /* Use browser speech for a malformed TTS response. */ }
+            }
             fastify.broadcast({
                 type: "tts:audio",
                 painelId,
                 ts: Date.now(),
                 payload: {
+                    call,
+                    traceId: call.id,
                     eventId,
                     ttsBody,
                     guiche: {

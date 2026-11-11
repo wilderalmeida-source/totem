@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const persistent_audit_1 = require("./lib/persistent-audit");
 const admin_audit_1 = require("./lib/admin-audit");
 const audit_retention_1 = require("./lib/audit-retention");
+const license_manager_1 = require("./lib/license-manager");
+const license_1 = require("./routes/license");
+const persistent_audit_2 = require("./lib/persistent-audit");
 const fastify_1 = __importDefault(require("fastify"));
 const flow_audit_1 = require("./lib/flow-audit");
 const cors_1 = __importDefault(require("@fastify/cors"));
@@ -35,8 +38,14 @@ const atendimentos_totem_1 = require("./routes/atendimentos-totem");
 async function bootstrap() {
     persistent_audit_1.auditOutbox.start();
     const fastify = (0, fastify_1.default)({ logger: true, });
+    const licenseManager = new license_manager_1.LicenseManager({
+        directory: process.env.LICENSE_STATE_DIRECTORY || node_path_1.default.join(process.cwd(), 'data/license'),
+        event: (action, metadata) => (0, persistent_audit_2.recordAudit)({ category: 'ADMIN', actor: 'sistema', action, step: 'licenciamento', metadata }),
+    });
+    await licenseManager.initialize();
+    licenseManager.start();
     const stopRetention = (0, audit_retention_1.startAuditRetention)();
-    fastify.addHook('onClose', async () => { stopRetention(); await persistent_audit_1.auditOutbox.stop(); });
+    fastify.addHook('onClose', async () => { stopRetention(); await licenseManager.stop(); await persistent_audit_1.auditOutbox.stop(); });
     fastify.addHook('onRequest', (request, _reply, done) => {
         flow_audit_1.auditContext.run({ flowId: (0, flow_audit_1.auditIdentifier)(request.headers['x-flow-id']) ?? '',
             device: (0, flow_audit_1.auditIdentifier)(request.headers['x-device-id']) ?? 'nao_informado' }, done);
@@ -64,6 +73,7 @@ async function bootstrap() {
         },
     });
     fastify.addHook('preHandler', autenticate_1.authenticate);
+    await (0, license_1.licensingRoutes)(fastify, licenseManager);
     (0, admin_audit_1.registerAdminAudit)(fastify);
     await fastify.register(painel_1.default);
     await fastify.register(static_1.default, {

@@ -3,6 +3,8 @@ node_modules
 venv
 .git
 .env
+.env*
 dist
 public/audios
 data/audit-outbox/
+data/license/

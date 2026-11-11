@@ -1,0 +1,41 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os');
+const {generateKeyPairSync}=require('node:crypto');
+const {configure}=require('./configurar-licenca-env.cjs');
+test('private env preserves original lines, never edits tracked source and is idempotent',async t=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'license-env-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const original='# Configuracao original\r\nDATABASE_URL=preservar\r\nOUTRA=valor\r\n';
+ await fs.writeFile(path.join(root,'env.backend'),original);
+ const pair=generateKeyPairSync('ed25519'),keyPath=path.join(root,'key.json');await fs.writeFile(keyPath,JSON.stringify(pair.publicKey.export({format:'jwk'})));
+ const args={url:'https://worker.example.test','public-key':keyPath};
+ const first=await configure(args,root);assert.equal(first.added,4);
+ const content=await fs.readFile(path.join(root,'.env.backend'),'utf8');assert.ok(content.startsWith(original));
+ assert.equal(await fs.readFile(path.join(root,'env.backend'),'utf8'),original);
+ assert.equal((await configure(args,root)).added,0);assert.equal(await fs.readFile(path.join(root,'.env.backend'),'utf8'),content);
+ await assert.rejects(configure({...args,url:'https://different.example.test'},root),/diferente/);assert.equal(await fs.readFile(path.join(root,'.env.backend'),'utf8'),content);
+ await assert.rejects(configure({...args,env:'env.backend'},root),/versionado/);
+});
+test('downloads the key from the same trusted HTTPS Worker with bounded response and no redirects',async t=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'license-key-download-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const pair=generateKeyPairSync('ed25519'),key=pair.publicKey.export({format:'jwk'});
+ let calls=0;
+ const fetcher=async(url,init)=>{calls++;assert.equal(String(url),'https://worker.example.test/public-key.json');assert.equal(init.redirect,'error');return Response.json(key);};
+ await configure({url:'https://worker.example.test'},root,fetcher);assert.equal(calls,1);
+ const original=await fs.readFile(path.join(root,'.env.backend'),'utf8');
+ const reordered={kty:key.kty,crv:key.crv,x:key.x};
+ assert.equal((await configure({url:'https://worker.example.test'},root,async()=>Response.json(reordered))).added,0);
+ await assert.rejects(configure({url:'https://worker.example.test','public-key-url':'https://evil.test/public-key.json'},root,fetcher),/mesmo Worker/);
+ await assert.rejects(configure({url:'https://worker.example.test'},root,async()=>new Response('x'.repeat(4097))),/4 KB/);
+ await assert.rejects(configure({url:'https://worker.example.test'},root,async()=>Response.json(pair.privateKey.export({format:'jwk'}))),/privadas/);
+ await assert.rejects(configure({url:'https://worker.example.test','public-key-sha256':'0'.repeat(64)},root,fetcher),/SHA-256/);
+ assert.equal(await fs.readFile(path.join(root,'.env.backend'),'utf8'),original);
+});
+test('recognizes existing env quotes, comments, exports, equivalent URL and public key ordering',async t=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'license-env-format-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
+ const key=generateKeyPairSync('ed25519').publicKey.export({format:'jwk'});
+ const text='export LICENSE_SERVER_URL="https://worker.example.test/" # manter comentario\nLICENSE_PUBLIC_KEY_JWK=\''+JSON.stringify(key)+'\' # manter\nLICENSE_KEY_ID=totem-licencas-v1\nLICENSE_ISSUER=urn:totem:licencas\n';
+ await fs.writeFile(path.join(root,'.env.backend'),text);
+ assert.equal((await configure({url:'https://worker.example.test'},root,async()=>Response.json({kty:key.kty,crv:key.crv,x:key.x}))).added,0);
+ assert.equal(await fs.readFile(path.join(root,'.env.backend'),'utf8'),text);
+});

@@ -40,6 +40,11 @@ export async function POST(request: NextRequest) {
       method: 'POST', body: JSON.stringify({ ...parsed.data, cd_paciente: session.patientId, preferencial: parsed.data.preferencial ?? 0, cd_modalidade: parsed.data.cd_modalidade ?? undefined }),
     }, request)
     if (!upstream.ok) {
+      const rejection = await upstream.clone().json().catch(() => null)
+      if (rejection?.code === 'LICENSE_UNAVAILABLE') {
+        auditServer(request, 'emissao_rejeitada', 'patientSession.senha', { outcome: 'FALHOU', status: upstream.status, code: 'LICENSE_UNAVAILABLE', enviadoAoBackend: true })
+        return patientJson({ error: 'Totem temporariamente indisponível. Procure a recepção.' }, 423)
+      }
       auditServer(request, 'emissao_sem_confirmacao', 'patientSession.senha', { outcome: 'DESCONHECIDO', status: upstream.status, code: 'BACKEND_REJECTED_ISSUANCE' })
       return patientJson({ error: 'Não foi possível gerar a senha. Procure a recepção se o problema persistir.' }, 502)
     }
