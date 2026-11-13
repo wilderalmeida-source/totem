@@ -7,9 +7,15 @@ const search_validation_1 = require("../lib/search-validation");
 const patient_diagnostics_1 = require("../lib/patient-diagnostics");
 const identification_attempts_1 = require("../lib/identification-attempts");
 const flow_audit_1 = require("../lib/flow-audit");
+const decoy_dates_1 = require("../lib/decoy-dates");
+const qr_guard_1 = require("../lib/qr-guard");
 const patientQuery = zod_1.z.union([
     zod_1.z.object({ tipo: zod_1.z.literal('RESET'), ds_paciente: zod_1.z.string().max(150).optional() }).strict(),
     zod_1.z.object({ tipo: zod_1.z.undefined().optional(), cd_paciente: search_validation_1.positiveId }).strict(),
+    // QR "paciente-atendimento": o atendimento precisa pertencer ao paciente.
+    zod_1.z.object({ tipo: zod_1.z.literal('QRATEND'), cd_paciente: search_validation_1.positiveId, cd_atendimento: search_validation_1.positiveId }).strict(),
+    // QR antigo (só o código do paciente): aceito enquanto QR_LEGADO não for "false" no env.backend.
+    zod_1.z.object({ tipo: zod_1.z.literal('QRLEGADO'), cd_paciente: search_validation_1.positiveId }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('ID'), ds_cpf: search_validation_1.cpf, dt_nascimento: search_validation_1.birthDate }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('NOMEDATA'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate, cd_paciente: search_validation_1.positiveId.optional() }).strict(),
     zod_1.z.object({ tipo: zod_1.z.literal('NOME'), ds_paciente: search_validation_1.patientName, dt_nascimento: search_validation_1.birthDate.optional() }).strict(),
@@ -18,58 +24,6 @@ const patientQuery = zod_1.z.union([
     zod_1.z.object({ tipo: zod_1.z.undefined().optional(), ds_paciente: search_validation_1.prefixName }).strict(),
 ]);
 async function pacientesRoute(fastify) {
-    function gerarECompletarDezDatas(datasReaisBanco) {
-        const listaDatasFormata = [];
-        // 1. FORÇA a conversão de todas as datas reais para string ISO e adiciona na lista
-        datasReaisBanco.forEach(data => {
-            if (data) {
-                try {
-                    let dataISO;
-                    // Se já for um objeto Date nativo
-                    if (data instanceof Date) {
-                        dataISO = data.toISOString();
-                    }
-                    // Se for uma string (comum ao trafegar dados ou de certos bancos)
-                    else if (typeof data === 'string') {
-                        dataISO = new Date(data).toISOString();
-                    }
-                    else {
-                        dataISO = new Date(data).toISOString();
-                    }
-                    // Só adiciona se for uma string ISO válida e não estiver duplicada
-                    if (dataISO && !listaDatasFormata.includes(dataISO)) {
-                        listaDatasFormata.push(dataISO);
-                    }
-                }
-                catch (e) {
-                    console.error("Erro crítico ao processar data real do banco:", data, e);
-                }
-            }
-        });
-        // 2. Intervalo de anos para preencher as datas falsas
-        const anoInicio = 1975;
-        const anoFim = 2005;
-        // 3. Preenche até ter exatamente 10 strings de datas distintas
-        while (listaDatasFormata.length < 10) {
-            const ano = Math.floor(Math.random() * (anoFim - anoInicio + 1)) + anoInicio;
-            const mes = Math.floor(Math.random() * 12);
-            const dia = Math.floor(Math.random() * 28) + 1;
-            const dataFalsaUTC = new Date(Date.UTC(ano, mes, dia, 0, 0, 0, 0));
-            const dataFalsaISO = dataFalsaUTC.toISOString();
-            if (!listaDatasFormata.includes(dataFalsaISO)) {
-                listaDatasFormata.push(dataFalsaISO);
-            }
-        }
-        // 4. Embaralha tudo (reais e falsas juntas) usando Fisher-Yates
-        for (let i = listaDatasFormata.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [listaDatasFormata[i], listaDatasFormata[j]] = [listaDatasFormata[j], listaDatasFormata[i]];
-        }
-        // 5. Retorna no formato exato que o seu front-end precisa
-        return listaDatasFormata.map(dataStr => ({
-            dt_nascimento: dataStr
-        }));
-    }
     fastify.get('/clinux/pacientes', async (request, reply) => {
         const inicio = Date.now();
         const recebido = (0, patient_diagnostics_1.describePatientInput)(request.query);
@@ -86,14 +40,49 @@ async function pacientesRoute(fastify) {
             return reply.code(400).send({ error: 'Filtros de paciente inválidos.' });
         }
         const input = query.data;
-        // Contador de UX por fluxo; nao substitui protecao contra forca bruta.
+        // Contador de UX por fluxo (o totem zera via RESET); a proteção contra força bruta é o contador por alvo abaixo.
         const headerFlow = request.headers['x-flow-id'];
         const flow = typeof headerFlow === 'string' && /^[a-zA-Z0-9_.:-]{1,100}$/.test(headerFlow) ? headerFlow : request.id;
         if (input.tipo === 'RESET') {
             const tentativas = (0, identification_attempts_1.identificationAttempts)(flow, 'reset');
             return reply.send([{ tentativas }]);
         }
-        if ((input.tipo === 'ID' || input.tipo === 'NOMEDATA') && (0, identification_attempts_1.identificationAttempts)(flow, 'read') === 0) {
+        if (input.tipo === 'QRLEGADO' && process.env.QR_LEGADO === 'false') {
+            (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: 'qr_legado_desativado', ramo: 'QRLEGADO' });
+            return reply.code(403).send({ error: 'QR Code antigo desativado.', code: 'QR_LEGADO_DESATIVADO' });
+        }
+        if (input.tipo === 'QRATEND') {
+            if ((0, qr_guard_1.qrBlocked)()) {
+                (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: 'qr_bloqueado', ramo: 'QRATEND' });
+                return reply.code(429).send({ error: 'Leitura de QR temporariamente bloqueada.', code: 'QR_BLOQUEADO' });
+            }
+            const hoje = (0, search_validation_1.todayBrazil)();
+            const seisMesesAtras = new Date(hoje);
+            seisMesesAtras.setUTCMonth(seisMesesAtras.getUTCMonth() - 6);
+            const atendimento = await prismaDB_1.prisma.atendimentos.findFirst({
+                where: {
+                    cd_atendimento: input.cd_atendimento, cd_paciente: input.cd_paciente,
+                    dt_data: { gte: seisMesesAtras },
+                    OR: [{ ds_status: null }, { ds_status: { not: 1 } }], // 1 = cancelado
+                },
+                select: { pacientes_atendimentos_cd_pacienteTopacientes: { select: { cd_paciente: true, ds_paciente: true, dt_nascimento: true } } },
+            });
+            const paciente = atendimento?.pacientes_atendimentos_cd_pacienteTopacientes;
+            if (!paciente) {
+                const bloqueou = (0, qr_guard_1.qrFailure)();
+                (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: bloqueou ? 'qr_bloqueado_por_erros' : 'qr_nao_confere', ramo: 'QRATEND', duracaoMs: Date.now() - inicio });
+                if (bloqueou)
+                    (0, flow_audit_1.flowAudit)('qr_bloqueado', 'identificacao', { outcome: 'FALHOU', motivo: 'muitos_qr_invalidos' });
+                return reply.send([]);
+            }
+            (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: 'qr_confere', ramo: 'QRATEND', duracaoMs: Date.now() - inicio });
+            return reply.send([paciente]);
+        }
+        const confirmacao = input.tipo === 'ID' || input.tipo === 'NOMEDATA';
+        // Erros também contam pelo paciente procurado: trocar x-flow-id, aparelho ou chamar RESET não renova as tentativas.
+        const alvo = confirmacao ? (0, identification_attempts_1.identificationTarget)(input) : null;
+        if (confirmacao && ((0, identification_attempts_1.identificationAttempts)(flow, 'read') === 0 || (alvo && (0, identification_attempts_1.identificationAttempts)(alvo, 'read', Date.now(), identification_attempts_1.TARGET) === 0))) {
+            (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: 'identificacao_bloqueada', flow, alvoBloqueado: Boolean(alvo && (0, identification_attempts_1.identificationAttempts)(alvo, 'read', Date.now(), identification_attempts_1.TARGET) === 0) });
             return reply.send([{ tentativas: 0 }]);
         }
         const where = {};
@@ -174,21 +163,26 @@ async function pacientesRoute(fastify) {
             const nome = input.ds_paciente.trim().toUpperCase();
             pacientes = pacientes.filter(p => p.ds_paciente?.trim().toUpperCase() === nome);
         }
-        if ((input.tipo === 'ID' || input.tipo === 'NOMEDATA') && !pacientes.length) {
-            const tentativas = (0, identification_attempts_1.identificationAttempts)(flow, 'fail');
+        if (confirmacao && !pacientes.length) {
+            let tentativas = (0, identification_attempts_1.identificationAttempts)(flow, 'fail');
+            if (alvo)
+                tentativas = Math.min(tentativas, (0, identification_attempts_1.identificationAttempts)(alvo, 'fail', Date.now(), identification_attempts_1.TARGET));
             (0, patient_diagnostics_1.patientDiagnostic)(request.id, { resultado: 'identificacao_incorreta', tentativas, flow });
             return reply.send([{ tentativas }]);
         }
-        if ((input.tipo === 'ID' || input.tipo === 'NOMEDATA') && pacientes.length === 1)
+        if (confirmacao && pacientes.length === 1) {
             (0, identification_attempts_1.identificationAttempts)(flow, 'reset');
+            if (alvo)
+                (0, identification_attempts_1.identificationAttempts)(alvo, 'reset', Date.now(), identification_attempts_1.TARGET);
+        }
         if (input.tipo === 'NOME') {
             const datas = [...new Set(pacientes.map(p => p.dt_nascimento?.toISOString()).filter((data) => Boolean(data)))];
             if (datas.length > 0 && datas.length < 10)
-                return reply.send(gerarECompletarDezDatas(datas));
+                return reply.send((0, decoy_dates_1.decoyBirthDates)(input.ds_paciente, datas));
             return reply.send(datas.map(dt_nascimento => ({ dt_nascimento })));
         }
         if (input.tipo === 'MASK' && pacientes.length > 0 && pacientes.length < 10) {
-            return reply.send(gerarECompletarDezDatas(pacientes.map(p => p.dt_nascimento)));
+            return reply.send((0, decoy_dates_1.decoyBirthDates)(input.ds_cpf, pacientes.map(p => p.dt_nascimento)));
         }
         return reply.send(pacientes);
     });

@@ -24,6 +24,8 @@ import { formatarDataNascimento } from "@/lib/formatdate";
 import type { RecepcaoModalidade } from "@/services/api/types";
 import { auditTotem } from "@/lib/audit-client";
 import { endPatientSession } from '@/lib/patient-session-client';
+import { ModalityPictogram } from '@/components/panel/Pictogram';
+import { Check } from 'lucide-react';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 export interface DadosPaciente {
@@ -264,18 +266,23 @@ export function DialogPatient({
         return;
       }
 
-      if (!/^[1-9]\d*$/.test(valorQR.trim()) || !Number.isSafeInteger(Number(valorQR.trim()))) {
-        auditTotem('qr_invalido', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), motivo: 'codigo_deve_ser_inteiro_positivo_seguro' });
+      // Formato "paciente-atendimento" (ex.: 123-456789) ou o QR antigo, só com o código do paciente.
+      const qrLido = /^([1-9]\d*)(?:-([1-9]\d*))?$/.exec(valorQR.trim());
+      const cdPacienteQR = Number(qrLido?.[1]);
+      const cdAtendimentoQR = qrLido?.[2] ? Number(qrLido[2]) : undefined;
+      if (!qrLido || !Number.isSafeInteger(cdPacienteQR) || (cdAtendimentoQR !== undefined && !Number.isSafeInteger(cdAtendimentoQR))) {
+        auditTotem('qr_invalido', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), motivo: 'formato_esperado_paciente-atendimento' });
         window.alert('QR Code inválido.'); return;
       }
       processandoRef.current = true;
       setLoading(true);
       try {
-      auditTotem('qr_pesquisa_enviada', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), codigoPesquisado: Number(valorQR.trim()) });
+      auditTotem('qr_pesquisa_enviada', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), codigoPesquisado: cdPacienteQR, atendimentoPesquisado: cdAtendimentoQR });
       const listpaciente = await buscaPaciente({
-        cd_paciente: Number(valorQR.trim()),
+        cd_paciente: cdPacienteQR,
+        cd_atendimento: cdAtendimentoQR,
       });
-      auditTotem('qr_resposta_recebida', 'patientSession.POST', { codigoPesquisado: Number(valorQR.trim()), quantidade: listpaciente?.length ?? 0, pacientes: listpaciente?.map(p => ({ cd_paciente: p.cd_paciente, ds_paciente: p.ds_paciente, dt_nascimento: p.dt_nascimento })) });
+      auditTotem('qr_resposta_recebida', 'patientSession.POST', { codigoPesquisado: cdPacienteQR, atendimentoPesquisado: cdAtendimentoQR, quantidade: listpaciente?.length ?? 0, pacientes: listpaciente?.map(p => ({ cd_paciente: p.cd_paciente, ds_paciente: p.ds_paciente, dt_nascimento: p.dt_nascimento })) });
       if (!listpaciente?.length) {
         window.alert("PACIENTE NÃO ENCONTRADO");
         return;
@@ -301,7 +308,7 @@ export function DialogPatient({
 
       setDados(newDados);
       } catch (error) {
-        auditTotem('qr_pesquisa_falhou', 'patientSession.POST', { codigoPesquisado: Number(valorQR.trim()), erro: error instanceof Error ? error.message.slice(0, 300) : 'erro_desconhecido' });
+        auditTotem('qr_pesquisa_falhou', 'patientSession.POST', { codigoPesquisado: cdPacienteQR, atendimentoPesquisado: cdAtendimentoQR, erro: error instanceof Error ? error.message.slice(0, 300) : 'erro_desconhecido' });
         window.alert(error instanceof Error ? error.message : 'Não foi possível identificar o paciente.');
       } finally {
         processandoRef.current = false;
@@ -428,7 +435,7 @@ export function DialogPatient({
         else setShowModal(true);
       }}
     >
-      <DialogContent className="patient-dialog" data-scanning={dados?.qr ? 'true' : 'false'}>
+      <DialogContent className="patient-dialog" data-service={dados?.servico} data-scanning={dados?.qr ? 'true' : 'false'}>
         {falhaEmissao ? (
           <div className="flex flex-col gap-6 py-4 text-center" role="alert">
             <DialogHeader>
@@ -563,11 +570,11 @@ export function DialogPatient({
                         }
                       >
                         <td className="break-words px-6 py-3">
-                          {
+                          <div className="patient-exam-description"><span className="patient-exam-icon"><ModalityPictogram name={atend.salas?.modalidades_salas_cd_modalidadeTomodalidades?.ds_modalidade || exame.procedimentos_exames_cd_procedimentoToprocedimentos?.ds_procedimento} /></span><div>{
                             exame
                               .procedimentos_exames_cd_procedimentoToprocedimentos
                               ?.ds_procedimento
-                          }
+                          }<small className="patient-exam-modality">{atend.salas?.modalidades_salas_cd_modalidadeTomodalidades?.ds_modalidade}</small></div></div>
                         </td>
                         <td className={`px-4 py-3 ${mostraHorarioPrevisto ? "font-bold text-gray-800" : ""}`}>
                           {mostraHorarioPrevisto
@@ -609,7 +616,7 @@ export function DialogPatient({
                 onClick={() => void gerarSenha()}
                 disabled={loading}
               >
-                {loading ? <OrbitProgress /> : <><span className="patient-confirm-legacy">OK</span><span className="patient-confirm-modern">{dados?.servico === 'C' ? 'Confirmar entrega' : 'Confirmar atendimento'}</span></>}
+                {loading ? <OrbitProgress /> : <><span className="patient-confirm-legacy">OK</span><span className="patient-confirm-modern"><Check aria-hidden="true" />{dados?.servico === 'C' ? 'Confirmar entrega' : 'Confirmar atendimento'}</span></>}
               </Button>
             )}
 

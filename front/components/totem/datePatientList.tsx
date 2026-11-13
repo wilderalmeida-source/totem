@@ -4,6 +4,7 @@ import type { PacienteComExame, Paciente } from '@/services/api'
 import type { TipoBusca } from '@/lib/patientUtils'
 import { formatarDataNascimento } from '@/lib/formatdate'
 import { auditTotem } from '@/lib/audit-client'
+import PatientChoice from './PatientChoice'
 
 interface DatePatientListProps {
   tipo: TipoBusca
@@ -76,9 +77,8 @@ export function DatePatientList({
               <li
                 key={`ex-${paciente.cd_paciente}`}
                 className="cursor-pointer text-4xl mb-3 text-red-500 font-bold"
-                onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: true }); onPatientClick(paciente) }}
               >
-                {paciente.ds_paciente}
+                <button type="button" className="patient-choice-button" onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: true }); onPatientClick(paciente) }}><PatientChoice label={paciente.ds_paciente ?? ''} /></button>
               </li>
             )
           })}
@@ -95,9 +95,8 @@ export function DatePatientList({
               <li
                 key={`pac-${paciente.cd_paciente ?? index}`}
                 className="cursor-pointer text-4xl mb-3"
-                onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: false }); onPatientClick(paciente) }}
               >
-                {label}
+                <button type="button" className="patient-choice-button" onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: false }); onPatientClick(paciente) }}><PatientChoice label={label} isDate={tipo !== 'DATA'} /></button>
               </li>
             )
           })}

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRI · Telas do totem e TV de chamadas</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;background:#E9EBEF;color:#1A1A1A;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #D9DCE3;padding:12px 20px;display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+.toolbar h1{font-size:16px;font-weight:500;margin-right:auto}
+.grp{display:flex;align-items:center;gap:6px;font-size:13px;color:#555}
+.grp button{border:1px solid #D0D4DC;background:#fff;border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;color:#333}
+.grp button.on{background:#1A1A1A;color:#fff;border-color:#1A1A1A}
+main{padding:24px 20px 60px}
+.sec{margin-bottom:40px}
+.sec h2{font-size:18px;font-weight:500;margin-bottom:14px;color:#333}
+.gal{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.item .cap{font-size:13px;color:#555;margin-bottom:6px}
+
+/* ===== TOKENS ===== */
+.screen[data-mode=escuro]{--okc:#9FE1CB;--okb:rgba(29,158,117,.18);--okd:rgba(93,202,165,.35)}
+.screen[data-mode=claro]{--okc:#0F6E56;--okb:#E1F5EE;--okd:#9FE1CB}
+.screen[data-theme=azul]{--pri:#1B6FD8;--pritx:#fff;--focus:#2F95E8;--acg:linear-gradient(90deg,#1B6FD8,#5BB8F0);--h1bg:#1B6FD8;--h1ic:#fff;--h2bg:#2F95E8;--h2ic:#fff;--h3bg:#5BB8F0;--h3ic:#0E2A5C}
+.screen[data-theme=azul][data-mode=escuro]{--bg:#1A1846;--card:rgba(255,255,255,.05);--bd:rgba(124,196,245,.16);--tx:#fff;--mu:#A9B6DD;--hv:rgba(47,149,232,.12);--ib:rgba(47,149,232,.18);--ic:#9FD6F7;--ar:#5A6699;--key:rgba(255,255,255,.07);--bar:rgba(255,255,255,.12);--sh:rgba(5,5,25,.65);--modal:#22205A;--tg:linear-gradient(90deg,#9FD6F7,#2F95E8)}
+.screen[data-theme=azul][data-mode=claro]{--bg:#F3F6FC;--card:#fff;--bd:#DCE4F2;--tx:#1A1846;--mu:#6B7AA6;--hv:#EAF4FD;--ib:#E3F0FC;--ic:#1B6FD8;--ar:#B4C0DC;--key:#fff;--bar:#E6ECF6;--sh:rgba(26,24,70,.45);--modal:#fff;--tg:linear-gradient(90deg,#1B6FD8,#2F95E8)}
+.screen[data-theme=dourado]{--pri:linear-gradient(135deg,#F5DC8C,#D4A73A 55%,#A8822A);--pritx:#1A1A1A;--focus:#D4A73A;--acg:linear-gradient(90deg,#A8822A,#F5DC8C);--h1bg:linear-gradient(135deg,#F5DC8C,#D4A73A 55%,#A8822A);--h1ic:#1A1A1A;--h2bg:var(--ib);--h2ic:var(--ic);--h3bg:var(--ib);--h3ic:var(--ic)}
+.screen[data-theme=dourado][data-mode=escuro]{--bg:#141310;--card:rgba(255,255,255,.045);--bd:rgba(232,192,74,.16);--tx:#fff;--mu:#B7AF9C;--hv:rgba(212,167,58,.12);--ib:rgba(212,167,58,.15);--ic:#E8C04A;--ar:#6B6455;--key:rgba(255,255,255,.06);--bar:rgba(255,255,255,.12);--sh:rgba(0,0,0,.6);--modal:#141310;--tg:linear-gradient(90deg,#F5DC8C,#D4A73A)}
+.screen[data-theme=dourado][data-mode=claro]{--bg:#FAF8F3;--card:#fff;--bd:#EAE2CF;--tx:#1A1A1A;--mu:#7A7262;--hv:#FBF5E6;--ib:#F7EDD3;--ic:#A8822A;--ar:#CFC6B1;--key:#fff;--bar:#EEE8DA;--sh:rgba(26,26,26,.4);--modal:#FAF8F3;--tg:linear-gradient(90deg,#B8922F,#8C6A1E)}
+
+/* ===== COMPONENTES ===== */
+.screen{position:relative;overflow:hidden;width:680px;border-radius:10px;background:var(--bg);color:var(--tx);padding:14px 16px 18px}
+.screen.tv{aspect-ratio:16/9;display:grid;grid-template-rows:auto 1fr auto;gap:10px;padding:14px 16px}
+.rel{position:relative}
+.hd{position:relative;display:flex;justify-content:space-between;align-items:center}
+.row-c{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:13px;padding:7px 11px}
+.btn i{font-size:16px}
+.ic38{width:38px;height:38px;padding:0}.ic38 i{font-size:19px}
+.clk{font-size:20px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sm{font-size:11px;color:var(--mu)}
+.ttl{position:relative;margin:16px 0 14px}
+.ttl .a{font-size:25px;font-weight:500;letter-spacing:-.02em;line-height:1.15}
+.ttl .s{font-size:13px;color:var(--mu);margin-top:3px}
+.tg{background:var(--tg);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cd{display:flex;gap:12px;padding:14px;border-radius:14px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+.cd.col{flex-direction:column}
+.cd .t{font-size:15px;font-weight:500}.cd .d{font-size:12px;color:var(--mu);margin-top:2px}
+.go{font-size:19px;color:var(--ar)}
+.ib{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--ib);flex-shrink:0}
+.ib i{font-size:22px;color:var(--ic)}
+.pri{background:var(--pri)!important;color:var(--pritx)!important;border-color:transparent!important}
+.pri i{color:var(--pritx)!important}
+.k{font-size:11px;letter-spacing:.14em;color:var(--mu);font-weight:500}
+.pill{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--ib);color:var(--ic);white-space:nowrap}
+.ok{font-size:11px;font-weight:500;color:var(--okc);background:var(--okb);border:1px solid var(--okd);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.gl{background:var(--card);border:1px solid var(--bd);border-radius:14px}
+.g2{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.g3{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.qrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.bar{height:4px;border-radius:2px;background:var(--bar);overflow:hidden}.bar>div{height:100%;background:var(--acg)}
+.tabs{position:relative;display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--card);border:1px solid var(--bd);margin-bottom:10px}
+.tab{flex:1;padding:8px 0;border-radius:9px;font-size:13px;font-weight:500;color:var(--mu);display:flex;align-items:center;justify-content:center;gap:6px}
+.tab.on{background:var(--pri);color:var(--pritx)}
+.inp{flex:1;display:flex;align-items:center;gap:10px;padding:0 14px;height:50px;border-radius:12px;background:var(--card);border:2px solid var(--focus)}
+.cur{width:2px;height:22px;background:var(--focus);margin-left:-8px;animation:bl 1s step-end infinite}
+.key{height:40px;font-size:17px;font-weight:500;background:var(--key);border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--tx)}
+.key.s{height:36px;font-size:15px}
+.av{border-radius:50%;background:var(--ib);display:flex;align-items:center;justify-content:center;font-weight:500;color:var(--ic);flex-shrink:0}
+.lv{width:8px;height:8px;border-radius:50%;background:var(--focus);color:var(--focus);display:inline-block;animation:pu 1.6s ease infinite}
+.esp{border-color:rgba(226,75,74,.45)!important}
+.esp .ib{background:rgba(226,75,74,.14)}.esp .ib i{color:#E24B4A}
+@keyframes pu{0%{box-shadow:0 0 0 0 currentColor}100%{box-shadow:0 0 0 10px transparent}}
+@keyframes bl{50%{opacity:0}}
+.px{position:absolute;display:grid;grid-template-columns:repeat(4,12px);pointer-events:none}.px i{width:12px;height:12px;display:block}
+
+@media print{
+  .toolbar{display:none}
+  body{background:#fff}
+  main{padding:0}
+  .item{break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
+  .sec{break-before:page}
+}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <h1>CRI · Telas do totem e TV de chamadas</h1>
+  <div class="grp">Tema: <button data-k="theme" data-v="azul">Tema 1 · Azul</button><button data-k="theme" data-v="dourado">Tema 2 · Dourado</button><button data-k="theme" data-v="ambos">Ambos</button></div>
+  <div class="grp">Modo: <button data-k="mode" data-v="escuro">Escuro</button><button data-k="mode" data-v="claro">Claro</button><button data-k="mode" data-v="ambos">Ambos</button></div>
+  <div class="grp">Zoom: <button data-k="zoom" data-v="1">1x</button><button data-k="zoom" data-v="1.5">1.5x</button><button data-k="zoom" data-v="2">2x</button><button data-k="zoom" data-v="2.82">1920px</button></div>
+</div>
+<main id="main"></main>
+
+<script>
+var st={theme:'ambos',mode:'ambos',zoom:'1'};
+var gid=0;
+var P='M1 24V13C6 5 16 0 29 2C20 3 12 9 8 16L8 24Z',P2='M29 2C25 6 22 12 21 24H17C18 13 23 6 29 2Z';
+function grad(i){return '<defs><linearGradient id="'+i+'" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#A8822A"/><stop offset=".6" stop-color="#D4A73A"/><stop offset="1" stop-color="#F5DC8C"/></linearGradient></defs>';}
+function arc(s){var i='g'+(gid++);return '<svg width="'+s+'" height="'+Math.round(s*.8)+'" viewBox="0 0 30 24">'+grad(i)+'<path d="'+P+'" fill="url(#'+i+')"/><path d="'+P2+'" fill="#F0D488"/></svg>';}
+function deco(t){
+  if(t==='dourado'){var i='g'+(gid++);return '<svg style="position:absolute;right:-40px;bottom:-50px;width:280px;height:224px;pointer-events:none;opacity:.1" viewBox="0 0 30 24">'+grad(i)+'<path d="'+P+'" fill="url(#'+i+')"/><path d="'+P2+'" fill="url(#'+i+')"/></svg>';}
+  var a='<i style="background:#1B6FD8"></i><i style="background:#2F95E8"></i><i style="background:#5BB8F0"></i><i></i><i style="background:#2F95E8"></i><i style="background:#9FD6F7"></i><i></i><i></i><i style="background:#5BB8F0"></i>';
+  return '<div class="px" style="top:0;left:0">'+a+'</div><div class="px" style="bottom:0;right:0;transform:rotate(180deg)">'+a+'</div>';
+}
+function logo(t,sub){
+  var m=t==='dourado'?arc(30):'<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#5BB8F0,#1B6FD8);display:flex;align-items:center;justify-content:center"><i class="ti ti-building-hospital" style="font-size:17px;color:#fff"></i></div>';
+  return '<div class="row-c" style="gap:10px">'+m+'<div style="line-height:1.15"><div style="font-size:15px;font-weight:500;letter-spacing:.08em">CRI</div><div class="sm">'+(sub||'Clínica Radiológica de Itumbiara')+'</div></div></div>';
+}
+function pl(t){return t==='azul'?' style="padding-left:44px"':'';}
+function nav(t){return '<div class="row-c" style="gap:6px">'+(t==='dourado'?arc(26):'')+'<div class="btn"><i class="ti ti-home"></i></div><div class="btn"><i class="ti ti-arrow-left"></i>Voltar</div></div>';}
+function steps(n){var h='<div class="row-c" style="gap:6px;font-size:12px;color:var(--mu)">';for(var i=1;i<=3;i++)h+='<span style="width:22px;height:4px;border-radius:2px;background:'+(i<=n?'var(--focus)':'var(--bar)')+'"></span>';return h+'<span style="margin-left:4px">Etapa '+n+' de 3</span></div>';}
+function ttl(a,b,s){return '<div class="ttl"><div class="a">'+a+' <span class="tg">'+b+'</span></div><div class="s">'+s+'</div></div>';}
+
+/* ===== TELAS ===== */
+function home(t){
+  function opt(h,ic,a,b){return '<div class="cd col"><div class="ib" style="background:var(--'+h+'bg)"><i class="ti '+ic+'" style="color:var(--'+h+'ic)"></i></div><div><div class="t">'+a+'</div><div class="d">'+b+'</div></div><i class="ti ti-arrow-right go" style="align-self:flex-end"></i></div>';}
+  function q(n,ic,tot,lab,st,names){var r='<div class="gl" style="padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:center"><div class="row-c"><i class="ti '+ic+'" style="font-size:18px;color:var(--ic)"></i><span style="font-size:15px;font-weight:500">'+n+'</span></div><span class="k">'+tot+' / '+tot+'</span></div><div class="bar" style="margin:10px 0 6px"><div style="width:100%"></div></div><div style="display:flex;gap:14px;font-size:11px;color:var(--mu);margin-bottom:6px"><span>Total <b style="color:var(--tx);font-weight:500">'+tot+'</b></span><span>'+lab+' <b style="color:var(--tx);font-weight:500">'+tot+'</b></span><span>Restantes <b style="color:var(--tx);font-weight:500">0</b></span></div>';names.forEach(function(x,i){r+='<div class="qrow"'+(i==2?' style="border:0"':'')+'><span>'+x+'</span><span class="ok"><i class="ti ti-check"></i> '+st+'</span></div>';});return r+'</div>';}
+  return deco(t)+'<div class="hd"'+pl(t)+'>'+logo(t)+'<div class="row-c" style="gap:10px"><div style="text-align:right;line-height:1.1"><div class="clk">09:45:58</div><div class="sm">quarta-feira, 11 de nov.</div></div><div class="btn ic38"><i class="ti ti-volume"></i></div></div></div>'
+  +ttl('Olá, seja bem-vindo','ao CRI','Toque em uma das opções abaixo para começar.')
+  +'<div class="g3">'+opt('h1','ti-calendar-plus','Agendar exames','Marque um novo exame')+opt('h2','ti-user-check','Atendimento','Retire sua senha')+opt('h3','ti-file-check','Entrega de exames','Retire seus resultados')+'</div>'
+  +'<div class="g2" style="margin-top:14px">'+q('Atendimento','ti-user-check',84,'Atendidos','Atendido',['Patricia *** Araujo','Higor *** Nascimento','Rosileide *** Silva'])+q('Entrega','ti-file-check',42,'Entregues','Entregue',['Ucelina *** Ferreira','Joaquina *** Junqueira','Geisiany *** Santos'])+'</div>';
+}
+function prio(t){
+  var items=[['ti-baby-carriage','Criança de colo','Acompanhante com bebê'],['ti-woman','Gestante','Qualquer período'],['ti-old','Idoso','60 anos ou mais'],['ti-wheelchair','Cadeirante','Mobilidade reduzida'],['ti-puzzle','Autista','Pessoa com TEA']];
+  var g=items.map(function(p){return '<div class="cd col"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="ib"><i class="ti '+p[0]+'"></i></div><span class="pill">Prioridade</span></div><div><div class="t">'+p[1]+'</div><div class="d">'+p[2]+'</div></div></div>';}).join('');
+  g+='<div class="cd col esp"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="ib"><i class="ti ti-heart-handshake"></i></div><span class="pill" style="background:rgba(226,75,74,.14);color:#E24B4A">Especial</span></div><div><div class="t">Especial</div><div class="d">Outras necessidades</div></div></div>';
+  return deco(t)+'<div class="hd"'+pl(t)+'>'+nav(t)+'<div class="clk" style="font-size:16px">09:45</div></div>'
+  +ttl('Como podemos','atender você?','Selecione o tipo de atendimento para retirar sua senha.')
+  +'<div class="cd rel" style="align-items:center;margin-bottom:10px"><div class="ib pri" style="width:46px;height:46px"><i class="ti ti-users"></i></div><div style="flex:1"><div class="t" style="font-size:17px">Atendimento normal</div><div class="d">Para todos os pacientes</div></div><i class="ti ti-arrow-right go"></i></div>'
+  +'<div class="rel row-c" style="margin:4px 0 8px"><span class="k">ATENDIMENTO PRIORITÁRIO</span><span style="flex:1;height:1px;background:var(--bd)"></span></div><div class="g3">'+g+'</div>';
+}
+function busca(t,modo){
+  var nome=modo==='nome';
+  var tabs=[['data','ti-calendar','Data de nascimento'],['cpf','ti-id','CPF'],['nome','ti-user','Nome']].map(function(x){return '<div class="tab'+(x[0]===modo?' on':'')+'"><i class="ti '+x[1]+'"></i>'+x[2]+'</div>';}).join('');
+  var res=nome?[['MA','Maria A*** S***','12/03/1958','456.789'],['MA','Mariana L*** F***','12/03/1958','654.321'],['MV','Marcos V*** R***','05/07/1990','222.333']]:[['MA','Maria A*** S***','12/03/1958','456.789'],['ML','Mariana L*** F***','12/03/1958','654.321']];
+  var lista=res.map(function(r){var c=r[3].split('.');return '<div class="cd" style="align-items:center;padding:9px 12px;margin-bottom:6px;border-radius:10px"><div class="av" style="width:36px;height:36px;font-size:13px">'+r[0]+'</div><div style="flex:1"><div class="t">'+r[1]+'</div><div class="d">Nasc. '+r[2]+' · CPF ***.'+c[0]+'.'+c[1]+'-**</div></div><i class="ti ti-chevron-right go"></i></div>';}).join('');
+  var kb='';
+  if(nome){['1234567890','QWERTYUIOP','ASDFGHJKLÇ','ZXCVBNM'].forEach(function(r,i){kb+='<div style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px">'+r.split('').map(function(c){return '<div class="key s">'+c+'</div>';}).join('')+(i===3?'<div class="key s" style="grid-column:span 3"><i class="ti ti-backspace" style="font-size:19px"></i></div>':'')+'</div>';});
+    kb+='<div style="display:grid;grid-template-columns:1fr 4fr 1fr;gap:5px"><div class="key s" style="font-size:13px">Limpar</div><div class="key s" style="font-size:13px;color:var(--mu)">espaço</div><div class="key s">\'</div></div>';}
+  else{kb='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;max-width:330px;margin:0 auto;width:100%">'+['1','2','3','4','5','6','7','8','9','Limpar','0','del'].map(function(c){return '<div class="key">'+(c==='del'?'<i class="ti ti-backspace" style="font-size:20px"></i>':c==='Limpar'?'<span style="font-size:13px">Limpar</span>':c)+'</div>';}).join('')+'</div>';}
+  return deco(t)+'<div class="hd"'+pl(t)+'>'+nav(t)+steps(1)+'</div>'
+  +ttl('Identifique-se para o','agendamento','Busque e toque no seu nome na lista.')
+  +'<div class="tabs">'+tabs+'</div>'
+  +'<div class="rel" style="display:flex;gap:8px;margin-bottom:10px"><div class="inp"><i class="ti '+(nome?'ti-user':'ti-calendar')+'" style="font-size:20px;color:var(--ic)"></i><span style="font-size:20px;font-weight:500">'+(nome?'MAR':'12/03/1958')+'</span><span class="cur"></span></div><div class="btn" style="width:50px;height:50px;padding:0"><i class="ti ti-qrcode" style="font-size:24px;color:var(--ic)"></i></div></div>'
+  +'<div class="rel" style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="k">PACIENTES ENCONTRADOS</span><span class="sm" style="font-size:12px">'+res.length+' resultados</span></div>'
+  +'<div class="rel" style="margin-bottom:10px">'+lista+'</div>'
+  +'<div class="rel" style="display:grid;gap:6px">'+kb+'</div>'
+  +'<div class="rel" style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px"><span style="font-size:13px;color:var(--mu)">Não encontrou seu nome?</span><div class="btn" style="font-size:14px;font-weight:500;padding:10px 16px;border:1.5px solid var(--focus);color:var(--ic)">Avançar sem cadastro<i class="ti ti-arrow-right" style="font-size:17px"></i></div></div>';
+}
+function mod(t){
+  var m=[['ti-ribbon-health','Mamografia','Exame das mamas'],['ti-wave-sine','Ultrassonografia','Ultrassom e doppler'],['ti-scan','Raio X','Radiografia digital'],['ti-magnet','Ressonância magnética','Imagem por ressonância'],['ti-circle-dot','Tomografia computadorizada','Exame de tomografia'],['ti-bone','Densitometria óssea','Densidade dos ossos']];
+  return deco(t)+'<div class="hd"'+pl(t)+'>'+nav(t)+steps(2)+'</div>'
+  +ttl('Escolha a','modalidade','Selecione para qual setor o paciente será encaminhado.')
+  +'<div class="g2">'+m.map(function(x){return '<div class="cd" style="align-items:center"><div class="ib"><i class="ti '+x[0]+'"></i></div><div style="flex:1"><div class="t">'+x[1]+'</div><div class="d">'+x[2]+'</div></div><i class="ti ti-chevron-right go"></i></div>';}).join('')+'</div>';
+}
+function entrega(t){
+  var ex=[['Mamografia digital bilateral','ti-ribbon-health','Mamografia'],['US transvaginal','ti-wave-sine','Ultrassonografia']];
+  var mk=t==='dourado'?arc(24):'<div class="ib" style="width:30px;height:30px;border-radius:9px"><i class="ti ti-file-check" style="font-size:17px"></i></div>';
+  return '<div style="margin:-14px -16px -18px;padding:28px 16px;background:var(--sh);display:flex;justify-content:center"><div style="position:relative;width:100%;max-width:440px;background:var(--modal);border:1px solid var(--bd);border-radius:18px;padding:18px 20px 20px;overflow:hidden">'+deco(t)
+  +'<div class="hd"'+(t==='azul'?' style="padding-right:0"':'')+'><div class="row-c"'+pl(t)+'>'+mk+'<span style="font-size:13px;font-weight:500;color:var(--mu)">Entrega de exames</span></div><i class="ti ti-x" style="font-size:18px;color:var(--mu)"></i></div>'
+  +'<div class="rel row-c" style="gap:12px;margin:16px 0 12px"><div class="pri" style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;flex-shrink:0">IR</div><div><div class="sm" style="font-size:12px">Paciente</div><div style="font-size:19px;font-weight:500;line-height:1.2">Ivonete Aparecida dos Anjos Rocha</div></div></div>'
+  +'<div class="g2" style="gap:8px;margin-bottom:14px"><div class="gl" style="border-radius:10px;padding:8px 12px"><div class="sm" style="letter-spacing:.06em">ID DO PACIENTE</div><div style="font-size:15px;font-weight:500">29705</div></div><div class="gl" style="border-radius:10px;padding:8px 12px"><div class="sm" style="letter-spacing:.06em">NASCIMENTO</div><div style="font-size:15px;font-weight:500">28/09/1964</div></div></div>'
+  +'<div class="rel" style="display:flex;justify-content:space-between;margin-bottom:6px"><span class="k">EXAMES PARA RETIRADA</span><span style="font-size:12px;color:var(--okc)">2 prontos</span></div>'
+  +'<div class="gl rel" style="overflow:hidden;margin-bottom:16px;border-radius:12px">'+ex.map(function(e,i){return '<div class="row-c" style="gap:10px;padding:10px 12px;'+(i?'border-top:1px solid var(--bd)':'')+'"><div class="ib" style="width:34px;height:34px;border-radius:9px"><i class="ti '+e[1]+'" style="font-size:18px"></i></div><div style="flex:1"><div style="font-size:14px;font-weight:500">'+e[0]+'</div><div class="sm" style="font-size:12px">'+e[2]+'</div></div><span class="ok"><i class="ti ti-check"></i> Laudado</span></div>';}).join('')+'</div>'
+  +'<div class="rel" style="display:grid;gap:8px"><div class="btn pri" style="height:48px;font-size:15px;font-weight:500"><i class="ti ti-check" style="font-size:19px"></i>Confirmar entrega</div><div class="btn" style="height:44px;font-size:15px;color:var(--mu);background:transparent">Cancelar</div></div></div></div>';
+}
+function tv(t){
+  var ant=[['Patricia A.','Mamografia','Sala 1','ti-ribbon-health','08:55'],['Higor N.','Raio X','Sala 5','ti-scan','08:51'],['Rosileide S.','Tomografia','Sala 2','ti-circle-dot','08:47']];
+  return deco(t)+'<div class="hd"'+pl(t)+'>'+logo(t,'Painel de chamadas')+'<div style="text-align:right;line-height:1.1"><div class="clk" style="font-size:22px">08:58</div><div class="sm">quarta-feira, 11 de nov.</div></div></div>'
+  +'<div class="gl rel" style="display:grid;grid-template-columns:1fr 1.1fr;overflow:hidden;min-height:0">'
+  +'<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--bd)"><div class="row-c"><span class="lv"></span><span class="k">CHAMANDO AGORA</span></div><div style="font-size:32px;font-weight:500;letter-spacing:-.03em;line-height:1.1;margin:6px 0 8px">Roberto C.</div><div class="row-c"><div class="ib" style="width:30px;height:30px;border-radius:8px"><i class="ti ti-wave-sine" style="font-size:17px"></i></div><div style="line-height:1.2"><div class="tg" style="font-size:16px;font-weight:500">Ultrassonografia</div><div class="sm" style="font-size:12px">Sala 3 · 2º andar</div></div></div></div>'
+  +'<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center"><div class="row-c" style="gap:10px"><div class="ib" style="width:36px;height:36px;border-radius:10px"><i class="ti ti-alert-circle" style="font-size:19px"></i></div><span class="k">INFORMATIVO</span></div><div style="font-size:19px;font-weight:500;line-height:1.2;margin-top:10px">Convênio IPASGO em atualização</div><div style="font-size:13px;color:var(--mu);margin-top:5px;line-height:1.45">O sistema do convênio está em atualização e pode causar atrasos no atendimento. Agradecemos a compreensão.</div><div style="display:flex;gap:4px;margin-top:12px"><div class="bar" style="flex:1;height:3px"><div style="width:60%"></div></div><div class="bar" style="flex:1;height:3px"><div style="width:0"></div></div><div class="bar" style="flex:1;height:3px"><div style="width:0"></div></div></div></div></div>'
+  +'<div class="rel"><div class="k" style="margin-bottom:6px">CHAMADAS ANTERIORES</div><div class="g3" style="gap:8px">'+ant.map(function(a,k){return '<div class="gl row-c" style="padding:10px 12px;gap:10px;opacity:'+(1-k*.18)+'"><div class="ib" style="width:32px;height:32px;border-radius:9px"><i class="ti '+a[3]+'" style="font-size:17px"></i></div><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:500">'+a[0]+'</span><span class="sm">'+a[4]+'</span></div><div class="sm" style="font-size:12px">'+a[1]+' · '+a[2]+'</div></div></div>';}).join('')+'</div></div>';
+}
+
+var telas=[
+  ['1. Início do totem',home,''],
+  ['2. Prioridade de atendimento',prio,''],
+  ['3a. Agendamento · busca por data (teclado numérico)',function(t){return busca(t,'data');},''],
+  ['3b. Agendamento · busca por nome (teclado alfanumérico)',function(t){return busca(t,'nome');},''],
+  ['4. Escolha da modalidade',mod,''],
+  ['5. Modal de entrega de exames',entrega,''],
+  ['6. TV de chamadas (16:9)',tv,'tv']
+];
+var nomesTema={azul:'Tema 1 · Azul (CDig)',dourado:'Tema 2 · Dourado (CRI)'};
+
+function render(){
+  var temas=st.theme==='ambos'?['azul','dourado']:[st.theme];
+  var modos=st.mode==='ambos'?['escuro','claro']:[st.mode];
+  var h='';
+  temas.forEach(function(t){modos.forEach(function(m){
+    h+='<section class="sec"><h2>'+nomesTema[t]+' — Modo '+m+'</h2><div class="gal">';
+    telas.forEach(function(x){h+='<div class="item"><div class="cap">'+x[0]+'</div><div class="screen '+x[2]+'" data-theme="'+t+'" data-mode="'+m+'" style="zoom:'+st.zoom+'">'+x[1](t)+'</div></div>';});
+    h+='</div></section>';
+  });});
+  document.getElementById('main').innerHTML=h;
+  document.querySelectorAll('.toolbar button').forEach(function(b){b.classList.toggle('on',st[b.dataset.k]===b.dataset.v);});
+}
+document.querySelectorAll('.toolbar button').forEach(function(b){b.onclick=function(){st[b.dataset.k]=b.dataset.v;render();};});
+render();
+</script>
+</body>
+</html>

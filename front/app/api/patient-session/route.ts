@@ -16,8 +16,8 @@ const name = z.string().trim().min(1).max(150)
 const confirmation = z.discriminatedUnion('tipo', [
   z.object({ tipo: z.literal('ID'), ds_cpf: z.string().regex(/^\d{11}$/), dt_nascimento: birth }).strict(),
   z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: name, dt_nascimento: birth, cd_paciente: z.number().int().positive().safe().optional() }).strict(),
-  // O QR legado é um código numérico, aceito como identificação pela operação interna.
-  z.object({ tipo: z.literal('QR'), cd_paciente: z.number().int().positive().safe() }).strict(),
+  // QR "paciente-atendimento"; sem cd_atendimento é o QR antigo (só o código), que o backend aceita enquanto QR_LEGADO não for "false".
+  z.object({ tipo: z.literal('QR'), cd_paciente: z.number().int().positive().safe(), cd_atendimento: z.number().int().positive().safe().optional() }).strict(),
   z.object({ tipo: z.literal('NEW'), ds_paciente: name, dt_nascimento: birth }).strict(),
 ])
 
@@ -36,11 +36,12 @@ export async function POST(request: NextRequest) {
   auditServer(request, parsed.success ? 'identificacao_recebida' : 'identificacao_rejeitada', 'patientSession.POST', {
     tipo: typeof raw?.tipo === 'string' ? raw.tipo.slice(0, 30) : undefined,
     codigoRecebido: raw?.tipo === 'QR' && typeof raw.cd_paciente === 'number' ? raw.cd_paciente : undefined,
+    atendimentoRecebido: raw?.tipo === 'QR' && typeof raw.cd_atendimento === 'number' ? raw.cd_atendimento : undefined,
     nomeRecebido: rawName, tamanhoNome: rawName?.length, espacosNasPontas: rawName !== undefined && rawName !== rawName.trim(),
     nomeNormalizado: rawName?.trim(), nascimento: typeof raw?.dt_nascimento === 'string' ? raw.dt_nascimento.slice(0, 100) : undefined,
     code: parsed.success ? 'IDENTIFICATION_VALIDATED' : 'INVALID_IDENTIFICATION',
   })
-  if (!parsed.success) return fail('Dados de identificação inválidos.', 400)
+  if (!parsed.success) return fail(raw?.tipo === 'QR' ? 'QR Code inválido.' : 'Dados de identificação inválidos.', 400)
   try {
     const input = parsed.data
     auditServer(request, 'identificacao_enviada_backend', 'patientSession.POST', { rota: '/clinux/pacientes', method: input.tipo === 'NEW' ? 'POST' : 'GET', enviado: identificationValues(input) })
@@ -49,8 +50,11 @@ export async function POST(request: NextRequest) {
       upstream = await patientBackend('/clinux/pacientes', { method: 'POST', body: JSON.stringify({ ds_paciente: input.ds_paciente, dt_nascimento: input.dt_nascimento }) }, request)
     } else {
       const params = new URLSearchParams()
-      if (input.tipo === 'QR') params.set('cd_paciente', String(input.cd_paciente))
-      else Object.entries(input).forEach(([key, value]) => { if (value !== undefined) params.set(key, String(value)) })
+      if (input.tipo === 'QR') {
+        if (input.cd_atendimento !== undefined) { params.set('tipo', 'QRATEND'); params.set('cd_atendimento', String(input.cd_atendimento)) }
+        else params.set('tipo', 'QRLEGADO')
+        params.set('cd_paciente', String(input.cd_paciente))
+      } else Object.entries(input).forEach(([key, value]) => { if (value !== undefined) params.set(key, String(value)) })
       if (input.tipo === 'QR') auditServer(request, 'qr_consulta_backend', 'patientSession.POST', { codigoPesquisado: input.cd_paciente, rota: '/clinux/pacientes', parametro: params.get('cd_paciente') })
       upstream = await patientBackend(`/clinux/pacientes?${params}`, {}, request)
     }
@@ -63,6 +67,8 @@ export async function POST(request: NextRequest) {
         erro: !Array.isArray(result) && typeof result?.error === 'string' ? result.error.slice(0, 300) : undefined,
       })
       if (!upstream.ok && result?.code === 'LICENSE_UNAVAILABLE') return fail('Totem temporariamente indisponível. Procure a recepção.', 503)
+      if (upstream.status === 403 && result?.code === 'QR_LEGADO_DESATIVADO') return fail('QR Code inválido.', 400)
+      if (upstream.status === 429 && result?.code === 'QR_BLOQUEADO') return fail('Leitura de QR Code temporariamente bloqueada. Procure a recepção.', 429)
     }
     if (!upstream.ok) return fail('Não foi possível confirmar o paciente.', 502)
     const body = await upstream.json()
@@ -71,6 +77,8 @@ export async function POST(request: NextRequest) {
       const remaining = Math.max(0, patients[0].tentativas)
       return fail(remaining === 0 ? 'Tentativas esgotadas. Cancele e procure a recepção.' : `Dados incorretos. Tentativas restantes: ${remaining}.`, 401)
     }
+    // Qualquer falha do QR tem a mesma mensagem, sem indicar se o paciente ou o atendimento existe.
+    if (input.tipo === 'QR' && (!Array.isArray(patients) || patients.length !== 1)) return fail('QR Code inválido.', 401)
     if (!Array.isArray(patients) || patients.length !== 1 || !Number.isSafeInteger(patients[0]?.cd_paciente) || patients[0].cd_paciente <= 0) {
       return fail('Paciente não confirmado. Confira os dados ou procure a recepção.', 401)
     }
@@ -80,6 +88,7 @@ export async function POST(request: NextRequest) {
       typeof patient.ds_paciente !== 'string' || patient.ds_paciente.trim().toUpperCase() !== input.ds_paciente.trim().toUpperCase() ||
       typeof patient.dt_nascimento !== 'string' || patient.dt_nascimento.slice(0, 10) !== input.dt_nascimento.slice(0, 10)
     )) return fail('O cadastro não corresponde ao paciente selecionado.', 401)
+    if (input.tipo === 'QR' && patient.cd_paciente !== input.cd_paciente) return fail('O cadastro não corresponde ao QR Code lido.', 401)
     const session = createPatientSession(patient.cd_paciente)
     auditServer(request, 'identificacao_resposta_final', 'patientSession.POST', { status: 200,
       nomePaciente: patient.ds_paciente, resposta: identificationResult({ patient }), outcome: 'CONCLUIDO' })

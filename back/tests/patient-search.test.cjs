@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const { createRequire } = require('node:module');
 const Fastify = require('fastify');
 
-async function setup(t, file, exportName, result = [], eligible = null) {
+async function setup(t, file, exportName, result = [], eligible = null, env = {}) {
   const calls = [];
   const diagnostics = [];
   const findMany = async args => { calls.push(args); return result; };
@@ -16,7 +16,7 @@ async function setup(t, file, exportName, result = [], eligible = null) {
   const exports = {};
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), {
     exports, require: name => name === '../lib/flow-audit' ? { flowAudit: () => {} } : name === '../../config/prismaDB' ? { prisma } : name === '../lib/patient-diagnostics' ? { describePatientInput: value => value, patientDiagnostic: (id, metadata) => diagnostics.push(metadata) } : realRequire(name),
-    console, process: { env: { IDMODALIDADE: '10000' } }, Date,
+    console, process: { env: { IDMODALIDADE: '10000', ...env } }, Date,
   });
   const app = Fastify();
   t.after(() => app.close());
@@ -196,8 +196,8 @@ test('diagnostico registra entrada normalizacao e resposta sem CPF', async t => 
 
 test('tres totens mantem tentativas independentes e reset nao afeta outro fluxo', async t => {
   const { get, calls } = await setup(t, 'pacientes.js', 'pacientesRoute');
-  const query = { tipo: 'NOMEDATA', ds_paciente: 'ANA', dt_nascimento: '1980-01-01' };
-  const attempt = async flow => (await get('/clinux/pacientes', query, { 'x-flow-id': flow })).json()[0].tentativas;
+  // Cada totem procura um paciente diferente; o mesmo paciente em vários totens é bloqueado pelo contador por alvo.
+  const attempt = async flow => (await get('/clinux/pacientes', { tipo: 'NOMEDATA', ds_paciente: `PACIENTE ${flow}`, dt_nascimento: '1980-01-01' }, { 'x-flow-id': flow })).json()[0].tentativas;
   assert.equal(await attempt('attempt-a'), 2);
   assert.equal(await attempt('attempt-a'), 1);
   assert.equal(await attempt('attempt-b'), 2);
@@ -207,6 +207,103 @@ test('tres totens mantem tentativas independentes e reset nao afeta outro fluxo'
   assert.equal(await attempt('attempt-a'), 0);
   assert.equal(calls.length, before);
   await get('/clinux/pacientes', { tipo: 'RESET' }, { 'x-flow-id': 'attempt-a' });
-  assert.equal(await attempt('attempt-a'), 2);
+  // RESET libera o fluxo para outro paciente, mas o paciente já errado 3 vezes continua bloqueado.
+  assert.equal(await attempt('attempt-a'), 0);
+  assert.equal((await get('/clinux/pacientes', { tipo: 'NOMEDATA', ds_paciente: 'OUTRO PACIENTE A', dt_nascimento: '1980-01-01' }, { 'x-flow-id': 'attempt-a' })).json()[0].tentativas, 2);
   assert.equal(await attempt('attempt-b'), 1);
+});
+
+test('datas falsas são as mesmas a cada busca, ordenadas e incluem a data real', async t => {
+  const rows = [{ ds_paciente: 'FULANO DE TAL', dt_nascimento: new Date('1948-07-30') }];
+  const { get } = await setup(t, 'pacientes.js', 'pacientesRoute', rows);
+  const first = (await get('/clinux/pacientes', { tipo: 'NOME', ds_paciente: 'FULANO DE TAL' })).json();
+  const second = (await get('/clinux/pacientes', { tipo: 'NOME', ds_paciente: '  fulano de tal ' })).json();
+  assert.equal(first.length, 10);
+  assert.deepEqual(second, first);
+  assert.ok(first.some(row => row.dt_nascimento === '1948-07-30T00:00:00.000Z'));
+  const values = first.map(row => row.dt_nascimento);
+  assert.deepEqual([...values].sort(), values);
+  assert.equal(new Set(values).size, 10);
+  assert.ok(values.every(value => value >= '1930-01-01' && value < String(new Date().getUTCFullYear())));
+  const other = (await get('/clinux/pacientes', { tipo: 'NOME', ds_paciente: 'CICLANO DE TAL' })).json();
+  assert.notDeepEqual(other.filter(r => r.dt_nascimento !== '1948-07-30T00:00:00.000Z'), first.filter(r => r.dt_nascimento !== '1948-07-30T00:00:00.000Z'));
+});
+
+test('CPF e nome: trocar x-flow-id ou chamar RESET não renova tentativas do mesmo paciente', async t => {
+  const { get, calls } = await setup(t, 'pacientes.js', 'pacientesRoute', []);
+  const tentativas = async (query, flow) => (await get('/clinux/pacientes', query, { 'x-flow-id': flow })).json()[0].tentativas;
+  const cpf = { tipo: 'ID', ds_cpf: '98765432100', dt_nascimento: '1980-01-01' };
+  assert.deepEqual([await tentativas(cpf, 'c1'), await tentativas(cpf, 'c2'), await tentativas(cpf, 'c3')], [2, 1, 0]);
+  await get('/clinux/pacientes', { tipo: 'RESET' }, { 'x-flow-id': 'c4' });
+  const antes = calls.length;
+  assert.equal(await tentativas(cpf, 'c4'), 0);
+  assert.equal(calls.length, antes, 'bloqueado não consulta o banco');
+  // Outro CPF no mesmo fluxo continua com o limite do fluxo.
+  assert.equal(await tentativas({ ...cpf, ds_cpf: '11122233344' }, 'c5'), 2);
+
+  const nome = { tipo: 'NOMEDATA', ds_paciente: 'BELTRANO TESTE', dt_nascimento: '1980-01-01' };
+  assert.equal(await tentativas(nome, 'n1'), 2);
+  assert.equal(await tentativas({ ...nome, ds_paciente: ' beltrano  teste ' }, 'n2'), 1);
+  assert.equal(await tentativas(nome, 'n3'), 0);
+  assert.equal(await tentativas(nome, 'n4'), 0);
+});
+
+test('QR paciente-atendimento: confere vínculo, validade e cancelamento; erro devolve lista vazia', async t => {
+  const { qrGuardReset } = require('../src/lib/qr-guard');
+  qrGuardReset();
+  const paciente = { cd_paciente: 123, ds_paciente: 'ANA', dt_nascimento: new Date('1980-01-01') };
+  const ok = await setup(t, 'pacientes.js', 'pacientesRoute', [], { pacientes_atendimentos_cd_pacienteTopacientes: paciente });
+  const response = await ok.get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: '456789' });
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(response.json().map(p => p.cd_paciente), [123]);
+  const where = ok.calls[0].where;
+  assert.equal(where.cd_paciente, 123);
+  assert.equal(where.cd_atendimento, 456789);
+  assert.ok(where.dt_data.gte instanceof Date);
+  const limite = new Date(); limite.setUTCMonth(limite.getUTCMonth() - 6);
+  assert.ok(Math.abs(where.dt_data.gte - limite) < 3 * 86400000);
+  assert.equal(JSON.stringify(where.OR), JSON.stringify([{ ds_status: null }, { ds_status: { not: 1 } }]));
+
+  const nao = await setup(t, 'pacientes.js', 'pacientesRoute', [], null);
+  assert.deepEqual((await nao.get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: '1' })).json(), []);
+  for (const query of [{ tipo: 'QRATEND', cd_paciente: '123' }, { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: 'abc' }]) {
+    assert.equal((await nao.get('/clinux/pacientes', query)).statusCode, 400);
+  }
+  qrGuardReset();
+});
+
+test('QR: 10 erros somando todos os totens bloqueiam a leitura por 5 minutos', async t => {
+  const guard = require('../src/lib/qr-guard');
+  guard.qrGuardReset();
+  const { get, calls } = await setup(t, 'pacientes.js', 'pacientesRoute', [], null);
+  for (let i = 0; i < 10; i++) {
+    const r = await get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: String(100 + i), cd_atendimento: '5' }, { 'x-flow-id': `totem-${i}` });
+    assert.equal(r.statusCode, 200);
+  }
+  const antes = calls.length;
+  const blocked = await get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: '1', cd_atendimento: '1' }, { 'x-flow-id': 'outro' });
+  assert.equal(blocked.statusCode, 429);
+  assert.equal(blocked.json().code, 'QR_BLOQUEADO');
+  assert.equal(calls.length, antes, 'bloqueado não consulta o banco');
+  assert.equal(guard.qrBlocked(Date.now() + guard.QR_GUARD.blockMs + 1), false);
+  // Erros espaçados além da janela não acumulam.
+  guard.qrGuardReset();
+  for (let i = 0; i < 20; i++) assert.equal(guard.qrFailure(i * guard.QR_GUARD.windowMs / 5), false);
+  guard.qrGuardReset();
+});
+
+test('QR antigo: aceito por padrão e recusado com QR_LEGADO=false', async t => {
+  const rows = [{ cd_paciente: 123, ds_paciente: 'ANA', dt_nascimento: new Date('1980-01-01') }];
+  const { get } = await setup(t, 'pacientes.js', 'pacientesRoute', rows);
+  const ok = await get('/clinux/pacientes', { tipo: 'QRLEGADO', cd_paciente: '123' });
+  assert.deepEqual(ok.json().map(p => p.cd_paciente), [123]);
+  {
+    const off = await setup(t, 'pacientes.js', 'pacientesRoute', rows, null, { QR_LEGADO: 'false' });
+    const response = await off.get('/clinux/pacientes', { tipo: 'QRLEGADO', cd_paciente: '123' });
+    assert.equal(response.statusCode, 403);
+    assert.equal(response.json().code, 'QR_LEGADO_DESATIVADO');
+    assert.equal(off.calls.length, 0);
+    // Consulta por código ligada à sessão do paciente continua funcionando.
+    assert.equal((await off.get('/clinux/pacientes', { cd_paciente: '123' })).statusCode, 200);
+  }
 });

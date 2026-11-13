@@ -4,6 +4,7 @@ import Image, { StaticImageData } from 'next/image'
 import { auditTotem } from '@/lib/audit-client'
 import { ArrowLeft, ArrowRight, Home, UsersRound, Baby, Accessibility, PersonStanding, Puzzle, HeartHandshake } from 'lucide-react'
 import DigitalClock from '@/components/DigitalClock'
+import GoldMark from '@/components/GoldMark'
 
 export type PriorityOption = { label: string; icone: StaticImageData; preferencial: number; href?: string; cor?: string }
 
@@ -18,10 +19,10 @@ export default function PriorityOptions({ options, servico }: { options: Priorit
   return <>
     <div className="priority-modern">
       <header className="priority-header">
-        <svg className="priority-brand-mark" width="32" height="32" viewBox="0 0 40 36" aria-hidden="true"><path d="M4 31V21C10 10 22 6 36 6C20 12 14 20 12 31Z" fill="#b68b28" /><path d="M24 31C24 21 28 13 37 7C31 18 30 24 30 31Z" fill="#e2bf62" /></svg>
+        <GoldMark className="priority-brand-mark" />
         <Link prefetch={false} href="/" aria-label="Início" className="priority-home" onClick={() => auditTotem('inicio_clicado', 'prioridade', { servico })}><Home size={19} /></Link>
         {back && <Link prefetch={false} href={back.href!} onClick={() => record(back)} className="priority-back"><ArrowLeft size={20} />Voltar</Link>}
-        <div className="priority-service"><span className="priority-service-label">{service} · </span><DigitalClock /></div>
+        <div className="priority-service"><span className="priority-service-label">{service} · </span><DigitalClock showSeconds={false} /></div>
       </header>
       <h1>Como podemos <span>atender você?</span></h1>
       <p className="priority-subtitle">Selecione o tipo de atendimento para retirar sua senha.</p>
@@ -33,7 +34,7 @@ export default function PriorityOptions({ options, servico }: { options: Priorit
         const Icon = icons[index] ?? HeartHandshake
         return <Link key={option.label} prefetch={false} href={`/totem?servico=${servico}&preferencial=${option.preferencial}`} onClick={() => record(option)} className={`priority-card ${option.preferencial === 2 ? 'priority-special' : ''}`}>
           <span className="priority-icon"><Icon size={27} /></span><span className="priority-badge">{option.preferencial === 2 ? 'Especial' : 'Prioridade'}</span>
-          <strong>{option.label.toLocaleLowerCase('pt-BR')}</strong><small>{descriptions[index] ?? 'Atendimento prioritário'}</small>
+          <strong>{option.label.charAt(0).toLocaleUpperCase('pt-BR') + option.label.slice(1).toLocaleLowerCase('pt-BR')}</strong><small>{descriptions[index] ?? 'Atendimento prioritário'}</small>
         </Link>
       })}</div>
     </div>

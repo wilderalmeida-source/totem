@@ -45,7 +45,7 @@ async function atendimentosTotemRoute(fastify) {
             },
             select: {
                 cd_atendimento: true, dt_data: true, dt_hora: true, ds_status: true,
-                salas: { select: { cd_modalidade: true, dt_hora_chegada: true } },
+                salas: { select: { cd_modalidade: true, dt_hora_chegada: true, modalidades_salas_cd_modalidadeTomodalidades: { select: { ds_modalidade: true } } } },
                 exames: { select: { dt_assinado: true, procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } } } },
             },
             orderBy: [{ dt_data: tipo === 'entrega' ? 'desc' : 'asc' }, { dt_hora: tipo === 'entrega' ? 'desc' : 'asc' }, { cd_atendimento: 'desc' }],

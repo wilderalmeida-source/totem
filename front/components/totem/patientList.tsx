@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Paciente } from "@/services/api";
 import { formatBirthDate, TipoBusca } from "@/lib/patientUtils";
 import { auditTotem } from "@/lib/audit-client";
+import PatientChoice from './PatientChoice';
 
 interface PatientListProps {
   pacientes: Paciente[];
@@ -49,9 +50,8 @@ export function PatientList({
                 <li
                   className="text-4xl mb-3 cursor-pointer"
                   key={paciente.cd_paciente ?? index}
-                  onClick={() => { auditTotem('resultado_busca_selecionado', 'paciente', { tipo, pacienteId: paciente.cd_paciente }); onCPFPatientClick(paciente) }}
                 >
-                  {label}
+                  <button type="button" className="patient-choice-button" onClick={() => { auditTotem('resultado_busca_selecionado', 'paciente', { tipo, pacienteId: paciente.cd_paciente }); onCPFPatientClick(paciente) }}><PatientChoice label={label} isDate /></button>
                 </li>
               );
             }
@@ -73,7 +73,7 @@ export function PatientList({
                     },
                   }}
                 >
-                  {label}
+                  <PatientChoice label={label} isDate={tipo === 'DATA'} />
                 </Link>
               </li>
             );

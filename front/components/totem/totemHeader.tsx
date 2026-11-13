@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { auditTotem } from '@/lib/audit-client';
 import { Home, ArrowLeft, ArrowRight } from 'lucide-react';
+import GoldMark from '@/components/GoldMark';
 
 interface TotemHeaderProps {
   title: string;
@@ -19,7 +20,7 @@ export function TotemHeader({ title, onAdvance, onBack }: TotemHeaderProps) {
 
   return (<>
     <div className="search-modern-heading">
-      <nav><button type="button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', pathname); router.replace('/'); }}><Home size={19} /></button>
+      <nav><GoldMark className="search-gold-mark" /><button type="button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', pathname); router.replace('/'); }}><Home size={19} /></button>
         <button type="button" onClick={() => { auditTotem('voltar', pathname); onBack(); }}><ArrowLeft size={19} />Voltar</button>
         <span className="search-steps"><i /><i /><i />Etapa {pathname === '/date' ? '2' : '1'} de 3</span>
       </nav>

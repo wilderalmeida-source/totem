@@ -25,7 +25,7 @@ function pathAllowed(pathname: string) {
 
 function requiresAdmin(pathname: string, method: string) {
   if (pathname === "/clinux/agenda" || pathname.startsWith("/clinux/agenda/")) return true;
-  if (pathname.startsWith("/clinux/voice/")) return true;
+  if (pathname === "/clinux/voice" || pathname.startsWith("/clinux/voice/")) return true;
   if (pathname === "/clinux/atencao" && method !== "GET") return true;
   if (pathname === "/clinux/atencao/text") return true;
   if (pathname.startsWith("/clinux/guiches")) return true;
@@ -81,9 +81,21 @@ async function proxy(request: NextRequest, context: RouteContext) {
   if (!pathAllowed(pathname)) {
     return NextResponse.json({ error: "Rota não permitida." }, { status: 404 });
   }
+  // Auditoria é gravada apenas pelo servidor do front; o navegador só consulta.
+  if ((pathname === '/clinux/audit' || pathname.startsWith('/clinux/audit/')) && request.method !== 'GET') {
+    return NextResponse.json({ error: "Rota não permitida." }, { status: 404 });
+  }
 
   const patientSearch = pathname === '/clinux/pacientes' && request.method === 'GET';
   const adminSession = patientSearch ? null : await getAdminSession(request);
+  // Botão "Silêncio": totem liberado com cartão/PIN ou administrador com permissão ATENCAO.
+  if (pathname === '/clinux/atencao' && request.method === 'GET') {
+    const adminAllowed = adminSession && (adminSession.permissions.includes('*') || adminSession.permissions.includes('ATENCAO'));
+    if (!adminAllowed) {
+      const denied = await requireTotemOperator(request);
+      if (denied) return denied;
+    }
+  }
   if (requiresAdmin(pathname, request.method) && !adminSession) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   }

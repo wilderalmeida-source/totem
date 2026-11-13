@@ -17,7 +17,7 @@ function environment(config) {
     const exports = {};
     const code = ts.transpileModule(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
     vm.runInNewContext(code, { exports, setTimeout: (fn, ms) => { timers.push({ fn, ms }); return timers.length; }, clearTimeout() {},
-      require: name => name === 'react' ? react : name === '@/lib/panel-notices' ? load('lib/panel-notices.ts') : name === './Pictogram' ? load('components/panel/Pictogram.tsx') : require(name),
+      require: name => name === 'react' ? react : name === '@/lib/panel-notices' ? load('lib/panel-notices.ts') : name === '@/components/GoldMark' ? load('components/GoldMark.tsx') : name === './Pictogram' ? load('components/panel/Pictogram.tsx') : require(name),
     });
     return exports;
   }

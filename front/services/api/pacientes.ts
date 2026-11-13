@@ -5,12 +5,14 @@ import { patientSessionRequest } from '@/lib/patient-session-client'
 export const buscaPaciente = async ({
   ds_paciente,
   cd_paciente,
+  cd_atendimento,
   dt_nascimento,
   ds_cpf,
   tipo,
 }: {
   ds_paciente?: string
   cd_paciente?: number
+  cd_atendimento?: number
   dt_nascimento?: string
   ds_cpf?: string
   tipo?: string
@@ -19,7 +21,7 @@ export const buscaPaciente = async ({
 
   if (tipo === 'ID' || tipo === 'NOMEDATA' || cd_paciente !== undefined) {
     const body = tipo === 'NOMEDATA' ? { tipo, ds_paciente, dt_nascimento, ...(cd_paciente !== undefined ? { cd_paciente } : {}) }
-      : cd_paciente !== undefined ? { tipo: 'QR', cd_paciente }
+      : cd_paciente !== undefined ? { tipo: 'QR', cd_paciente, ...(cd_atendimento !== undefined ? { cd_atendimento } : {}) }
       : tipo === 'ID' ? { tipo, ds_cpf, dt_nascimento } : { tipo, ds_paciente, dt_nascimento }
     const result = await patientSessionRequest<{ patient: Paciente }>('POST', body)
     return [result.patient]

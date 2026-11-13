@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 const sections = [
-  { href: '/informativos', title: 'Informativos', description: 'Cadastre, ordene e programe os avisos de texto dos painéis do Tema 1.', icon: ScrollText, color: 'bg-blue-600', permission: 'PAINEIS' },
+  { href: '/informativos', title: 'Informativos', description: 'Cadastre, ordene e programe os avisos de texto dos painéis dos Temas 1 e 2.', icon: ScrollText, color: 'bg-blue-600', permission: 'PAINEIS' },
   { href: '/temas', title: 'Temas', description: 'Escolha o visual do sistema e a aparência clara ou escura.', icon: MonitorCog, color: 'bg-blue-600', permission: 'PAINEIS' },
   { href: '/licenca', title: 'Licença do sistema', description: 'Envie o arquivo de licença e consulte a ativação desta instalação.', icon: KeyRound, color: 'bg-blue-600', permission: 'USUARIOS' },
   { href: '/acesso-totem', title: 'Acesso ao totem', description: 'Cadastre colaboradores, cartões e PINs para liberar os terminais.', icon: KeyRound, color: 'bg-teal-600', permission: 'USUARIOS' },

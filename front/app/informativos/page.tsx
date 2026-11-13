@@ -40,7 +40,7 @@ export default function NoticesPage() {
     try {
       const response = await fetch('/api/informativos', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) })
       if (!response.ok) throw Error('Não foi possível salvar os informativos.')
-      setNotice('Informativos salvos. Os painéis do Tema 1 atualizam a playlist em até um minuto.')
+      setNotice('Informativos salvos. Os painéis dos Temas 1 e 2 atualizam a playlist em até um minuto.')
     } catch (e) { setError(e instanceof Error ? e.message : 'Erro ao salvar.') }
     finally { setBusy(false) }
   }
@@ -61,7 +61,7 @@ export default function NoticesPage() {
     finally { setBusy(false) }
   }
   return <main className="min-h-screen bg-slate-100 p-5 md:p-10"><div className="mx-auto max-w-5xl">
-    <h1 className="text-3xl font-bold">Informativos do painel</h1><p className="mt-2 text-slate-600">Playlist de avisos com textos e imagens exibidos nos painéis do Tema 1. Os itens ativos são repetidos na ordem abaixo.</p>
+    <h1 className="text-3xl font-bold">Informativos do painel</h1><p className="mt-2 text-slate-600">Playlist de avisos com textos e imagens exibidos nos painéis dos Temas 1 e 2. Os itens ativos são repetidos na ordem abaixo.</p>
     {error && <p role="alert" className="my-4 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
     {notice && <p role="status" className="my-4 rounded-xl bg-green-50 p-4 text-green-800">{notice}</p>}
     {!config ? <p className="mt-6">{error ? 'Recarregue a página para tentar novamente.' : 'Carregando…'}</p> : <fieldset disabled={busy} className="mt-6 space-y-5 disabled:opacity-60">

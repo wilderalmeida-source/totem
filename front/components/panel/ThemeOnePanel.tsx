@@ -5,6 +5,7 @@ import type { PanelCall } from '@/lib/panel-call'
 import type { QueuePerson } from '@/components/QueueList'
 import { validNoticeSettings, noticeCategories, type NoticeSettings } from '@/lib/panel-notices'
 import { ModalityPictogram, NoticePictogram } from './Pictogram'
+import GoldMark from '@/components/GoldMark'
 
 function shortName(name: string) {
   const words = name.trim().split(/\s+/)
@@ -45,7 +46,7 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
   }, [cycle, config, notice?.id, notice?.durationSeconds])
   const name = current?.fullName || current?.name
   return <section className={`tv-panel ${!notice ? 'tv-no-notice' : ''}`} aria-label={`Painel de chamadas ${painelId}`}>
-    <header className="tv-header"><div className="tv-brand"><span><Building2 /></span><div><strong>{company}</strong><small>Painel de chamadas · Recepção {painelId}</small></div></div><div className="tv-clock"><time>{now?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) ?? '--:--'}</time><small>{now?.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}</small></div></header>
+    <header className="tv-header"><div className="tv-brand"><span><Building2 className="tv-blue-mark" /><GoldMark className="tv-gold-mark" /></span><div><strong>{company}</strong><small>Painel de chamadas · Recepção {painelId}</small></div></div><div className="tv-clock"><time>{now?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) ?? '--:--'}</time><small>{now?.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}</small></div></header>
     <div className="tv-main">
       <section className="tv-current" aria-label="Chamando agora"><div className="tv-eyebrow"><span className="tv-live" />Chamando agora</div>
         <h1 key={current?.id ?? 'waiting'} className="tv-patient-name">{name || 'Aguardando chamada'}</h1>
@@ -65,7 +66,7 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
 export default function ThemeOnePanel(props: { current: PanelCall | null; people: QueuePerson[]; painelId: number }) {
   const [active, setActive] = useState(false)
   useEffect(() => {
-    const update = () => setActive(document.documentElement.dataset.visualTheme === 'theme1')
+    const update = () => setActive(['theme1', 'theme2'].includes(document.documentElement.dataset.visualTheme ?? ''))
     update(); const observer = new MutationObserver(update)
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-visual-theme'] })
     return () => observer.disconnect()

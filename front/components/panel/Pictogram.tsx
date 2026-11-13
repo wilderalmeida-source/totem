@@ -9,6 +9,16 @@ export function modalityIcon(name = '') {
   if (value.includes('raio') || value.includes('radiogr')) return ScanLine
   return Stethoscope
 }
+export function modalityDescription(name = '') {
+  const value = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  if (value.includes('mamo')) return 'Exame das mamas'
+  if (value.includes('ultra')) return 'Ultrassom e doppler'
+  if (value.includes('resson')) return 'Imagem por ressonância'
+  if (value.includes('densito')) return 'Densidade dos ossos'
+  if (value.includes('tomogra')) return 'Exame de tomografia'
+  if (value.includes('raio') || value.includes('radiogr')) return 'Radiografia digital'
+  return ''
+}
 export function ModalityPictogram({ name }: { name?: string }) {
   const Icon = modalityIcon(name)
   return <span className="tv-pictogram" aria-hidden="true"><Icon /></span>

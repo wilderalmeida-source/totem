@@ -22,9 +22,9 @@ export default function Home() {
         <HomeThemeHeader company={empresa} description={process.env.EMPRESA_DESCRICAO || 'Atendimento e resultados'} />
         <div className="home-welcome">
           <h2 className="text-6xl text-center">
-            Olá, seja bem vindo ao <AdminAccessTrigger companyName={empresa} />!
+            Olá, seja bem-vindo ao <AdminAccessTrigger companyName={empresa} />
           </h2>
-          <h6 className="text-4xl text-center mt-4">Escolha uma opção abaixo.</h6>
+          <h6 className="text-4xl text-center mt-4">Toque em uma das opções abaixo para começar.</h6>
         </div>
         <LicenseAvailability><Servicos servicos={services} /></LicenseAvailability>
         <div className="home-history flex flex-col h-full justify-end mb-5 xl:h-[700px]">

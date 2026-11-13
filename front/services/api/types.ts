@@ -7,6 +7,7 @@ export type Sala = {
   cd_modalidade: number
   ds_sala?: string
   dt_hora_chegada?: string | null
+  modalidades_salas_cd_modalidadeTomodalidades?: { ds_modalidade: string | null } | null
 }
 
 export type ExameProc = {

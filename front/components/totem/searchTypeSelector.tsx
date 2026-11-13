@@ -1,6 +1,7 @@
 "use client";
 
 import { TipoBusca } from "@/lib/patientUtils";
+import { CalendarDays, ContactRound, UserRound } from 'lucide-react';
 
 interface SearchTypeSelectorProps {
   tipo: TipoBusca;
@@ -29,7 +30,7 @@ export function SearchTypeSelector({ tipo, onChange }: SearchTypeSelectorProps) 
             checked={tipo === option.value}
             onChange={() => onChange(option.value)}
           />
-          <span className="search-type-legacy">{option.label}</span><span className="search-type-modern">{option.value === 'DATA' ? 'Data de nascimento' : option.value === 'NOME' ? 'Nome' : 'CPF'}</span>
+          <span className="search-type-legacy">{option.label}</span><span className="search-type-modern">{option.value === 'DATA' ? <CalendarDays size={17} /> : option.value === 'NOME' ? <UserRound size={17} /> : <ContactRound size={17} />}{option.value === 'DATA' ? 'Data de nascimento' : option.value === 'NOME' ? 'Nome' : 'CPF'}</span>
         </label>
       ))}
     </div>
