@@ -52,7 +52,9 @@ export function PatientList({
             const label =
               tipo === "DATA" || tipo === "CPF"
                 ? formatBirthDate(paciente.dt_nascimento)
-                : paciente.ds_nome || "SEM NOME";
+                : tipo === "PROTOCOLO"
+                  ? `Protocolo ${paciente.ds_nome}`
+                  : paciente.ds_nome || "SEM NOME";
 
             if (tipo === "CPF") {
               return (
@@ -82,7 +84,7 @@ export function PatientList({
                     },
                   }}
                 >
-                  <PatientChoice label={label} isDate={tipo === 'DATA'} />
+                  <PatientChoice label={label} isDate={tipo === 'DATA'} isProtocolo={tipo === 'PROTOCOLO'} />
                 </Link>
               </li>
             );

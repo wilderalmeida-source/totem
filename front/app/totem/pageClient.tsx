@@ -106,6 +106,13 @@ export default function Totem() {
   }
   async function avancar() {
     auditTotem('avancar_clicado', 'busca', { tipo, servico, preferencial, preenchido: Boolean(text.trim()) });
+    if (tipo === "PROTOCOLO") {
+      const protocolo = onlyNumbers(text);
+      if (!protocolo) { window.alert("Digite o número do protocolo"); return; }
+      router.push(`/date?servico=${servico}&preferencial=${preferencial}&nome=${protocolo}&tipo=PROTOCOLO`);
+      return;
+    }
+
     if (!text.trim()) {
       window.alert("Digite o nome do paciente");
       return;
@@ -173,11 +180,11 @@ export default function Totem() {
   }
   return (
     <div className="search-screen overflow-hidden h-screen" data-search-type={tipo}>
-      <TotemHeader title={title} onAdvance={avancar} onBack={voltar} />
+      <TotemHeader title={title} onAdvance={tipo === "PROTOCOLO" ? undefined : avancar} onBack={voltar} />
 
       <Base type="totem">
         <div className="flex h-full flex-col justify-start mt-8 px-2">
-          <SearchTypeSelector tipo={tipo} onChange={handleChangeTipo} />
+          <SearchTypeSelector tipo={tipo} onChange={handleChangeTipo} servico={servico} />
 
           <PatientSearchInput
             tipo={tipo}

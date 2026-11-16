@@ -957,3 +957,6 @@ html.dark .brand-logo-for-light, html:not(.dark) .brand-logo-for-dark { display:
 @media (max-width: 599px) {
   .brand-logo-header .brand-logo-img { max-height: 40px; max-width: 180px; }
 }
+
+/* Busca por protocolo: rótulo visível do campo "Senha" na segunda tela. */
+.search-input-label { display: block; margin: 0 0 6px; font-size: 15px; font-weight: 700; letter-spacing: .02em; color: var(--search-muted, #64748b); }

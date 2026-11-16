@@ -302,3 +302,26 @@ test('QR antigo vai como QRLEGADO e recusa do backend vira "QR Code inválido"',
   assert.equal(response.status, 400);
   assert.equal((await response.json()).error, 'QR Code inválido.');
 });
+
+test('protocolo confirma o ID escolhido pela sessao; ID que nao confere ou tentativas viram erro', async () => {
+  const env = environment();
+  const token = await identify(env, { tipo: 'PROTOCOLO', cd_atendimento: 987654, cd_paciente: 123 });
+  assert.equal(env.store.readPatientSession(token).patientId, 123);
+  const query = env.calls[0].url.searchParams;
+  assert.equal(query.get('tipo'), 'PROTOCOLOID');
+  assert.equal(query.get('cd_atendimento'), '987654');
+  assert.equal(query.get('cd_paciente'), '123');
+
+  // Backend devolveu outro paciente: não abre sessão.
+  const mismatch = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'PROTOCOLO', cd_atendimento: 987654, cd_paciente: 999 }));
+  assert.equal(mismatch.status, 401);
+
+  env.context.fetch = async () => new Response(JSON.stringify([{ tentativas: 2 }]), { headers: { 'Content-Type': 'application/json' } });
+  const wrong = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'PROTOCOLO', cd_atendimento: 987654, cd_paciente: 5 }));
+  assert.equal(wrong.status, 401);
+  assert.equal((await wrong.json()).error, 'Dados incorretos. Tentativas restantes: 2.');
+
+  const invalid = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'PROTOCOLO', cd_atendimento: 987654 }));
+  assert.equal(invalid.status, 400);
+});
+

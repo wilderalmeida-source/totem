@@ -1,7 +1,8 @@
 
 import { Paciente } from "@/services/api";
 import { formatarDataNascimento } from "./formatdate";
-export type TipoBusca = "DATA" | "CPF" | "NOME";
+// PROTOCOLO: só na Entrega de exames (código do atendimento).
+export type TipoBusca = "DATA" | "CPF" | "NOME" | "PROTOCOLO";
 
 export const COMMON_NAMES = ["MARIA", "JOAO", "JOSÉ", "JOSE"];
 
@@ -62,5 +63,6 @@ export function getInputMask(tipo: TipoBusca) {
 export function getInputPlaceholder(tipo: TipoBusca) {
   if (tipo === "DATA") return "Digite a Data de Nascimento";
   if (tipo === "CPF") return "Digite seu CPF";
+  if (tipo === "PROTOCOLO") return "Digite o número do protocolo";
   return "Digite seu Nome";
 }

@@ -5,7 +5,7 @@ const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
 const directory = path.resolve(process.argv[2] || '');
 const requestedSize = process.argv[3] || 'all';
-const screens = ['home','priority','search-name','search-data','search-cpf','confirm-name','confirm-date','modalities','modal','tv','login','login-totem','admin','themes'];
+const screens = ['home','priority','search-name','search-data','search-cpf','search-protocolo','confirm-name','confirm-date','confirm-protocolo','modalities','modal','tv','login','login-totem','admin','themes'];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function main() {
   if (!process.argv[2] || !['all','desktop','mobile'].includes(requestedSize)) throw Error('Usage: node scripts/render-layout-previews.cjs <fixture-directory> [all|desktop|mobile]');

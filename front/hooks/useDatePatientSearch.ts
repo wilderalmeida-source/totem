@@ -41,6 +41,13 @@ export function useDatePatientSearch({ nome, tipo, filtroNome, filtroNascimento 
         setAtendimentosHoje(unicos)
         setIdsComExame(ids)
         setPacientes(responsePacientes.filter(paciente => !paciente.cd_paciente || !ids.has(paciente.cd_paciente)))
+      } else if (tipo === 'PROTOCOLO') {
+        // Lista "Senha": ID real do paciente do protocolo + IDs falsos (sempre os mesmos).
+        const response = await buscaPaciente({ tipo: 'PROTOCOLO', cd_atendimento: Number(nome) })
+        if (requestId !== sequence.current) return
+        setPacientes(response)
+        setAtendimentosHoje([])
+        setIdsComExame(new Set())
       } else {
         const response = await buscaPaciente({ ds_paciente: nome, tipo: 'NOME', dt_nascimento: filtroNascimento })
         if (requestId !== sequence.current) return

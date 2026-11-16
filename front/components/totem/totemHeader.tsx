@@ -7,7 +7,8 @@ import BrandMark from '@/components/brand/BrandMark';
 
 interface TotemHeaderProps {
   title: string;
-  onAdvance: () => void;
+  /** Sem onAdvance, o "Avançar sem cadastro" não aparece (ex.: busca por protocolo). */
+  onAdvance?: () => void;
   onBack: () => void;
 }
 
@@ -27,14 +28,14 @@ export function TotemHeader({ title, onAdvance, onBack }: TotemHeaderProps) {
       <h1>Identifique-se para <span>{title.toLocaleLowerCase('pt-BR') === 'agendamento' ? 'o agendamento' : title.toLocaleLowerCase('pt-BR') === 'atendimento' ? 'o atendimento' : 'a entrega de exames'}</span></h1>
       <p>{pathname === '/date' ? 'Confirme seus dados selecionando a opção correta na lista.' : 'Busque e toque nos seus dados na lista.'}</p>
     </div>
-    <div className="search-modern-footer"><span>Não encontrou seus dados?</span><button type="button" onClick={onAdvance}>Avançar sem cadastro <ArrowRight size={18} /></button></div>
+    {onAdvance && <div className="search-modern-footer"><span>Não encontrou seus dados?</span><button type="button" onClick={onAdvance}>Avançar sem cadastro <ArrowRight size={18} /></button></div>}
     <div className="search-legacy-heading flex flex-row flex-1 justify-between mt-3 w-full">
       <h2 className="text-2xl p-5 font-extrabold self-start">{title}</h2>
 
       <div className="top-10 left-3/4 w-60 space-y-2">
-        <button className={buttonClass} onClick={onAdvance}>
+        {onAdvance && <button className={buttonClass} onClick={onAdvance}>
           AVANÇAR
-        </button>
+        </button>}
 
         <button
           className={buttonClass}

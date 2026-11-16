@@ -14,6 +14,11 @@ interface PatientSearchInputProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onQRCodeClick: () => void;
   qrCodeDisabled?: boolean;
+  /** Rótulo visível e placeholder próprios (ex.: "Senha" na busca por protocolo). */
+  label?: string;
+  placeholder?: string;
+  /** Esconde o botão de QR Code. */
+  hideQRCode?: boolean;
 }
 
 export function PatientSearchInput({
@@ -23,16 +28,21 @@ export function PatientSearchInput({
   onChange,
   onQRCodeClick,
   qrCodeDisabled = false,
+  label,
+  placeholder,
+  hideQRCode = false,
 }: PatientSearchInputProps) {
-  return (
+  return (<>
+    {label && <label htmlFor="patient-search-input" className="search-input-label">{label}</label>}
     <div className="search-input-row flex w-full">
       <IMaskInput
         inputRef={inputRef}
+        id="patient-search-input"
         mask={getInputMask(tipo)}
         unmask={true}
         inputMode={tipo === "NOME" ? undefined : "numeric"}
         autoFocus
-        placeholder={getInputPlaceholder(tipo)}
+        placeholder={placeholder ?? getInputPlaceholder(tipo)}
         className="h-16 w-full rounded-lg text-4xl px-4 border-black mr-3 border-solid border-2"
         value={value}
         onChange={onChange}
@@ -42,7 +52,7 @@ export function PatientSearchInput({
         }}
       />
 
-      <button
+      {!hideQRCode && <button
         type="button"
         disabled={qrCodeDisabled}
         onClick={() => { auditTotem('tipo_busca_selecionado', 'busca', { tipo: 'QR' }); onQRCodeClick(); }}
@@ -51,7 +61,7 @@ export function PatientSearchInput({
         className="flex w-16 items-center justify-center disabled:cursor-not-allowed disabled:opacity-30"
       >
         <Image src={qrcode} width={40} height={40} alt="QR Code" />
-      </button>
+      </button>}
     </div>
-  );
+  </>);
 }

@@ -62,3 +62,12 @@ test('GET /clinux/atencao: totem liberado ou admin ATENCAO tocam; anônimo não'
   assert.equal(calls.length, 2);
   assert.ok(calls.every(c => c.url.endsWith('/clinux/atencao?TorP=play')));
 });
+
+test('protocolo: lista de IDs passa pelo proxy; confirmacao (PROTOCOLOID) so pela sessao do paciente', async () => {
+  const calls = [];
+  const proxy = load({ totemAllowed: true }, calls);
+  assert.equal((await call(proxy, 'clinux/pacientes?tipo=PROTOCOLO&cd_atendimento=987654')).status, 200);
+  assert.match(calls[0].url, /tipo=PROTOCOLO&cd_atendimento=987654/);
+  assert.equal((await call(proxy, 'clinux/pacientes?tipo=PROTOCOLOID&cd_atendimento=987654&cd_paciente=1')).status, 403);
+  assert.equal(calls.length, 1);
+});

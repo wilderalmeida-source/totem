@@ -111,7 +111,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
   if ((pathname === '/clinux/pacientes' || pathname === '/clinux/senhas') && request.method !== 'GET') {
     return NextResponse.json({ error: 'Utilize o fluxo de identificação do paciente.' }, { status: 403 });
   }
-  if (pathname === '/clinux/pacientes' && ['ID', 'NOMEDATA'].includes(target.searchParams.get('tipo') ?? '')) {
+  if (pathname === '/clinux/pacientes' && ['ID', 'NOMEDATA', 'PROTOCOLOID'].includes(target.searchParams.get('tipo') ?? '')) {
     return NextResponse.json({ error: 'Utilize o fluxo de identificação do paciente.' }, { status: 403 });
   }
   if (pathname === '/clinux/totem/atendimentos' || (pathname === '/clinux/pacientes' && target.searchParams.has('cd_paciente'))) {

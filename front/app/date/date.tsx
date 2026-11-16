@@ -12,6 +12,7 @@ import { useDatePatientSearch } from '@/hooks/useDatePatientSearch'
 import { identificationValues } from '@/lib/identification-diagnostic'
 import { TipoBusca, isValidDateBR, toISODateBR } from '@/lib/patientUtils'
 import { buscarPacienteNomeData } from '@/services/buscaNomeData'
+import { buscarPacienteProtocolo } from '@/services/buscaProtocolo'
 import type { Paciente } from '@/services/api'
 import type { DadosPaciente } from '@/components/modals/patientModal'
 import { buscarConfiguracaoPaineis } from '@/services/api'
@@ -51,6 +52,7 @@ export default function DataNasc() {
 
   const tituloBusca = useMemo(() => {
     if (tipo === 'DATA') return formatarDataNascimento(nome)
+    if (tipo === 'PROTOCOLO') return `Protocolo ${nome}`
     return nome
   }, [nome, tipo])
 
@@ -92,19 +94,22 @@ export default function DataNasc() {
     try {
       const dsPaciente = tipo === 'DATA' ? paciente.ds_paciente ?? text : nome
       const dtNascimento = tipo === 'DATA' ? nome : paciente.dt_nascimento ?? text
-      auditTotem('identificacao_confirmacao_original', 'busca_complementar', {
+      if (tipo === 'PROTOCOLO') auditTotem('identificacao_confirmacao_original', 'busca_complementar', { tipo, protocolo: nome, idSelecionado: paciente.cd_paciente })
+      else auditTotem('identificacao_confirmacao_original', 'busca_complementar', {
         nomePaciente: dsPaciente,
         tipo, entrada: identificationValues(tipo === 'DATA' ? { ds_paciente: originalInput.current } : { dt_nascimento: originalInput.current }),
         selecionado: identificationValues({ ds_paciente: dsPaciente, dt_nascimento: dtNascimento }),
       })
 
-      const result = await buscarPacienteNomeData({
-        cd_paciente: tipo === 'DATA' ? paciente.cd_paciente : undefined,
-        ds_paciente: dsPaciente,
-        dt_nascimento: dtNascimento,
-        servico,
-        preferencial,
-      })
+      const result = tipo === 'PROTOCOLO'
+        ? await buscarPacienteProtocolo({ cd_atendimento: Number(nome), cd_paciente: Number(paciente.cd_paciente), servico, preferencial })
+        : await buscarPacienteNomeData({
+          cd_paciente: tipo === 'DATA' ? paciente.cd_paciente : undefined,
+          ds_paciente: dsPaciente,
+          dt_nascimento: dtNascimento,
+          servico,
+          preferencial,
+        })
 
       const configPainel = await buscarConfiguracaoPaineis()
       if (saindoRef.current) return
@@ -233,7 +238,7 @@ export default function DataNasc() {
     <div className="search-screen search-confirmation overflow-hidden h-screen" data-search-type={tipo === 'DATA' ? 'NOME' : 'DATA'}>
       <TotemHeader
         title={title}
-        onAdvance={avancar}
+        onAdvance={tipo === 'PROTOCOLO' ? undefined : avancar}
         onBack={voltar}
       />
 
@@ -242,12 +247,13 @@ export default function DataNasc() {
           <h2 className="mb-3 content-center text-4xl">{tituloBusca}</h2>
 
           <PatientSearchInput
-            tipo={tipo === 'DATA' ? 'NOME' : 'DATA'}
+            tipo={tipo === 'PROTOCOLO' ? 'PROTOCOLO' : tipo === 'DATA' ? 'NOME' : 'DATA'}
             value={text}
             inputRef={inputRef}
             onChange={(event) => updateSearchText(event.target.value)}
             onQRCodeClick={abrirQRCode}
             qrCodeDisabled={servico !== 'C'}
+            {...(tipo === 'PROTOCOLO' ? { label: 'Senha', placeholder: 'Senha', hideQRCode: true } : {})}
           />
 
           <DatePatientList
@@ -262,7 +268,7 @@ export default function DataNasc() {
           />
 
           <VirtualKeyboard
-            tipo={tipo === 'DATA' ? 'NOME' : 'DATA'}
+            tipo={tipo === 'PROTOCOLO' ? 'PROTOCOLO' : tipo === 'DATA' ? 'NOME' : 'DATA'}
             value={text}
             onChange={updateSearchText}
           />

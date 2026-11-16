@@ -40,3 +40,19 @@ export function decoyBirthDates(key: string, realDates: (Date | string | null | 
   }
   return dates.sort().map(dt_nascimento => ({ dt_nascimento }))
 }
+
+/**
+ * Busca por protocolo: completa o ID real do paciente com IDs falsos até somar 10.
+ * Os falsos saem de 1..maior código de paciente existente (mesma faixa dos reais, para não serem
+ * descartáveis à primeira vista) e dependem só do protocolo + segredo: a lista não muda ao repetir.
+ */
+export function decoyPatientIds(key: string, realId: number | null, maxId: number) {
+  const max = Math.max(Math.floor(maxId), realId ?? 0, 1000)
+  const ids = new Set<number>()
+  if (realId) ids.add(realId)
+  for (let counter = 0; ids.size < TOTAL && counter < 1000; counter++) {
+    const digest = createHmac('sha256', secret()).update(`decoy-id:${key}:${counter}`).digest()
+    ids.add(1 + (digest.readUInt32BE(0) % max))
+  }
+  return [...ids].sort((a, b) => a - b).map(cd_paciente => ({ cd_paciente }))
+}

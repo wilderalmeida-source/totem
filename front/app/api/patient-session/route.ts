@@ -19,6 +19,8 @@ const confirmation = z.discriminatedUnion('tipo', [
   // QR "paciente-atendimento"; sem cd_atendimento é o QR antigo (só o código), que o backend aceita enquanto QR_LEGADO não for "false".
   z.object({ tipo: z.literal('QR'), cd_paciente: z.number().int().positive().safe(), cd_atendimento: z.number().int().positive().safe().optional() }).strict(),
   z.object({ tipo: z.literal('NEW'), ds_paciente: name, dt_nascimento: birth }).strict(),
+  // Entrega por protocolo: o atendimento (protocolo) precisa pertencer ao paciente (ID escolhido na lista "Senha").
+  z.object({ tipo: z.literal('PROTOCOLO'), cd_atendimento: z.number().int().positive().safe(), cd_paciente: z.number().int().positive().safe() }).strict(),
 ])
 
 export async function POST(request: NextRequest) {
@@ -54,6 +56,8 @@ export async function POST(request: NextRequest) {
         if (input.cd_atendimento !== undefined) { params.set('tipo', 'QRATEND'); params.set('cd_atendimento', String(input.cd_atendimento)) }
         else params.set('tipo', 'QRLEGADO')
         params.set('cd_paciente', String(input.cd_paciente))
+      } else if (input.tipo === 'PROTOCOLO') {
+        params.set('tipo', 'PROTOCOLOID'); params.set('cd_atendimento', String(input.cd_atendimento)); params.set('cd_paciente', String(input.cd_paciente))
       } else Object.entries(input).forEach(([key, value]) => { if (value !== undefined) params.set(key, String(value)) })
       if (input.tipo === 'QR') auditServer(request, 'qr_consulta_backend', 'patientSession.POST', { codigoPesquisado: input.cd_paciente, rota: '/clinux/pacientes', parametro: params.get('cd_paciente') })
       upstream = await patientBackend(`/clinux/pacientes?${params}`, {}, request)
@@ -89,6 +93,7 @@ export async function POST(request: NextRequest) {
       typeof patient.dt_nascimento !== 'string' || patient.dt_nascimento.slice(0, 10) !== input.dt_nascimento.slice(0, 10)
     )) return fail('O cadastro não corresponde ao paciente selecionado.', 401)
     if (input.tipo === 'QR' && patient.cd_paciente !== input.cd_paciente) return fail('O cadastro não corresponde ao QR Code lido.', 401)
+    if (input.tipo === 'PROTOCOLO' && patient.cd_paciente !== input.cd_paciente) return fail('Dados incorretos.', 401)
     const session = createPatientSession(patient.cd_paciente)
     auditServer(request, 'identificacao_resposta_final', 'patientSession.POST', { status: 200,
       nomePaciente: patient.ds_paciente, resposta: identificationResult({ patient }), outcome: 'CONCLUIDO' })

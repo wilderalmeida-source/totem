@@ -55,6 +55,13 @@ export function usePatientSearch(tipo: TipoBusca) {
         }
       }
 
+      // Protocolo: só mostra o item para seguir à tela da senha (a consulta acontece lá).
+      if (tipo === "PROTOCOLO") {
+        setPacientes(number.length > 0 && number.length <= 12 ? [{ ds_nome: number } as Paciente] : []);
+        setTruncada(false);
+        return;
+      }
+
       if (tipo === "CPF" && number.length !== 11) {
         setPacientes([]);
         return;

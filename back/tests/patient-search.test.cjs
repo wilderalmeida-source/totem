@@ -10,7 +10,7 @@ async function setup(t, file, exportName, result = [], eligible = null, env = {}
   const calls = [];
   const diagnostics = [];
   const findMany = async args => { calls.push(args); return result; };
-  const prisma = { pacientes: { findMany, groupBy: findMany }, atendimentos: { findMany, findFirst: async args => { calls.push(args); return eligible; } } };
+  const prisma = { pacientes: { findMany, groupBy: findMany, aggregate: async () => ({ _max: { cd_paciente: 500000 } }) }, atendimentos: { findMany, findFirst: async args => { calls.push(args); return eligible; } } };
   const filename = path.join(__dirname, '../src/routes', file);
   const realRequire = createRequire(filename);
   const exports = {};
@@ -320,3 +320,35 @@ test('QR antigo: aceito por padrão e recusado com QR_LEGADO=false', async t => 
     assert.equal((await off.get('/clinux/pacientes', { cd_paciente: '123' })).statusCode, 200);
   }
 });
+
+test('protocolo lista 10 IDs (real + falsos), sempre iguais, e nao revela protocolo inexistente', async t => {
+  const { calls, get } = await setup(t, 'pacientes.js', 'pacientesRoute', [], { cd_paciente: 4242 });
+  const first = (await get('/clinux/pacientes', { tipo: 'PROTOCOLO', cd_atendimento: '987654' })).json();
+  assert.equal(first.length, 10);
+  assert.ok(first.some(item => item.cd_paciente === 4242));
+  assert.ok(first.every(item => Object.keys(item).join() === 'cd_paciente' && item.cd_paciente >= 1 && item.cd_paciente <= 500000));
+  assert.deepEqual(first.map(i => i.cd_paciente), [...first.map(i => i.cd_paciente)].sort((a, b) => a - b));
+  const again = (await get('/clinux/pacientes', { tipo: 'PROTOCOLO', cd_atendimento: '987654' })).json();
+  assert.deepEqual(again, first);
+  assert.equal(calls[0].where.cd_atendimento, 987654);
+  assert.equal(JSON.stringify(calls[0].where.OR), JSON.stringify([{ ds_status: null }, { ds_status: { not: 1 } }]));
+  const missing = await setup(t, 'pacientes.js', 'pacientesRoute', [], null);
+  assert.equal((await missing.get('/clinux/pacientes', { tipo: 'PROTOCOLO', cd_atendimento: '111' })).json().length, 10);
+});
+
+test('protocolo confirma o ID do atendimento; erros contam por protocolo como a data', async t => {
+  const ok = await setup(t, 'pacientes.js', 'pacientesRoute', [], { pacientes_atendimentos_cd_pacienteTopacientes: { cd_paciente: 4242, ds_paciente: 'CRI TESTE', dt_nascimento: null } });
+  const hit = await ok.get('/clinux/pacientes', { tipo: 'PROTOCOLOID', cd_atendimento: '987654', cd_paciente: '4242' }, { 'x-flow-id': 'totem-ok' });
+  assert.equal(hit.json()[0].cd_paciente, 4242);
+  assert.equal(ok.calls[0].where.cd_paciente, 4242);
+  assert.equal(ok.calls[0].where.cd_atendimento, 987654);
+  const wrong = await setup(t, 'pacientes.js', 'pacientesRoute', [], null);
+  const tries = [];
+  for (let i = 0; i < 3; i++) tries.push((await wrong.get('/clinux/pacientes', { tipo: 'PROTOCOLOID', cd_atendimento: '5555', cd_paciente: String(10 + i) }, { 'x-flow-id': `totem-${i}` })).json()[0].tentativas);
+  assert.deepEqual(tries, [2, 1, 0]);
+  // Trocar de totem (x-flow-id) não renova as tentativas daquele protocolo.
+  const blocked = await wrong.get('/clinux/pacientes', { tipo: 'PROTOCOLOID', cd_atendimento: '5555', cd_paciente: '99' }, { 'x-flow-id': 'outro-totem' });
+  assert.equal(blocked.json()[0].tentativas, 0);
+  assert.equal((await wrong.get('/clinux/pacientes', { tipo: 'PROTOCOLOID', cd_atendimento: '5555' })).statusCode, 400);
+});
+

@@ -7,7 +7,8 @@ import { birthDate, cpf, patientName, positiveId, prefixName, SEARCH_LIMIT, toda
 import { describePatientInput, patientDiagnostic } from '../lib/patient-diagnostics'
 import { identificationAttempts, identificationTarget, TARGET } from '../lib/identification-attempts'
 import { flowAudit } from '../lib/flow-audit'
-import { decoyBirthDates } from '../lib/decoy-dates'
+import { decoyBirthDates, decoyPatientIds } from '../lib/decoy-dates'
+import { ttlCache } from '../lib/painel-caches'
 import { qrBlocked, qrFailure } from '../lib/qr-guard'
 import { clientErrorDetails } from '../lib/client-error'
 
@@ -18,6 +19,10 @@ const patientQuery = z.union([
   z.object({ tipo: z.literal('QRATEND'), cd_paciente: positiveId, cd_atendimento: positiveId }).strict(),
   // QR antigo (só o código do paciente): aceito enquanto QR_LEGADO não for "false" no env.backend.
   z.object({ tipo: z.literal('QRLEGADO'), cd_paciente: positiveId }).strict(),
+  // Entrega por protocolo: 1) lista de IDs (real + falsos) para o código do atendimento;
+  // 2) confirmação do ID escolhido, com a mesma regra de tentativas da data de nascimento.
+  z.object({ tipo: z.literal('PROTOCOLO'), cd_atendimento: positiveId }).strict(),
+  z.object({ tipo: z.literal('PROTOCOLOID'), cd_atendimento: positiveId, cd_paciente: positiveId }).strict(),
   z.object({ tipo: z.literal('ID'), ds_cpf: cpf, dt_nascimento: birthDate }).strict(),
   z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: patientName, dt_nascimento: birthDate, cd_paciente: positiveId.optional() }).strict(),
   z.object({ tipo: z.literal('NOME'), ds_paciente: patientName, dt_nascimento: birthDate.optional() }).strict(),
@@ -25,6 +30,11 @@ const patientQuery = z.union([
   z.object({ tipo: z.literal('DATA').optional(), dt_nascimento: birthDate, ds_paciente: patientName.optional() }).strict(),
   z.object({ tipo: z.undefined().optional(), ds_paciente: prefixName }).strict(),
 ])
+// Maior código de paciente: faixa dos IDs falsos da busca por protocolo (muda devagar; 1 h em memória).
+const maiorCodigoCache = ttlCache<number>(60 * 60_000)
+const maiorCodigoPaciente = () => maiorCodigoCache('max', async () =>
+  (await prisma.pacientes.aggregate({ _max: { cd_paciente: true } }))._max.cd_paciente ?? 0)
+
 export async function pacientesRoute(fastify: FastifyInstance) {
   fastify.get('/clinux/pacientes', async (request, reply) => {
     const inicio = Date.now()
@@ -77,6 +87,42 @@ export async function pacientesRoute(fastify: FastifyInstance) {
         return reply.send([])
       }
       patientDiagnostic(request.id, { resultado: 'qr_confere', ramo: 'QRATEND', duracaoMs: Date.now() - inicio })
+      return reply.send([paciente])
+    }
+    if (input.tipo === 'PROTOCOLO' || input.tipo === 'PROTOCOLOID') {
+      // Mesma janela do QR: atendimento dos últimos 6 meses e não cancelado.
+      const hoje = todayBrazil()
+      const seisMesesAtras = new Date(hoje)
+      seisMesesAtras.setUTCMonth(seisMesesAtras.getUTCMonth() - 6)
+      const janela = { cd_atendimento: input.cd_atendimento, dt_data: { gte: seisMesesAtras }, OR: [{ ds_status: null }, { ds_status: { not: 1 } }] }
+      if (input.tipo === 'PROTOCOLO') {
+        // Protocolo inexistente também recebe 10 IDs: a resposta não revela se o atendimento existe.
+        const [atendimento, maxId] = await Promise.all([
+          prisma.atendimentos.findFirst({ where: janela, select: { cd_paciente: true } }),
+          maiorCodigoPaciente(),
+        ])
+        patientDiagnostic(request.id, { resultado: 'protocolo_listado', ramo: 'PROTOCOLO', duracaoMs: Date.now() - inicio })
+        return reply.send(decoyPatientIds(`protocolo:${input.cd_atendimento}`, atendimento?.cd_paciente ?? null, maxId))
+      }
+      // `#` não é aceito em x-flow-id: a chave do protocolo não colide com fluxos.
+      const alvoProtocolo = `protocolo#${input.cd_atendimento}`
+      if (identificationAttempts(flow, 'read') === 0 || identificationAttempts(alvoProtocolo, 'read', Date.now(), TARGET) === 0) {
+        patientDiagnostic(request.id, { resultado: 'identificacao_bloqueada', ramo: 'PROTOCOLOID', flow })
+        return reply.send([{ tentativas: 0 }])
+      }
+      const atendimento = await prisma.atendimentos.findFirst({
+        where: { ...janela, cd_paciente: input.cd_paciente },
+        select: { pacientes_atendimentos_cd_pacienteTopacientes: { select: { cd_paciente: true, ds_paciente: true, dt_nascimento: true } } },
+      })
+      const paciente = atendimento?.pacientes_atendimentos_cd_pacienteTopacientes
+      if (!paciente) {
+        const tentativas = Math.min(identificationAttempts(flow, 'fail'), identificationAttempts(alvoProtocolo, 'fail', Date.now(), TARGET))
+        patientDiagnostic(request.id, { resultado: 'identificacao_incorreta', ramo: 'PROTOCOLOID', tentativas, flow })
+        return reply.send([{ tentativas }])
+      }
+      identificationAttempts(flow, 'reset')
+      identificationAttempts(alvoProtocolo, 'reset', Date.now(), TARGET)
+      patientDiagnostic(request.id, { resultado: 'protocolo_confere', ramo: 'PROTOCOLOID', duracaoMs: Date.now() - inicio })
       return reply.send([paciente])
     }
     const confirmacao = input.tipo === 'ID' || input.tipo === 'NOMEDATA'

@@ -47,6 +47,8 @@ export function DatePatientList({
   })
 
   const listaNormal = pacientes.filter((paciente) => {
+    // Protocolo: o que é digitado no campo "Senha" filtra os IDs pelo começo.
+    if (tipo === 'PROTOCOLO') return !filtroNumerico || String(paciente.cd_paciente ?? '').startsWith(filtroNumerico)
     if (tipo === 'DATA') {
       if (paciente.cd_paciente && idsComExame.has(paciente.cd_paciente)) return false
 
@@ -87,7 +89,9 @@ export function DatePatientList({
           !error &&
           listaNormal.map((paciente, index) => {
             const label =
-              tipo === 'DATA'
+              tipo === 'PROTOCOLO'
+                ? String(paciente.cd_paciente ?? '')
+                : tipo === 'DATA'
                 ? paciente.ds_paciente ?? paciente.ds_nome ?? 'SEM NOME'
                 : formatarDataNascimento(paciente.dt_nascimento)
 
@@ -96,7 +100,7 @@ export function DatePatientList({
                 key={`pac-${paciente.cd_paciente ?? index}`}
                 className="cursor-pointer text-4xl mb-3"
               >
-                <button type="button" className="patient-choice-button" onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: false }); onPatientClick(paciente) }}><PatientChoice label={label} isDate={tipo !== 'DATA'} /></button>
+                <button type="button" className="patient-choice-button" onClick={() => { auditTotem('paciente_selecionado', 'paciente', { tipo, nomePaciente: paciente.ds_paciente, pacienteId: paciente.cd_paciente, possuiExame: false }); onPatientClick(paciente) }}><PatientChoice label={label} isDate={tipo !== 'DATA' && tipo !== 'PROTOCOLO'} isSenha={tipo === 'PROTOCOLO'} /></button>
               </li>
             )
           })}
