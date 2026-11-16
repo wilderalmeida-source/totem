@@ -1,8 +1,15 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { PrismaLog } from "../../config/prismalog";
+import { guicheCache } from "../lib/painel-caches";
 
 export async function guichesRoute(fastify: FastifyInstance) {
+    // Cadastrar, editar ou excluir guichê limpa o cache de nomes usado nas chamadas do painel.
+    fastify.addHook("onSend", async (request, _reply, payload) => {
+        if (request.method !== "GET") guicheCache.clear();
+        return payload;
+    });
+
     fastify.get("/clinux/guiches", async () => {
         return PrismaLog.guiches.findMany({
             orderBy: { numero: "asc" },

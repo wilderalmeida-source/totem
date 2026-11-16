@@ -12,7 +12,7 @@ function setup(allowed = true, origin = true) {
   vm.runInNewContext(code, { exports, Buffer, File,
     require: name => name.includes('require-panel-admin') ? { requirePanelAdmin: async () => allowed ? { sub: 'admin' } : null }
       : name.includes('patient-session-http') ? { sameOrigin: () => origin }
-      : name.includes('panel-storage') ? { MEDIA_DIRECTORY: '/virtual', ensureMediaDirectory: async () => {} }
+      : name.includes('panel-storage') ? { NOTICES_DIRECTORY: '/virtual', ensureImagesReady: async () => {} }
       : name === 'node:fs' ? { promises: { writeFile: async (file, content, options) => writes.push({ file, content, options }) } } : require(name),
   });
   return { api: exports, writes };

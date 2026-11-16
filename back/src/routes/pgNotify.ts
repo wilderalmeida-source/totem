@@ -112,39 +112,8 @@ const plugin: FastifyPluginAsync<PgNotifyOpts> = async (fastify, opts) => {
     } catch { }
   });
 
-  // Rota SSE
-  fastify.get("/events", async (req, reply) => {
-    reply
-      .raw.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Connection: "keep-alive",
-        "X-Accel-Buffering": "no",
-      });
-
-    const write = (data: unknown) => {
-      reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
-    };
-
-    if (!fastify.broadcast) {
-      (fastify as any).broadcast = (d: unknown) => write(d);
-    } else {
-      const old = fastify.broadcast.bind(fastify);
-      (reply as any)._restoreBroadcast = () => (fastify.broadcast = old);
-      fastify.broadcast = (d: unknown) => {
-        try { old(d); } catch { }
-        try { write(d); } catch { }
-      };
-    }
-
-    const ping = setInterval(() => reply.raw.write(`event: ping\ndata: ${Date.now()}\n\n`), 15000);
-
-    req.raw.on("close", () => {
-      clearInterval(ping);
-      if ((reply as any)._restoreBroadcast) (reply as any)._restoreBroadcast();
-      try { reply.raw.end(); } catch { }
-    });
-  });
+  // A antiga rota SSE /events foi removida: não era usada (o front recebe os eventos pelo WebSocket,
+  // via /api/events do Next) e trocava o fastify.broadcast global, derrubando outros clientes ao fechar.
 };
 
 export default fp(plugin, {

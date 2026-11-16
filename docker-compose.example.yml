@@ -72,6 +72,11 @@ services:
     networks:
       - totem-net
     volumes:
+      # Imagens (logo da clínica, logos de parceiros, imagens dos informativos) em subpastas.
+      # Volume nomeado: já nasce gravável pelo usuário do container (nextjs).
+      - imagens_frontend:/app/data/imagens
+      # Pasta antiga: na primeira subida o sistema COPIA as imagens daqui para data/imagens.
+      # Depois de conferir as logos e informativos, esta linha pode ser removida.
       - ./public/videos:/app/public/videos
       - audit_frontend:/app/data/audit-outbox
 
@@ -79,6 +84,7 @@ volumes:
   license_backend:
   audit_backend:
   audit_frontend:
+  imagens_frontend:
   pgdata:
   postgres_logs_data:
 

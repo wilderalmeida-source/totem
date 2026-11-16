@@ -23,7 +23,7 @@ export default function Totem() {
   const [tipo, setTipo] = useState<TipoBusca>("DATA");
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { pacientes, loading, error, pesquisar, clearPatients } =
+  const { pacientes, truncada, loading, error, pesquisar, clearPatients } =
     usePatientSearch(tipo);
 
   const servico = url.get("servico") ?? "";
@@ -190,6 +190,7 @@ export default function Totem() {
 
           <PatientList
             pacientes={pacientes}
+            truncada={truncada}
             tipo={tipo}
             servico={servico}
             preferencial={preferencial}

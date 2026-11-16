@@ -13,7 +13,6 @@ interface ConfigPainel {
   atendimento: number[]
   marcacao: number[]
   resultado: number[]
-  playlistId: string | null
   universal: {
     atendimento: boolean
     marcacao: boolean
@@ -37,7 +36,6 @@ function criarConfigInicial(): ConfigPainel[] {
     atendimento: [],
     marcacao: [],
     resultado: [],
-    playlistId: null,
     universal: {
       atendimento: false,
       marcacao: false,

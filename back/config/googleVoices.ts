@@ -159,6 +159,20 @@ export async function resolveEffectiveVoice(now = new Date()) {
   };
 }
 
+// Cache da configuração de voz (voz da semana, velocidade, volume): era consultada no banco a cada
+// chamada do painel. 30 s em memória; as rotas que alteram voz/velocidade/volume limpam na hora.
+let effectiveCache: { key: string; until: number; value: ReturnType<typeof resolveEffectiveVoice> } | null = null
+export function invalidateEffectiveVoice() { effectiveCache = null }
+export function resolveEffectiveVoiceCached(now = new Date()) {
+  const key = `${getYMDInTZ(now, TZ).y}-${getWeekOfYearSundaySP(now)}`
+  if (effectiveCache && effectiveCache.key === key && effectiveCache.until > Date.now()) return effectiveCache.value
+  const value = resolveEffectiveVoice(now)
+  const entry = { key, until: Date.now() + 30_000, value }
+  effectiveCache = entry
+  value.catch(() => { if (effectiveCache === entry) effectiveCache = null })
+  return value
+}
+
 // =======================
 // Dicionário (normalização + applyDictionary)
 // =======================

@@ -1,4 +1,4 @@
-FROM node:25-alpine
+FROM node:24-alpine
 WORKDIR /app
 
 # Instala ferramentas nativas caso alguma biblioteca de banco precise compilar algo
@@ -9,6 +9,8 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Instala TUDO (incluindo tsx, typescript e devDependencies)
+# O mermaid-cli (só documentação) baixaria o Chromium a cada build.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN npm install
 
 # Copia o restante do código-fonte local
@@ -18,4 +20,5 @@ COPY . .
 EXPOSE 5000
 
 # O comando padrão aqui vira o de dev (mas ele será gerenciado pelo Compose)
-CMD ["npm", "run", "start"]
+# Os .js não ficam mais no git: compila antes de subir.
+CMD ["sh", "-c", "npm run build && npm run start"]

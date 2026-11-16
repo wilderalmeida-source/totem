@@ -79,11 +79,11 @@ export async function gerarSenhaEntrega({
   const modalidadeSenha =
     cd_modalidade ?? atendimento.salas?.cd_modalidade ?? modalidadeTotem
 
-  const IP_PAINEL = await resolverIpPainelPorModalidade(
-    'C',
-    modalidadeSenha
-  )
-  const dsModalidade = await resolveModalidade(modalidadeSenha)
+  // Independentes entre si: em paralelo.
+  const [IP_PAINEL, dsModalidade] = await Promise.all([
+    resolverIpPainelPorModalidade('C', modalidadeSenha),
+    resolveModalidade(modalidadeSenha),
+  ])
 
   const result = await auditOperation('clinico.gravar_senha_entrega', () => prisma.atendimentos_senhas.create({
     data: {

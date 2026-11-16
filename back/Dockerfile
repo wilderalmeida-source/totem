@@ -1,10 +1,15 @@
 # ---------------------------------------------------------
 # ETAPA 1: Construção e Instalação (Ambiente Temporário)
 # ---------------------------------------------------------
-FROM node:25-alpine AS builder
+# node:24 é a versão LTS (node:25 não tem suporte de longo prazo).
+FROM node:24-alpine AS builder
 
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
+# O @mermaid-js/mermaid-cli (devDependency, só para diagramas da documentação) baixaria o
+# Chromium a cada build; o backend não usa. Deixa o build mais rápido e menor.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 # Copia os arquivos de dependência e a pasta do Prisma
 COPY package.json package-lock.json* ./
@@ -21,7 +26,7 @@ COPY config ./config
 COPY tsconfig.json ./
 COPY middleware ./middleware
 
-# Executa o build do TypeScript (se o seu projeto tiver essa etapa)
+# Compila o TypeScript: os .js são gerados aqui (não ficam mais versionados no git)
 RUN npm run build
 
 # Executa a geração do cliente do Prisma de forma otimizada
@@ -35,10 +40,10 @@ RUN rm -rf node_modules && \
 # ---------------------------------------------------------
 # ETAPA 2: Imagem Final de Produção (Ultra-Leve)
 # ---------------------------------------------------------
-FROM node:25-alpine
+FROM node:24-alpine
 
-# Instala a biblioteca de compatibilidade que o Prisma exige para rodar no Alpine
-RUN apk add --no-cache libc6-compat
+# libc6-compat: exigida pelo Prisma no Alpine. su-exec: troca do root para o usuário "node" na entrada.
+RUN apk add --no-cache libc6-compat su-exec
 WORKDIR /app
 
 # Copia APENAS o essencial da Etapa 1, deixando para trás todo o lixo de dev
@@ -51,8 +56,18 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/prisma.logs.config.ts ./prisma.logs.config.ts
 COPY --from=builder /app/config ./config
 COPY --from=builder /app/middleware ./middleware
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# Pastas gravadas pelo backend (áudios, fila de auditoria, licença, exportação de RTF).
+RUN mkdir -p /app/public/audios /app/data/audit-outbox /app/data/license /app/export/modelos-rtf \
+    && chown -R node:node /app/public /app/data /app/export \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
+
 ENV NODE_ENV=production
 EXPOSE 5000
 
-# Executa o script de produção definido no seu package.json (geralmente node dist/main.js ou similar)
-CMD ["npm", "run", "start"]
+# A entrada roda como root só para ajustar o dono dos volumes (que podem ter sido criados como root
+# em versões anteriores) e depois executa o servidor como o usuário "node", sem privilégios.
+ENTRYPOINT ["docker-entrypoint.sh"]
+# node direto (sem npm) recebe o SIGTERM do Docker e encerra limpo.
+CMD ["node", "src/server.js"]

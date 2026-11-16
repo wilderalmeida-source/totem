@@ -1,22 +1,30 @@
 import { persistAudit, auditOutbox } from '../lib/persistent-audit'
 import { auditQuery, auditExtraFilters, auditPatientFilter } from '../lib/audit-filters'
-import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
+import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { PrismaLog } from '../../config/prismalog'
 import { Prisma } from '../../prisma-logs/app/generated/prisma/clientLog'
 
-function hashPassword(password: string) {
-  const salt = randomBytes(16).toString('hex')
-  return `${salt}:${scryptSync(password, salt, 64).toString('hex')}`
+// scrypt assíncrono: a versão Sync travava o event loop (~50-100 ms por login), parando o painel e o totem.
+function scryptAsync(password: string, salt: string) {
+  return new Promise<Buffer>((resolve, reject) => scrypt(password, salt, 64, (error, key) => error ? reject(error) : resolve(key)))
 }
 
-function verifyPassword(password: string, stored: string) {
-  const [salt, expectedHex] = stored.split(':')
+async function hashPassword(password: string) {
+  const salt = randomBytes(16).toString('hex')
+  return `${salt}:${(await scryptAsync(password, salt)).toString('hex')}`
+}
+
+// Usuário inexistente também passa pelo scrypt, para o tempo de resposta não revelar quais usuários existem.
+const DUMMY_HASH = `${'0'.repeat(32)}:${'0'.repeat(128)}`
+
+async function verifyPassword(password: string, stored: string | null | undefined) {
+  const [salt, expectedHex] = (stored || DUMMY_HASH).split(':')
   if (!salt || !expectedHex) return false
-  const actual = scryptSync(password, salt, 64)
+  const actual = await scryptAsync(password, salt)
   const expected = Buffer.from(expectedHex, 'hex')
-  return actual.length === expected.length && timingSafeEqual(actual, expected)
+  return Boolean(stored) && actual.length === expected.length && timingSafeEqual(actual, expected)
 }
 
 const strongPassword = z.string().min(12).max(256)
@@ -59,7 +67,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
   fastify.post('/clinux/admin/users/verify', async (request, reply) => {
     const body = z.object({ username: z.string().min(1).max(100), password: z.string().min(1).max(256) }).parse(request.body)
     const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
-    if (!user || !user.active || !verifyPassword(body.password, user.passwordHash)) {
+    if (!(await verifyPassword(body.password, user?.passwordHash)) || !user || !user.active) {
       return reply.code(401).send({ error: 'Usuário ou senha inválidos.' })
     }
     return { username: user.username, displayName: user.displayName, mustChangePassword: user.mustChangePassword, permissions: user.permissions, version: user.updatedAt.toISOString() }
@@ -78,14 +86,14 @@ export async function adminRoutes(fastify: FastifyInstance) {
       permissions: z.array(permission).min(1),
     }).parse(request.body)
     if (body.password.toLowerCase().includes(body.username.toLowerCase())) return reply.code(400).send({ error: 'A senha não pode conter o usuário.' })
-    const user = await PrismaLog.adminUser.create({ data: { username: body.username, displayName: body.displayName, passwordHash: hashPassword(body.password), permissions: body.permissions } })
+    const user = await PrismaLog.adminUser.create({ data: { username: body.username, displayName: body.displayName, passwordHash: await hashPassword(body.password), permissions: body.permissions } })
     return reply.code(201).send({ id: user.id, username: user.username, displayName: user.displayName, active: user.active, mustChangePassword: user.mustChangePassword, permissions: user.permissions })
   })
 
   fastify.patch('/clinux/admin/users/:id', async (request) => {
     const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(request.params)
     const body = z.object({ displayName: z.string().trim().min(2).max(150).optional(), password: strongPassword.optional(), active: z.boolean().optional(), permissions: z.array(permission).min(1).optional() }).parse(request.body)
-    return PrismaLog.adminUser.update({ where: { id }, data: { displayName: body.displayName, active: body.active, permissions: body.permissions, ...(body.password ? { passwordHash: hashPassword(body.password), mustChangePassword: true } : {}) }, select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true } })
+    return PrismaLog.adminUser.update({ where: { id }, data: { displayName: body.displayName, active: body.active, permissions: body.permissions, ...(body.password ? { passwordHash: await hashPassword(body.password), mustChangePassword: true } : {}) }, select: { id: true, username: true, displayName: true, active: true, mustChangePassword: true, permissions: true } })
   })
 
   fastify.delete('/clinux/admin/users/:id', async (request, reply) => {
@@ -99,10 +107,10 @@ export async function adminRoutes(fastify: FastifyInstance) {
   fastify.post('/clinux/admin/users/change-password', async (request, reply) => {
     const body = z.object({ username: z.string().min(1).max(100), currentPassword: z.string().min(1).max(256), newPassword: strongPassword }).parse(request.body)
     const user = await PrismaLog.adminUser.findUnique({ where: { username: body.username } })
-    if (!user || !user.active || !verifyPassword(body.currentPassword, user.passwordHash)) return reply.code(401).send({ error: 'Senha atual inválida.' })
-    if (verifyPassword(body.newPassword, user.passwordHash)) return reply.code(400).send({ error: 'A nova senha deve ser diferente da atual.' })
+    if (!user || !user.active || !(await verifyPassword(body.currentPassword, user.passwordHash))) return reply.code(401).send({ error: 'Senha atual inválida.' })
+    if (await verifyPassword(body.newPassword, user.passwordHash)) return reply.code(400).send({ error: 'A nova senha deve ser diferente da atual.' })
     if (body.newPassword.toLowerCase().includes(user.username.toLowerCase())) return reply.code(400).send({ error: 'A senha não pode conter o usuário.' })
-    await PrismaLog.adminUser.update({ where: { id: user.id }, data: { passwordHash: hashPassword(body.newPassword), mustChangePassword: false } })
+    await PrismaLog.adminUser.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(body.newPassword), mustChangePassword: false } })
     return { ok: true }
   })
 

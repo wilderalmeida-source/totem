@@ -4,7 +4,7 @@ import Image, { StaticImageData } from 'next/image'
 import { auditTotem } from '@/lib/audit-client'
 import { ArrowLeft, ArrowRight, Home, UsersRound, Baby, Accessibility, PersonStanding, Puzzle, HeartHandshake } from 'lucide-react'
 import DigitalClock from '@/components/DigitalClock'
-import GoldMark from '@/components/GoldMark'
+import BrandMark from '@/components/brand/BrandMark'
 
 export type PriorityOption = { label: string; icone: StaticImageData; preferencial: number; href?: string; cor?: string }
 
@@ -19,7 +19,7 @@ export default function PriorityOptions({ options, servico }: { options: Priorit
   return <>
     <div className="priority-modern">
       <header className="priority-header">
-        <GoldMark className="priority-brand-mark" />
+        <BrandMark className="priority-brand-mark" />
         <Link prefetch={false} href="/" aria-label="Início" className="priority-home" onClick={() => auditTotem('inicio_clicado', 'prioridade', { servico })}><Home size={19} /></Link>
         {back && <Link prefetch={false} href={back.href!} onClick={() => record(back)} className="priority-back"><ArrowLeft size={20} />Voltar</Link>}
         <div className="priority-service"><span className="priority-service-label">{service} · </span><DigitalClock showSeconds={false} /></div>

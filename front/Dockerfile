@@ -1,5 +1,5 @@
 # 1. ESTÁGIO DE DEPENDÊNCIAS
-FROM node:25-alpine AS deps
+FROM node:24-alpine AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine 
 # para entender por que libc6-compat pode ser necessário.
 RUN apk add --no-cache libc6-compat
@@ -10,7 +10,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 # 2. ESTÁGIO DE BUILD
-FROM node:25-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -24,7 +24,7 @@ ENV LINK_API_INTERNA=$LINK_API_INTERNA
 RUN npm run build
 
 # 3. ESTÁGIO DE EXECUÇÃO (RUNNER)
-FROM node:25-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -41,7 +41,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-RUN mkdir -p /app/data/audit-outbox /app/public/videos && chown -R nextjs:nodejs /app/data /app/public/videos
+# data/imagens: logo da clínica, parceiros e informativos (subpastas criadas pelo próprio sistema).
+RUN mkdir -p /app/data/audit-outbox /app/data/imagens && chown -R nextjs:nodejs /app/data
 USER nextjs
 
 EXPOSE 3000

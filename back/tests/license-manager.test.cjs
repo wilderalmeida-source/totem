@@ -8,7 +8,8 @@ const { LicenseManager, requiresLicense } = require('../src/lib/license-manager'
 
 async function fixture(t, options = {}) {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'totem-license-test-'));
-  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  // Windows: novas tentativas evitam ENOTEMPTY quando um arquivo ainda está sendo liberado.
+  t.after(() => fs.rm(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 }));
   const pair = generateKeyPairSync('ed25519');
   const trust = { url: 'https://licenses.test', issuer: 'test', audience: 'totem-backend', keyId: 'key', publicJwk: pair.publicKey.export({ format: 'jwk' }) };
   const credentials = { installationId: 'clinic-1', licenseId: randomUUID(), credential: randomBytes(32).toString('hex') };

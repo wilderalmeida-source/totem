@@ -18,6 +18,7 @@ import {
   type Atendimento,
 } from "@/services/api";
 import { contextoEntrega } from "@/services/entregadeexames";
+import { examesParaExibir } from "@/lib/exames-modal";
 import ok from "@/assets/icons/ok.png";
 import atention from "@/assets/icons/atention.png";
 import { formatarDataNascimento } from "@/lib/formatdate";
@@ -196,6 +197,8 @@ export function DialogPatient({
   const processandoRef = useRef(false);
   const aberturaRegistradaRef = useRef(false);
   const mostraHorarioPrevisto = dados?.servico === "B" || dados?.servico === "D";
+  // Entrega: só os 10 exames mais recentes; atendimento/marcação: todos os do dia.
+  const examesExibidos = examesParaExibir(exames, dados?.servico);
 
   useEffect(() => {
     if (!showModal || !mostraHorarioPrevisto) return;
@@ -546,9 +549,9 @@ export function DialogPatient({
             )}
 
             {/* Tabela de exames */}
-            {!invalido && exames && exames.length > 0 && (
+            {!invalido && examesExibidos.length > 0 && (
               <div className="patient-exams w-full overflow-hidden rounded-lg border border-slate-300">
-              <div className="patient-exams-heading"><span>{dados?.servico === 'C' ? 'Exames para retirada' : 'Exames do atendimento'}</span><span>{exames.flatMap(a => a.exames ?? []).filter(e => e.dt_assinado).length} laudados</span></div>
+              <div className="patient-exams-heading"><span>{dados?.servico === 'C' ? 'Exames para retirada' : 'Exames do atendimento'}</span><span>{examesExibidos.filter(({ exame }) => exame.dt_assinado).length} laudados</span></div>
               <table className="w-full table-fixed border-collapse text-left text-sm text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase sticky top-0">
                   <tr>
@@ -559,8 +562,7 @@ export function DialogPatient({
                   </tr>
                 </thead>
                 <tbody>
-                  {exames.flatMap((atend, ai) =>
-                    (atend.exames ?? []).map((exame, ei) => (
+                  {examesExibidos.map(({ atend, exame, ai, ei }) => (
                       <tr
                         key={`${ai}-${ei}`}
                         className={
@@ -582,8 +584,7 @@ export function DialogPatient({
                             : <><span className="patient-status-legacy"><StatusIcon done={!!exame.dt_assinado} /></span><span className={`patient-status-badge ${exame.dt_assinado ? 'patient-status-done' : 'patient-status-pending'}`}>{exame.dt_assinado ? '✓ Laudado' : 'Pendente'}</span></>}
                         </td>
                       </tr>
-                    )),
-                  )}
+                    ))}
                 </tbody>
               </table>
               </div>

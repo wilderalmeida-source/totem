@@ -27,6 +27,16 @@ export const buscaPaciente = async ({
     return [result.patient]
   }
 
+  return (await consultaPacientes({ ds_paciente, cd_paciente, dt_nascimento, ds_cpf, tipo }, signal)).pacientes
+}
+
+/** Busca pelo começo do nome. `truncada` indica que havia mais de 100 nomes e só os primeiros vieram. */
+export const buscaPacientesPorPrefixo = async (ds_paciente: string, signal?: AbortSignal) =>
+  consultaPacientes({ ds_paciente }, signal)
+
+async function consultaPacientes({ ds_paciente, cd_paciente, dt_nascimento, ds_cpf, tipo }: {
+  ds_paciente?: string; cd_paciente?: number; dt_nascimento?: string; ds_cpf?: string; tipo?: string
+}, signal?: AbortSignal): Promise<{ pacientes: Paciente[]; truncada: boolean }> {
   const params = new URLSearchParams()
   if (ds_paciente)   params.append("ds_paciente", ds_paciente)
   if (cd_paciente)   params.append("cd_paciente", String(cd_paciente))
@@ -42,7 +52,7 @@ export const buscaPaciente = async ({
     const error = await res.json().catch(() => null)
     throw new Error(error?.error ?? 'Não foi possível buscar pacientes.')
   }
-  return res.json() as Promise<Paciente[]>
+  return { pacientes: await res.json() as Paciente[], truncada: res.headers.get('x-result-truncated') === 'true' }
 }
 
 export const cadastraPaciente = async ({

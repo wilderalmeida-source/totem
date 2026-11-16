@@ -29,9 +29,10 @@ navegador, sujeito à habilitação de som/autoplay do equipamento.
 
 Recompile e recrie **frontend e backend**. O backend passa a enviar identificação
 única e dados da chamada junto ao áudio. Não há migração ou mudança no banco clínico.
-As imagens e config.json ficam em `/app/public/videos/partnerships`, dentro do volume
-de vídeos já utilizado pelo frontend. Preserve esse volume e suas permissões de
-escrita para o usuário nextjs (UID/GID 1001). O Dockerfile prepara permissões da
+As imagens e config.json ficam em `/app/data/imagens/parceiros`, dentro do volume
+de imagens do frontend (`imagens_frontend` no compose de exemplo). Preserve esse volume e
+suas permissões de escrita para o usuário nextjs (UID/GID 1001). Instalações antigas tinham
+os arquivos em `/app/public/videos/partnerships`; eles são copiados na primeira subida. O Dockerfile prepara permissões da
 imagem; permissões de uma pasta montada pelo host continuam sendo as do host.
 
 No modelo atual há um frontend gravador. Para várias réplicas gravando configuração,

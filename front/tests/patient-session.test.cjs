@@ -91,7 +91,10 @@ test('nome divergente do retorno do backend nao cria sessao', async () => {
 
 test('diagnostico registra resposta final quando data e invalida', async () => {
   const env = environment();
-  const response = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'NOMEDATA', ds_paciente: 'Fulano', dt_nascimento: 'data-incorreta' }));
+  // O totem sempre manda x-flow-id; sem ele a auditoria é ignorada de propósito (flow-audit-server).
+  const req = request('/api/patient-session', 'POST', { tipo: 'NOMEDATA', ds_paciente: 'Fulano', dt_nascimento: 'data-incorreta' });
+  req.headers.set('x-flow-id', 'homologacao-data');
+  const response = await env.session.POST(req);
   assert.equal(response.status, 400);
   const final = env.auditEvents.find(event => event.action === 'identificacao_resposta_final');
   assert.equal(final.metadata.status, 400);
@@ -221,7 +224,9 @@ test('emissões simultâneas da mesma sessão não são encaminhadas duas vezes'
 
 test('recusas de emissao registram o motivo sem chamar Clinux nem registrar cookies', async () => {
   const env = environment();
-  const response = await env.issue.POST(request('/api/patient-session/senha', 'POST', { servico: 'B' }));
+  const req = request('/api/patient-session/senha', 'POST', { servico: 'B' });
+  req.headers.set('x-flow-id', 'homologacao-emissao');
+  const response = await env.issue.POST(req);
   assert.equal(response.status, 401);
   assert.equal(env.calls.length, 0);
   const denied = env.auditEvents.find(e => e.action === 'emissao_rejeitada');

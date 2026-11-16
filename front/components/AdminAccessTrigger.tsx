@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { PointerEvent, useEffect, useRef, useState } from "react";
+import { PointerEvent, ReactNode, useEffect, useRef, useState } from "react";
 
 const HOLD_DURATION_MS = 5_000;
 
 type AdminAccessTriggerProps = {
   companyName: string;
+  /** Conteúdo exibido no lugar do nome (ex.: a logo). Segurar 5 s continua abrindo o login. */
+  children?: ReactNode;
 };
 
-export default function AdminAccessTrigger({ companyName }: AdminAccessTriggerProps) {
+export default function AdminAccessTrigger({ companyName, children }: AdminAccessTriggerProps) {
   const router = useRouter();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -77,7 +79,7 @@ export default function AdminAccessTrigger({ companyName }: AdminAccessTriggerPr
       onBlur={cancelHold}
       className="select-none bg-transparent p-0 text-inherit outline-none"
     >
-      {companyName}
+      {children ?? companyName}
       </button>
     </>
   );

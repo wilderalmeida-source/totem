@@ -8,7 +8,7 @@ import { modalContext } from '@/components/modals/providers'
 import { auditTotem } from '@/lib/audit-client'
 import { endPatientSession } from '@/lib/patient-session-client'
 import { Home, ArrowLeft, ChevronRight } from 'lucide-react'
-import GoldMark from '@/components/GoldMark'
+import BrandMark from '@/components/brand/BrandMark'
 import { ModalityPictogram, modalityDescription } from '@/components/panel/Pictogram'
 
 interface PacienteModalidadeStorage {
@@ -126,7 +126,7 @@ export default function ModalidadePage() {
     <Base>
       <div className="modality-screen flex h-full flex-col items-center justify-center px-6">
         <nav className="modality-modern-nav">
-          <GoldMark className="search-gold-mark" />
+          <BrandMark className="search-gold-mark" />
           <button type="button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', 'modalidade'); router.replace('/'); }}><Home size={19} /></button>
           <button type="button" onClick={voltar}><ArrowLeft size={19} />Voltar</button>
           <span className="search-steps"><i /><i /><i />Etapa 2 de 3</span>

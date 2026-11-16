@@ -18,7 +18,7 @@ function environment(t, session = { sub: 'admin', permissions: ['PAINEIS'] }) {
     cache.set(filename, exports);
     const source = ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
     vm.runInNewContext(source, { exports, Buffer, File, structuredClone, console, process, require: name => {
-      if (name.includes('panel-storage')) return { MEDIA_DIRECTORY: directory };
+      if (name.includes('panel-storage')) return { PARTNERS_DIRECTORY: path.join(directory, 'partnerships'), ensureImagesReady: async () => {} };
       if (name.includes('require-panel-admin')) return { requirePanelAdmin: async () => session };
       if (name.includes('persistent-audit')) return { recordAudit: async event => audit.push(event) };
       if (name.startsWith('@/')) return load(name.slice(2) + '.ts');

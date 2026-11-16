@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto'
 import sharp from 'sharp'
 import { requirePanelAdmin } from '@/lib/require-panel-admin'
 import { sameOrigin } from '@/lib/patient-session-http'
-import { ensureMediaDirectory, MEDIA_DIRECTORY } from '@/lib/panel-storage'
+import { ensureImagesReady, NOTICES_DIRECTORY } from '@/lib/panel-storage'
 export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   const session = await requirePanelAdmin(request)
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
       if (!['jpeg', 'png', 'webp'].includes(metadata.format ?? '')) return NextResponse.json({ error: 'Formato de imagem inválido.' }, { status: 400 })
       converted.push({ content: await image.rotate().resize({ width: 1920, height: 1080, fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer(), file: `notice-${randomUUID()}.webp` })
     }
-    await ensureMediaDirectory()
-    for (const image of converted) await fs.writeFile(path.join(MEDIA_DIRECTORY, image.file), image.content, { flag: 'wx' })
+    await ensureImagesReady()
+    for (const image of converted) await fs.writeFile(path.join(NOTICES_DIRECTORY, image.file), image.content, { flag: 'wx' })
     return NextResponse.json({ images: converted.map(image => ({ file: image.file, alt: '' })) }, { status: 201 })
   } catch { return NextResponse.json({ error: 'Não foi possível processar ou salvar as imagens.' }, { status: 400 }) }
 }

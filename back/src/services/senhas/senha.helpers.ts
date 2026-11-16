@@ -1,15 +1,20 @@
 import { prisma } from '../../../config/prismaDB'
 import { PrismaLog } from '../../../config/prismalog'
+import { configPainelCache, ttlCache } from '../../lib/painel-caches'
 const FUNCIONARIO = process.env.IDFUNCIONARIO
     ? Number(process.env.IDFUNCIONARIO)
     : 1
+// Convenção do sistema: o Clinux grava hora de parede de Brasília em colunas sem fuso, que o Prisma lê
+// como UTC. Então "agora no Brasil" = UTC - 3 h, e todos os ajustes são feitos com os métodos UTC.
+// (Antes usava setHours, que depende do TZ do servidor: com TZ=America/Sao_Paulo, entre 00:00 e 03:00
+// o "hoje" virava o dia anterior e a numeração das senhas misturava os dias.)
 export function getAgoraBrasil() {
   return new Date(Date.now() - 3 * 60 * 60 * 1000)
 }
 
 export function getHojeBrasil() {
   const hoje = getAgoraBrasil()
-  hoje.setHours(0, 0, 0, 0)
+  hoje.setUTCHours(0, 0, 0, 0)
   return hoje
 }
 
@@ -21,13 +26,16 @@ export function montarDsSenha(
   return `${preferencial !== 0 ? 'P' : 'N'}${fila}-${nr_senha}`
 }
 
+// Nome da modalidade muda raramente: 5 min em memória evitam uma ida ao banco clínico a cada senha.
+const modalidadeCache = ttlCache<string>(5 * 60_000)
 export async function resolveModalidade(cd_modalidade: number) {
-  const modalidade = await prisma.modalidades.findFirst({
-    where: { cd_modalidade },
-    select: { ds_modalidade: true },
+  return modalidadeCache(String(cd_modalidade), async () => {
+    const modalidade = await prisma.modalidades.findFirst({
+      where: { cd_modalidade },
+      select: { ds_modalidade: true },
+    })
+    return modalidade?.ds_modalidade ?? ''
   })
-
-  return modalidade?.ds_modalidade ?? ''
 }
 
 export async function novoAtendimentoTotem(cd_paciente: number) {
@@ -101,9 +109,9 @@ export async function resolverIpPainelPorModalidade(
   // IP_PAINEL corresponde ao env.backend; aceita o nome legado durante a transicao.
   const IP_PADRAO = process.env.IP_PAINEL?.trim() || process.env.IPPAINEL?.trim() || ''
 
-  const config = await PrismaLog.configuracao_painel.findUnique({
+  const config = await configPainelCache('configuracao_painel', () => PrismaLog.configuracao_painel.findUnique({
     where: { id: 1 },
-  })
+  })) as Awaited<ReturnType<typeof PrismaLog.configuracao_painel.findUnique>>
 
   if (!config?.ativo) {
     return IP_PADRAO

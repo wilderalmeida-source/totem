@@ -12,7 +12,7 @@ const ALLOWED_PREFIXES = [
   "/clinux/totem/atendimentos", "/clinux/totem/pacientes-com-exames", "/clinux/agenda", "/clinux/atencao",
   "/clinux/guiches", "/clinux/medicos",
   "/clinux/modalidades", "/clinux/pacientes", "/clinux/paineis-config",
-  "/clinux/atrasos-config", "/clinux/midias-config",
+  "/clinux/atrasos-config",
   "/clinux/procedimentos", "/clinux/recepcoes-modalidades",
   "/clinux/salas", "/clinux/senhas", "/clinux/voice", "/clinux/admin", "/clinux/audit",
 ] as const;
@@ -30,7 +30,7 @@ function requiresAdmin(pathname: string, method: string) {
   if (pathname === "/clinux/atencao/text") return true;
   if (pathname.startsWith("/clinux/guiches")) return true;
   if (pathname.startsWith("/clinux/paineis-config") && method !== "GET") return true;
-  if ((pathname.startsWith("/clinux/atrasos-config") || pathname.startsWith("/clinux/midias-config")) && method !== "GET") return true;
+  if (pathname.startsWith("/clinux/atrasos-config") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/recepcoes-modalidades") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/admin")) return true;
   if (pathname.startsWith("/clinux/audit") && method === "GET") return true;
@@ -43,7 +43,7 @@ function requiredPermission(pathname: string) {
   if (pathname.startsWith('/clinux/atencao')) return 'ATENCAO'
   if (pathname.startsWith('/clinux/guiches')) return 'GUICHES'
   if (pathname.startsWith('/clinux/paineis-config')) return 'PAINEIS'
-  if (pathname.startsWith('/clinux/atrasos-config') || pathname.startsWith('/clinux/midias-config')) return 'PAINEIS'
+  if (pathname.startsWith('/clinux/atrasos-config')) return 'PAINEIS'
   if (pathname.startsWith('/clinux/recepcoes-modalidades')) return 'RECEPCOES'
   if (pathname.startsWith('/clinux/admin/users')) return 'USUARIOS'
   if (pathname.startsWith('/clinux/audit')) return 'LOGS'
@@ -151,7 +151,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
     const auditMs = Date.now() - auditStarted;
     const responseHeaders = new Headers();
     if (patientSearch) responseHeaders.set('Server-Timing', 'access;dur=' + accessMs + ', backend;dur=' + backendMs + ', audit;dur=' + auditMs + ', proxy;dur=' + (Date.now() - requestStarted));
-    for (const name of ["content-type", "content-disposition", "cache-control"]) {
+    for (const name of ["content-type", "content-disposition", "cache-control", "x-result-truncated"]) {
       const value = upstream.headers.get(name);
       if (value) responseHeaders.set(name, value);
     }

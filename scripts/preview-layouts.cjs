@@ -13,6 +13,10 @@ const modalContext = React.createContext(setters);
 const modalities = ['Mamografia','Ultrassonografia','Raio X','Ressonância magnética','Tomografia computadorizada','Densitometria óssea'].map((ds_modalidade,i)=>({cd_modalidade:i+1,ds_modalidade}));
 const notices = {enabled:true,items:[{id:'test',title:'Informativo de demonstração',text:'Este texto é usado somente na prévia offline do layout.',icon:'info',active:true,durationSeconds:15}]};
 let searchType='NOME', previewPath='/totem';
+// PREVIEW_BRAND=header|welcome: prévia com uma logo de exemplo (fictícia) na posição escolhida.
+const previewPlacement=process.env.PREVIEW_BRAND;
+const sampleLogo=color=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="360" height="120" viewBox="0 0 360 120"><circle cx="60" cy="60" r="44" fill="#2a9d8f"/><path d="M38 60h44M60 38v44" stroke="#fff" stroke-width="12" stroke-linecap="round"/><text x="120" y="72" font-family="Segoe UI,Arial" font-size="40" font-weight="700" fill="${color}">Exemplo</text></svg>`);
+const sampleBrand=previewPlacement?{placement:previewPlacement,lightUrl:sampleLogo('#12324a'),darkUrl:sampleLogo('#ffffff'),uploaded:{light:true,dark:true}}:null;
 function load(relative) {
  let filename=path.join(front,relative);
  if(!fs.existsSync(filename)) filename=['.ts','.tsx'].map(ext=>filename+ext).find(file=>fs.existsSync(file));
@@ -55,6 +59,9 @@ function load(relative) {
    };
    if(name==='react-imask')return {IMaskInput:({inputRef,mask,unmask,onAccept,...p})=>React.createElement('input',p)};
    if(name.startsWith('@/services/')||name.includes('audit-client')||name.includes('patient-session-client'))return new Proxy({},{get:()=>noop});
+   if(sampleBrand&&name==='@/lib/brand')return {...load('lib/brand'),publicBrand:()=>sampleBrand};
+   if(name==='@/lib/brand-storage')return {readBrand:async()=>({placement:'header',light:null,dark:null,revision:''})};
+   if(sampleBrand&&(name==='@/components/brand/useBrand'||(name==='./useBrand'&&filename.includes('brand'))))return {useBrand:()=>sampleBrand,loadBrand:async()=>sampleBrand};
    if(name.startsWith('@/'))return load(name.slice(2));
    if(name.startsWith('.'))return load(path.relative(front,path.resolve(path.dirname(filename),name)));
    if(name.endsWith('.css'))return {};
@@ -69,7 +76,7 @@ function screen(kind){
  if(kind==='login'||kind==='login-totem')return e(load(`app/${kind}/page.tsx`).default);
  if(kind==='confirm-name'||kind==='confirm-date') {searchType=kind==='confirm-name'?'DATA':'NOME';return e(load('app/date/date.tsx').default);}
  if(kind==='admin'||kind==='themes') {previewPath=kind==='admin'?'/configuracoes':'/temas';return e(load('components/admin/AdminRouteFrame.tsx').default,null,e(load(kind==='admin'?'app/configuracoes/page.tsx':'app/temas/page.tsx').default));}
- if(kind==='home')return e(load('app/page.tsx').default);
+ if(kind==='home')return load('app/page.tsx').default();
  if(kind==='priority')return e('div',{className:'priority-screen'},e(load('components/PriorityOptions.tsx').default,{servico:'B',options:labels.map((label,i)=>({label,icone:{src:''},preferencial:i===0||i===7?0:i===6?2:1,...(i===7?{href:'/'}:{})}))}));
  if(kind.startsWith('search')){searchType=kind==='search-name'?'NOME':kind==='search-cpf'?'CPF':'DATA';return e(load('app/totem/pageClient.tsx').default);}
  if(kind==='modalities')return e(load('app/modalidades/modalidadesContent.tsx').default);
@@ -78,10 +85,10 @@ function screen(kind){
 }
 const keyboardJs=fs.readFileSync(req.resolve('simple-keyboard/build/index.js'),'utf8');
 const keyboardCss=fs.readFileSync(req.resolve('simple-keyboard/build/css/index.css'),'utf8');
-for(const theme of ['theme1','theme2'])for(const mode of ['light','dark'])for(const kind of ['home','priority','search-name','search-data','search-cpf','confirm-name','confirm-date','modalities','modal','tv','login','login-totem','admin','themes']){
- const markup=renderToStaticMarkup(screen(kind));
+(async()=>{for(const theme of ['theme1','theme2'])for(const mode of ['light','dark'])for(const kind of ['home','priority','search-name','search-data','search-cpf','confirm-name','confirm-date','modalities','modal','tv','login','login-totem','admin','themes']){
+ const markup=renderToStaticMarkup(await screen(kind));
  const bootstrap=`document.querySelectorAll('time').forEach(t=>{if(t.textContent==='--:--:--')t.textContent='14:30:00';if(t.textContent==='--:--')t.textContent='14:30'});if(document.querySelector('.simple-keyboard'))new window.SimpleKeyboard.default({layout:{default:${JSON.stringify(kind==='search-name'||kind==='confirm-name'?['1 2 3 4 5 6 7 8 9 0','Q W E R T Y U I O P','A S D F G H J K L Ç','Z X C V B N M {bksp}',"{clear} {space} '"]:['1 2 3','4 5 6','7 8 9','{clear} 0 {bksp}'])}},display:{'{clear}':'Limpar','{space}':'espaço','{bksp}':'⌫'}});`;
  const metrics=`setTimeout(()=>{const output=document.createElement('output');output.id='review-metrics';output.hidden=true;output.textContent=JSON.stringify({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,inputBackground:document.querySelector('.search-input-row input')?getComputedStyle(document.querySelector('.search-input-row input')).backgroundColor:null,cardBackground:document.querySelector('.modality-card')?getComputedStyle(document.querySelector('.modality-card')).backgroundColor:null});document.body.append(output)},100);`;
  fs.writeFileSync(path.join(directory,`${kind}-${theme}-${mode}.html`),`<!doctype html><html lang="pt-BR" class="${mode==='dark'?'dark':''}" data-visual-theme="${theme}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prévia offline · ${kind}</title><style>${keyboardCss}\n${css}\n/* Freeze transitions only in the offline review artifact. */*{animation:none!important;transition:none!important}</style><body>${markup}<script>${keyboardJs.replaceAll('</script','<\\/script')}</script><script>${bootstrap}${metrics}</script></body></html>`);
 }
-console.log(directory);
+console.log(directory);})();

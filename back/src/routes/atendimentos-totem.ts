@@ -42,7 +42,8 @@ export async function atendimentosTotemRoute(fastify: FastifyInstance) {
       select: {
         cd_atendimento: true, dt_data: true, dt_hora: true, ds_status: true,
         salas: { select: { cd_modalidade: true, dt_hora_chegada: true, modalidades_salas_cd_modalidadeTomodalidades: { select: { ds_modalidade: true } } } },
-        exames: { select: { dt_assinado: true, procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } } } },
+        // Mais recente primeiro: o modal da entrega mostra só os 10 últimos exames.
+        exames: { orderBy: { cd_exame: 'desc' }, select: { dt_assinado: true, procedimentos_exames_cd_procedimentoToprocedimentos: { select: { ds_procedimento: true } } } },
       },
       orderBy: [{ dt_data: tipo === 'entrega' ? 'desc' : 'asc' }, { dt_hora: tipo === 'entrega' ? 'desc' : 'asc' }, { cd_atendimento: 'desc' }],
       take: tipo === 'entrega' ? 10 : SEARCH_LIMIT + 1,

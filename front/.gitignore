@@ -38,3 +38,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Imagens enviadas pelo sistema (logo, parceiros, informativos) e fila de auditoria local.
+data/

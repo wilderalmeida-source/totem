@@ -62,6 +62,7 @@ export async function recepcoesModalidadesRoute(fastify: FastifyInstance) {
             data: dados,
         });
 
+        await fastify.recarregarCachePainel?.();
         return reply.code(201).send(cadastro);
     });
 
@@ -88,6 +89,7 @@ export async function recepcoesModalidadesRoute(fastify: FastifyInstance) {
             data: dados,
         });
 
+        await fastify.recarregarCachePainel?.();
         return reply.send(atualizado);
     });
 
@@ -103,6 +105,7 @@ export async function recepcoesModalidadesRoute(fastify: FastifyInstance) {
             where: { id },
         });
 
+        await fastify.recarregarCachePainel?.();
         return reply.send({ success: true });
     });
 }

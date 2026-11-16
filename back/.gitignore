@@ -1,3 +1,11 @@
 node_modules
 # Keep environment variables out of version control
 .env
+
+# JavaScript gerado pelo TypeScript (npm run build). O Dockerfile compila no build;
+# versionar os dois causava conflitos e .js desatualizado em relação ao .ts.
+/src/**/*.js
+/config/*.js
+/middleware/*.js
+/prisma.config.js
+/prisma.logs.config.js

@@ -2,6 +2,9 @@ import { randomUUID } from 'node:crypto'
 import { createTcpFrames } from '../lib/tcp-frames'
 import { auditContext, flowAudit } from '../lib/flow-audit'
 import fp from "fastify-plugin";
+import { parseAllowedIps, tcpAllowed } from '../lib/tcp-allowlist';
+import { guicheCache } from '../lib/painel-caches';
+import { getHojeBrasil } from '../services/senhas/senha.helpers';
 import type { FastifyInstance } from "fastify";
 import net from "net";
 import { PrismaLog } from "../../config/prismalog";
@@ -29,9 +32,20 @@ let cacheRecepcoes = new Map<string, string>();
 let cacheLocalizacoes = new Map<string, string>();
 let recepcoesLoadedAt = 0;
 let recepcoesPending: Promise<void> | undefined;
+// Recarga por "cache miss" (modalidade desconhecida ou nenhum painel ativo) no máximo a cada 30 s;
+// antes cada chamada TCP nessas condições fazia duas consultas ao banco.
+const MISS_RELOAD_MS = 30000;
+let missReloadAt = 0;
 
-async function refreshRecepcoes() {
-  if (Date.now() - recepcoesLoadedAt < 30000) return;
+declare module "fastify" {
+  interface FastifyInstance {
+    recarregarCachePainel: () => Promise<void>;
+  }
+}
+
+async function refreshRecepcoes(force = false) {
+  if (!force && Date.now() - recepcoesLoadedAt < 30000) return;
+  if (force && recepcoesPending) await recepcoesPending.catch(() => {});
   if (!recepcoesPending) {
     recepcoesPending = PrismaLog.recepcoes_modalidades.findMany({
       where: { ativo: true }, select: { cd_modalidade: true, servico: true, recepcao: true, localizacao: true },
@@ -64,41 +78,46 @@ function extrairDadosTcp(raw: string) {
   };
 }
 
-async function extrairNomePaciente(body: any, servico: string): Promise<string | undefined> {
-  const fontes = servico === 'C'
-    ? [body?.senhasnr, body?.senhasRawQuery]
-    : [body?.senhasRawQuery, body?.senhas]
+// Para logs do Fastify (stdout/docker logs): a mensagem TCP traz o nome do paciente, que não vai para o log.
+function resumoTcp(raw: string) {
+  const { servico, senha, guiche, modalidadeNome } = extrairDadosTcp(raw);
+  return { servico, senha, guiche, modalidade: modalidadeNome, bytes: Buffer.byteLength(raw) };
+}
 
-  for (const fonte of fontes) {
-    if (!Array.isArray(fonte)) continue
-
-    for (const row of fonte) {
-      const pacienteRelacionado = row?.atendimentos?.[0]
-        ?.pacientes_atendimentos_cd_pacienteTopacientes
-      const cdPaciente = Number(row?.cd_paciente ?? pacienteRelacionado?.cd_paciente)
-
-      if (Number.isInteger(cdPaciente) && cdPaciente > 0) {
-        const pacienteOriginal = await prisma.pacientes.findUnique({
-          where: { cd_paciente: cdPaciente },
-          select: { ds_paciente: true },
-        })
-
-        if (pacienteOriginal?.ds_paciente?.trim()) {
-          return pacienteOriginal.ds_paciente.trim()
-        }
-      }
-
-      if (typeof row?.ds_paciente === 'string' && row.ds_paciente.trim()) {
-        return row.ds_paciente.trim()
-      }
-
-      if (typeof pacienteRelacionado?.ds_paciente === 'string' && pacienteRelacionado.ds_paciente.trim()) {
-        return pacienteRelacionado.ds_paciente.trim()
-      }
+// Nome completo do paciente da senha chamada. Antes a chamada carregava TODAS as senhas do dia
+// (via /clinux/senhas) e, em B/D, usava o paciente da senha mais recente, que podia ser outra pessoa.
+// Mensagem do Clinux: B-NN-0394-06-...  -> 3º campo = número da senha (nr_senha) do dia.
+async function buscarNomeDaChamada(servico: string, referencia: string): Promise<string | undefined> {
+  const digits = referencia.replace(/\D/g, '')
+  const numero = Number(digits)
+  if (!digits || !Number.isSafeInteger(numero) || numero <= 0) return undefined
+  const inicio = getHojeBrasil()
+  const fim = new Date(inicio.getTime() + 86_400_000)
+  try {
+    if (servico === 'C') {
+      // Entrega: o número vem dos últimos dígitos do atendimento (mesmo critério de antes).
+      const rows = await prisma.$queryRaw<{ ds_paciente: string | null }[]>`
+        SELECT p.ds_paciente
+        FROM atendimentos_senhas s
+        JOIN atendimentos a ON a.cd_atendimento = s.nr_controle
+        JOIN pacientes p ON p.cd_paciente = a.cd_paciente
+        WHERE s.dt_entrada >= ${inicio} AND s.dt_entrada < ${fim}
+          AND s.ds_opcao = 'C'
+          AND (a.cd_atendimento % ${10 ** digits.length}) = ${numero}
+        ORDER BY s.dt_entrada DESC
+        LIMIT 1`
+      return rows[0]?.ds_paciente?.trim() || undefined
     }
+    const senha = await prisma.atendimentos_senhas.findFirst({
+      where: { dt_entrada: { gte: inicio, lt: fim }, nr_senha: numero, ds_opcao: servico },
+      orderBy: { dt_entrada: 'desc' },
+      select: { atendimentos: { take: 1, select: { pacientes_atendimentos_cd_pacienteTopacientes: { select: { ds_paciente: true } } } } },
+    })
+    return senha?.atendimentos[0]?.pacientes_atendimentos_cd_pacienteTopacientes?.ds_paciente?.trim() || undefined
+  } catch {
+    // Sem o nome do banco, a chamada segue com o nome que veio na mensagem TCP.
+    return undefined
   }
-
-  return undefined
 }
 
 function montarNomeGuichePadrao(numero: string) {
@@ -120,9 +139,10 @@ async function buscarNomeGuiche(numero: string) {
 
   const numeroFormatado = numeroLimpo.padStart(2, "0");
 
-  const guiche = await PrismaLog.guiches.findUnique({
+  const guiche = await guicheCache(numeroFormatado, () => PrismaLog.guiches.findUnique({
     where: { numero: numeroFormatado },
-  });
+    select: { ativo: true, nome: true },
+  }));
 
   if (guiche?.ativo && guiche.nome?.trim()) {
     return guiche.nome.trim();
@@ -131,7 +151,7 @@ async function buscarNomeGuiche(numero: string) {
   return montarNomeGuichePadrao(numeroFormatado);
 }
 
-async function carregarCachePainel(fastify: FastifyInstance) {
+async function carregarCachePainel(fastify: FastifyInstance, force = false) {
   try {
     const config = await PrismaLog.configuracao_painel.findUnique({
       where: { id: 1 },
@@ -158,7 +178,7 @@ async function carregarCachePainel(fastify: FastifyInstance) {
       );
     }
 
-    await refreshRecepcoes();
+    await refreshRecepcoes(force);
 
     fastify.log.info(
       {
@@ -187,7 +207,8 @@ async function descobrirPainelPorEvento(
       normalizarTexto(modalidadeNome)
     );
 
-    if (!cdModalidade || cachePaineis.length === 0) {
+    if ((!cdModalidade || cachePaineis.length === 0) && Date.now() - missReloadAt >= MISS_RELOAD_MS) {
+      missReloadAt = Date.now();
       await carregarCachePainel(fastify);
 
       cdModalidade = cacheNomeModalidadeParaId.get(
@@ -197,7 +218,7 @@ async function descobrirPainelPorEvento(
 
     if (!cdModalidade) {
       fastify.log.warn(
-        { modalidadeNome, raw },
+        { tcp: resumoTcp(raw) },
         "Modalidade não encontrada no cache"
       );
       return 1;
@@ -227,7 +248,7 @@ async function descobrirPainelPorEvento(
     return painel?.painel ?? 1;
   } catch (error) {
     fastify.log.error(
-      { error, raw },
+      { error, tcp: resumoTcp(raw) },
       "Erro ao descobrir painel pelo evento TCP"
     );
     return 1;
@@ -257,17 +278,7 @@ async function tratarMensagemTcp(
       return;
     }
 
-    const res = await fastify.inject({
-      method: "GET",
-      url: `/clinux/senhas?filtroControle=${encodeURIComponent(tail)}`,
-      headers: {
-        Authorization: `Bearer ${(process.env.TOKEN_API_INT?.trim() || process.env.TOKENAPIINT?.trim())}`,
-        'x-flow-id': auditContext.getStore()?.flowId ?? '',
-      },
-    });
-
-    const body = res.json() as any;
-    const dsPaciente = await extrairNomePaciente(body, servico);
+    const dsPaciente = await buscarNomeDaChamada(servico, tail);
 
     let out = raw;
 
@@ -391,7 +402,16 @@ async function tratarMensagemTcp(
 export default fp(async function painelClinux(fastify: FastifyInstance) {
   await carregarCachePainel(fastify);
 
+  const allowedIps = parseAllowedIps(process.env.TCP_ALLOWED_IPS);
+  if (allowedIps.size) fastify.log.info({ total: allowedIps.size }, "TCP 2345 restrito aos IPs de TCP_ALLOWED_IPS");
+
   const server = net.createServer((sock) => {
+    if (!tcpAllowed(sock.remoteAddress, allowedIps)) {
+      flowAudit('tcp_ip_recusado', 'tcp.2345', { code: 'TCP_IP_NOT_ALLOWED' });
+      fastify.log.warn({ remoteAddress: sock.remoteAddress }, "Conexão TCP recusada: IP fora de TCP_ALLOWED_IPS");
+      sock.destroy();
+      return;
+    }
     let queue = Promise.resolve()
     let queued = 0
     const frames = createTcpFrames((raw) => {
@@ -404,7 +424,7 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
         fastify.log.info(
           {
             painelId,
-            raw,
+            tcp: resumoTcp(raw),
             localAddress: sock.localAddress,
             remoteAddress: sock.remoteAddress,
           },
@@ -438,8 +458,9 @@ export default fp(async function painelClinux(fastify: FastifyInstance) {
     fastify.log.error({ err }, "Erro no servidor TCP");
   });
 
+  // Chamado ao salvar a configuração dos painéis ou das recepções, para valer na hora.
   fastify.decorate("recarregarCachePainel", async () => {
-    await carregarCachePainel(fastify);
+    await carregarCachePainel(fastify, true);
   });
 
   fastify.addHook("onClose", (_inst, done) => server.close(done));

@@ -12,7 +12,7 @@ function load() {
     require: name => name === '../../config/prismalog' ? { PrismaLog: { guiches: { findUnique: async () => ({ ativo: true, nome: 'Atendimento' }) }, recepcoes_modalidades: { findMany: async () => [] } } }
       : name === '../../config/prismaDB' ? { prisma: {} }
       : name.includes('flow-audit') ? { auditContext: { getStore: () => ({ flowId: 'unique-call' }) }, flowAudit() {} }
-      : name.includes('tcp-frames') ? {} : require(name),
+      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   return exports.tratarMensagemTcp;
 }

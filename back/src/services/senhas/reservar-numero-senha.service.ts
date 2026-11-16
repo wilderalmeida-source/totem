@@ -5,11 +5,14 @@ import { PrismaLog } from '../../../config/prismalog'
 export async function reservarNumeroSenha(hoje: Date): Promise<number> {
   const periodo = { gte: hoje, lt: new Date(hoje.getTime() + 86400000) }
   // Apenas leituras no banco clinico, inclusive para a transicao no meio do dia.
-  const total = await auditOperation('clinico.contagem', () => prisma.atendimentos_senhas.count({ where: { dt_entrada: periodo } }))
-  const maior = await auditOperation('clinico.maior_numero', () => prisma.atendimentos_senhas.aggregate({
-    where: { dt_entrada: periodo, OR: [{ ds_opcao: { not: 'C' } }, { ds_opcao: null }] },
-    _max: { nr_senha: true },
-  }))
+  // As duas leituras são independentes: em paralelo, uma ida ao banco a menos no tempo da emissão.
+  const [total, maior] = await Promise.all([
+    auditOperation('clinico.contagem', () => prisma.atendimentos_senhas.count({ where: { dt_entrada: periodo } })),
+    auditOperation('clinico.maior_numero', () => prisma.atendimentos_senhas.aggregate({
+      where: { dt_entrada: periodo, OR: [{ ds_opcao: { not: 'C' } }, { ds_opcao: null }] },
+      _max: { nr_senha: true },
+    })),
+  ])
   const piso = Math.max(total, maior._max.nr_senha ?? 0)
   // A reserva e confirmada nos logs antes da gravacao clinica. Nunca devolver o numero.
   const rows = await auditOperation('logs.reserva_numero', () => PrismaLog.$queryRaw<{ number: number }[]>`

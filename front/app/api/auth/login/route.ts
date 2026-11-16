@@ -7,9 +7,31 @@ import {
   createAdminSession,
 } from "@/lib/admin-session";
 
+// Limite de tentativas por IP e por usuário. O IP vem do X-Forwarded-For, que o cliente pode trocar
+// a cada tentativa; o limite por usuário não depende de cabeçalho e é o que impede a força bruta.
 const attempts = new Map<string, { count: number; resetAt: number }>();
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000;
+const MAX_KEYS = 10000;
+
+function blocked(key: string, now: number) {
+  const current = attempts.get(key);
+  if (current && current.resetAt <= now) { attempts.delete(key); return false; }
+  return Boolean(current && current.count >= MAX_ATTEMPTS);
+}
+
+function registerFailure(key: string, now: number) {
+  if (!attempts.has(key) && attempts.size >= MAX_KEYS) {
+    for (const [k, v] of attempts) if (v.resetAt <= now) attempts.delete(k);
+    // Sem crescer sem limite com IPs forjados: descarta as entradas mais antigas.
+    for (const k of attempts.keys()) { if (attempts.size < MAX_KEYS) break; attempts.delete(k); }
+  }
+  const previous = attempts.get(key);
+  attempts.set(key, {
+    count: previous && previous.resetAt > now ? previous.count + 1 : 1,
+    resetAt: previous && previous.resetAt > now ? previous.resetAt : now + WINDOW_MS,
+  });
+}
 
 function safeEqual(received: string, expected: string) {
   const left = createHash("sha256").update(received).digest();
@@ -72,16 +94,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const address = clientAddress(request);
+  const address = `ip:${clientAddress(request)}`;
   const now = Date.now();
-  const current = attempts.get(address);
-  if (current && current.resetAt > now && current.count >= MAX_ATTEMPTS) {
+  if (blocked(address, now)) {
     return NextResponse.json(
       { error: "Muitas tentativas. Aguarde 15 minutos." },
       { status: 429 }
     );
   }
-  if (current && current.resetAt <= now) attempts.delete(address);
 
   let body: unknown;
   try {
@@ -98,6 +118,14 @@ export async function POST(request: NextRequest) {
     typeof body === "object" && body && "password" in body
       ? String(body.password).slice(0, 256)
       : "";
+
+  const userKey = `user:${username.trim().toLowerCase()}`;
+  if (blocked(userKey, now)) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Aguarde 15 minutos." },
+      { status: 429 }
+    );
+  }
 
   const bootstrapValid = Boolean(
     usernameExpected && passwordExpected &&
@@ -118,15 +146,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!authenticatedUser && !bootstrapValid) {
-    const previous = attempts.get(address);
-    attempts.set(address, {
-      count: previous && previous.resetAt > now ? previous.count + 1 : 1,
-      resetAt: previous && previous.resetAt > now ? previous.resetAt : now + WINDOW_MS,
-    });
+    registerFailure(address, now);
+    registerFailure(userKey, now);
     return NextResponse.json({ error: "Usuário ou senha inválidos." }, { status: 401 });
   }
 
   attempts.delete(address);
+  attempts.delete(userKey);
   if (apiBase && apiToken) {
     recordAudit({ category: 'ADMIN', actor: authenticatedUser?.username ?? username, action: 'login_realizado', step: 'autenticacao' });
   }

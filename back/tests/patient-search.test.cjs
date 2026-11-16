@@ -10,7 +10,7 @@ async function setup(t, file, exportName, result = [], eligible = null, env = {}
   const calls = [];
   const diagnostics = [];
   const findMany = async args => { calls.push(args); return result; };
-  const prisma = { pacientes: { findMany }, atendimentos: { findMany, findFirst: async args => { calls.push(args); return eligible; } } };
+  const prisma = { pacientes: { findMany, groupBy: findMany }, atendimentos: { findMany, findFirst: async args => { calls.push(args); return eligible; } } };
   const filename = path.join(__dirname, '../src/routes', file);
   const realRequire = createRequire(filename);
   const exports = {};
@@ -56,6 +56,17 @@ test('confirma CPF e nome com nascimento; preserva QR e pesquisa por nome', asyn
   assert.equal(calls[2].orderBy, undefined);
 });
 
+test('busca por prefixo agrupa no banco (GROUP BY + LIMIT) em vez de distinct na memoria', async t => {
+  const { calls, get } = await setup(t, 'pacientes.js', 'pacientesRoute');
+  assert.equal((await get('/clinux/pacientes', { ds_paciente: 'MARIA AP' })).statusCode, 200);
+  assert.equal(calls.length, 1);
+  assert.equal(JSON.stringify(calls[0].by), '["ds_paciente"]');
+  assert.equal(calls[0].distinct, undefined);
+  assert.equal(calls[0].select, undefined);
+  assert.equal(calls[0].take, 101);
+  assert.equal(calls[0].orderBy.ds_paciente, 'asc');
+});
+
 test('mantém as dez opções de nascimento na confirmação por CPF', async t => {
   const { get } = await setup(t, 'pacientes.js', 'pacientesRoute', [{ dt_nascimento: new Date('1980-01-01') }]);
   const response = await get('/clinux/pacientes', { tipo: 'MASK', ds_cpf: '12345678901' });
@@ -65,11 +76,12 @@ test('mantém as dez opções de nascimento na confirmação por CPF', async t =
   assert.ok(rows.every(row => Object.keys(row).join() === 'dt_nascimento'));
 });
 
-test('busca ampla não devolve lista truncada; reset não consulta o banco', async t => {
+test('busca ampla mostra os 100 primeiros e avisa o corte; reset não consulta o banco', async t => {
   const { calls, get } = await setup(t, 'pacientes.js', 'pacientesRoute', Array(101).fill({ ds_paciente: 'TESTE' }));
   const response = await get('/clinux/pacientes', { ds_paciente: 'CARLOS' });
-  assert.equal(response.statusCode, 422);
-  assert.match(response.json().error, /refinar/);
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().length, 100);
+  assert.equal(response.headers['x-result-truncated'], 'true');
   assert.equal((await get('/clinux/pacientes', { tipo: 'RESET', ds_paciente: 'RE' })).statusCode, 200);
   assert.equal(calls.length, 1);
 });
@@ -141,6 +153,7 @@ test('entrega pede modalidade sem exame real e consulta alem dos dez itens exibi
     assert.equal(response.statusCode, 200);
     assert.equal(response.json().requerSelecaoModalidade, !eligible);
     assert.equal(response.json().exames.length, 10);
+    assert.equal(calls[0].select.exames.orderBy.cd_exame, 'desc');
     assert.equal(calls[1].where.cd_paciente, 123);
     assert.equal(calls[1].where.ds_status, 5);
     assert.equal(calls[1].where.nr_controle.not, null);

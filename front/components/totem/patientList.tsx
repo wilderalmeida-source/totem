@@ -9,6 +9,8 @@ import PatientChoice from './PatientChoice';
 
 interface PatientListProps {
   pacientes: Paciente[];
+  /** Havia mais de 100 nomes e só os primeiros vieram. */
+  truncada?: boolean;
   tipo: TipoBusca;
   servico: string;
   preferencial: number;
@@ -19,6 +21,7 @@ interface PatientListProps {
 
 export function PatientList({
   pacientes,
+  truncada,
   tipo,
   servico,
   preferencial,
@@ -36,6 +39,12 @@ export function PatientList({
         {loading && <li className="text-3xl mb-3">Buscando...</li>}
 
         {error && <li className="text-3xl mb-3 text-red-600">{error}</li>}
+
+        {!loading && !error && truncada && pacientesExibidos.length > 0 && (
+          <li className="text-2xl mb-3 font-semibold" role="status">
+            Mostrando os 100 primeiros nomes. Continue digitando para encontrar o seu.
+          </li>
+        )}
 
         {!loading &&
           !error &&

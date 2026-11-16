@@ -6,6 +6,7 @@
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "start": "node src/server.js",
+    "test": "tsc && node --test tests/*.test.cjs",
     "export:modelos-rtf": "node src/scripts/exportar-modelos-rtf.js",
     "export:chaves-rtf": "node src/scripts/exportar-chaves-rtf.js",
     "db:push": "npx prisma db push --config=prisma.logs.config.ts",

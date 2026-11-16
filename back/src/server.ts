@@ -17,6 +17,7 @@ import { senhaRoute } from "./routes/senhas";
 import { modalidadesRoute } from "./routes/modalidades";
 import pgNotify from "./routes/pgNotify";
 import ws from './routes/websocket'
+import { requestSerializer } from './lib/log-redact'
 import painelClinux from './routes/painel'
 import { procedimentosRoute } from "./routes/procedimentos";
 import { voiceRoute } from "./routes/voice";
@@ -34,7 +35,8 @@ import { atendimentosTotemRoute } from './routes/atendimentos-totem';
 
 async function bootstrap() {
   auditOutbox.start()
-  const fastify = Fastify({ logger: true, })
+  // Log de requisições sem os valores da query string (nome, CPF e nascimento nas buscas de paciente).
+  const fastify = Fastify({ logger: { serializers: { req: requestSerializer } } })
   const licenseManager = new LicenseManager({
     directory: process.env.LICENSE_STATE_DIRECTORY || path.join(process.cwd(), 'data/license'),
     event: (action, metadata) => recordAudit({ category: 'ADMIN', actor: 'sistema', action, step: 'licenciamento', metadata }),

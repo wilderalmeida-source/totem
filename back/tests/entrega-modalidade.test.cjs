@@ -41,5 +41,6 @@ test('sem escolha explicita preserva exame real e ignora controle TOTEM quando h
   ]);
   assert.equal(result.nr_controle, 222);
   assert.equal(result.nr_modalidade, 8);
-  assert.equal(calls[0].where.dt_data.gte.toISOString(), '2026-06-22T00:00:00.000Z');
+  // Janela de 6 meses (commit "Log e resultados seis meses"): 22/09 -> 22/03.
+  assert.equal(calls[0].where.dt_data.gte.toISOString(), '2026-03-22T00:00:00.000Z');
 });

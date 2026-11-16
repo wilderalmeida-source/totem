@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createReadStream, promises as fs } from "node:fs";
 import path from "node:path";
 import { Readable } from "node:stream";
-import { MEDIA_DIRECTORY } from "@/lib/panel-storage";
+import { ensureImagesReady, NOTICES_DIRECTORY } from "@/lib/panel-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +12,6 @@ const contentTypes: Record<string, string> = {
   ".png": "image/png",
   ".webp": "image/webp",
   ".gif": "image/gif",
-  ".mp4": "video/mp4",
-  ".webm": "video/webm",
-  ".ogv": "video/ogg",
 };
 
 export async function GET(request: NextRequest) {
@@ -25,9 +22,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Arquivo inválido." }, { status: 400 });
   }
 
-  const filePath = path.join(MEDIA_DIRECTORY, name);
+  // Imagens dos informativos, em data/imagens/informativos.
+  const filePath = path.join(NOTICES_DIRECTORY, name);
 
   try {
+    await ensureImagesReady();
     const stat = await fs.stat(filePath);
     const range = request.headers.get("range");
     let start = 0;

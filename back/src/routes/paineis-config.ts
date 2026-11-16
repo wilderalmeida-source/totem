@@ -1,5 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { PrismaLog } from '../../config/prismalog'
+import { z } from 'zod'
+import { configPainelCache } from '../lib/painel-caches'
 
 type ServicoPainel = 'atendimento' | 'marcacao' | 'resultado'
 
@@ -13,6 +15,20 @@ function ipValido(ip: string) {
     return numero >= 0 && numero <= 255
   })
 }
+
+// Estrutura enviada pela tela Setup Painel. Antes qualquer JSON era gravado e quebrava o roteamento das chamadas.
+const modalidades = z.array(z.number().int().positive()).max(1000).default([])
+const painelSchema = z.object({
+  painel: z.number().int().min(1).max(99),
+  ativo: z.boolean(),
+  ip: z.string().trim().max(15).optional().default(''),
+  atendimento: modalidades,
+  marcacao: modalidades,
+  resultado: modalidades,
+  universal: z.object({ atendimento: z.boolean().optional(), marcacao: z.boolean().optional(), resultado: z.boolean().optional() }).optional().default({}),
+})
+const configSchema = z.object({ ativo: z.boolean(), paineis: z.array(painelSchema).max(50) })
+  .refine(c => new Set(c.paineis.map(p => p.painel)).size === c.paineis.length, 'Número de painel repetido.')
 
 export async function configuracaoPaineisRoutes(fastify: FastifyInstance) {
   fastify.get('/clinux/paineis-config', async () => {
@@ -38,35 +54,19 @@ export async function configuracaoPaineisRoutes(fastify: FastifyInstance) {
   })
 
   fastify.post('/clinux/paineis-config', async (request, reply) => {
-    const { ativo, paineis } = request.body as any
-
-    if (typeof ativo !== 'boolean') {
-      return reply.code(400).send({
-        error: 'Campo ativo inválido.',
-      })
+    const parsed = configSchema.safeParse(request.body)
+    if (!parsed.success) {
+      return reply.code(400).send({ error: parsed.error.issues[0]?.message === 'Número de painel repetido.' ? 'Número de painel repetido.' : 'Configuração dos painéis inválida.' })
     }
-
-    if (!Array.isArray(paineis)) {
-      return reply.code(400).send({
-        error: 'Campo paineis precisa ser uma lista.',
-      })
-    }
+    const { ativo } = parsed.data
+    const paineis: any[] = parsed.data.paineis
 
     const paineisAtivos = paineis.filter((painel) => painel.ativo)
 
-    const configMidia = await PrismaLog.configuracao_midia.findUnique({ where: { id: 1 } })
-    const playlists = Array.isArray(configMidia?.playlists) ? configMidia.playlists as any[] : []
-    const playlistIds = new Set(playlists.map((playlist) => String(playlist.id)))
-    for (const painel of paineis) {
-      if (painel.playlistId != null && painel.playlistId !== '' && !playlistIds.has(String(painel.playlistId))) {
-        return reply.code(400).send({ error: `A playlist configurada no Painel ${painel.painel} não existe.` })
-      }
-      painel.playlistId = painel.playlistId ? String(painel.playlistId) : null
-    }
 
     if (ativo && paineisAtivos.length < 1) {
       return reply.code(400).send({
-        error: 'É necessário ativar pelo menos 2 painéis.',
+        error: 'É necessário ativar pelo menos 1 painel.',
       })
     }
 
@@ -135,6 +135,9 @@ export async function configuracaoPaineisRoutes(fastify: FastifyInstance) {
         paineis,
       },
     })
+
+    configPainelCache.clear()
+    await fastify.recarregarCachePainel?.()
 
     return reply.send({
       message: 'Configuração salva com sucesso.',

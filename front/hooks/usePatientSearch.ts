@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { auditTotem } from '@/lib/audit-client';
 import { identificationValues } from '@/lib/identification-diagnostic';
 
-import { buscaPaciente, Paciente } from "@/services/api";
+import { buscaPaciente, buscaPacientesPorPrefixo, Paciente } from "@/services/api";
 import {
   isCommonShortName,
   isValidDateBR,
@@ -16,6 +16,7 @@ export function usePatientSearch(tipo: TipoBusca) {
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [truncada, setTruncada] = useState(false);
 
   const sequence = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -32,6 +33,7 @@ export function usePatientSearch(tipo: TipoBusca) {
     controller.current?.abort();
     setLoading(false);
     setPacientes([]);
+    setTruncada(false);
     setError(null);
   }, []);
 
@@ -69,17 +71,16 @@ export function usePatientSearch(tipo: TipoBusca) {
           tipo === 'NOME' ? { ds_paciente: valor } : tipo === 'DATA' ? { dt_nascimento: valor } : { ds_cpf: valor }
         ) });
 
-        const result = await buscaPaciente(
-          tipo === "NOME"
-            ? { ds_paciente: term }
-            : tipo === "CPF"
-              ? { ds_cpf: number, tipo: "MASK" }
-              : { dt_nascimento: toISODateBR(number) },
-          requestController.signal
-        );
+        const { pacientes: result, truncada: cortada } = tipo === "NOME"
+          ? await buscaPacientesPorPrefixo(term, requestController.signal)
+          : { pacientes: await buscaPaciente(
+              tipo === "CPF" ? { ds_cpf: number, tipo: "MASK" } : { dt_nascimento: toISODateBR(number) },
+              requestController.signal
+            ), truncada: false };
 
         if (requestId !== sequence.current) return;
         setPacientes((result ?? []).map(normalizePaciente));
+        setTruncada(cortada);
       } catch (err) {
         if (requestId !== sequence.current) return;
         console.error("Erro ao pesquisar paciente:", err);
@@ -97,6 +98,7 @@ export function usePatientSearch(tipo: TipoBusca) {
     if (timer.current) clearTimeout(timer.current);
     controller.current?.abort();
     setPacientes([]);
+    setTruncada(false);
     setError(null);
     setLoading(false);
     if (tipo === 'NOME') {
@@ -108,6 +110,7 @@ export function usePatientSearch(tipo: TipoBusca) {
 
   return {
     pacientes,
+    truncada,
     loading,
     error,
     pesquisar,

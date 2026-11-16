@@ -1,16 +1,18 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { MEDIA_DIRECTORY } from './panel-storage'
+import { ensureImagesReady, PARTNERS_DIRECTORY } from './panel-storage'
 import { EMPTY_PARTNERSHIPS, partnershipsSchema, type PartnerLogo, type PartnershipsConfig } from './partnerships'
 
-export const PARTNERSHIPS_DIRECTORY = path.join(MEDIA_DIRECTORY, 'partnerships')
+// data/imagens/parceiros (volume ./data/imagens no compose).
+export const PARTNERSHIPS_DIRECTORY = PARTNERS_DIRECTORY
 const configFile = path.join(PARTNERSHIPS_DIRECTORY, 'config.json')
 export class PartnershipConflict extends Error {}
 export class PartnershipInvalid extends Error {}
 const state = globalThis as typeof globalThis & { partnershipsWrite?: Promise<unknown> }
 
 export async function readPartnerships(): Promise<PartnershipsConfig> {
+  await ensureImagesReady()
   try { return partnershipsSchema.parse(JSON.parse(await fs.readFile(configFile, 'utf8'))) }
   catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return structuredClone(EMPTY_PARTNERSHIPS)

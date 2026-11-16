@@ -3,7 +3,9 @@ import { z } from "zod"
 import { PrismaLog } from "../../config/prismalog";
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveEffectiveVoice } from "../../config/googleVoices";
+import { resolveEffectiveVoiceCached } from "../../config/googleVoices";
+import { synthesizeSpeech } from "../lib/google-tts";
+import { getHojeBrasil } from "../services/senhas/senha.helpers";
 export async function atencaoRoute(fastify: FastifyInstance) {
   fastify.get("/clinux/atencao", async (request, reply) => {
     const createbody = z.object({ TorP: z.string() });
@@ -101,8 +103,8 @@ export async function atencaoRoute(fastify: FastifyInstance) {
       const rate = 1;
 
       const now = new Date();
-      const dateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const volume = (await resolveEffectiveVoice(now)).volumeSound;
+      const dateOnly = getHojeBrasil();
+      const volume = (await resolveEffectiveVoiceCached(now)).volumeSound;
 
       const body = {
         input: { text },
@@ -114,25 +116,15 @@ export async function atencaoRoute(fastify: FastifyInstance) {
         },
       };
 
-      const res = await fetch(
-        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        }
-      );
+      const audioBuffer = await synthesizeSpeech(body, GOOGLE_TTS_KEY);
 
-      const data = await res.json();
-
-      if (!res.ok || !data.audioContent) {
-        // Google retornou erro — remove MP3 antigo e usa fallback
+      if (!audioBuffer) {
+        // Google retornou erro ou demorou demais — remove MP3 antigo e usa fallback
         if (existe) fs.unlinkSync(caminhoCompleto);
         return reply.status(200).send({ errorTTS: text }); // ✅ JSON
       }
 
       // Salva o MP3
-      const audioBuffer = Buffer.from(data.audioContent, 'base64');
       await fs.promises.writeFile(caminhoCompleto, audioBuffer); // ✅ removido bloco duplicado após isso
 
       // Contagem de caracteres

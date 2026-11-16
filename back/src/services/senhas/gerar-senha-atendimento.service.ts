@@ -68,16 +68,15 @@ export async function gerarSenhaAtendimento({
     throw new Error('IDMODALIDADE não configurado no .env')
   }
 
-  let dsModalidade = await resolveModalidade(modalidadeSenha)
+  // Independentes entre si: em paralelo.
+  let [dsModalidade, IP_PAINEL] = await Promise.all([
+    resolveModalidade(modalidadeSenha),
+    resolverIpPainelPorModalidade(servico, modalidadeSenha),
+  ])
 
   if (!dsModalidade) {
     throw new Error(`Modalidade ${modalidadeSenha} não encontrada`)
   }
-
-  const IP_PAINEL = await resolverIpPainelPorModalidade(
-    servico,
-    modalidadeSenha
-  )
 
   if (novoAtendimento && servico === 'A') {
     dsModalidade = 'ATENDIMENTO PRÉ'

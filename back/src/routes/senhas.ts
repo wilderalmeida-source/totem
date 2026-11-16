@@ -1,4 +1,5 @@
 import { FastifyInstance } from "fastify"
+import { clientErrorDetails } from '../lib/client-error'
 import { z } from "zod"
 import { prisma } from '../../config/prismaDB'
 import { gerarSenhaService } from '../services/senhas/gerar-senha.service'
@@ -36,11 +37,11 @@ export async function senhaRoute(fastify: FastifyInstance) {
 
       const dateInitial = new Date()
       dateInitial.setUTCHours(dateInitial.getUTCHours() - 3)
-      dateInitial.setHours(0, 1, 0, 0)
+      dateInitial.setUTCHours(0, 1, 0, 0)
 
       const dateFinal = new Date()
       dateFinal.setUTCHours(dateFinal.getUTCHours() - 3)
-      dateFinal.setHours(23, 59, 59, 999)
+      dateFinal.setUTCHours(23, 59, 59, 999)
 
       const senhasRawORM = await prisma.atendimentos_senhas.findMany({
         where: {
@@ -188,7 +189,7 @@ export async function senhaRoute(fastify: FastifyInstance) {
     } catch (err: any) {
       return reply.status(400).send({
         error: 'Requisição inválida',
-        details: err?.errors ?? String(err),
+        ...clientErrorDetails(err, request.log),
       })
     }
   })
@@ -212,7 +213,7 @@ export async function senhaRoute(fastify: FastifyInstance) {
       flowAudit('emissao_falhou_backend', 'emissao', { code, outcome: 'DESCONHECIDO', status: 400 })
       return reply.status(400).send({
         error: 'Erro ao gerar senha',
-        details: err?.errors ?? String(err),
+        ...clientErrorDetails(err, request.log),
       })
     }
   })

@@ -9,6 +9,7 @@ import { identificationAttempts, identificationTarget, TARGET } from '../lib/ide
 import { flowAudit } from '../lib/flow-audit'
 import { decoyBirthDates } from '../lib/decoy-dates'
 import { qrBlocked, qrFailure } from '../lib/qr-guard'
+import { clientErrorDetails } from '../lib/client-error'
 
 const patientQuery = z.union([
   z.object({ tipo: z.literal('RESET'), ds_paciente: z.string().max(150).optional() }).strict(),
@@ -87,6 +88,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     }
     const where: Prisma.pacientesWhereInput = {}
     let select: Prisma.pacientesSelect
+    let prefixo = false
     if ('cd_paciente' in input && input.tipo !== 'NOMEDATA') {
       where.cd_paciente = input.cd_paciente
       select = { cd_paciente: true, ds_paciente: true, dt_nascimento: true }
@@ -115,6 +117,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     } else {
       where.ds_paciente = { startsWith: input.ds_paciente, mode: 'insensitive' }
       select = { ds_paciente: true }
+      prefixo = true
     }
     const distinct: Prisma.PacientesScalarFieldEnum[] =
       !('cd_paciente' in input) && input.tipo !== 'DATA' && input.tipo !== 'ID' && input.tipo !== 'NOMEDATA'
@@ -126,10 +129,15 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     const porCodigo = where.cd_paciente !== undefined
     const limite = somenteData || porCodigo ? 1 : input.tipo === 'ID' ? 2 : SEARCH_LIMIT + 1
     const ordenarPorNome = !somenteData && !porCodigo && !('ds_cpf' in input)
-    const consultar = () => prisma.pacientes.findMany({ where, select,
+    const buscar = () => prisma.pacientes.findMany({ where, select,
       ...(!somenteData && distinct.length ? { distinct } : {}),
       ...(ordenarPorNome ? { orderBy: { ds_paciente: 'asc' as const } } : {}), take: limite })
-    let pacientes: Awaited<ReturnType<typeof consultar>>
+    // Prefixo ("MARIA AP"): o distinct do Prisma é feito na memória e o SQL sai sem LIMIT, trazendo
+    // todas as linhas que casam a cada letra. O groupBy faz GROUP BY + LIMIT no próprio banco.
+    const consultar = (): ReturnType<typeof buscar> => prefixo
+      ? prisma.pacientes.groupBy({ by: ['ds_paciente'], where, orderBy: { ds_paciente: 'asc' }, take: limite }) as unknown as ReturnType<typeof buscar>
+      : buscar()
+    let pacientes: Awaited<ReturnType<typeof buscar>>
     try { pacientes = await consultar() } catch (error) {
       patientDiagnostic(request.id, { recebido, normalizado: describePatientInput(input), ramo: input.tipo ?? 'FILTRO',
         operacao: 'prisma.pacientes.findMany', resultado: 'erro_prisma', duracaoMs: Date.now() - inicio,
@@ -190,7 +198,8 @@ export async function pacientesRoute(fastify: FastifyInstance) {
           data: {
             ds_paciente: ds_paciente.toUpperCase(),
             dt_nascimento,
-            cd_funcionario: 50
+            // Mesmo funcionário do restante do totem; sem IDFUNCIONARIO mantém o 50 usado até agora.
+            cd_funcionario: Number(process.env.IDFUNCIONARIO) > 0 ? Number(process.env.IDFUNCIONARIO) : 50
           },
           select: { ds_paciente: true, dt_nascimento: true, cd_paciente: true },
         })
@@ -219,7 +228,7 @@ export async function pacientesRoute(fastify: FastifyInstance) {
     flowAudit('cadastro_paciente_falhou', 'cadastro', { code, outcome: 'DESCONHECIDO' })
     return reply.status(400).send({
       error: "Requisição inválida",
-      details: err?.errors ?? String(err),
+      ...clientErrorDetails(err, request.log),
     });
   }
 });

@@ -3,7 +3,24 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 
 export type AuditEvent = { eventId: string; createdAt: string; category: string; action: string; sessionId?: string; actor?: string; step?: string; metadata?: unknown }
+const EVENT_FILE = /^[a-f0-9-]{36}\.json$/i
+// Só os temporários criados pela própria fila. Antivírus/sincronização no Windows criam cópias
+// como "<ID>.JSON.tmp" na pasta, que não podem deixar a saúde da fila em ATENÇÃO.
+const OWN_TEMP_FILE = /^[a-f0-9-]{36}\.json\.[a-f0-9-]{36}\.tmp$/
+
+// Arquivo ilegível (JSON quebrado, campos faltando) não pode travar a fila: vai para "<nome>.corrupt".
+function validEvent(value: unknown): value is AuditEvent {
+  const event = value as AuditEvent
+  return Boolean(event) && typeof event === 'object' && typeof event.eventId === 'string' && /^[a-f0-9-]{36}$/i.test(event.eventId)
+    && typeof event.createdAt === 'string' && Number.isFinite(Date.parse(event.createdAt))
+    && typeof event.category === 'string' && typeof event.action === 'string'
+}
+
 export class AuditOutbox {
+  // Quantidade de eventos na pasta, mantida em memória: antes cada evento listava a pasta inteira.
+  // Recontada a cada envio de lote, que já lista a pasta.
+  private fileCount: number | null = null
+  private corrupted = 0
   private running = false
   private flushPending?: Promise<void>
   private deliveryFailures = 0
@@ -12,20 +29,21 @@ export class AuditOutbox {
   private lastSuccess: string | null = null
   private lastFailure: string | null = null
   async health() {
-    let pending = 0, bytes = 0, oldest = Date.now(), temporaryFiles = 0
+    let pending = 0, bytes = 0, oldest = Date.now(), temporaryFiles = 0, corruptFiles = 0
     let readable = true
     try {
       for (const name of await fs.readdir(this.directory).catch((error: NodeJS.ErrnoException) => { if (error.code === 'ENOENT') return []; throw error })) {
-        if (name.endsWith('.tmp')) temporaryFiles++
-        if (!/^[a-f0-9-]{36}\.json$/i.test(name)) continue
+        if (OWN_TEMP_FILE.test(name)) temporaryFiles++
+        if (name.endsWith('.corrupt')) corruptFiles++
+        if (!EVENT_FILE.test(name)) continue
         const stat = await fs.stat(path.join(this.directory, name)).catch((error: NodeJS.ErrnoException) => { if (error.code === 'ENOENT') return null; throw error })
         if (!stat) continue
         pending++; bytes += stat.size; oldest = Math.min(oldest, stat.mtimeMs)
       }
     } catch { readable = false }
     const oldestPendingSeconds = pending ? Math.floor((Date.now() - oldest) / 1000) : 0
-    return { status: !readable ? 'ERRO' : this.consecutiveFailures || oldestPendingSeconds >= 60 || temporaryFiles || pending >= 80000 ? 'ATENCAO' : 'OK',
-      readable, pending, writesPending: this.queuedWrites, bytes, temporaryFiles, oldestPendingSeconds, capacity: 100000,
+    return { status: !readable ? 'ERRO' : this.consecutiveFailures || oldestPendingSeconds >= 60 || temporaryFiles || corruptFiles || pending >= 80000 ? 'ATENCAO' : 'OK',
+      readable, pending, writesPending: this.queuedWrites, bytes, temporaryFiles, corruptFiles, oldestPendingSeconds, capacity: 100000,
       deliveryFailures: this.deliveryFailures, consecutiveFailures: this.consecutiveFailures,
       delivered: this.delivered, lastSuccess: this.lastSuccess, lastFailure: this.lastFailure,
       sending: this.running, checkedAt: new Date().toISOString() }
@@ -44,8 +62,8 @@ export class AuditOutbox {
     this.queuedWrites++
     const write = this.writes.then(async () => {
     await fs.mkdir(this.directory, { recursive: true, mode: 0o700 })
-    const files = (await fs.readdir(this.directory)).filter(name => name.endsWith('.json'))
-    if (files.length >= 100000) throw Error('AUDIT_QUEUE_FULL')
+    if (this.fileCount === null) this.fileCount = (await fs.readdir(this.directory)).filter(name => name.endsWith('.json')).length
+    if (this.fileCount >= 100000) throw Error('AUDIT_QUEUE_FULL')
     const target = path.join(this.directory, event.eventId + '.json')
     if (await fs.stat(target).then(() => true, (error: NodeJS.ErrnoException) => { if (error.code === 'ENOENT') return false; throw error })) return event.eventId
     const temporary = target + '.' + randomUUID() + '.tmp'
@@ -53,6 +71,7 @@ export class AuditOutbox {
     try { await fd.writeFile(data); await fd.sync() } finally { await fd.close() }
     await fs.rename(temporary, target)
     await this.syncDirectory()
+    this.fileCount++
     this.start()
     return event.eventId
     })
@@ -85,13 +104,27 @@ export class AuditOutbox {
   private async flushBatch() {
     this.running = true
     try {
-      const files = (await fs.readdir(this.directory).catch((error: NodeJS.ErrnoException) => { if (error.code === 'ENOENT') return []; throw error })).filter(name => /^[a-f0-9-]{36}\.json$/i.test(name)).slice(0, 100)
+      const all = (await fs.readdir(this.directory).catch((error: NodeJS.ErrnoException) => { if (error.code === 'ENOENT') return []; throw error }))
+      this.fileCount = all.filter(name => name.endsWith('.json')).length
+      const files = all.filter(name => EVENT_FILE.test(name)).slice(0, 100)
       for (const name of files) {
         const file = path.join(this.directory, name)
-        const event = JSON.parse(await fs.readFile(file, 'utf8')) as AuditEvent
+        let event: unknown
+        try { event = JSON.parse(await fs.readFile(file, 'utf8')) } catch (error) {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
+          event = undefined
+        }
+        if (!validEvent(event)) {
+          await fs.rename(file, file + '.corrupt')
+          this.fileCount = Math.max(0, this.fileCount - 1)
+          this.corrupted++
+          console.error('AUDIT_EVENT_CORRUPT: arquivo separado como .corrupt para a fila seguir')
+          continue
+        }
         await this.deliver(event)
+        // Sem fsync aqui: se o unlink se perder numa queda, o evento é reenviado e o banco ignora (ON CONFLICT).
         await fs.unlink(file)
-        await this.syncDirectory()
+        this.fileCount = Math.max(0, this.fileCount - 1)
         this.delivered++
         this.lastSuccess = new Date().toISOString()
         this.consecutiveFailures = 0

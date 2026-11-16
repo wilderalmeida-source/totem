@@ -3,7 +3,10 @@ import { z } from "zod"
 import { PrismaLog } from "../../config/prismalog";
 import fs from 'node:fs';
 import path from 'node:path';
-import { applyDictionary, makeCacheKey, normalizeKey, resolveEffectiveVoice } from "../../config/googleVoices";
+import { applyDictionary, invalidateEffectiveVoice, makeCacheKey, normalizeKey, resolveEffectiveVoice, resolveEffectiveVoiceCached } from "../../config/googleVoices";
+import { synthesizeSpeech } from "../lib/google-tts";
+import { getHojeBrasil } from "../services/senhas/senha.helpers";
+import { AUDIO_CLEANUP_INTERVAL_MS, limparAudiosAntigos } from "../lib/audio-cleanup";
 import { GOOGLE_VOICES, PREMIUM_FEMALE, PREMIUM_MALE, CHEAP_FEMALE, CHEAP_MALE } from "../../config/voicesList";
 export function capitalizarNome(nome: string): string {
   return nome
@@ -19,6 +22,16 @@ export function normalizarGuicheParaFala(texto: string): string {
 }
 
 export async function voiceRoute(fastify: FastifyInstance) {
+  // Limpa os MP3 de chamada com mais de 24 h ao subir e de hora em hora.
+  const pastaAudios = path.resolve(__dirname, '../../public/audios');
+  const limpar = () => limparAudiosAntigos(pastaAudios)
+    .then(removidos => { if (removidos) fastify.log.info({ removidos }, "MP3 antigos removidos") })
+    .catch(() => fastify.log.warn("Falha ao limpar MP3 antigos"));
+  void limpar();
+  const limpeza = setInterval(limpar, AUDIO_CLEANUP_INTERVAL_MS);
+  limpeza.unref();
+  fastify.addHook("onClose", (_instance, done) => { clearInterval(limpeza); done(); });
+
   fastify.post('/clinux/voice', async (request, reply) => {
     const createbody = z.object({
       text: z.string(),
@@ -30,7 +43,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
         })
         .optional(),
     })
-    const { text, eventId } = createbody.parse(request.body)
+    const { text } = createbody.parse(request.body)
     const GOOGLE_TTS_KEY = process.env.GOOGLE_TTS_KEY
     const pastaPublica = path.resolve(__dirname, '../../public/audios');
     if (!fs.existsSync(pastaPublica)) {
@@ -42,18 +55,23 @@ export async function voiceRoute(fastify: FastifyInstance) {
       }
       // ========= VOZ DA SEMANA =========
       const now = new Date();
-      const effectiveVoice = await resolveEffectiveVoice(now);
+      // Configuração de voz (em cache) e dicionário em paralelo: antes eram 3 consultas em sequência
+      // antes mesmo de verificar se o MP3 da chamada já existia.
+      const [effectiveVoice, textoComDict] = await Promise.all([
+        resolveEffectiveVoiceCached(now),
+        applyDictionary(normalizarGuicheParaFala(text)),
+      ]);
       const voiceName = effectiveVoice.voiceName;
       const rate = effectiveVoice.rate;
       const volume = effectiveVoice.volumeSound;
 
       // O cache precisa considerar o texto depois do dicionário. Caso contrário,
       // um áudio antigo continua sendo usado após uma correção de pronúncia.
-      const textoComDict = await applyDictionary(normalizarGuicheParaFala(text));
       const formatado = capitalizarNome(textoComDict)
       const cacheKey = makeCacheKey({ voiceName, rate, volume, text: formatado });
-      const eventPrefix = eventId?.replace(/[^a-z0-9]/gi, '_').slice(0, 80) || 'temp';
-      const nomeArquivo = `chamada-${eventPrefix}-${cacheKey.slice(0, 16)}.mp3`;
+      // Só o hash no nome do arquivo: o eventId é o texto da chamada (nome do paciente) e acabava
+      // no disco, na URL /audios/... e nos logs.
+      const nomeArquivo = `chamada-${cacheKey.slice(0, 32)}.mp3`;
       const caminhoCompleto = path.join(pastaPublica, nomeArquivo);
       const urlRelativa = `/audios/${nomeArquivo}`;
       if (fs.existsSync(caminhoCompleto)) {
@@ -61,14 +79,9 @@ export async function voiceRoute(fastify: FastifyInstance) {
       }
 
       // ========= DATA LOCAL (apenas dia, sem hora) =========
-      const dateOnly = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-      );
+      const dateOnly = getHojeBrasil();
       const dateIso = dateOnly.toISOString();
-      const year = now.getFullYear();
-      const week = effectiveVoice.week;
+      const { year, week } = effectiveVoice;
 
       // ========= SALVAR VOZ DA SEMANA NO BANCO =========
       await PrismaLog.ttsWeekVoice.upsert({
@@ -77,7 +90,8 @@ export async function voiceRoute(fastify: FastifyInstance) {
         create: { year, week, voiceName },
       });
 
-      fastify.log.info({ eventId, text: formatado }, "Gerando áudio TTS")
+      // eventId e texto contêm o nome do paciente; no log fica só o tamanho.
+      fastify.log.info({ chars: formatado.length }, "Gerando áudio TTS")
       const body = {
         input: { text: formatado },
         voice: {
@@ -93,22 +107,10 @@ export async function voiceRoute(fastify: FastifyInstance) {
       if (!GOOGLE_TTS_KEY) {
         return reply.status(200).send({ errorTTS: formatado })
       }
-      const res = await fetch(
-        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        }
-      );
-      if (!res.ok) {
+      const audioBuffer = await synthesizeSpeech(body, GOOGLE_TTS_KEY);
+      if (!audioBuffer) {
         return reply.status(200).send({ errorTTS: formatado });
       }
-      const data = await res.json();
-      if (!data.audioContent) {
-        return reply.status(200).send({ errorTTS: formatado });
-      }
-      const audioBuffer = Buffer.from(data.audioContent, 'base64');
       await fs.promises.writeFile(caminhoCompleto, audioBuffer);
 
       // ========= CONTAGEM DE CARACTERES DIÁRIOS =========
@@ -142,28 +144,24 @@ export async function voiceRoute(fastify: FastifyInstance) {
   fastify.get("/clinux/voice/stats", async (request, reply) => { // status
     try {
       const now = new Date();
-      const year = now.getFullYear();
-      const week = (await resolveEffectiveVoice(now)).week;
-      const currentVoice = (await resolveEffectiveVoice()).voiceName;
-      const autoVoice = (await resolveEffectiveVoice(now)).autoVoice
-      const overrideVoice = (await resolveEffectiveVoice(now)).overrideVoice
-      const envForced = (await resolveEffectiveVoice(now)).envForced
-      const hasOverride = (await resolveEffectiveVoice(now)).hasOverride
-      const rate = (await resolveEffectiveVoice(now)).rate
-      const volumeSound = (await resolveEffectiveVoice(now)).volumeSound
       // últimos 30 dias
       const since = new Date();
       since.setDate(since.getDate() - 30);
 
-      const daily = await PrismaLog.ttsDailyUsage.findMany({
-        where: { date: { gte: since } },
-        orderBy: { date: "asc" },
-      });
-
-      const weeks = await PrismaLog.ttsWeekVoice.findMany({
-        orderBy: [{ year: "desc" }, { week: "desc" }],
-        take: 12, // últimas 12 semanas
-      });
+      // Antes: resolveEffectiveVoice chamado 8 vezes em sequência (16 consultas). Agora 1 vez,
+      // em paralelo com as outras duas consultas.
+      const [effective, daily, weeks] = await Promise.all([
+        resolveEffectiveVoice(now),
+        PrismaLog.ttsDailyUsage.findMany({
+          where: { date: { gte: since } },
+          orderBy: { date: "asc" },
+        }),
+        PrismaLog.ttsWeekVoice.findMany({
+          orderBy: [{ year: "desc" }, { week: "desc" }],
+          take: 12, // últimas 12 semanas
+        }),
+      ]);
+      const { year, week, voiceName: currentVoice, autoVoice, overrideVoice, envForced, hasOverride, rate, volumeSound } = effective;
 
       return reply.send({
         currentWeek: {
@@ -224,6 +222,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
       create: { year: body.year, week: body.week, voiceName: body.voiceName },
     });
 
+    invalidateEffectiveVoice();
     return reply.send({ ok: true });
   });
 
@@ -237,6 +236,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
       where: { year_week: { year: params.year, week: params.week } },
     });
 
+    invalidateEffectiveVoice();
     return reply.send({ ok: true });
   });
 
@@ -252,6 +252,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
       await PrismaLog.ttsSettings.create({ data: { rate: body.rate } });
     }
 
+    invalidateEffectiveVoice();
     return reply.send({ ok: true });
   });
 
@@ -265,6 +266,7 @@ export async function voiceRoute(fastify: FastifyInstance) {
       await PrismaLog.ttsSettings.create({ data: { volumeSound: body.volume } });
     }
 
+    invalidateEffectiveVoice();
     return reply.send({ ok: true });
   });
   //======================================
@@ -384,12 +386,22 @@ export async function voiceRoute(fastify: FastifyInstance) {
     }
     // 6)chama Google
     const chars = text.length;
-    const dateOnly = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
+    const dateOnly = getHojeBrasil();
     const dateIso = dateOnly.toISOString();
+    const body = {
+      input: { ssml },
+      voice: { languageCode: "pt-BR", name: voiceName },
+      audioConfig: { audioEncoding: "MP3", volumeGainDb: volume },
+    };
+
+    // Grava e contabiliza só quando o Google devolveu áudio; antes gravava um MP3 vazio em caso de erro.
+    const audioBuffer = await synthesizeSpeech(body, GOOGLE_TTS_KEY);
+    if (!audioBuffer) {
+      fastify.log.error("Falha ao gerar áudio de teste no Google TTS");
+      return reply.status(500).send("Falha ao gerar áudio");
+    }
+    await fs.promises.writeFile(caminhoCompleto, audioBuffer);
+
     await PrismaLog.ttsDailyUsage.upsert({
       where: { date: dateOnly },
       update: {
@@ -406,26 +418,6 @@ export async function voiceRoute(fastify: FastifyInstance) {
       type: "tts:delta",
       payload: { date: dateIso, chars, requestsInc: 1 },
     });
-
-    const body = {
-      input: { ssml },
-      voice: { languageCode: "pt-BR", name: voiceName },
-      audioConfig: { audioEncoding: "MP3", volumeGainDb: volume },
-    };
-
-    const res = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
-    );
-
-    const data = await res.json();
-    const audioBuffer = Buffer.from(data.audioContent, 'base64');
-    await fs.promises.writeFile(caminhoCompleto, audioBuffer);
-
-    if (!res.ok || !data.audioContent) {
-      console.error("Erro TTS Google:", data);
-      return reply.status(500).send("Falha ao gerar áudio");
-    }
 
     return reply.send({ audioContent: urlRelativa, cached: false, voiceName, rate });
   });

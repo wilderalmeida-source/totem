@@ -6,6 +6,9 @@ import type { QueuePerson } from '@/components/QueueList'
 import { validNoticeSettings, noticeCategories, type NoticeSettings } from '@/lib/panel-notices'
 import { ModalityPictogram, NoticePictogram } from './Pictogram'
 import GoldMark from '@/components/GoldMark'
+import BrandLogo from '@/components/brand/BrandLogo'
+import { useBrand } from '@/components/brand/useBrand'
+import { hasBrandLogo } from '@/lib/brand'
 
 function shortName(name: string) {
   const words = name.trim().split(/\s+/)
@@ -45,8 +48,13 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
     return () => clearTimeout(timer)
   }, [cycle, config, notice?.id, notice?.durationSeconds])
   const name = current?.fullName || current?.name
+  // Logo no canto superior substitui ícone e nome; na posição "saudação" o painel mantém o padrão.
+  const brand = useBrand()
+  const logoNoTopo = hasBrandLogo(brand) && brand?.placement === 'header'
   return <section className={`tv-panel ${!notice ? 'tv-no-notice' : ''}`} aria-label={`Painel de chamadas ${painelId}`}>
-    <header className="tv-header"><div className="tv-brand"><span><Building2 className="tv-blue-mark" /><GoldMark className="tv-gold-mark" /></span><div><strong>{company}</strong><small>Painel de chamadas · Recepção {painelId}</small></div></div><div className="tv-clock"><time>{now?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) ?? '--:--'}</time><small>{now?.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}</small></div></header>
+    <header className="tv-header">{logoNoTopo && brand
+      ? <div className="tv-brand tv-brand-with-logo"><BrandLogo brand={brand} className="brand-logo-tv" alt={company} /><div><small>Painel de chamadas · Recepção {painelId}</small></div></div>
+      : <div className="tv-brand"><span><Building2 className="tv-blue-mark" /><GoldMark className="tv-gold-mark" /></span><div><strong>{company}</strong><small>Painel de chamadas · Recepção {painelId}</small></div></div>}<div className="tv-clock"><time>{now?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) ?? '--:--'}</time><small>{now?.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'short' })}</small></div></header>
     <div className="tv-main">
       <section className="tv-current" aria-label="Chamando agora"><div className="tv-eyebrow"><span className="tv-live" />Chamando agora</div>
         <h1 key={current?.id ?? 'waiting'} className="tv-patient-name">{name || 'Aguardando chamada'}</h1>

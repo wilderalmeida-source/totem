@@ -120,6 +120,7 @@ export default function Historic() {
   const requestRef = useRef<AbortController | null>(null)
   const stoppedRef = useRef(false)
   const [error, setError] = useState(false)
+  const lastFetchRef = useRef(0)
 
   useEffect(() => {
     void buscaPaciente({ ds_paciente: 'RE', tipo: 'RESET' }).catch(() => {})
@@ -135,6 +136,7 @@ export default function Historic() {
       const response = await buscaSenhas(controller.signal)
       if (controller.signal.aborted || stoppedRef.current) return
       setError(false)
+      lastFetchRef.current = Date.now()
 
       startTransition(() => {
         setDados(response)
@@ -169,6 +171,21 @@ export default function Historic() {
     void fetchData()
 
     const eventSource = new EventSource('/api/events')
+    // Eventos perdidos enquanto a conexão estava caída: ao reconectar, recarrega o histórico.
+    let disconnected = false
+    eventSource.onerror = () => { disconnected = true }
+    eventSource.onopen = () => { if (disconnected && !aborted) { disconnected = false; scheduleFetch() } }
+
+    // Atualização automática a cada 30 s, mesmo sem eventos (evita histórico parado se os eventos
+    // não chegarem). Se um evento já atualizou há pouco, espera completar os 30 s.
+    const REFRESH_MS = 30_000
+    const refresh = window.setInterval(() => {
+      if (!aborted && Date.now() - lastFetchRef.current >= REFRESH_MS) void fetchData()
+    }, 5_000)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && !aborted && Date.now() - lastFetchRef.current >= 10_000) void fetchData()
+    }
+    document.addEventListener('visibilitychange', onVisible)
 
     eventSource.onmessage = (event) => {
       try {
@@ -195,6 +212,8 @@ export default function Historic() {
       }
 
       eventSource.close()
+      clearInterval(refresh)
+      document.removeEventListener('visibilitychange', onVisible)
     }
     window.addEventListener('totem-service-selected', stop)
     return () => {
