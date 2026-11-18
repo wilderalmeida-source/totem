@@ -36,7 +36,8 @@ export async function atendimentosTotemRoute(fastify: FastifyInstance) {
       where: {
         cd_paciente,
         dt_data: { gte: inicio, lte: hoje },
-        ds_status: tipo === 'entrega' ? 5 : { in: [2, 3, 7] },
+        // Entrega: 5 = pronto para retirar, 6 = já entregue (aparece como "Entregue" no modal).
+        ds_status: tipo === 'entrega' ? { in: [5, 6] } : { in: [2, 3, 7] },
         ...(tipo === 'hoje' ? { exames: { some: {} } } : {}),
       },
       select: {

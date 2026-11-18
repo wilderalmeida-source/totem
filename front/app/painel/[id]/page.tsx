@@ -566,13 +566,16 @@ export default function Page() {
   return (
     <div className="call-panel h-dvh w-screen max-w-none mx-auto px-6 pt-8 pb-4 bg-slate-200 bg-cover bg-center bg-no-repeat flex flex-col">
       {atencaoVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-600">
-          <span
-            className="text-white font-black uppercase tracking-widest select-none"
-            style={{ fontSize: "clamp(4rem, 15vw, 12rem)" }}
-          >
-            ATENÇÃO
-          </span>
+        <div className="panel-attention" role="alert" aria-live="assertive">
+          <div className="panel-attention-card">
+            <div className="panel-attention-icon" aria-hidden="true">
+              <span className="panel-attention-ring" />
+              <span className="panel-attention-ring panel-attention-ring-delay" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+            </div>
+            <span className="panel-attention-title">Atenção</span>
+            <span className="panel-attention-text">Por favor, mantenha o silêncio</span>
+          </div>
         </div>
       )}
 

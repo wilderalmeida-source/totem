@@ -1099,3 +1099,67 @@ html[data-visual-theme='theme1'] .priority-home { display: inline-flex; }
   html:is(.dark, :not(.dark))[data-visual-theme] .totem-clock time { font-size: 22px; }
   html:is(.dark, :not(.dark))[data-visual-theme] .totem-clock span { font-size: 11px; }
 }
+
+/* ── Status "Entregue" (ds_status 6) no modal da entrega ── */
+.patient-status-delivered { color: #15803d; border: 1px solid #22c55e80; background: #22c55e1f; }
+html:is(.dark, :not(.dark))[data-visual-theme] .patient-status-delivered { color: #15803d; border-color: #22c55e80; background: #22c55e1f; }
+html.dark[data-visual-theme] .patient-status-delivered { color: #86efac; border-color: #22c55e66; background: #22c55e26; }
+
+/* ── Pop-up de atenção do painel ── */
+.panel-attention {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center; padding: 4vmin;
+  background: radial-gradient(circle at center, rgba(127, 29, 29, .55), rgba(15, 23, 42, .88));
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: panel-attention-fade .35s ease-out;
+}
+.panel-attention-card {
+  display: flex; flex-direction: column; align-items: center; gap: clamp(12px, 2.4vmin, 32px);
+  width: min(88vw, 1100px); padding: clamp(32px, 6vmin, 88px) clamp(24px, 5vmin, 80px);
+  border-radius: clamp(24px, 3vmin, 44px);
+  background: linear-gradient(160deg, #dc2626 0%, #b91c1c 55%, #7f1d1d 100%);
+  border: 1px solid rgba(255, 255, 255, .22);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .25);
+  color: #fff; text-align: center; user-select: none;
+  animation: panel-attention-pop .45s cubic-bezier(.2, 1.3, .4, 1);
+}
+.panel-attention-icon {
+  position: relative; display: grid; place-items: center;
+  width: clamp(96px, 17vmin, 220px); aspect-ratio: 1; border-radius: 50%;
+  background: rgba(255, 255, 255, .16); border: 2px solid rgba(255, 255, 255, .35);
+}
+.panel-attention-icon svg { width: 56%; height: 56%; animation: panel-attention-shake 1.6s ease-in-out infinite; }
+.panel-attention-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, .55);
+  animation: panel-attention-ring 1.8s ease-out infinite;
+}
+.panel-attention-ring-delay { animation-delay: .9s; }
+.panel-attention-title {
+  font-size: clamp(64px, 13vmin, 190px); line-height: .95; font-weight: 900;
+  letter-spacing: .08em; text-transform: uppercase;
+  text-shadow: 0 6px 30px rgba(0, 0, 0, .3);
+}
+.panel-attention-text {
+  font-size: clamp(22px, 4vmin, 58px); font-weight: 600; opacity: .92;
+  padding: .35em 1.1em; border-radius: 999px; background: rgba(0, 0, 0, .18);
+}
+@keyframes panel-attention-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes panel-attention-pop { from { opacity: 0; transform: scale(.86) } to { opacity: 1; transform: scale(1) } }
+@keyframes panel-attention-ring { from { transform: scale(1); opacity: .8 } to { transform: scale(1.7); opacity: 0 } }
+@keyframes panel-attention-shake { 0%, 100% { transform: rotate(0) } 10%, 30% { transform: rotate(-8deg) } 20%, 40% { transform: rotate(8deg) } 50% { transform: rotate(0) } }
+@media (prefers-reduced-motion: reduce) {
+  .panel-attention, .panel-attention-card, .panel-attention-icon svg, .panel-attention-ring { animation: none; }
+}
+
+/* ── Comunicado com imagem ocupando todo o quadro ── */
+.tv-notice.tv-notice-full { position: relative; padding: 0; overflow: hidden; min-height: 40vh; }
+.tv-notice-fullimages { position: absolute; inset: 0; display: grid; gap: 4px; animation: tv-enter .5s ease; }
+.tv-notice-fullimages-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+.tv-notice-fullimages figure { position: relative; margin: 0; overflow: hidden; min-height: 0; background: #0f172a; }
+/* Fundo desfocado com a própria imagem: a imagem inteira aparece sem corte e sem faixas vazias. */
+.tv-notice-fullimages figure::before { content: ''; position: absolute; inset: -40px; background: var(--tv-full-bg) center / cover no-repeat; filter: blur(28px) brightness(.7); }
+.tv-notice-fullimages img { position: relative; width: 100%; height: 100%; object-fit: contain; }
+.tv-notice-full .tv-progress { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; margin: 0; padding: 14px clamp(16px, 2vw, 32px); background: linear-gradient(transparent, rgba(0, 0, 0, .45)); }
+.tv-notice-full .tv-progress > span { background: rgba(255, 255, 255, .3); }
+@media (prefers-reduced-motion: reduce) { .tv-notice-fullimages { animation: none; } }

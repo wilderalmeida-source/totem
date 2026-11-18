@@ -584,7 +584,9 @@ export function DialogPatient({
                         <td className={`px-4 py-3 ${mostraHorarioPrevisto ? "font-bold text-gray-800" : ""}`}>
                           {mostraHorarioPrevisto
                             ? formatarHoraChegada(atend)
-                            : <><span className="patient-status-legacy"><StatusIcon done={!!exame.dt_assinado} /></span><span className={`patient-status-badge ${exame.dt_assinado ? 'patient-status-done' : 'patient-status-pending'}`}>{exame.dt_assinado ? '✓ Laudado' : 'Pendente'}</span></>}
+                            : atend.ds_status === 6
+                              ? <><span className="patient-status-legacy"><StatusIcon done /></span><span className="patient-status-badge patient-status-delivered">✓ Entregue</span></>
+                              : <><span className="patient-status-legacy"><StatusIcon done={!!exame.dt_assinado} /></span><span className={`patient-status-badge ${exame.dt_assinado ? 'patient-status-done' : 'patient-status-pending'}`}>{exame.dt_assinado ? '✓ Laudado' : 'Pendente'}</span></>}
                         </td>
                       </tr>
                     ))}

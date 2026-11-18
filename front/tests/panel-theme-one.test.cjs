@@ -54,3 +54,27 @@ test('indicador vermelho pertence somente a categoria informativos e imagens usa
   assert.doesNotMatch(campaign, /tv-notice-alert-dot/);
   assert.match(campaign, /Campanha/);
 });
+
+test('imagem no quadro todo esconde categoria, titulo e texto e mantem a barra de progresso', () => {
+  const images = [{ file: 'notice-f260a461-0bdf-4fad-82d3-2479cd3727a1.webp', alt: '' }];
+  const html = environment({ enabled: true, items: [{ ...item, text: '', fullImage: true, images }] }).render();
+  assert.match(html, /tv-notice tv-notice-full/);
+  assert.match(html, /tv-notice-fullimages/);
+  assert.match(html, /alt="Aviso"/); // sem descrição, usa o título como texto alternativo
+  assert.doesNotMatch(html, /tv-notice-label|tv-notice-copy/);
+  assert.match(html, /tv-progress/);
+  const semImagem = environment({ enabled: true, items: [{ ...item, fullImage: true }] }).render();
+  assert.match(semImagem, /tv-notice-copy/); // sem imagem, cai no layout normal
+});
+
+test('validacao do front: quadro todo exige imagem e dispensa texto', () => {
+  const exports = {};
+  const code = ts.transpileModule(fs.readFileSync(path.join(__dirname, '../lib/panel-notices.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+  vm.runInNewContext(code, { exports });
+  const images = [{ file: 'notice-f260a461-0bdf-4fad-82d3-2479cd3727a1.webp', alt: '' }];
+  const ok = items => exports.validNoticeSettings({ enabled: true, items });
+  assert.equal(ok([{ ...item, text: '', fullImage: true, images }]), true);
+  assert.equal(ok([{ ...item, text: '', fullImage: true }]), false);
+  assert.equal(ok([{ ...item, text: '', fullImage: false, images }]), false);
+  assert.equal(ok([{ ...item, fullImage: 'sim', images }]), false);
+});

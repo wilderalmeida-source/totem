@@ -1,4 +1,5 @@
 'use client'
+import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Building2 } from 'lucide-react'
 import type { PanelCall } from '@/lib/panel-call'
@@ -48,6 +49,8 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
     return () => clearTimeout(timer)
   }, [cycle, config, notice?.id, notice?.durationSeconds])
   const name = current?.fullName || current?.name
+  // Comunicado só com imagem ocupando todo o quadro (sem rótulo, título e texto).
+  const fullImage = !!notice?.fullImage && !!notice.images?.length
   // Logo no canto superior substitui ícone e nome; na posição "saudação" o painel mantém o padrão.
   const brand = useBrand()
   const logoNoTopo = hasBrandLogo(brand) && brand?.placement === 'header'
@@ -60,10 +63,10 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
         <h1 key={current?.id ?? 'waiting'} className="tv-patient-name">{name || 'Aguardando chamada'}</h1>
         {current && <><div className="tv-destination"><ModalityPictogram name={current.modalidade} /><div><strong>{current.modalidade || current.guicheNome || current.recepcao}</strong><p>{[current.guicheNome, current.localizacao || current.recepcao].filter(Boolean).join(' · ')}</p></div></div><time className="tv-called-time">Chamado às {current.calledAt}</time></>}
       </section>
-      {notice && <aside className="tv-notice" aria-label={noticeCategories[notice.category ?? 'informativos']}><div className="tv-notice-label"><NoticePictogram icon={notice.icon} /><span className="tv-eyebrow">{noticeCategories[notice.category ?? 'informativos']}{(notice.category ?? 'informativos') === 'informativos' && <span className="tv-notice-alert-dot" aria-hidden="true" />}</span></div>
+      {notice && <aside className={`tv-notice ${fullImage ? 'tv-notice-full' : ''}`} aria-label={noticeCategories[notice.category ?? 'informativos']}>{fullImage ? <div key={`${notice.id}:${cycle}`} className={`tv-notice-fullimages ${notice.images!.length > 1 ? 'tv-notice-fullimages-grid' : ''}`}>{notice.images!.map(image => { const src = `/api/media/file?name=${encodeURIComponent(image.file)}`; return <figure key={image.file} style={{ '--tv-full-bg': `url("${src}")` } as React.CSSProperties}><img src={src} alt={image.alt || notice.title} /></figure> })}</div> : <><div className="tv-notice-label"><NoticePictogram icon={notice.icon} /><span className="tv-eyebrow">{noticeCategories[notice.category ?? 'informativos']}{(notice.category ?? 'informativos') === 'informativos' && <span className="tv-notice-alert-dot" aria-hidden="true" />}</span></div>
         <div key={`${notice.id}:${cycle}`} className="tv-notice-copy"><h2>{notice.title}</h2><p>{notice.text}</p>
           {!!notice.images?.length && <div className={`tv-notice-images ${notice.images.length > 1 ? 'tv-notice-images-grid' : ''}`}>{notice.images.map(image => <img key={image.file} src={`/api/media/file?name=${encodeURIComponent(image.file)}`} alt={image.alt} />)}</div>}
-        </div>
+        </div></>}
         <div className="tv-progress" aria-label={`Informativo ${index + 1} de ${items.length}`}>{items.map((item, i) => <span key={`${item.id}:${cycle}`}><i style={{ width: i < index ? '100%' : '0%', ...(i === index ? { animation: `tv-progress ${notice.durationSeconds}s linear forwards` } : {}) }} /></span>)}</div>
       </aside>}
     </div>

@@ -18,6 +18,15 @@ test('valida limites, duplicidades e playlist vazia sem aceitar icones arbitrari
   assert.equal(noticeSettings.safeParse({ enabled: true, items: [{ ...item, images: [{ file: '../arquivo.webp', alt: '' }] }] }).success, false);
   assert.equal(noticeSettings.safeParse({ enabled: true, items: [{ ...item, category: 'categoria-invalida' }] }).success, false);
 });
+test('imagem no quadro todo exige imagem e dispensa texto', () => {
+  const images = [{ file: 'notice-f260a461-0bdf-4fad-82d3-2479cd3727a1.webp', alt: '' }];
+  const ok = items => noticeSettings.safeParse({ enabled: true, items }).success;
+  assert.equal(ok([{ ...item, text: '', fullImage: true, images }]), true);
+  assert.equal(ok([{ ...item, text: '', fullImage: true }]), false);
+  assert.equal(ok([{ ...item, text: '', images }]), false);
+  assert.equal(ok([{ ...item, text: '   ' }]), false);
+  assert.equal(ok([{ ...item, fullImage: 'sim', images }]), false);
+});
 test('configuracao salva e recarregada preserva ordem, inativos e texto parametrizado', async t => {
   let stored, writes = 0;
   const file = path.join(__dirname, '../src/routes/configuracoes-totem.js');
