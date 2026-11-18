@@ -55,7 +55,7 @@ export async function atendimentosTotemRoute(fastify: FastifyInstance) {
       const modalidadeTotem = Number(process.env.IDMODALIDADE ?? 0)
       const elegivel = await prisma.atendimentos.findFirst({
         where: {
-          cd_paciente, ds_status: 5, nr_controle: { not: null },
+          cd_paciente, ds_status: { in: [5, 6] }, nr_controle: { not: null },
           dt_data: { gte: inicio, lte: hoje },
           salas: { cd_modalidade: { gt: 0, not: modalidadeTotem } },
         },

@@ -136,7 +136,7 @@ test('atendimentos do totem exigem paciente e não aceitam ampliação de perío
   assert.equal((await get('/clinux/totem/atendimentos', { cd_paciente: '123', tipo: 'entrega' })).statusCode, 200);
   assert.equal(calls[0].where.cd_paciente, 123);
   assert.equal(calls[0].where.dt_data.gte.getTime(), calls[0].where.dt_data.lte.getTime());
-  assert.equal(JSON.stringify(calls[1].where.ds_status), JSON.stringify({ in: [5, 6] })); // 6 = já entregue, só para exibir
+  assert.equal(JSON.stringify(calls[1].where.ds_status), JSON.stringify({ in: [5, 6] })); // 6 = já entregue
   assert.equal(calls[1].take, 10);
   const expectedStart = new Date(calls[1].where.dt_data.lte);
   expectedStart.setUTCMonth(expectedStart.getUTCMonth() - 6);
@@ -156,7 +156,7 @@ test('entrega pede modalidade sem exame real e consulta alem dos dez itens exibi
     assert.equal(calls[0].select.exames.orderBy.cd_exame, 'desc');
     assert.equal(calls[1].where.cd_paciente, 123);
     assert.equal(JSON.stringify(calls[0].where.ds_status), JSON.stringify({ in: [5, 6] }));
-    assert.equal(calls[1].where.ds_status, 5); // senha de retirada só para status 5
+    assert.equal(JSON.stringify(calls[1].where.ds_status), JSON.stringify({ in: [5, 6] })); // entregues também geram senha pelo NR controle
     assert.equal(calls[1].where.nr_controle.not, null);
     assert.equal(calls[1].where.salas.cd_modalidade.not, 10000);
     assert.equal(calls[1].where.dt_data.gte.getTime(), calls[0].where.dt_data.gte.getTime());

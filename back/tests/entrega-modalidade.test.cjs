@@ -44,3 +44,17 @@ test('sem escolha explicita preserva exame real e ignora controle TOTEM quando h
   // Janela de 6 meses (commit "Log e resultados seis meses"): 22/09 -> 22/03.
   assert.equal(calls[0].where.dt_data.gte.toISOString(), '2026-03-22T00:00:00.000Z');
 });
+test('exame ja entregue (status 6) tambem gera senha pelo NR controle', async () => {
+  const { result, calls } = await issue([{ cd_atendimento: 3, nr_controle: 333, ds_status: 6, salas: { cd_modalidade: 8 } }]);
+  assert.equal(JSON.stringify(calls[0].where.ds_status), JSON.stringify({ in: [5, 6] }));
+  assert.equal(result.nr_controle, 333);
+  assert.equal(result.nr_modalidade, 8);
+});
+test('status 5 tem preferencia sobre status 6 mais recente', async () => {
+  const { result } = await issue([
+    { cd_atendimento: 4, nr_controle: 444, ds_status: 6, salas: { cd_modalidade: 8 } },
+    { cd_atendimento: 5, nr_controle: 555, ds_status: 5, salas: { cd_modalidade: 9 } },
+  ]);
+  assert.equal(result.nr_controle, 555);
+  assert.equal(result.nr_modalidade, 9);
+});

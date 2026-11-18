@@ -30,7 +30,7 @@ export async function gerarSenhaEntrega({
   const atendimentos = await prisma.atendimentos.findMany({
     where: {
       cd_paciente,
-      ds_status: 5,
+      ds_status: { in: [5, 6] }, // 5 = pronto para retirar, 6 = já entregue
       dt_data: {
         gte: seisMesesAtras,
         lte: hoje,
@@ -66,7 +66,11 @@ export async function gerarSenhaEntrega({
         )
       : atendimentosComControle
 
-  let atendimento = atendimentosElegiveis[0]
+  // Status 5 (pronto para retirar) tem preferência; sem ele, usa o 6 (já entregue).
+  // Dentro de cada status vale o mais recente (a lista já vem ordenada).
+  let atendimento =
+    atendimentosElegiveis.find((item) => item.ds_status === 5) ??
+    atendimentosElegiveis[0]
 
   if (!atendimento) {
     atendimento = await novoAtendimentoTotem(cd_paciente)
