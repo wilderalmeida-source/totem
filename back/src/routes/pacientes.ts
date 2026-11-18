@@ -10,13 +10,14 @@ import { flowAudit } from '../lib/flow-audit'
 import { decoyBirthDates, decoyPatientIds } from '../lib/decoy-dates'
 import { ttlCache } from '../lib/painel-caches'
 import { qrBlocked, qrFailure } from '../lib/qr-guard'
+import { idadeEmMeses } from '../lib/idade'
 import { clientErrorDetails } from '../lib/client-error'
 
 const patientQuery = z.union([
   z.object({ tipo: z.literal('RESET'), ds_paciente: z.string().max(150).optional() }).strict(),
   z.object({ tipo: z.undefined().optional(), cd_paciente: positiveId }).strict(),
-  // QR "paciente-atendimento": o atendimento precisa pertencer ao paciente.
-  z.object({ tipo: z.literal('QRATEND'), cd_paciente: positiveId, cd_atendimento: positiveId }).strict(),
+  // QR "paciente-AA A MM M" (ex.: 13060-64 A 07 M): idade do paciente, em anos e meses, na data de um atendimento recente.
+  z.object({ tipo: z.literal('QRIDADE'), cd_paciente: positiveId, anos: z.string().regex(/^\d{1,3}$/).transform(Number).pipe(z.number().max(130)), meses: z.string().regex(/^\d{1,2}$/).transform(Number).pipe(z.number().max(11)) }).strict(),
   // QR antigo (só o código do paciente): aceito enquanto QR_LEGADO não for "false" no env.backend.
   z.object({ tipo: z.literal('QRLEGADO'), cd_paciente: positiveId }).strict(),
   // Entrega por protocolo: 1) lista de IDs (real + falsos) para o código do atendimento;
@@ -63,30 +64,38 @@ export async function pacientesRoute(fastify: FastifyInstance) {
       patientDiagnostic(request.id, { resultado: 'qr_legado_desativado', ramo: 'QRLEGADO' })
       return reply.code(403).send({ error: 'QR Code antigo desativado.', code: 'QR_LEGADO_DESATIVADO' })
     }
-    if (input.tipo === 'QRATEND') {
+    if (input.tipo === 'QRIDADE') {
       if (qrBlocked()) {
-        patientDiagnostic(request.id, { resultado: 'qr_bloqueado', ramo: 'QRATEND' })
+        patientDiagnostic(request.id, { resultado: 'qr_bloqueado', ramo: 'QRIDADE' })
         return reply.code(429).send({ error: 'Leitura de QR temporariamente bloqueada.', code: 'QR_BLOQUEADO' })
       }
       const hoje = todayBrazil()
       const seisMesesAtras = new Date(hoje)
       seisMesesAtras.setUTCMonth(seisMesesAtras.getUTCMonth() - 6)
-      const atendimento = await prisma.atendimentos.findFirst({
+      // A etiqueta traz a idade do paciente no dia do atendimento; a entrega pode ser semanas depois,
+      // então a idade é conferida na data de cada atendimento dos últimos 6 meses (não cancelado).
+      const atendimentos = await prisma.atendimentos.findMany({
         where: {
-          cd_atendimento: input.cd_atendimento, cd_paciente: input.cd_paciente,
+          cd_paciente: input.cd_paciente,
           dt_data: { gte: seisMesesAtras },
           OR: [{ ds_status: null }, { ds_status: { not: 1 } }], // 1 = cancelado
         },
-        select: { pacientes_atendimentos_cd_pacienteTopacientes: { select: { cd_paciente: true, ds_paciente: true, dt_nascimento: true } } },
+        select: { dt_data: true, pacientes_atendimentos_cd_pacienteTopacientes: { select: { cd_paciente: true, ds_paciente: true, dt_nascimento: true } } },
+        orderBy: { dt_data: 'desc' }, take: 200,
       })
-      const paciente = atendimento?.pacientes_atendimentos_cd_pacienteTopacientes
+      const idadeLida = input.anos * 12 + input.meses
+      const confere = atendimentos.find(atendimento => {
+        const nascimento = atendimento.pacientes_atendimentos_cd_pacienteTopacientes?.dt_nascimento
+        return nascimento && atendimento.dt_data && idadeEmMeses(nascimento, atendimento.dt_data) === idadeLida
+      })
+      const paciente = confere?.pacientes_atendimentos_cd_pacienteTopacientes
       if (!paciente) {
         const bloqueou = qrFailure()
-        patientDiagnostic(request.id, { resultado: bloqueou ? 'qr_bloqueado_por_erros' : 'qr_nao_confere', ramo: 'QRATEND', duracaoMs: Date.now() - inicio })
+        patientDiagnostic(request.id, { resultado: bloqueou ? 'qr_bloqueado_por_erros' : 'qr_nao_confere', ramo: 'QRIDADE', duracaoMs: Date.now() - inicio })
         if (bloqueou) flowAudit('qr_bloqueado', 'identificacao', { outcome: 'FALHOU', motivo: 'muitos_qr_invalidos' })
         return reply.send([])
       }
-      patientDiagnostic(request.id, { resultado: 'qr_confere', ramo: 'QRATEND', duracaoMs: Date.now() - inicio })
+      patientDiagnostic(request.id, { resultado: 'qr_confere', ramo: 'QRIDADE', duracaoMs: Date.now() - inicio })
       return reply.send([paciente])
     }
     if (input.tipo === 'PROTOCOLO' || input.tipo === 'PROTOCOLOID') {

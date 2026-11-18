@@ -272,22 +272,30 @@ test('proxy de pesquisa exige operador e informa tempos sem consultar paciente q
   assert.match(result.headers.get('Server-Timing'), /access;dur=.*backend;dur=.*audit;dur=/);
 });
 
-test('QR paciente-atendimento consulta o vínculo; falha e bloqueio têm mensagem única', async () => {
+test('QR paciente-idade consulta anos e meses; formato paciente-atendimento é recusado; falha e bloqueio têm mensagem única', async () => {
   const env = environment();
-  const token = await identify(env, { tipo: 'QR', cd_paciente: 123, cd_atendimento: 456789 });
+  const token = await identify(env, { tipo: 'QR', cd_paciente: 123, anos: 64, meses: 7 });
   assert.equal(env.store.readPatientSession(token).patientId, 123);
   const query = env.calls[0].url.searchParams;
-  assert.equal(query.get('tipo'), 'QRATEND');
+  assert.equal(query.get('tipo'), 'QRIDADE');
   assert.equal(query.get('cd_paciente'), '123');
-  assert.equal(query.get('cd_atendimento'), '456789');
+  assert.equal(query.get('anos'), '64');
+  assert.equal(query.get('meses'), '7');
+  assert.equal(query.get('cd_atendimento'), null);
+  for (const body of [{ tipo: 'QR', cd_paciente: 123, cd_atendimento: 456789 }, { tipo: 'QR', cd_paciente: 123, hora: '14:30' }, { tipo: 'QR', cd_paciente: 123, anos: 64 },
+    { tipo: 'QR', cd_paciente: 123, anos: 64, meses: 12 }, { tipo: 'QR', cd_paciente: 123, anos: '64', meses: '7' }]) {
+    const recusado = await env.session.POST(request('/api/patient-session', 'POST', body));
+    assert.equal(recusado.status, 400, JSON.stringify(body));
+    assert.equal((await recusado.json()).error, 'QR Code inválido.');
+  }
 
   env.context.fetch = async () => new Response('[]', { headers: { 'Content-Type': 'application/json' } });
-  const invalid = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'QR', cd_paciente: 123, cd_atendimento: 1 }));
+  const invalid = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'QR', cd_paciente: 123, anos: 30, meses: 1 }));
   assert.equal(invalid.status, 401);
   assert.equal((await invalid.json()).error, 'QR Code inválido.');
 
   env.context.fetch = async () => new Response(JSON.stringify({ error: 'x', code: 'QR_BLOQUEADO' }), { status: 429 });
-  const blocked = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'QR', cd_paciente: 123, cd_atendimento: 2 }));
+  const blocked = await env.session.POST(request('/api/patient-session', 'POST', { tipo: 'QR', cd_paciente: 123, anos: 30, meses: 2 }));
   assert.equal(blocked.status, 429);
   assert.match((await blocked.json()).error, /bloqueada/);
 });

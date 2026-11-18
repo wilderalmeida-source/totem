@@ -9,6 +9,8 @@ export const buscaPaciente = async ({
   dt_nascimento,
   ds_cpf,
   tipo,
+  anos,
+  meses,
 }: {
   ds_paciente?: string
   cd_paciente?: number
@@ -16,6 +18,9 @@ export const buscaPaciente = async ({
   dt_nascimento?: string
   ds_cpf?: string
   tipo?: string
+  /** Idade do paciente lida no QR (anos e meses). */
+  anos?: number
+  meses?: number
 }, signal?: AbortSignal): Promise<Paciente[]> => {
   if (!ds_paciente && !cd_paciente && !cd_atendimento && !dt_nascimento && !ds_cpf && !tipo) return []
 
@@ -26,7 +31,7 @@ export const buscaPaciente = async ({
   }
   if (tipo === 'ID' || tipo === 'NOMEDATA' || cd_paciente !== undefined) {
     const body = tipo === 'NOMEDATA' ? { tipo, ds_paciente, dt_nascimento, ...(cd_paciente !== undefined ? { cd_paciente } : {}) }
-      : cd_paciente !== undefined ? { tipo: 'QR', cd_paciente, ...(cd_atendimento !== undefined ? { cd_atendimento } : {}) }
+      : cd_paciente !== undefined ? { tipo: 'QR', cd_paciente, ...(anos !== undefined && meses !== undefined ? { anos, meses } : {}) }
       : tipo === 'ID' ? { tipo, ds_cpf, dt_nascimento } : { tipo, ds_paciente, dt_nascimento }
     const result = await patientSessionRequest<{ patient: Paciente }>('POST', body)
     return [result.patient]

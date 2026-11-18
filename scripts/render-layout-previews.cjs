@@ -8,7 +8,7 @@ const requestedSize = process.argv[3] || 'all';
 const screens = ['home','priority','search-name','search-data','search-cpf','search-protocolo','confirm-name','confirm-date','confirm-protocolo','modalities','modal','tv','login','login-totem','admin','themes'];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function main() {
-  if (!process.argv[2] || !['all','desktop','mobile'].includes(requestedSize)) throw Error('Usage: node scripts/render-layout-previews.cjs <fixture-directory> [all|desktop|mobile]');
+  if (!process.argv[2] || !['all','desktop','mobile','kiosk'].includes(requestedSize)) throw Error('Usage: node scripts/render-layout-previews.cjs <fixture-directory> [all|desktop|mobile|kiosk]');
   const profile = await fs.mkdtemp(path.join(directory, 'edge-cdp-'));
   const browser = spawn('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', ['--headless=new','--disable-gpu','--no-first-run','--disable-background-networking','--remote-debugging-port=0','--remote-debugging-address=127.0.0.1',`--user-data-dir=${profile}`,'about:blank'], { windowsHide: true, stdio: 'ignore' });
   let socket;
@@ -47,9 +47,10 @@ async function main() {
     for (const viewport of requestedSize==='all'?['desktop','mobile']:[requestedSize]) {
       for (const screen of screens) {
         if(viewport==='mobile'&&screen==='tv') continue;
+        if(viewport==='kiosk'&&['tv','admin','themes','login'].includes(screen)) continue;
         for(const theme of ['theme1','theme2']) for(const mode of ['light','dark']) {
-          const name=`${screen}-${theme}-${mode}`, artifact=name+(viewport==='mobile'?'-mobile':'');
-          const [width,height]=viewport==='mobile'?[390,844]:screen==='tv'?[1920,1080]:['admin','themes'].includes(screen)?[1440,1000]:[712,900];
+          const name=`${screen}-${theme}-${mode}`, artifact=name+(viewport==='mobile'?'-mobile':viewport==='kiosk'?'-kiosk':'');
+          const [width,height]=viewport==='mobile'?[390,844]:viewport==='kiosk'?[768,1366]:screen==='tv'?[1920,1080]:['admin','themes'].includes(screen)?[1440,1000]:[712,900];
           const {targetId}=await send('Target.createTarget',{url:'about:blank'});
           const {sessionId}=await send('Target.attachToTarget',{targetId,flatten:true});
           await send('Page.enable',{},sessionId);

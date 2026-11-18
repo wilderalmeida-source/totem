@@ -9,6 +9,7 @@ import { auditTotem } from '@/lib/audit-client'
 import { endPatientSession } from '@/lib/patient-session-client'
 import { Home, ArrowLeft, ChevronRight } from 'lucide-react'
 import BrandMark from '@/components/brand/BrandMark'
+import TotemClock from '@/components/totem/TotemClock'
 import { ModalityPictogram, modalityDescription } from '@/components/panel/Pictogram'
 
 interface PacienteModalidadeStorage {
@@ -127,9 +128,9 @@ export default function ModalidadePage() {
       <div className="modality-screen flex h-full flex-col items-center justify-center px-6">
         <nav className="modality-modern-nav">
           <BrandMark className="search-gold-mark" />
-          <button type="button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', 'modalidade'); router.replace('/'); }}><Home size={19} /></button>
-          <button type="button" onClick={voltar}><ArrowLeft size={19} />Voltar</button>
-          <span className="search-steps"><i /><i /><i />Etapa 2 de 3</span>
+          <button type="button" className="totem-nav-button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', 'modalidade'); router.replace('/'); }}><Home size={19} /></button>
+          <button type="button" className="totem-nav-button" onClick={voltar}><ArrowLeft size={19} />Voltar</button>
+          <span className="search-steps"><i /><i /><i />Etapa 2 de 3</span><TotemClock />
         </nav>
         <h1 className="mb-4 text-4xl font-bold">
           Escolha a <span>modalidade</span>

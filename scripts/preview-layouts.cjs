@@ -31,7 +31,7 @@ function load(relative) {
  const react={...React,useEffect:noop,useState:initial=>{
    let value=initial;
    if((file.endsWith('AdminRouteFrame.tsx')||file==='app/configuracoes/page.tsx')&&Array.isArray(initial))value=['*'];
-   if(file.endsWith('HomeThemeHeader.tsx')&&initial===null)value=new Date('2026-11-11T14:30:00-03:00');
+   if((file.endsWith('HomeThemeHeader.tsx')||file.endsWith('TotemClock.tsx'))&&initial===null)value=new Date('2026-11-11T14:30:00-03:00');
    if(file.endsWith('ThemeOnePanel.tsx')) {if(initial===false)value=true;if(initial===null)value=new Date('2026-11-11T14:30:00-03:00');if(initial?.items)value=notices;}
    if(file.endsWith('modalidadesContent.tsx')) {if(Array.isArray(initial))value=modalities;if(initial===true)value=false;}
    if(file.endsWith('pageClient.tsx')) {if(initial==='DATA')value=searchType;if(initial==='')value=searchType==='NOME'?'PAC':searchType==='PROTOCOLO'?'987654':'12/03/1958';}

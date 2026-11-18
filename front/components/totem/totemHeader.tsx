@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { auditTotem } from '@/lib/audit-client';
 import { Home, ArrowLeft, ArrowRight } from 'lucide-react';
 import BrandMark from '@/components/brand/BrandMark';
+import TotemClock from '@/components/totem/TotemClock';
 
 interface TotemHeaderProps {
   title: string;
@@ -21,9 +22,9 @@ export function TotemHeader({ title, onAdvance, onBack }: TotemHeaderProps) {
 
   return (<>
     <div className="search-modern-heading">
-      <nav><BrandMark className="search-gold-mark" /><button type="button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', pathname); router.replace('/'); }}><Home size={19} /></button>
-        <button type="button" onClick={() => { auditTotem('voltar', pathname); onBack(); }}><ArrowLeft size={19} />Voltar</button>
-        <span className="search-steps"><i /><i /><i />Etapa {pathname === '/date' ? '2' : '1'} de 3</span>
+      <nav><BrandMark className="search-gold-mark" /><button type="button" className="totem-nav-button" aria-label="Início" onClick={() => { auditTotem('inicio_clicado', pathname); router.replace('/'); }}><Home size={19} /></button>
+        <button type="button" className="totem-nav-button" onClick={() => { auditTotem('voltar', pathname); onBack(); }}><ArrowLeft size={19} />Voltar</button>
+        <span className="search-steps"><i /><i /><i />Etapa {pathname === '/date' ? '2' : '1'} de 3</span><TotemClock />
       </nav>
       <h1>Identifique-se para <span>{title.toLocaleLowerCase('pt-BR') === 'agendamento' ? 'o agendamento' : title.toLocaleLowerCase('pt-BR') === 'atendimento' ? 'o atendimento' : 'a entrega de exames'}</span></h1>
       <p>{pathname === '/date' ? 'Confirme seus dados selecionando a opção correta na lista.' : 'Busque e toque nos seus dados na lista.'}</p>

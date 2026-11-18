@@ -16,8 +16,9 @@ const name = z.string().trim().min(1).max(150)
 const confirmation = z.discriminatedUnion('tipo', [
   z.object({ tipo: z.literal('ID'), ds_cpf: z.string().regex(/^\d{11}$/), dt_nascimento: birth }).strict(),
   z.object({ tipo: z.literal('NOMEDATA'), ds_paciente: name, dt_nascimento: birth, cd_paciente: z.number().int().positive().safe().optional() }).strict(),
-  // QR "paciente-atendimento"; sem cd_atendimento é o QR antigo (só o código), que o backend aceita enquanto QR_LEGADO não for "false".
-  z.object({ tipo: z.literal('QR'), cd_paciente: z.number().int().positive().safe(), cd_atendimento: z.number().int().positive().safe().optional() }).strict(),
+  // QR "paciente-AA A MM M" (idade em anos e meses); sem idade é o QR antigo (só o código), que o backend aceita enquanto QR_LEGADO não for "false".
+  z.object({ tipo: z.literal('QR'), cd_paciente: z.number().int().positive().safe(), anos: z.number().int().min(0).max(130).optional(), meses: z.number().int().min(0).max(11).optional() }).strict()
+    .refine(value => (value.anos === undefined) === (value.meses === undefined)),
   z.object({ tipo: z.literal('NEW'), ds_paciente: name, dt_nascimento: birth }).strict(),
   // Entrega por protocolo: o atendimento (protocolo) precisa pertencer ao paciente (ID escolhido na lista "Senha").
   z.object({ tipo: z.literal('PROTOCOLO'), cd_atendimento: z.number().int().positive().safe(), cd_paciente: z.number().int().positive().safe() }).strict(),
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
   auditServer(request, parsed.success ? 'identificacao_recebida' : 'identificacao_rejeitada', 'patientSession.POST', {
     tipo: typeof raw?.tipo === 'string' ? raw.tipo.slice(0, 30) : undefined,
     codigoRecebido: raw?.tipo === 'QR' && typeof raw.cd_paciente === 'number' ? raw.cd_paciente : undefined,
-    atendimentoRecebido: raw?.tipo === 'QR' && typeof raw.cd_atendimento === 'number' ? raw.cd_atendimento : undefined,
+    idadeRecebida: raw?.tipo === 'QR' && typeof raw.anos === 'number' && typeof raw.meses === 'number' ? `${raw.anos}A ${raw.meses}M` : undefined,
     nomeRecebido: rawName, tamanhoNome: rawName?.length, espacosNasPontas: rawName !== undefined && rawName !== rawName.trim(),
     nomeNormalizado: rawName?.trim(), nascimento: typeof raw?.dt_nascimento === 'string' ? raw.dt_nascimento.slice(0, 100) : undefined,
     code: parsed.success ? 'IDENTIFICATION_VALIDATED' : 'INVALID_IDENTIFICATION',
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     } else {
       const params = new URLSearchParams()
       if (input.tipo === 'QR') {
-        if (input.cd_atendimento !== undefined) { params.set('tipo', 'QRATEND'); params.set('cd_atendimento', String(input.cd_atendimento)) }
+        if (input.anos !== undefined && input.meses !== undefined) { params.set('tipo', 'QRIDADE'); params.set('anos', String(input.anos)); params.set('meses', String(input.meses)) }
         else params.set('tipo', 'QRLEGADO')
         params.set('cd_paciente', String(input.cd_paciente))
       } else if (input.tipo === 'PROTOCOLO') {

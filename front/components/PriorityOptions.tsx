@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image, { StaticImageData } from 'next/image'
 import { auditTotem } from '@/lib/audit-client'
 import { ArrowLeft, ArrowRight, Home, UsersRound, Baby, Accessibility, PersonStanding, Puzzle, HeartHandshake } from 'lucide-react'
-import DigitalClock from '@/components/DigitalClock'
+import TotemClock from '@/components/totem/TotemClock'
 import BrandMark from '@/components/brand/BrandMark'
 
 export type PriorityOption = { label: string; icone: StaticImageData; preferencial: number; href?: string; cor?: string }
@@ -15,14 +15,13 @@ export default function PriorityOptions({ options, servico }: { options: Priorit
   const priority = options.filter(option => !option.href && option.preferencial !== 0)
   const descriptions = ['Acompanhante com bebê', 'Qualquer período', '60 anos ou mais', 'Mobilidade reduzida', 'Pessoa com TEA', 'Outras necessidades']
   const icons = [Baby, PersonStanding, PersonStanding, Accessibility, Puzzle, HeartHandshake]
-  const service = ({ B: 'Atendimento', C: 'Entrega de exames', D: 'Agendamento' } as Record<string, string>)[servico] ?? 'Atendimento'
   return <>
     <div className="priority-modern">
       <header className="priority-header">
         <BrandMark className="priority-brand-mark" />
-        <Link prefetch={false} href="/" aria-label="Início" className="priority-home" onClick={() => auditTotem('inicio_clicado', 'prioridade', { servico })}><Home size={19} /></Link>
-        {back && <Link prefetch={false} href={back.href!} onClick={() => record(back)} className="priority-back"><ArrowLeft size={20} />Voltar</Link>}
-        <div className="priority-service"><span className="priority-service-label">{service} · </span><DigitalClock showSeconds={false} /></div>
+        <Link prefetch={false} href="/" aria-label="Início" className="priority-home totem-nav-button" onClick={() => auditTotem('inicio_clicado', 'prioridade', { servico })}><Home size={19} /></Link>
+        {back && <Link prefetch={false} href={back.href!} onClick={() => record(back)} className="priority-back totem-nav-button"><ArrowLeft size={20} />Voltar</Link>}
+        <div className="priority-service"><TotemClock /></div>
       </header>
       <h1>Como podemos <span>atender você?</span></h1>
       <p className="priority-subtitle">Selecione o tipo de atendimento para retirar sua senha.</p>

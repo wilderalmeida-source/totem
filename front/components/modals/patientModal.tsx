@@ -269,23 +269,26 @@ export function DialogPatient({
         return;
       }
 
-      // Formato "paciente-atendimento" (ex.: 123-456789) ou o QR antigo, só com o código do paciente.
-      const qrLido = /^([1-9]\d*)(?:-([1-9]\d*))?$/.exec(valorQR.trim());
+      // Formato "paciente-AA A MM M" (código e idade em anos e meses, ex.: 13060-64 A 07 M) ou o QR antigo, só com o código.
+      // Os "*" do começo e do fim (marcas do código de barras) são opcionais. "paciente-atendimento" não é mais aceito.
+      const qrLido = /^\*?\s*([1-9]\d*)(?:\s*-\s*(\d{1,3})\s*A\s*(\d{1,2})\s*M)?\s*\*?$/i.exec(valorQR.trim());
       const cdPacienteQR = Number(qrLido?.[1]);
-      const cdAtendimentoQR = qrLido?.[2] ? Number(qrLido[2]) : undefined;
-      if (!qrLido || !Number.isSafeInteger(cdPacienteQR) || (cdAtendimentoQR !== undefined && !Number.isSafeInteger(cdAtendimentoQR))) {
-        auditTotem('qr_invalido', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), motivo: 'formato_esperado_paciente-atendimento' });
+      const anosQR = qrLido?.[2] !== undefined ? Number(qrLido[2]) : undefined;
+      const mesesQR = qrLido?.[3] !== undefined ? Number(qrLido[3]) : undefined;
+      if (!qrLido || !Number.isSafeInteger(cdPacienteQR) || (anosQR !== undefined && anosQR > 130) || (mesesQR !== undefined && mesesQR > 11)) {
+        auditTotem('qr_invalido', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), motivo: 'formato_esperado_paciente-idade' });
         window.alert('QR Code inválido.'); return;
       }
       processandoRef.current = true;
       setLoading(true);
       try {
-      auditTotem('qr_pesquisa_enviada', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), codigoPesquisado: cdPacienteQR, atendimentoPesquisado: cdAtendimentoQR });
+      auditTotem('qr_pesquisa_enviada', 'patientSession.POST', { codigoLido: valorQR.slice(0, 200), codigoPesquisado: cdPacienteQR, idadePesquisada: anosQR !== undefined ? `${anosQR}A ${mesesQR}M` : undefined });
       const listpaciente = await buscaPaciente({
         cd_paciente: cdPacienteQR,
-        cd_atendimento: cdAtendimentoQR,
+        anos: anosQR,
+        meses: mesesQR,
       });
-      auditTotem('qr_resposta_recebida', 'patientSession.POST', { codigoPesquisado: cdPacienteQR, atendimentoPesquisado: cdAtendimentoQR, quantidade: listpaciente?.length ?? 0, pacientes: listpaciente?.map(p => ({ cd_paciente: p.cd_paciente, ds_paciente: p.ds_paciente, dt_nascimento: p.dt_nascimento })) });
+      auditTotem('qr_resposta_recebida', 'patientSession.POST', { codigoPesquisado: cdPacienteQR, idadePesquisada: anosQR !== undefined ? `${anosQR}A ${mesesQR}M` : undefined, quantidade: listpaciente?.length ?? 0, pacientes: listpaciente?.map(p => ({ cd_paciente: p.cd_paciente, ds_paciente: p.ds_paciente, dt_nascimento: p.dt_nascimento })) });
       if (!listpaciente?.length) {
         window.alert("PACIENTE NÃO ENCONTRADO");
         return;
@@ -311,7 +314,7 @@ export function DialogPatient({
 
       setDados(newDados);
       } catch (error) {
-        auditTotem('qr_pesquisa_falhou', 'patientSession.POST', { codigoPesquisado: cdPacienteQR, atendimentoPesquisado: cdAtendimentoQR, erro: error instanceof Error ? error.message.slice(0, 300) : 'erro_desconhecido' });
+        auditTotem('qr_pesquisa_falhou', 'patientSession.POST', { codigoPesquisado: cdPacienteQR, idadePesquisada: anosQR !== undefined ? `${anosQR}A ${mesesQR}M` : undefined, erro: error instanceof Error ? error.message.slice(0, 300) : 'erro_desconhecido' });
         window.alert(error instanceof Error ? error.message : 'Não foi possível identificar o paciente.');
       } finally {
         processandoRef.current = false;

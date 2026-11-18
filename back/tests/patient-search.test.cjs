@@ -261,26 +261,41 @@ test('CPF e nome: trocar x-flow-id ou chamar RESET não renova tentativas do mes
   assert.equal(await tentativas(nome, 'n4'), 0);
 });
 
-test('QR paciente-atendimento: confere vínculo, validade e cancelamento; erro devolve lista vazia', async t => {
+test('idade em meses completos respeita o dia do aniversário', () => {
+  const { idadeEmMeses } = require('../src/lib/idade.js');
+  const nascimento = new Date('1962-03-15T00:00:00Z');
+  assert.equal(idadeEmMeses(nascimento, new Date('2026-10-14T00:00:00Z')), 64 * 12 + 6);
+  assert.equal(idadeEmMeses(nascimento, new Date('2026-10-15T00:00:00Z')), 64 * 12 + 7);
+  assert.equal(idadeEmMeses(nascimento, new Date('2027-03-14T00:00:00Z')), 64 * 12 + 11);
+  assert.equal(idadeEmMeses(nascimento, new Date('2027-03-15T00:00:00Z')), 65 * 12);
+});
+
+test('QR paciente-idade: confere a idade na data de um atendimento recente; formatos antigos e inválidos são recusados', async t => {
   const { qrGuardReset } = require('../src/lib/qr-guard');
   qrGuardReset();
-  const paciente = { cd_paciente: 123, ds_paciente: 'ANA', dt_nascimento: new Date('1980-01-01') };
-  const ok = await setup(t, 'pacientes.js', 'pacientesRoute', [], { pacientes_atendimentos_cd_pacienteTopacientes: paciente });
-  const response = await ok.get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: '456789' });
+  const paciente = { cd_paciente: 13060, ds_paciente: 'ANA', dt_nascimento: new Date('1962-03-15T00:00:00Z') };
+  // Etiqueta impressa num atendimento de 20/10/2026, quando ela tinha 64 anos e 7 meses.
+  const rows = [{ dt_data: new Date('2026-11-10T00:00:00Z'), pacientes_atendimentos_cd_pacienteTopacientes: paciente },
+    { dt_data: new Date('2026-10-20T00:00:00Z'), pacientes_atendimentos_cd_pacienteTopacientes: paciente }];
+  const ok = await setup(t, 'pacientes.js', 'pacientesRoute', rows);
+  const response = await ok.get('/clinux/pacientes', { tipo: 'QRIDADE', cd_paciente: '13060', anos: '64', meses: '07' });
   assert.equal(response.statusCode, 200);
-  assert.deepEqual(response.json().map(p => p.cd_paciente), [123]);
+  assert.deepEqual(response.json().map(p => p.cd_paciente), [13060]);
   const where = ok.calls[0].where;
-  assert.equal(where.cd_paciente, 123);
-  assert.equal(where.cd_atendimento, 456789);
+  assert.equal(where.cd_paciente, 13060);
   assert.ok(where.dt_data.gte instanceof Date);
   const limite = new Date(); limite.setUTCMonth(limite.getUTCMonth() - 6);
   assert.ok(Math.abs(where.dt_data.gte - limite) < 3 * 86400000);
   assert.equal(JSON.stringify(where.OR), JSON.stringify([{ ds_status: null }, { ds_status: { not: 1 } }]));
 
-  const nao = await setup(t, 'pacientes.js', 'pacientesRoute', [], null);
-  assert.deepEqual((await nao.get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: '1' })).json(), []);
-  for (const query of [{ tipo: 'QRATEND', cd_paciente: '123' }, { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: 'abc' }]) {
-    assert.equal((await nao.get('/clinux/pacientes', query)).statusCode, 400);
+  // Idade que não bate com nenhum atendimento: lista vazia, sem dizer o motivo.
+  assert.deepEqual((await ok.get('/clinux/pacientes', { tipo: 'QRIDADE', cd_paciente: '13060', anos: '64', meses: '9' })).json(), []);
+  const vazio = await setup(t, 'pacientes.js', 'pacientesRoute', []);
+  assert.deepEqual((await vazio.get('/clinux/pacientes', { tipo: 'QRIDADE', cd_paciente: '13060', anos: '64', meses: '7' })).json(), []);
+  for (const query of [{ tipo: 'QRIDADE', cd_paciente: '13060' }, { tipo: 'QRIDADE', cd_paciente: '13060', anos: '', meses: '' },
+    { tipo: 'QRIDADE', cd_paciente: '13060', anos: '64', meses: '12' }, { tipo: 'QRIDADE', cd_paciente: '13060', anos: '64,5', meses: '1' },
+    { tipo: 'QRHORA', cd_paciente: '123', hora: '14:30' }, { tipo: 'QRATEND', cd_paciente: '123', cd_atendimento: '456789' }]) {
+    assert.equal((await vazio.get('/clinux/pacientes', query)).statusCode, 400, JSON.stringify(query));
   }
   qrGuardReset();
 });
@@ -290,11 +305,11 @@ test('QR: 10 erros somando todos os totens bloqueiam a leitura por 5 minutos', a
   guard.qrGuardReset();
   const { get, calls } = await setup(t, 'pacientes.js', 'pacientesRoute', [], null);
   for (let i = 0; i < 10; i++) {
-    const r = await get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: String(100 + i), cd_atendimento: '5' }, { 'x-flow-id': `totem-${i}` });
+    const r = await get('/clinux/pacientes', { tipo: 'QRIDADE', cd_paciente: String(100 + i), anos: '40', meses: '1' }, { 'x-flow-id': `totem-${i}` });
     assert.equal(r.statusCode, 200);
   }
   const antes = calls.length;
-  const blocked = await get('/clinux/pacientes', { tipo: 'QRATEND', cd_paciente: '1', cd_atendimento: '1' }, { 'x-flow-id': 'outro' });
+  const blocked = await get('/clinux/pacientes', { tipo: 'QRIDADE', cd_paciente: '1', anos: '40', meses: '2' }, { 'x-flow-id': 'outro' });
   assert.equal(blocked.statusCode, 429);
   assert.equal(blocked.json().code, 'QR_BLOQUEADO');
   assert.equal(calls.length, antes, 'bloqueado não consulta o banco');

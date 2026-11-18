@@ -1,5 +1,5 @@
-// Trava global da leitura de QR (paciente-atendimento), somando todos os totens.
-// Quem usa direito não erra, porque o par vem impresso pelo sistema; erros seguidos indicam
+// Trava global da leitura de QR (paciente-idade), somando todos os totens.
+// Quem usa direito não erra, porque o código e a idade vêm impressos pelo sistema; erros seguidos indicam
 // alguém tentando adivinhar combinações. Não depende de login, aparelho ou cabeçalho.
 export const QR_GUARD = { maxFailures: 10, windowMs: 5 * 60 * 1000, blockMs: 5 * 60 * 1000 }
 
