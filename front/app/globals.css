@@ -1163,3 +1163,18 @@ html.dark[data-visual-theme] .patient-status-delivered { color: #86efac; border-
 .tv-notice-full .tv-progress { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; margin: 0; padding: 14px clamp(16px, 2vw, 32px); background: linear-gradient(transparent, rgba(0, 0, 0, .45)); }
 .tv-notice-full .tv-progress > span { background: rgba(255, 255, 255, .3); }
 @media (prefers-reduced-motion: reduce) { .tv-notice-fullimages { animation: none; } }
+
+/* ── Painel: guichê e recepção em destaque (modalidade fica secundária) ── */
+.tv-destination-desk { align-items: stretch; gap: clamp(12px, 1.3vw, 24px); margin-top: clamp(6px, 1vh, 16px); padding: clamp(10px, 1.6vh, 22px) clamp(16px, 1.6vw, 28px); border-radius: clamp(16px, 1.4vw, 26px); background: var(--tv-icon-bg, #2f95e825); border-left: clamp(6px, .5vw, 10px) solid var(--tv-icon, #1b6fd8); }
+.tv-desk-icon { display: grid; place-items: center; flex-shrink: 0; align-self: center; width: clamp(56px, min(4.4vw, 8vh), 96px); aspect-ratio: 1; border-radius: clamp(14px, 1.2vw, 24px); background: var(--tv-icon, #1b6fd8); color: #fff; }
+.tv-desk-icon svg { width: 56%; height: 56%; }
+.tv-desk-caption { display: block; color: var(--tv-muted); font-size: clamp(13px, 1.1vw, 22px); text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+.tv-destination-desk strong { display: block; color: var(--tv-icon, #1b6fd8); font-size: clamp(30px, min(3.4vw, 5.8vh), 76px); line-height: 1.05; font-weight: 800; text-transform: uppercase; overflow-wrap: anywhere; }
+.tv-destination-desk .tv-desk-place { color: inherit; font-size: clamp(20px, min(2vw, 3.4vh), 44px); font-weight: 600; margin-top: 2px; overflow-wrap: anywhere; }
+.tv-desk-modality { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; color: var(--tv-muted); font-size: clamp(13px, min(1.1vw, 2vh), 21px); }
+.tv-desk-modality .tv-pictogram { width: 1.6em; height: 1.6em; border-radius: .45em; }
+.tv-desk-modality .tv-pictogram svg { width: 62%; height: 62%; }
+.tv-history-desk { color: var(--tv-icon, #1b6fd8); font-weight: 700; }
+
+/* Nome um pouco menor para o bloco do guichê caber sem cortar o rótulo e o horário. */
+@media (min-width: 801px) { .tv-current .tv-patient-name { font-size: clamp(34px, min(4.6vw, 7.4vh), 96px); } .tv-current .tv-called-time { margin-top: 10px; } }

@@ -1,7 +1,7 @@
 'use client'
 import type React from 'react'
 import { useEffect, useState } from 'react'
-import { Building2 } from 'lucide-react'
+import { Building2, DoorOpen } from 'lucide-react'
 import type { PanelCall } from '@/lib/panel-call'
 import type { QueuePerson } from '@/components/QueueList'
 import { validNoticeSettings, noticeCategories, type NoticeSettings } from '@/lib/panel-notices'
@@ -61,7 +61,7 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
     <div className="tv-main">
       <section className="tv-current" aria-label="Chamando agora"><div className="tv-eyebrow"><span className="tv-live" />Chamando agora</div>
         <h1 key={current?.id ?? 'waiting'} className="tv-patient-name">{name || 'Aguardando chamada'}</h1>
-        {current && <><div className="tv-destination"><ModalityPictogram name={current.modalidade} /><div><strong>{current.modalidade || current.guicheNome || current.recepcao}</strong><p>{[current.guicheNome, current.localizacao || current.recepcao].filter(Boolean).join(' · ')}</p></div></div><time className="tv-called-time">Chamado às {current.calledAt}</time></>}
+        {current && <><div className="tv-destination tv-destination-desk"><span className="tv-desk-icon" aria-hidden="true"><DoorOpen /></span><div><span className="tv-desk-caption">Dirija-se ao</span><strong>{current.guicheNome || 'Guichê'}</strong>{(current.localizacao || current.recepcao) && <p className="tv-desk-place">{current.localizacao || current.recepcao}</p>}{current.modalidade && <small className="tv-desk-modality"><ModalityPictogram name={current.modalidade} />{current.modalidade}</small>}</div></div><time className="tv-called-time">Chamado às {current.calledAt}</time></>}
       </section>
       {notice && <aside className={`tv-notice ${fullImage ? 'tv-notice-full' : ''}`} aria-label={noticeCategories[notice.category ?? 'informativos']}>{fullImage ? <div key={`${notice.id}:${cycle}`} className={`tv-notice-fullimages ${notice.images!.length > 1 ? 'tv-notice-fullimages-grid' : ''}`}>{notice.images!.map(image => { const src = `/api/media/file?name=${encodeURIComponent(image.file)}`; return <figure key={image.file} style={{ '--tv-full-bg': `url("${src}")` } as React.CSSProperties}><img src={src} alt={image.alt || notice.title} /></figure> })}</div> : <><div className="tv-notice-label"><NoticePictogram icon={notice.icon} /><span className="tv-eyebrow">{noticeCategories[notice.category ?? 'informativos']}{(notice.category ?? 'informativos') === 'informativos' && <span className="tv-notice-alert-dot" aria-hidden="true" />}</span></div>
         <div key={`${notice.id}:${cycle}`} className="tv-notice-copy"><h2>{notice.title}</h2><p>{notice.text}</p>
@@ -70,7 +70,7 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
         <div className="tv-progress" aria-label={`Informativo ${index + 1} de ${items.length}`}>{items.map((item, i) => <span key={`${item.id}:${cycle}`}><i style={{ width: i < index ? '100%' : '0%', ...(i === index ? { animation: `tv-progress ${notice.durationSeconds}s linear forwards` } : {}) }} /></span>)}</div>
       </aside>}
     </div>
-    <footer className="tv-history"><h2 className="tv-eyebrow">Chamadas anteriores</h2><div className="tv-history-grid">{people.slice(0, 3).map((person, i) => <article key={`${person.id}:${person.name}`} style={{ opacity: 1 - i * .15 }}><ModalityPictogram name={person.modalidade} /><div><div className="tv-history-name"><strong>{shortName(person.name)}</strong><time>{person.calledAt}</time></div><p>{[person.modalidade, person.instruction].filter(Boolean).join(' · ')}</p></div></article>)}{people.length === 0 && <p className="tv-empty">As chamadas anteriores aparecerão aqui.</p>}</div></footer>
+    <footer className="tv-history"><h2 className="tv-eyebrow">Chamadas anteriores</h2><div className="tv-history-grid">{people.slice(0, 3).map((person, i) => <article key={`${person.id}:${person.name}`} style={{ opacity: 1 - i * .15 }}><ModalityPictogram name={person.modalidade} /><div><div className="tv-history-name"><strong>{shortName(person.name)}</strong><time>{person.calledAt}</time></div><p>{person.instruction && <b className="tv-history-desk">{person.instruction}</b>}{person.instruction && person.modalidade ? ' · ' : ''}{person.modalidade}</p></div></article>)}{people.length === 0 && <p className="tv-empty">As chamadas anteriores aparecerão aqui.</p>}</div></footer>
   </section>
 }
 
