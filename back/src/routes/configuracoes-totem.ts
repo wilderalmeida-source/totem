@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { PrismaLog } from "../../config/prismalog";
 import { noticeSettings } from '../lib/panel-notices';
+import { lerPrivacidade, salvarPrivacidade, privacidadeSchema } from '../lib/privacidade';
 
 const atraso = z.object({ toleranceMinutes: z.number().int().min(0).max(1440), timeBasis: z.enum(["EXAM", "ARRIVAL"]) });
 
@@ -25,6 +26,13 @@ export async function configuracoesTotemRoutes(fastify: FastifyInstance) {
     const body = z.object({ theme: z.enum(['theme1', 'theme2']), mode: z.enum(['light', 'dark']) }).strict().parse(request.body);
     await PrismaLog.$executeRaw`INSERT INTO configuracao_visual (id, tema, modo) VALUES (1, ${body.theme}, ${body.mode}) ON CONFLICT (id) DO UPDATE SET tema = EXCLUDED.tema, modo = EXCLUDED.modo`;
     return body;
+  });
+  fastify.get('/clinux/privacidade-config', async () => lerPrivacidade());
+  fastify.put('/clinux/privacidade-config', async (request, reply) => {
+    const parsed = privacidadeSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'Configuração de privacidade inválida.' });
+    await salvarPrivacidade(parsed.data);
+    return parsed.data;
   });
   fastify.get("/clinux/atrasos-config", async () => {
     const value = await PrismaLog.configuracao_atraso.findUnique({ where: { id: 1 } });

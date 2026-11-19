@@ -12,7 +12,7 @@ function load() {
     require: name => name === '../../config/prismalog' ? { PrismaLog: { guiches: { findUnique: async () => ({ ativo: true, nome: 'Atendimento' }) }, recepcoes_modalidades: { findMany: async () => [] } } }
       : name === '../../config/prismaDB' ? { prisma: {} }
       : name.includes('flow-audit') ? { auditContext: { getStore: () => ({ flowId: 'unique-call' }) }, flowAudit() {} }
-      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
+      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('nome-privacidade') ? require('../src/lib/nome-privacidade.js') : name.endsWith('/privacidade') ? { lerPrivacidade: async () => ({ painelNome: globalThis.__painelNome ?? 'completo' }) } : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   return exports.tratarMensagemTcp;
 }
@@ -35,4 +35,18 @@ test('TTS rejection keeps call metadata and provides speech fallback', async () 
     ? { json: () => ({}) } : { statusCode: 503 } }, 'B-0-123-02-RAIO X-MARIA-GUICHE', 1);
   assert.equal(messages[1].type, 'tts:audio');
   assert.match(messages[1].payload.ttsBody.errorTTS, /MARIA/);
+});
+test('privacidade: painel recebe o nome no formato escolhido e a voz continua com o nome', async () => {
+  globalThis.__painelNome = 'iniciais';
+  try {
+    const messages = [];
+    const injected = [];
+    await load()({ log: { error() {} }, broadcast: message => messages.push(message), inject: async request => { injected.push(request); return request.method === 'GET'
+      ? { json: () => ({}) } : { statusCode: 200, json: () => ({ audioContent: '/audios/test.mp3' }) }; } }, 'B-0-123-02-RAIO X-MARIA DA SILVA-GUICHE', 1);
+    assert.equal(messages[0].payload.call.name, 'M. S.');
+    assert.equal(messages[0].payload.call.fullName, 'M. S.');
+    assert.equal(messages[0].data.includes('MARIA DA SILVA'), false); // mensagem crua do painel classico tambem mascarada
+    assert.match(messages[0].data, /-M\. S\.-/);
+    assert.match(injected.find(r => r.method === 'POST').payload.text, /MARIA DA SILVA/);
+  } finally { delete globalThis.__painelNome; }
 });

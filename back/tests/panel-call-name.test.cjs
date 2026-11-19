@@ -14,7 +14,7 @@ function load(prisma) {
       : name.includes('flow-audit') ? { auditContext: { getStore: () => undefined }, flowAudit() {} }
       : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js')
       : name.includes('painel-caches') ? require('../src/lib/painel-caches.js')
-      : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
+      : name.includes('nome-privacidade') ? require('../src/lib/nome-privacidade.js') : name.endsWith('/privacidade') ? { lerPrivacidade: async () => ({ painelNome: globalThis.__painelNome ?? 'completo' }) } : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   return exports.buscarNomeDaChamada;
 }

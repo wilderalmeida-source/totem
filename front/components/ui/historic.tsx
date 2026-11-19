@@ -244,6 +244,9 @@ export default function Historic() {
     })
   }, [dados?.senhasnr])
 
+  // A clínica escolheu não mostrar o histórico (tela Temas > Privacidade).
+  if (dados?.oculto) return null
+
   return (
     <>
       {error && <p role="status" className="ml-3 text-sm text-gray-500">Histórico indisponível no momento. Você pode selecionar um serviço normalmente.</p>}

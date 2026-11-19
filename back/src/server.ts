@@ -30,6 +30,7 @@ import { recepcoesModalidadesRoute } from "./routes/recepcoesModalidades";
 import { adminRoutes } from "./routes/admin";
 import { totemAccessRoutes } from './routes/totem-access';
 import { configuracoesTotemRoutes } from "./routes/configuracoes-totem";
+import { limparLogsAntigos } from "./lib/privacidade";
 
 import { atendimentosTotemRoute } from './routes/atendimentos-totem';
 
@@ -101,6 +102,13 @@ async function bootstrap() {
   await fastify.register(configuracoesTotemRoutes)
   await fastify.register(ws)
   await fastify.register(pgNotify, { channel: "db_atendimentos_senhas", logRawPayload: false, })
+
+  // Prazo de guarda dos logs (tela Temas > Privacidade): limpa 1 minuto após subir e depois a cada 6 horas.
+  const limpar = () => limparLogsAntigos()
+    .then(total => { if (total) fastify.log.info({ total }, 'Logs antigos apagados pelo prazo de guarda') })
+    .catch(err => fastify.log.warn({ err }, 'Não foi possível apagar os logs antigos'))
+  setTimeout(limpar, 60_000).unref()
+  setInterval(limpar, 6 * 3_600_000).unref()
 
   fastify.listen({ port: 5000, host: '0.0.0.0' }, (err, address) => {
     if (err) {

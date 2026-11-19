@@ -50,7 +50,7 @@ function loadPanel(counter) {
       ? { PrismaLog: { configuracao_painel: { findUnique: async () => { counter.config++; return null } }, recepcoes_modalidades: { findMany: async () => [] } } }
       : name === '../../config/prismaDB' ? { prisma: { modalidades: { findMany: async () => { counter.modalidades++; return [] } } } }
       : name.includes('flow-audit') ? { auditContext: { getStore: () => undefined }, flowAudit() {} }
-      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
+      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('nome-privacidade') ? require('../src/lib/nome-privacidade.js') : name.endsWith('/privacidade') ? { lerPrivacidade: async () => ({ painelNome: globalThis.__painelNome ?? 'completo' }) } : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   return exports.descobrirPainelPorEvento;
 }
@@ -70,7 +70,7 @@ test('salvar a configuracao dos paineis recarrega o cache na hora', async t => {
     exports, console,
     require: name => name === '../../config/prismalog'
       ? { PrismaLog: { configuracao_painel: { upsert: async ({ create }) => create } } }
-      : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
+      : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('nome-privacidade') ? require('../src/lib/nome-privacidade.js') : name.endsWith('/privacidade') ? { lerPrivacidade: async () => ({ painelNome: globalThis.__painelNome ?? 'completo' }) } : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   let reloads = 0;
   const app = Fastify();
@@ -89,7 +89,7 @@ test('configuracao dos paineis recusa estrutura invalida e aceita 1 painel ativo
     exports, console,
     require: name => name === '../../config/prismalog'
       ? { PrismaLog: { configuracao_painel: { upsert: async ({ create }) => { saved.push(create); return create } } } }
-      : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
+      : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('nome-privacidade') ? require('../src/lib/nome-privacidade.js') : name.endsWith('/privacidade') ? { lerPrivacidade: async () => ({ painelNome: globalThis.__painelNome ?? 'completo' }) } : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   const app = Fastify();
   t.after(() => app.close());

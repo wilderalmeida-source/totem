@@ -5,24 +5,12 @@ import { prisma } from '../../config/prismaDB'
 import { gerarSenhaService } from '../services/senhas/gerar-senha.service'
 import { sharedHistory } from '../lib/shared-history'
 import { flowAudit } from '../lib/flow-audit'
-// Função para mascarar o nome mantendo apenas o Primeiro e Último visíveis
-function aplicarMascaraNome(nomeCompleto: string | null | undefined): string {
+import { formatarNome, type FormatoNome } from '../lib/nome-privacidade'
+import { lerPrivacidade } from '../lib/privacidade'
+// Histórico público do totem: o formato do nome vem da tela Temas (padrão: primeiro e último nome).
+function aplicarMascaraNome(nomeCompleto: string | null | undefined, formato: FormatoNome = 'primeiro_ultimo'): string {
   if (!nomeCompleto) return "Paciente Oculto";
-
-  const partes = nomeCompleto.trim().split(/\s+/);
-
-  if (partes.length === 1) {
-    return partes[0];
-  }
-
-  const primeiroNome = partes[0];
-  const ultimoNome = partes[partes.length - 1];
-  // Se tiver apenas 2 nomes (Ex: João Silva) exibe ambos.
-  if (partes.length === 2) {
-    return `${primeiroNome} ${ultimoNome}`;
-  }
-  // Se tiver 3 ou mais, oculta o meio com asteriscos fixos.
-  return `${primeiroNome} *** ${ultimoNome}`;
+  return formatarNome(nomeCompleto, formato) || "Paciente Oculto";
 }
 export async function senhaRoute(fastify: FastifyInstance) {
   const history = sharedHistory<unknown>()
@@ -33,6 +21,10 @@ export async function senhaRoute(fastify: FastifyInstance) {
 
     try {
       const { filtroControle } = createbody.parse(request.query)
+      const privacidade = await lerPrivacidade()
+      // A clínica escolheu não mostrar o histórico: nada de nomes sai daqui.
+      if (privacidade.historicoNome === 'oculto') { reply.header('Cache-Control', 'no-store'); return reply.send({ senhas: [], senhasnr: [], oculto: true }) }
+      const formato = privacidade.historicoNome
       const load = async () => {
 
       const dateInitial = new Date()
@@ -160,7 +152,7 @@ export async function senhaRoute(fastify: FastifyInstance) {
             if (typeof obj[key] === 'object' && obj[key] !== null) {
               varrerEMascarar(obj[key])
             } else if (key === 'ds_paciente' && typeof obj[key] === 'string') {
-              obj[key] = aplicarMascaraNome(obj[key])
+              obj[key] = aplicarMascaraNome(obj[key], formato)
             }
           }
         }
@@ -175,7 +167,7 @@ export async function senhaRoute(fastify: FastifyInstance) {
       const senhasnr = senhasEntregaRaw.map((senha) => ({
         ...senha,
         ds_paciente: senha.ds_paciente
-          ? aplicarMascaraNome(senha.ds_paciente)
+          ? aplicarMascaraNome(senha.ds_paciente, formato)
           : null,
       }))
 
@@ -185,7 +177,7 @@ export async function senhaRoute(fastify: FastifyInstance) {
       }
       }
       reply.header('Cache-Control', 'no-store')
-      return reply.send(filtroControle ? await load() : await history(load))
+      return reply.send(filtroControle ? await load() : await history(load, formato))
     } catch (err: any) {
       return reply.status(400).send({
         error: 'Requisição inválida',

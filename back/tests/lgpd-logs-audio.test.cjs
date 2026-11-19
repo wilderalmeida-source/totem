@@ -48,7 +48,7 @@ test('mensagem TCP vai para o log sem o nome do paciente', () => {
     exports, Date, Buffer, process: { env: {} },
     require: name => name.includes('prismalog') ? { PrismaLog: {} } : name.includes('prismaDB') ? { prisma: {} }
       : name.includes('flow-audit') ? { auditContext: { getStore: () => undefined }, flowAudit() {} }
-      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
+      : name.includes('tcp-frames') ? {} : name.includes('tcp-allowlist') ? require('../src/lib/tcp-allowlist.js') : name.includes('painel-caches') ? require('../src/lib/painel-caches.js') : name.includes('nome-privacidade') ? require('../src/lib/nome-privacidade.js') : name.endsWith('/privacidade') ? { lerPrivacidade: async () => ({ painelNome: globalThis.__painelNome ?? 'completo' }) } : name.includes('senha.helpers') ? { getHojeBrasil: () => new Date('2026-11-15T00:00:00.000Z') } : require(name),
   });
   const resumo = exports.resumoTcp('B-0-123-02-RAIO X-MARIA DA SILVA-GUICHE');
   assert.ok(!JSON.stringify(resumo).includes('MARIA'));

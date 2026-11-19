@@ -35,6 +35,7 @@ model configuracao_visual {
   id   Int    @id @default(1)
   tema String @default("theme2")
   modo String @default("light")
+  privacidade Json @default("{}")
 }
 
 model configuracao_informativos {

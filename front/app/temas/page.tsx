@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import type { BrandMode, PublicBrand } from '@/lib/brand'
+import { formatarNome } from '@/lib/nome-privacidade'
 
 const LOGO_SLOTS: { mode: BrandMode; label: string; hint: string; preview: string }[] = [
   { mode: 'light', label: 'Logo para o modo claro', hint: 'Use uma versão escura ou colorida da logo.', preview: 'bg-white border-slate-200' },
@@ -64,6 +65,53 @@ function BrandSettings() {
   </section>
 }
 
+
+type Privacy = { painelNome: 'completo' | 'primeiro_ultimo' | 'abreviado' | 'iniciais'; historicoNome: 'primeiro_ultimo' | 'abreviado' | 'iniciais' | 'oculto'; logsRetencaoDias: 0 | 30 | 90 | 180 | 365 }
+const EXEMPLO = 'MARIA APARECIDA DOS SANTOS'
+const NOME_OPCOES: [Privacy['painelNome'], string][] = [['completo', 'Nome completo'], ['primeiro_ultimo', 'Primeiro e último nome'], ['abreviado', 'Primeiro nome e iniciais'], ['iniciais', 'Somente as iniciais']]
+const RETENCAO: [Privacy['logsRetencaoDias'], string][] = [[0, 'Guardar sem prazo'], [30, '30 dias'], [90, '90 dias'], [180, '180 dias (6 meses)'], [365, '365 dias (1 ano)']]
+
+// Privacidade (LGPD): como o nome do paciente aparece nas telas públicas e por quanto tempo os logs ficam guardados.
+// O formato é aplicado no servidor: o nome completo nem chega ao navegador do painel ou do totem.
+function PrivacySettings() {
+  const [value, setValue] = useState<Privacy | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  useEffect(() => { fetch('/api/privacy-settings', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(Error('Não foi possível carregar a privacidade. Confira a atualização do banco.'))).then(setValue).catch(e => setMessage(e.message)) }, [])
+  async function save() {
+    if (!value) return
+    setBusy(true); setMessage('')
+    try {
+      const response = await fetch('/api/privacy-settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value) })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw Error(data.error || 'Não foi possível salvar a privacidade.')
+      setMessage('Privacidade salva. Vale para as próximas chamadas e para o histórico em até 30 segundos.')
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'Erro ao salvar.') }
+    finally { setBusy(false) }
+  }
+  const set = (patch: Partial<Privacy>) => setValue(current => current ? { ...current, ...patch } : current)
+  return <section className="mt-10 rounded-2xl border bg-white p-6">
+    <h2 className="text-2xl font-bold">Privacidade</h2>
+    <p className="mt-2 text-slate-600">Escolha como o nome do paciente aparece nas telas que qualquer pessoa pode ver. A voz do painel continua chamando o paciente pelo nome.</p>
+    <fieldset disabled={!value || busy} className="mt-6">
+      <legend className="mb-3 font-bold">Nome no painel de chamadas</legend>
+      {NOME_OPCOES.map(([opcao, label]) => <label key={opcao} className="mb-2 flex items-center gap-3"><input type="radio" name="painelNome" checked={value?.painelNome === opcao} onChange={() => set({ painelNome: opcao })} /><span><strong>{label}</strong> <span className="text-sm text-slate-500">— {formatarNome(EXEMPLO, opcao)}</span></span></label>)}
+    </fieldset>
+    <fieldset disabled={!value || busy} className="mt-6">
+      <legend className="mb-3 font-bold">Histórico do dia na tela inicial do totem</legend>
+      {NOME_OPCOES.filter(([opcao]) => opcao !== 'completo').map(([opcao, label]) => <label key={opcao} className="mb-2 flex items-center gap-3"><input type="radio" name="historicoNome" checked={value?.historicoNome === opcao} onChange={() => set({ historicoNome: opcao as Privacy['historicoNome'] })} /><span><strong>{label}</strong> <span className="text-sm text-slate-500">— {formatarNome(EXEMPLO, opcao)}</span></span></label>)}
+      <label className="mb-2 flex items-center gap-3"><input type="radio" name="historicoNome" checked={value?.historicoNome === 'oculto'} onChange={() => set({ historicoNome: 'oculto' })} /><span><strong>Não mostrar o histórico</strong> <span className="text-sm text-slate-500">— a tela inicial mostra só os serviços</span></span></label>
+    </fieldset>
+    <fieldset disabled={!value || busy} className="mt-6">
+      <legend className="mb-2 font-bold">Prazo de guarda dos logs</legend>
+      <p className="mb-3 text-sm text-slate-600">Os logs têm nomes de pacientes. Depois do prazo, os registros mais antigos são apagados automaticamente, a cada 6 horas. Essa limpeza não pode ser desfeita.</p>
+      <select className="rounded-xl border p-3" value={value?.logsRetencaoDias ?? 0} onChange={e => set({ logsRetencaoDias: Number(e.target.value) as Privacy['logsRetencaoDias'] })}>{RETENCAO.map(([dias, label]) => <option key={dias} value={dias}>{label}</option>)}</select>
+    </fieldset>
+    <button disabled={!value || busy} onClick={save} className="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white disabled:opacity-50">{busy ? 'Salvando…' : 'Salvar privacidade'}</button>
+    {message && <p role="status" className="mt-4">{message}</p>}
+  </section>
+}
+
 export default function ThemesPage() {
   const [theme, setVisual] = useState('theme2')
   const [mode, setMode] = useState('light')
@@ -97,5 +145,6 @@ export default function ThemesPage() {
     <button disabled={!ready || busy} onClick={save} className="rounded-xl bg-blue-600 px-6 py-3 font-bold text-white disabled:opacity-50">{busy ? 'Salvando…' : 'Salvar tema'}</button>
     {message && <p role="status" className="mt-4">{message}</p>}
     <BrandSettings />
+    <PrivacySettings />
   </div></main>
 }

@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { formatarNome, type FormatoNome } from '../lib/nome-privacidade';
+import { lerPrivacidade } from '../lib/privacidade';
 import { createTcpFrames } from '../lib/tcp-frames'
 import { auditContext, flowAudit } from '../lib/flow-audit'
 import fp from "fastify-plugin";
@@ -87,6 +89,15 @@ function resumoTcp(raw: string) {
 // Nome completo do paciente da senha chamada. Antes a chamada carregava TODAS as senhas do dia
 // (via /clinux/senhas) e, em B/D, usava o paciente da senha mais recente, que podia ser outra pessoa.
 // Mensagem do Clinux: B-NN-0394-06-...  -> 3º campo = número da senha (nr_senha) do dia.
+// Troca o nome (6º campo da mensagem TCP) pelo formato escolhido na tela Temas antes de enviar ao painel.
+function mascararMensagem(raw: string, formato: FormatoNome) {
+  if (formato === 'completo') return raw
+  return raw.replace(/^((?:[^-]*-){5})\s*([^-]*?)\s*(-)/, (_f, g1: string, nome: string, g3: string) => `${g1}${formatarNome(nome, formato)}${g3}`)
+}
+async function formatoPainel(): Promise<FormatoNome> {
+  try { return (await lerPrivacidade()).painelNome } catch { return 'completo' }
+}
+
 async function buscarNomeDaChamada(servico: string, referencia: string): Promise<string | undefined> {
   const digits = referencia.replace(/\D/g, '')
   const numero = Number(digits)
@@ -273,7 +284,7 @@ async function tratarMensagemTcp(
         type: "tcp",
         painelId,
         ts: Date.now(),
-        data: raw,
+        data: mascararMensagem(raw, await formatoPainel()),
       });
       return;
     }
@@ -316,9 +327,11 @@ async function tratarMensagemTcp(
     await refreshRecepcoes().catch(() => fastify.log.warn('Não foi possível atualizar as recepções da chamada'));
     const modalidade = cacheNomeModalidadeParaId.get(normalizarTexto(extrairDadosTcp(out).modalidadeNome));
     const receptionService = servico === 'C' || servico === 'D' ? servico : 'B';
+    // A voz continua falando o nome para chamar o paciente; a tela segue o formato escolhido.
+    const formatoNome = await formatoPainel();
     const call = {
-      id: auditContext.getStore()?.flowId ?? randomUUID(), name: nomeAux,
-      fullName: dsPaciente || nomeAux,
+      id: auditContext.getStore()?.flowId ?? randomUUID(), name: formatarNome(nomeAux, formatoNome),
+      fullName: formatarNome(dsPaciente || nomeAux, formatoNome),
       modalidade: extrairDadosTcp(out).modalidadeNome,
       localizacao: cacheLocalizacoes.get(`${modalidade}:${receptionService}`) || '',
       guicheNumero: numeroGuiche, guicheNome: nomeGuiche,
@@ -349,7 +362,7 @@ async function tratarMensagemTcp(
       type: "tcp",
       painelId,
       ts: Date.now(),
-      data: out,
+      data: mascararMensagem(out, formatoNome),
       payload: {
         call,
         followsAudio: true,
@@ -394,7 +407,7 @@ async function tratarMensagemTcp(
       type: "tcp",
       painelId,
       ts: Date.now(),
-      data: raw,
+      data: mascararMensagem(raw, await formatoPainel()),
     });
   }
 }

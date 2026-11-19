@@ -80,6 +80,8 @@ export type Senha = {
 export type SenhasResponse = {
   senhas: Senha[]
   senhasnr: Senha[]
+  /** true quando a clínica escolheu não mostrar o histórico no totem */
+  oculto?: boolean
 }
 
 /* =======================
