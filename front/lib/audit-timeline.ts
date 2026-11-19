@@ -9,7 +9,7 @@ const titles: Record<string, string> = {
   prioridade_selecionada: 'Prioridade selecionada', paciente_selecionado: 'Paciente selecionado',
   modal_paciente_aberto: 'Dados do paciente exibidos para confirmação', confirmacao_senha: 'Confirmação da emissão pressionada',
   resultado_busca_selecionado: 'Resultado da pesquisa selecionado', avancar_clicado: 'Avançar pressionado',
-  modalidade_selecionada: 'Modalidade selecionada', identificacao_enviada_next: 'Identificação enviada pelo totem',
+  modalidade_selecionada: 'Modalidade selecionada', modalidades_exibida: 'Tela de modalidades exibida', identificacao_enviada_next: 'Identificação enviada pelo totem',
   identificacao_recebida: 'Servidor recebeu a identificação', identificacao_rejeitada: 'Identificação rejeitada',
   identificacao_enviada_backend: 'Identificação encaminhada ao backend', identificacao_retorno_backend: 'Backend respondeu à identificação',
   identificacao_resposta_final: 'Resultado da identificação', identificacao_resposta_navegador: 'Totem recebeu o resultado da identificação',
@@ -25,7 +25,7 @@ const titles: Record<string, string> = {
   sessao_encerramento_solicitado: 'Encerramento do atendimento solicitado', fluxo_encerrado: 'Atendimento encerrado',
   falha_comunicacao: 'Falha de comunicação', proxy_resposta: 'Resposta do proxy', resposta_backend: 'Resposta do backend', resposta_next: 'Resposta recebida pelo navegador',
 }
-const reasons: Record<string, string> = {
+export const reasons: Record<string, string> = {
   PATIENT_SESSION_MISSING: 'Sessão do paciente ausente ou expirada; o pedido não foi enviado ao Clinux.',
   PATIENT_MISMATCH: 'O cadastro enviado difere do paciente identificado.',
   INVALID_TICKET_INPUT: 'Dados da senha inválidos.', ISSUANCE_BUSY: 'Já existe uma emissão em andamento ou a sessão terminou.',
@@ -37,6 +37,7 @@ const reasons: Record<string, string> = {
   P2000: 'Um valor excedeu o tamanho permitido no banco.', P2002: 'Conflito com um registro único no banco.',
   P2003: 'Referência a um cadastro inexistente no banco.', P2028: 'A transação do banco falhou ou excedeu o prazo.',
 }
+export const CLOSING_REASONS: Record<string, string> = { retorno_inicio: 'Voltou ao início', voltar_date: 'Voltou da confirmação de identidade', voltar_modalidades: 'Voltou da tela de modalidades', tela_prioridade: 'Voltou para a escolha de prioridade', sessao_rejeitada: 'Sessão rejeitada pelo servidor', inatividade_ou_expiracao: 'Ficou parado e o atendimento expirou', sucesso: 'Finalizado após confirmação', falha_emissao: 'Finalizado após falha na senha', fechamento_modal: 'Fechou a janela de confirmação', cancelar_modal: 'Cancelou na janela de confirmação' }
 export function eventTitle(log: AuditLogEntry) {
   return titles[log.action] ?? log.action.replace(/[_./]+/g, ' ')
 }
@@ -58,7 +59,7 @@ export function eventContext(log: AuditLogEntry) {
   const types: Record<string, string> = { NOME: 'Nome', DATA: 'Data de nascimento', CPF: 'CPF', NOMEDATA: 'Nome e data', QR: 'QR Code' }
   if (typeof m.tipo === 'string' && types[m.tipo]) parts.push(`Seleção: ${types[m.tipo]}`)
   if (typeof m.modalidadeNome === 'string') parts.push(`Modalidade: ${m.modalidadeNome}`)
-  const closingReasons: Record<string, string> = { retorno_inicio: 'Retorno ao início', voltar_date: 'Voltou da confirmação de identidade', voltar_modalidades: 'Voltou da seleção de modalidades', tela_prioridade: 'Seleção de prioridade', sessao_rejeitada: 'Sessão rejeitada pelo servidor', inatividade_ou_expiracao: 'Inatividade ou sessão expirada', sucesso: 'Finalizado após confirmação', falha_emissao: 'Finalizado após falha de emissão', fechamento_modal: 'Modal fechado', cancelar_modal: 'Cancelamento do modal' }
+  const closingReasons: Record<string, string> = { ...CLOSING_REASONS, retorno_inicio: 'Retorno ao início', voltar_date: 'Voltou da confirmação de identidade', voltar_modalidades: 'Voltou da seleção de modalidades', tela_prioridade: 'Seleção de prioridade', sessao_rejeitada: 'Sessão rejeitada pelo servidor', inatividade_ou_expiracao: 'Inatividade ou sessão expirada', sucesso: 'Finalizado após confirmação', falha_emissao: 'Finalizado após falha de emissão', fechamento_modal: 'Modal fechado', cancelar_modal: 'Cancelamento do modal' }
   if (typeof m.reason === 'string' && closingReasons[m.reason]) parts.push(closingReasons[m.reason])
   for (const [key, label] of [['cd_paciente', 'Cadastro'], ['pacienteId', 'Cadastro'], ['cd_senha', 'Código da senha'], ['nr_senha', 'Senha'], ['modalidadeId', 'Modalidade']]) {
     if (typeof m[key] === 'number') parts.push(`${label}: ${m[key]}`)

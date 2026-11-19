@@ -12,6 +12,8 @@ export const auditQuery = z.object({
   from: date.optional(), to: date.optional(),
   page: z.coerce.number().int().min(1).max(100000).default(1),
   limit: z.coerce.number().int().min(1).max(200).default(50),
+  // flows: pagina por atendimento (sessionId) e devolve todos os eventos de cada um, para o resumo da página de logs.
+  view: z.enum(['events', 'flows']).default('events'),
 }).refine(q => !q.from || !q.to || q.from <= q.to, 'Periodo invalido')
 
 // Find matching flows first; the main query must retain their other events.

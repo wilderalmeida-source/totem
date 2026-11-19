@@ -139,6 +139,18 @@ export async function adminRoutes(fastify: FastifyInstance) {
       ...(query.device ? { metadata: { path: ['device'], equals: query.device } } : {}),
       AND: [...auditExtraFilters(query), ...(query.group ? [auditGroups[query.group]] : []), ...(matchingFlows ? [{ sessionId: { in: matchingFlows } }] : [])],
     }
+    if (query.view === 'flows') {
+      // Um atendimento por item: os filtros escolhem os atendimentos e todos os eventos deles voltam juntos,
+      // para o resumo não ficar cortado entre páginas.
+      const groups = await PrismaLog.auditLog.groupBy({
+        by: ['sessionId'], where: { AND: [where, { sessionId: { not: null } }, { category: 'TOTEM' }] },
+        _max: { createdAt: true }, orderBy: { _max: { createdAt: 'desc' } },
+        skip: (query.page - 1) * query.limit, take: query.limit + 1,
+      })
+      const flows = groups.slice(0, query.limit).flatMap(group => group.sessionId ? [group.sessionId] : [])
+      const items = flows.length ? await PrismaLog.auditLog.findMany({ where: { sessionId: { in: flows } }, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }], take: 5000 }) : []
+      return { items: items.map((item) => ({ ...item, id: item.id.toString() })), flows, hasMore: groups.length > query.limit, page: query.page }
+    }
     const [items, total] = await Promise.all([PrismaLog.auditLog.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: (query.page - 1) * query.limit, take: query.limit }), PrismaLog.auditLog.count({ where })])
     return { items: items.map((item) => ({ ...item, id: item.id.toString() })), total, page: query.page }
   })

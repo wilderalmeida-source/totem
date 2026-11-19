@@ -17,6 +17,7 @@ async function setup(t, matches) {
       return args.select ? matches : [{ id: 1n, sessionId: 'flow-1', action: 'servico_selecionado', metadata: { servico: 'D' } }];
     },
     count: async args => { calls.push(args); return 1; },
+    groupBy: async args => { calls.push(args); return [{ sessionId: 'flow-2' }, { sessionId: 'flow-1' }, { sessionId: 'flow-0' }].slice(0, args.take); },
   };
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), {
     exports, Buffer,
@@ -54,4 +55,19 @@ test('busca ampla exige refinamento em vez de truncar atendimentos', async t => 
   assert.equal(response.statusCode, 422);
   assert.match(response.json().error, /nome mais completo/);
   assert.equal(calls.length, 1);
+});
+
+test('modo resumo pagina por atendimento e devolve todos os eventos de cada um', async t => {
+  const { calls, get } = await setup(t, []);
+  const response = await get({ view: 'flows', limit: '2', page: '1', outcome: 'FALHOU' });
+  assert.equal(response.statusCode, 200);
+  const group = calls[0];
+  assert.equal(group.by[0], 'sessionId');
+  assert.equal(group.take, 3); // um a mais para saber se ha proxima pagina
+  assert.equal(group.where.AND[0].AND[0].metadata.equals, 'FALHOU');
+  assert.equal(group.where.AND[2].category, 'TOTEM');
+  assert.equal(JSON.stringify(calls[1].where.sessionId.in), JSON.stringify(['flow-2', 'flow-1']));
+  assert.equal(JSON.stringify(calls[1].where).includes('FALHOU'), false); // eventos do atendimento inteiro, sem o filtro
+  assert.equal(response.json().hasMore, true);
+  assert.equal(JSON.stringify(response.json().flows), JSON.stringify(['flow-2', 'flow-1']));
 });

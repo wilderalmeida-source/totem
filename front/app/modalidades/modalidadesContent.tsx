@@ -63,6 +63,8 @@ export default function ModalidadePage() {
       try {
         const response = await buscaModalidades(10000)
         setModalidades(response ?? [])
+        // Registra que a tela apareceu (o resumo dos logs responde "apareceu a tela de modalidade?").
+        auditTotem('modalidades_exibida', 'modalidade', { servico, preferencial, quantidade: response?.length ?? 0 })
       } catch (error) {
         console.error('Erro ao carregar modalidades:', error)
         setModalidades([])
