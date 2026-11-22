@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS configuracao_visual (
   modo TEXT NOT NULL DEFAULT 'light' CHECK (modo IN ('light', 'dark'))
 );
 ALTER TABLE configuracao_visual ADD COLUMN IF NOT EXISTS privacidade JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE configuracao_visual ADD COLUMN IF NOT EXISTS analises JSONB NOT NULL DEFAULT '{}'::jsonb;
 INSERT INTO configuracao_visual (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS configuracao_informativos (

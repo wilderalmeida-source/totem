@@ -36,6 +36,7 @@ model configuracao_visual {
   tema String @default("theme2")
   modo String @default("light")
   privacidade Json @default("{}")
+  analises    Json @default("{}")
 }
 
 model configuracao_informativos {

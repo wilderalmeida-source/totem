@@ -15,6 +15,7 @@ const ALLOWED_PREFIXES = [
   "/clinux/atrasos-config",
   "/clinux/procedimentos", "/clinux/recepcoes-modalidades",
   "/clinux/salas", "/clinux/senhas", "/clinux/voice", "/clinux/admin", "/clinux/audit",
+  "/clinux/dashboard",
 ] as const;
 
 function pathAllowed(pathname: string) {
@@ -33,6 +34,7 @@ function requiresAdmin(pathname: string, method: string) {
   if (pathname.startsWith("/clinux/atrasos-config") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/recepcoes-modalidades") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/admin")) return true;
+  if (pathname.startsWith("/clinux/dashboard")) return true;
   if (pathname.startsWith("/clinux/audit") && method === "GET") return true;
   return false;
 }
@@ -47,6 +49,7 @@ function requiredPermission(pathname: string) {
   if (pathname.startsWith('/clinux/recepcoes-modalidades')) return 'RECEPCOES'
   if (pathname.startsWith('/clinux/admin/users')) return 'USUARIOS'
   if (pathname.startsWith('/clinux/audit')) return 'LOGS'
+  if (pathname.startsWith('/clinux/dashboard')) return 'DASHBOARD'
   return null
 }
 

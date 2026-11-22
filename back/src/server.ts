@@ -30,6 +30,12 @@ import { recepcoesModalidadesRoute } from "./routes/recepcoesModalidades";
 import { adminRoutes } from "./routes/admin";
 import { totemAccessRoutes } from './routes/totem-access';
 import { configuracoesTotemRoutes } from "./routes/configuracoes-totem";
+import { dashboardRoutes } from "./routes/dashboard";
+import { desempenhoRoutes } from "./routes/desempenho";
+import { errosRoutes } from "./routes/erros";
+import { atrasosPacientesRoutes } from "./routes/atrasos-pacientes";
+import { configAnalisesRoutes } from "./routes/config-analises";
+import { laudosRoutes } from "./routes/laudos";
 import { limparLogsAntigos } from "./lib/privacidade";
 
 import { atendimentosTotemRoute } from './routes/atendimentos-totem';
@@ -100,6 +106,12 @@ async function bootstrap() {
   await fastify.register(adminRoutes)
   await fastify.register(totemAccessRoutes)
   await fastify.register(configuracoesTotemRoutes)
+  await fastify.register(dashboardRoutes)
+  await fastify.register(desempenhoRoutes)
+  await fastify.register(errosRoutes)
+  await fastify.register(atrasosPacientesRoutes)
+  await fastify.register(configAnalisesRoutes)
+  await fastify.register(laudosRoutes)
   await fastify.register(ws)
   await fastify.register(pgNotify, { channel: "db_atendimentos_senhas", logRawPayload: false, })
 
