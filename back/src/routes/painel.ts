@@ -333,6 +333,7 @@ async function tratarMensagemTcp(
       id: auditContext.getStore()?.flowId ?? randomUUID(), name: formatarNome(nomeAux, formatoNome),
       fullName: formatarNome(dsPaciente || nomeAux, formatoNome),
       modalidade: extrairDadosTcp(out).modalidadeNome,
+      ...(modalidade ? { cdModalidade: modalidade } : {}),
       localizacao: cacheLocalizacoes.get(`${modalidade}:${receptionService}`) || '',
       guicheNumero: numeroGuiche, guicheNome: nomeGuiche,
       recepcao: cacheRecepcoes.get(`${modalidade}:${receptionService}`) || `Recepção ${painelId}`,

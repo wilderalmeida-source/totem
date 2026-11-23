@@ -44,3 +44,12 @@ test('configuracao salva e recarregada preserva ordem, inativos e texto parametr
   assert.equal((await app.inject({ method: 'PUT', url: '/clinux/informativos-config', payload: { enabled: true, items: [item, item] } })).statusCode, 400);
   assert.equal(writes, 1);
 });
+
+test('aviso da modalidade exige ao menos uma modalidade e limita os segundos extras', () => {
+  const mod = { ...item, category: 'modalidade', modalidades: [7, 8], extraSeconds: 5 };
+  assert.equal(noticeSettings.safeParse({ enabled: true, items: [mod] }).success, true);
+  assert.equal(noticeSettings.safeParse({ enabled: true, items: [{ ...mod, modalidades: [] }] }).success, false);
+  assert.equal(noticeSettings.safeParse({ enabled: true, items: [{ ...mod, modalidades: undefined }] }).success, false);
+  assert.equal(noticeSettings.safeParse({ enabled: true, items: [{ ...mod, extraSeconds: 61 }] }).success, false);
+  assert.equal(noticeSettings.safeParse({ enabled: true, items: [{ ...mod, modalidades: [0] }] }).success, false);
+});

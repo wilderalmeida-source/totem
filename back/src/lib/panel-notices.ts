@@ -8,11 +8,16 @@ export const noticeSettings = z.object({
     text: z.string().trim().max(700),
     fullImage: z.boolean().optional(),
     icon: z.enum(['info', 'alert', 'results', 'calendar', 'heart']),
-    category: z.enum(['informativos', 'avisos', 'orientacoes', 'campanhas']).optional(),
+    category: z.enum(['informativos', 'avisos', 'orientacoes', 'campanhas', 'modalidade']).optional(),
+    // Categoria "modalidade": aparece quando um paciente dessas modalidades é chamado, por durationSeconds;
+    // cada nova chamada das mesmas modalidades enquanto ele está na tela soma extraSeconds.
+    modalidades: z.array(z.number().int().positive()).max(100).optional(),
+    extraSeconds: z.number().int().min(0).max(60).optional(),
     images: z.array(z.object({ file: z.string().regex(/^notice-[0-9a-f-]{36}\.webp$/), alt: z.string().trim().max(160) }).strict()).max(4).optional(),
     durationSeconds: z.number().int().min(5).max(300), active: z.boolean(),
   }).strict().superRefine((item, ctx) => {
     if (item.fullImage && !item.images?.length) ctx.addIssue({ code: 'custom', path: ['images'], message: 'Imagem em tela cheia exige ao menos uma imagem' })
     if (!item.fullImage && !item.text) ctx.addIssue({ code: 'custom', path: ['text'], message: 'Informe o texto' })
+    if (item.category === 'modalidade' && !item.modalidades?.length) ctx.addIssue({ code: 'custom', path: ['modalidades'], message: 'Escolha ao menos uma modalidade' })
   })).max(50),
 }).strict().refine(value => new Set(value.items.map(item => item.id)).size === value.items.length, 'Informativos duplicados')

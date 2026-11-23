@@ -9,7 +9,7 @@ const { renderToStaticMarkup } = require('react-dom/server');
 function environment(config) {
   let cycle = 0;
   const effects = [], timers = [];
-  const react = { useEffect: fn => effects.push(fn), useRef: value => ({ current: value }), useState: initial => [
+  const react = { useEffect: fn => effects.push(fn), useRef: value => ({ current: value }), useMemo: fn => fn(), useState: initial => [
     initial === false ? true : typeof initial === 'number' ? cycle : initial && typeof initial === 'object' && 'items' in initial ? config : initial,
     value => { if (typeof initial === 'number') cycle = typeof value === 'function' ? value(cycle) : value; },
   ] };

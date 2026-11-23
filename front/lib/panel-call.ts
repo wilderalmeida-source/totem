@@ -8,6 +8,7 @@ export type PanelCall = {
   fullName?: string
   modalidade?: string
   localizacao?: string
+  cdModalidade?: number   // código da modalidade (avisos da modalidade)
 }
 
 /** Keep call identity and display fields together when TCP and TTS arrive separately. */
@@ -33,6 +34,10 @@ export function parsePanelCall(value: unknown): PanelCall | null {
     if (input[key] === undefined) continue
     if (typeof input[key] !== 'string' || input[key].length > 200) return null
     result[key] = input[key].trim()
+  }
+  if (input.cdModalidade !== undefined && input.cdModalidade !== null) {
+    if (typeof input.cdModalidade !== 'number' || !Number.isInteger(input.cdModalidade) || input.cdModalidade <= 0) return null
+    result.cdModalidade = input.cdModalidade
   }
   return result
 }
