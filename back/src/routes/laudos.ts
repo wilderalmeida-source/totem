@@ -8,7 +8,8 @@ import { lerConfigAnalise, type ConfigAnalise } from '../lib/config-analises'
 //                       D. Laudo e assinatura. Republicar após correção não muda a data (não vira atraso).
 //   Laudo do período  = data do laudo dentro do período, seja qual for a data do exame (um exame do dia 17
 //                       laudado no dia 19 conta no dia 19).
-//   Pendente          = exame do período (data do atendimento) ainda sem D. Laudo. Só informativo.
+//   Pendente          = exame ainda sem D. Laudo feito até o fim do período (menos os de hoje), inclusive antes do início (até 92 dias),
+//                       para o atrasado de dias anteriores não sumir quando o período é curto. Só informativo.
 //   Médico            = o médico executor do atendimento (atendimentos.cd_medico), o mesmo da tela Desempenho.
 //                       Atendimento sem médico não entra.
 //   Modalidade        = a do procedimento do exame (procedimentos.cd_modalidade); sem ela, a da sala.
@@ -23,7 +24,7 @@ import { lerConfigAnalise, type ConfigAnalise } from '../lib/config-analises'
 // atribuídas ao médico do laudo corrigido: o último exame assinado do mesmo paciente, na mesma modalidade, até 1 ano
 // antes. Sem esse laudo anterior, ficam com o médico do próprio exame de revisão/retificação.
 // O mínimo de exames da configuração tira o par médico × modalidade com poucos laudos nos ÚLTIMOS 90 DIAS (até o fim
-// do período) — medido numa janela fixa para não cortar todo mundo quando o período escolhido é curto (ex.: 1 dia).
+// do período), só dos laudos finalizados: pendentes sempre contam — medido numa janela fixa para não cortar todo mundo quando o período escolhido é curto (ex.: 1 dia).
 
 const dataIso = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 const filtros = z.object({ inicio: dataIso, fim: dataIso }).superRefine((f, ctx) => {
@@ -89,11 +90,11 @@ async function linhas(inicio: string, fim: string, cfg: ConfigAnalise) {
       LEFT JOIN modalidades md ON md.cd_modalidade = COALESCE(pr.cd_modalidade, sl.cd_modalidade)
       CROSS JOIN LATERAL (SELECT COALESCE(NULLIF(pr.nr_prazo_entrega, 0), NULLIF(md.nr_entrega, 0)) AS dias) de
       -- Exames de ate 92 dias antes do inicio. Candidatos: alguma data de laudo atual a partir do inicio (a primeira
-      -- publicacao nunca e posterior as datas atuais) ou exame do periodo ainda sem laudo.
+      -- publicacao nunca e posterior as datas atuais) ou exame ainda sem laudo (mesmo feito antes do inicio).
       WHERE a.dt_data >= ${inicio}::date - 92 AND a.dt_data <= ${fim}::date
         AND (
           GREATEST(e.dt_laudo, e.dt_assinado, e.dt_publicado) >= ${inicio}::date
-          OR (COALESCE(e.dt_laudo, e.dt_assinado, e.dt_publicado) IS NULL AND a.dt_data >= ${inicio}::date)
+          OR COALESCE(e.dt_laudo, e.dt_assinado, e.dt_publicado) IS NULL
         )
         AND a.cd_medico IS NOT NULL
         AND a.ds_status IS DISTINCT FROM 1
@@ -119,8 +120,11 @@ async function linhas(inicio: string, fim: string, cfg: ConfigAnalise) {
     periodo AS (
       SELECT * FROM ex
       WHERE (dt_laudo >= ${inicio}::date AND dt_laudo < ${fim}::date + 1)
-         -- Pendentes: exame do periodo sem laudo, so se o procedimento for laudavel (gravacoes, taxas etc. ficam fora).
-         OR (dt_laudo IS NULL AND dt_data >= ${inicio}::date AND sn_laudar IS DISTINCT FROM false)
+         -- Pendentes: exame sem laudo feito ate o fim do periodo (inclusive antes do inicio, dentro da janela de 92 dias).
+         -- procedimentos.sn_laudar e "NAO laudar": true = o exame nunca tera laudo e fica fora dos pendentes.
+         -- Gravacoes, 2a via, taxas etc. tambem saem pelos procedimentos excluidos em "Configurar analiticos".
+         -- Exame feito hoje ainda nao tem como estar laudado: fica fora dos pendentes (data de hoje no horario de Brasilia).
+         OR (dt_laudo IS NULL AND sn_laudar IS DISTINCT FROM true AND dt_data < (now() AT TIME ZONE 'America/Sao_Paulo')::date)
     )
     SELECT
       x.cd_exame, x.cd_atendimento, x.cd_paciente,
@@ -230,10 +234,12 @@ export async function laudosRoutes(fastify: FastifyInstance) {
       }
     }).filter(l => l.cdMedico === null || !cfg.medicosExcluidos.includes(l.cdMedico))
 
-    // Mínimo de laudos do médico na modalidade, contados nos últimos 90 dias. Revisão/retificação não é cortada.
+    // Mínimo de laudos do médico na modalidade, contados nos últimos 90 dias: tira dos rankings quem tem pouco volume.
+    // Vale só para laudos FINALIZADOS. Exame ainda sem laudo sempre conta (senão o atrasado some do painel), e
+    // revisão/retificação também não é cortada.
     const par = (l: { cdMedico: number | null; cdModalidade: number | null }) => `${l.cdMedico ?? '-'}|${l.cdModalidade ?? '-'}`
-    const abaixo = new Set(volume ? base.filter(l => l.tipo === 'laudo' && (volume.get(par(l)) ?? 0) < cfg.minimoExames).map(par) : [])
-    const dentro = base.filter(l => l.tipo !== 'laudo' || !abaixo.has(par(l)))
+    const abaixo = new Set(volume ? base.filter(l => l.tipo === 'laudo' && l.finalizado && (volume.get(par(l)) ?? 0) < cfg.minimoExames).map(par) : [])
+    const dentro = base.filter(l => l.tipo !== 'laudo' || !l.finalizado || !abaixo.has(par(l)))
     const laudados = dentro.filter(l => l.tipo === 'laudo' && l.finalizado)
 
     const [medicos, modalidades, convenios, procedimentos, pacientes] = await Promise.all([
@@ -241,9 +247,9 @@ export async function laudosRoutes(fastify: FastifyInstance) {
       nomes('modalidades', unicos(dentro.map(l => l.cdModalidade))),
       nomes('fornecedores', unicos(dentro.map(l => l.cdConvenio))),
       nomes('procedimentos', unicos(dentro.map(l => l.cdProcedimento))),
-      // Nome do paciente só onde a tela lista exames: revisões, retificações e atrasados.
+      // Nome do paciente onde a tela lista exames: revisões, retificações, atrasados e ainda não finalizados.
       (async () => {
-        const ids = unicos(dentro.filter(l => l.tipo !== 'laudo' || (l.atrasoHoras ?? 0) > 0).map(l => l.cdPaciente))
+        const ids = unicos(dentro.filter(l => l.tipo !== 'laudo' || !l.finalizado || (l.atrasoHoras ?? 0) > 0).map(l => l.cdPaciente))
         if (!ids.length) return {}
         const r = await prisma.$queryRaw<Array<{ id: number; nome: string }>>`SELECT cd_paciente AS id, TRIM(ds_paciente) AS nome FROM pacientes WHERE cd_paciente = ANY(${ids}::int[])`
         return Object.fromEntries(r.map(x => [Number(x.id), x.nome]))
