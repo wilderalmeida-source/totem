@@ -1,11 +1,12 @@
 'use client'
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Building2, DoorOpen } from 'lucide-react'
 import type { PanelCall } from '@/lib/panel-call'
 import type { QueuePerson } from '@/components/QueueList'
 import { validNoticeSettings, noticeCategories, type NoticeSettings } from '@/lib/panel-notices'
 import { ModalityPictogram, NoticePictogram } from './Pictogram'
+import { useFitText } from './useFitText'
 import GoldMark from '@/components/GoldMark'
 import BrandLogo from '@/components/brand/BrandLogo'
 import { useBrand } from '@/components/brand/useBrand'
@@ -51,6 +52,9 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
   const name = current?.fullName || current?.name
   // Comunicado só com imagem ocupando todo o quadro (sem rótulo, título e texto).
   const fullImage = !!notice?.fullImage && !!notice.images?.length
+  // Comunicado longo: a letra diminui até caber no quadro.
+  const fitRef = useRef<HTMLDivElement>(null)
+  useFitText(fitRef, `${notice?.id}:${cycle}:${notice?.title}:${notice?.text}:${fullImage}`)
   // Logo no canto superior substitui ícone e nome; na posição "saudação" o painel mantém o padrão.
   const brand = useBrand()
   const logoNoTopo = hasBrandLogo(brand) && brand?.placement === 'header'
@@ -64,9 +68,9 @@ function ActivePanel({ current, people, painelId }: { current: PanelCall | null;
         {current && <><div className="tv-destination tv-destination-desk"><span className="tv-desk-icon" aria-hidden="true"><DoorOpen /></span><div><span className="tv-desk-caption">Dirija-se ao</span><strong>{current.guicheNome || 'Guichê'}</strong>{(current.localizacao || current.recepcao) && <p className="tv-desk-place">{current.localizacao || current.recepcao}</p>}{current.modalidade && <small className="tv-desk-modality"><ModalityPictogram name={current.modalidade} />{current.modalidade}</small>}</div></div><time className="tv-called-time">Chamado às {current.calledAt}</time></>}
       </section>
       {notice && <aside className={`tv-notice ${fullImage ? 'tv-notice-full' : ''}`} aria-label={noticeCategories[notice.category ?? 'informativos']}>{fullImage ? <div key={`${notice.id}:${cycle}`} className={`tv-notice-fullimages ${notice.images!.length > 1 ? 'tv-notice-fullimages-grid' : ''}`}>{notice.images!.map(image => { const src = `/api/media/file?name=${encodeURIComponent(image.file)}`; return <figure key={image.file} style={{ '--tv-full-bg': `url("${src}")` } as React.CSSProperties}><img src={src} alt={image.alt || notice.title} /></figure> })}</div> : <><div className="tv-notice-label"><NoticePictogram icon={notice.icon} /><span className="tv-eyebrow">{noticeCategories[notice.category ?? 'informativos']}{(notice.category ?? 'informativos') === 'informativos' && <span className="tv-notice-alert-dot" aria-hidden="true" />}</span></div>
-        <div key={`${notice.id}:${cycle}`} className="tv-notice-copy"><h2>{notice.title}</h2><p>{notice.text}</p>
+        <div ref={fitRef} className="tv-notice-fit"><div key={`${notice.id}:${cycle}`} className="tv-notice-copy"><h2>{notice.title}</h2><p>{notice.text}</p>
           {!!notice.images?.length && <div className={`tv-notice-images ${notice.images.length > 1 ? 'tv-notice-images-grid' : ''}`}>{notice.images.map(image => <img key={image.file} src={`/api/media/file?name=${encodeURIComponent(image.file)}`} alt={image.alt} />)}</div>}
-        </div></>}
+        </div></div></>}
         <div className="tv-progress" aria-label={`Informativo ${index + 1} de ${items.length}`}>{items.map((item, i) => <span key={`${item.id}:${cycle}`}><i style={{ width: i < index ? '100%' : '0%', ...(i === index ? { animation: `tv-progress ${notice.durationSeconds}s linear forwards` } : {}) }} /></span>)}</div>
       </aside>}
     </div>

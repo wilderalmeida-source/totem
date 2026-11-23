@@ -9,7 +9,7 @@ const { renderToStaticMarkup } = require('react-dom/server');
 function environment(config) {
   let cycle = 0;
   const effects = [], timers = [];
-  const react = { useEffect: fn => effects.push(fn), useState: initial => [
+  const react = { useEffect: fn => effects.push(fn), useRef: value => ({ current: value }), useState: initial => [
     initial === false ? true : typeof initial === 'number' ? cycle : initial && typeof initial === 'object' && 'items' in initial ? config : initial,
     value => { if (typeof initial === 'number') cycle = typeof value === 'function' ? value(cycle) : value; },
   ] };
@@ -17,7 +17,7 @@ function environment(config) {
     const exports = {};
     const code = ts.transpileModule(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
     vm.runInNewContext(code, { exports, setTimeout: (fn, ms) => { timers.push({ fn, ms }); return timers.length; }, clearTimeout() {},
-      require: name => name === 'react' ? react : name === '@/lib/panel-notices' ? load('lib/panel-notices.ts') : name === '@/components/GoldMark' ? load('components/GoldMark.tsx') : name === './Pictogram' ? load('components/panel/Pictogram.tsx') : name === '@/components/brand/BrandLogo' ? load('components/brand/BrandLogo.tsx') : name === '@/components/brand/useBrand' ? { useBrand: () => null } : name === '@/lib/brand' ? load('lib/brand.ts') : require(name),
+      require: name => name === 'react' ? react : name === '@/lib/panel-notices' ? load('lib/panel-notices.ts') : name === '@/components/GoldMark' ? load('components/GoldMark.tsx') : name === './Pictogram' ? load('components/panel/Pictogram.tsx') : name === './useFitText' ? { useFitText: () => {} } : name === '@/components/brand/BrandLogo' ? load('components/brand/BrandLogo.tsx') : name === '@/components/brand/useBrand' ? { useBrand: () => null } : name === '@/lib/brand' ? load('lib/brand.ts') : require(name),
     });
     return exports;
   }

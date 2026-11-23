@@ -229,13 +229,15 @@ html.dark:is([data-visual-theme='theme1'], [data-visual-theme='theme2']) .tv-pan
 .tv-notice-label .tv-pictogram svg { width: 55%; height: 55%; }
 .tv-notice-alert-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; background: #ef4444; animation: tv-notice-blink 1.3s ease-in-out infinite; }
 @keyframes tv-notice-blink { 0%, 100% { opacity: 1; box-shadow: 0 0 0 4px #ef444422; } 50% { opacity: .25; box-shadow: none; } }
-.tv-notice-images { display: grid; gap: 10px; margin-top: 16px; }
+.tv-notice-images { display: grid; gap: 10px; margin-top: calc(16px * var(--tv-fit, 1)); }
 .tv-notice-images-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.tv-notice-images img { width: 100%; max-height: 23vh; object-fit: contain; border-radius: 12px; }
+.tv-notice-images img { width: 100%; max-height: calc(23vh * var(--tv-fit, 1)); object-fit: contain; border-radius: 12px; }
 @media (prefers-reduced-motion: reduce) { .tv-notice-alert-dot { animation: none; } }
 .tv-notice-copy { animation: tv-enter .5s ease; }
-.tv-notice-copy h2 { font-size: clamp(30px, 3.8vw, 72px); line-height: 1.15; font-weight: 600; margin-top: 26px; overflow-wrap: anywhere; }
-.tv-notice-copy p { color: var(--tv-muted); font-size: clamp(20px, 2.2vw, 42px); line-height: 1.4; margin-top: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Área do texto: ocupa o espaço entre o rótulo e a barra de progresso; useFitText reduz --tv-fit até o texto caber. */
+.tv-notice-fit { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.tv-notice-copy h2 { font-size: calc(clamp(30px, 3.8vw, 72px) * var(--tv-fit, 1)); line-height: 1.15; font-weight: 600; margin-top: calc(26px * var(--tv-fit, 1)); overflow-wrap: anywhere; }
+.tv-notice-copy p { color: var(--tv-muted); font-size: calc(clamp(20px, 2.2vw, 42px) * var(--tv-fit, 1)); line-height: 1.4; margin-top: calc(16px * var(--tv-fit, 1)); white-space: pre-wrap; overflow-wrap: anywhere; }
 .tv-progress { display: flex; gap: 6px; margin-top: auto; padding-top: 24px; }
 .tv-progress > span { height: 5px; flex: 1; border-radius: 5px; overflow: hidden; background: var(--tv-bar); }
 .tv-progress i { display: block; height: 100%; background: linear-gradient(90deg, #1b6fd8, #5bb8f0); }
