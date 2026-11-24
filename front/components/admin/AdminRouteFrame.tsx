@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { ADMIN_AREAS, ADMIN_SECTIONS, CATEGORIAS_ANALITICOS, ORDEM_CATEGORIAS, areaOfPath, categoriaOfPath, sectionsOfArea, type AdminSection, type AreaComPagina } from "@/lib/admin-sections";
 import { ReactNode, useEffect, useState } from "react";
+import BotaoPdfDashboard from "@/components/admin/BotaoPdfDashboard";
 
 const adminPaths = new Set(ADMIN_SECTIONS.map((section) => section.href));
 const AREAS = Object.keys(ADMIN_AREAS) as AreaComPagina[];
@@ -154,6 +155,7 @@ export default function AdminRouteFrame({ children }: { children: ReactNode }) {
           )}
         </aside>
         <div className="admin-page-content min-w-0 flex-1">{children}</div>
+        {ADMIN_SECTIONS.some(s => s.href === pathname && s.area === "analiticos") && pathname !== "/configuracao-analises" && <BotaoPdfDashboard />}
       </div>
     </div>
   );

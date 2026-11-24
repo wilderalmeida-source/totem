@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AlertTriangle, ArrowDownCircle, ArrowUpCircle, Banknote, CalendarClock, CalendarRange, Gauge, Landmark, LineChart as IconeLinha, Plus, Receipt,
-  RefreshCw, Scale, ShieldCheck, Target, Trash2, Wallet, Wallet2, Waves,
-} from "lucide-react";
+  RefreshCw, Scale, ShieldCheck, Target, Trash2, Wallet, Wallet2, Waves, ShieldAlert } from "lucide-react";
 import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { COR, CaixaTooltip, Kpi, Painel, Vazio, eixo } from "@/components/dashboard/wait-charts";
 import { Alternador } from "@/components/dashboard/laudos-charts";
@@ -113,7 +112,7 @@ export default function FluxoCaixa() {
         </header>
 
         <nav className="flex flex-wrap gap-2" aria-label="Telas do financeiro">
-          {([["/financeiro", "Visão geral", Gauge], ["/financeiro/fluxo", "Fluxo de caixa", Waves], ["/financeiro/receber", "Contas a receber", Banknote], ["/financeiro/pagar", "Contas a pagar", Receipt]] as const).map(([href, nome, Icone]) => (
+          {([["/financeiro", "Visão geral", Gauge], ["/financeiro/fluxo", "Fluxo de caixa", Waves], ["/financeiro/receber", "Contas a receber", Banknote], ["/financeiro/pagar", "Contas a pagar", Receipt], ["/financeiro/exames", "Exames e auditoria", ShieldAlert]] as const).map(([href, nome, Icone]) => (
             <Link key={href} href={href} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition ${href === "/financeiro/fluxo" ? "border-blue-300 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}><Icone size={16} />{nome}</Link>
           ))}
         </nav>

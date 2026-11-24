@@ -38,6 +38,7 @@ import { configAnalisesRoutes } from "./routes/config-analises";
 import { laudosRoutes } from "./routes/laudos";
 import { diretoriaRoutes } from "./routes/diretoria";
 import { financeiroRoutes } from "./routes/financeiro";
+import { financeiroExamesRoutes } from "./routes/financeiro-exames";
 import { dreRoutes } from "./routes/dre";
 import { fluxoCaixaRoutes } from "./routes/fluxo-caixa";
 import { faturamentoRoutes } from "./routes/faturamento";
@@ -121,6 +122,7 @@ async function bootstrap() {
   await fastify.register(laudosRoutes)
   await fastify.register(diretoriaRoutes)
   await fastify.register(financeiroRoutes)
+  await fastify.register(financeiroExamesRoutes)
   await fastify.register(dreRoutes)
   await fastify.register(fluxoCaixaRoutes)
   await fastify.register(faturamentoRoutes)

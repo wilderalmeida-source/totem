@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AlertTriangle, ArrowDownCircle, ArrowUpCircle, Banknote, CalendarClock, CalendarRange, CheckCircle2, Clock3, Coins, Download, FileWarning,
-  Gauge, Hourglass, Waves, Landmark, LineChart, PiggyBank, Receipt, RefreshCw, Scale, TrendingDown, TrendingUp, Wallet, Wallet2,
+  Gauge, Hourglass, ShieldAlert, Waves, Landmark, LineChart, PiggyBank, Receipt, RefreshCw, Scale, TrendingDown, TrendingUp, Wallet, Wallet2,
 } from "lucide-react";
 import { COR, Kpi, Painel } from "@/components/dashboard/wait-charts";
 import { Alternador } from "@/components/dashboard/laudos-charts";
@@ -12,18 +12,20 @@ import { AvisoCarregando } from "@/components/dashboard/carregando";
 import { GraficoMensal, RankingBarras } from "@/components/dashboard/diretoria-charts";
 import { COR_ORIGEM, GraficoAtrasos, GraficoEnvelhecimento, GraficoFluxo } from "@/components/dashboard/financeiro-charts";
 import { ContasPagar } from "@/components/dashboard/contas-pagar";
+import ExamesAuditoria from "@/components/financeiro/ExamesAuditoria";
 import { despesasDre, formatarReais, rotuloMes } from "@/lib/diretoria";
 import {
   FAIXAS_A_VENCER, FAIXAS_VENCIDAS, ROTULO_FAIXA, ROTULO_TIPO_CONTA, despesasFixas, dso, mesesDoPeriodo, origem, projecao,
   resultado, resumoBancos, resumoFluxo, resumoReceber, resumoRecebidos, serieFluxo, type Origem, type RespostaFinanceiro,
 } from "@/lib/financeiro";
 
-export type Aba = "geral" | "receber" | "pagar";
-const TITULO: Record<Aba, string> = { geral: "Visão geral financeira", receber: "Contas a receber", pagar: "Contas a pagar" };
+export type Aba = "geral" | "receber" | "pagar" | "exames";
+const TITULO: Record<Aba, string> = { geral: "Visão geral financeira", receber: "Contas a receber", pagar: "Contas a pagar", exames: "Exames e auditoria" };
 const SUBTITULO: Record<Aba, string> = {
   geral: "Saldos, fluxo de caixa, resultado do período, projeção e capital de giro.",
   receber: "Recebíveis por convênio e particular, envelhecimento, inadimplência e prazos.",
   pagar: "Obrigações, fornecedores, categorias, centros de custo, juros, descontos e prazos.",
+  exames: "Ticket médio por modalidade e exames com valor fora do padrão para auditoria.",
 };
 
 function iso(d: Date) {
@@ -52,6 +54,8 @@ export default function FinanceiroTela({ aba }: { aba: Aba }) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const pedido = useRef(0);
+  // Aba Exames: busca os próprios dados; o Atualizar só avisa a aba.
+  const [versaoExames, setVersaoExames] = useState(0);
 
   const carregar = useCallback(async (forcar = false) => {
     const n = ++pedido.current;
@@ -68,7 +72,7 @@ export default function FinanceiroTela({ aba }: { aba: Aba }) {
     }
   }, [inicio, fim]);
 
-  useEffect(() => { void carregar(); }, [carregar]);
+  useEffect(() => { if (aba !== "exames") void carregar(); else setCarregando(false); }, [carregar, aba]);
 
   const v = useMemo(() => (dados ? calcularTudo(dados) : null), [dados]);
 
@@ -86,15 +90,15 @@ export default function FinanceiroTela({ aba }: { aba: Aba }) {
             </div>
           </div>
           <div className="flex items-center gap-3 text-sm text-slate-500">
-            {dados && <span>Atualizado às {new Date(dados.atualizadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>}
-            <button onClick={() => void carregar(true)} disabled={carregando} className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60">
+            {dados && aba !== "exames" && <span>Atualizado às {new Date(dados.atualizadoEm).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>}
+            <button onClick={() => (aba === "exames" ? setVersaoExames(n => n + 1) : void carregar(true))} disabled={carregando} className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60">
               <RefreshCw size={16} className={carregando ? "animate-spin" : ""} />Atualizar
             </button>
           </div>
         </header>
 
         <nav className="flex flex-wrap gap-2" aria-label="Telas do financeiro">
-          {([["geral", "/financeiro", "Visão geral", Gauge], ["fluxo", "/financeiro/fluxo", "Fluxo de caixa", Waves], ["receber", "/financeiro/receber", "Contas a receber", Banknote], ["pagar", "/financeiro/pagar", "Contas a pagar", Receipt]] as const).map(([id, href, nome, Icone]) => (
+          {([["geral", "/financeiro", "Visão geral", Gauge], ["fluxo", "/financeiro/fluxo", "Fluxo de caixa", Waves], ["receber", "/financeiro/receber", "Contas a receber", Banknote], ["pagar", "/financeiro/pagar", "Contas a pagar", Receipt], ["exames", "/financeiro/exames", "Exames e auditoria", ShieldAlert]] as const).map(([id, href, nome, Icone]) => (
             <Link key={id} href={href} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition ${aba === id ? "border-blue-300 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>
               <Icone size={16} />{nome}
             </Link>
@@ -119,7 +123,7 @@ export default function FinanceiroTela({ aba }: { aba: Aba }) {
 
         {erro && <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700"><AlertTriangle size={18} />{erro}</div>}
 
-        {dados && v && (aba === "geral" ? <VisaoGeral dados={dados} v={v} /> : aba === "receber" ? <ContasReceber dados={dados} v={v} /> : <ContasPagar dados={dados} />)}
+        {aba === "exames" ? <ExamesAuditoria inicio={inicio} fim={fim} versao={versaoExames} /> : dados && v && (aba === "geral" ? <VisaoGeral dados={dados} v={v} /> : aba === "receber" ? <ContasReceber dados={dados} v={v} /> : <ContasPagar dados={dados} />)}
       </div>
     </main>
   );

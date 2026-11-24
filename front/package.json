@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cantoo/pdf-lib": "2.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -41,6 +42,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
+    "html-to-image": "1.11.13",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
     "moment": "^2.30.1",
@@ -56,6 +58,7 @@
     "react-loading-indicator": "^1.0.2",
     "react-resizable-panels": "^3.0.6",
     "recharts": "^2.15.4",
+    "sharp": "0.34.3",
     "short-unique-id": "^5.2.0",
     "simple-keyboard": "^3.8.81",
     "sonner": "^2.0.7",
@@ -63,8 +66,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "ws": "^8.19.0",
-    "zod": "^4.1.13",
-    "sharp": "0.34.3"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/node": "^20",
