@@ -88,6 +88,10 @@ export function consolidarErros(alteracoes: Alteracao[], opcoes: OpcoesErro): Er
 }
 
 export const MINIMO_FICHAS = 10;
+// Funcionário só entra nos pódios e no ranking com fichas em pelo menos tantos dias diferentes no período
+// (quem cobriu um ou dois dias não distorce a comparação). Períodos mais curtos exigem todos os dias.
+export const MINIMO_DIAS = 3;
+export const minimoDias = (diasNoPeriodo: number) => Math.max(1, Math.min(MINIMO_DIAS, diasNoPeriodo));
 
 export type DimAtendimento = "funcionario" | "modalidade" | "convenio" | "data" | "diaSemana" | "hora";
 export type DimErro = "campo" | "origem";
@@ -181,23 +185,26 @@ export function resumirErros({ atendimentos, erros }: BaseErros): ResumoErros {
   };
 }
 
-export type GrupoErro = { chave: string; nome: string; analisados: number; comErro: number; taxa: number; erros: number; origem?: OrigemErro };
+export type GrupoErro = { chave: string; nome: string; analisados: number; comErro: number; taxa: number; erros: number; origem?: OrigemErro; dias?: number };
 
 export function agruparErros(base: BaseErros, d: DimensaoErro): GrupoErro[] {
   if (ehDimAtendimento(d)) {
     const errosPorAtendimento = new Map<number, number>();
     for (const e of base.erros) errosPorAtendimento.set(e.cdAtendimento, (errosPorAtendimento.get(e.cdAtendimento) ?? 0) + 1);
     const mapa = new Map<string, GrupoErro>();
+    const diasDoGrupo = new Map<string, Set<string>>();
     for (const a of base.atendimentos) {
       const k = chaveAtendimento(a, d);
       const g = mapa.get(k) ?? { chave: k, nome: nomeAtendimento(a, d), analisados: 0, comErro: 0, taxa: 0, erros: 0 };
       const n = errosPorAtendimento.get(a.cdAtendimento) ?? 0;
+      const ds = diasDoGrupo.get(k) ?? new Set<string>();
+      ds.add(a.data); diasDoGrupo.set(k, ds);
       g.analisados += 1;
       g.erros += n;
       if (n) g.comErro += 1;
       mapa.set(k, g);
     }
-    return [...mapa.values()].map(g => ({ ...g, taxa: g.analisados ? arred((g.comErro / g.analisados) * 100) : 0 }));
+    return [...mapa.values()].map(g => ({ ...g, dias: diasDoGrupo.get(g.chave)?.size ?? 0, taxa: g.analisados ? arred((g.comErro / g.analisados) * 100) : 0 }));
   }
   // Campo/origem: taxa = fichas com aquele erro sobre todas as fichas analisadas.
   const total = base.atendimentos.length;
@@ -229,8 +236,8 @@ export function notaDesempenho(analisados: number, comErro: number): number {
 
 export type Colocado = GrupoErro & { acerto: number; nota: number };
 
-export function podiosFuncionarios(grupos: GrupoErro[]) {
-  const validos: Colocado[] = grupos.filter(g => g.chave !== "-" && g.analisados > 0)
+export function podiosFuncionarios(grupos: GrupoErro[], diasMinimos = 1) {
+  const validos: Colocado[] = grupos.filter(g => g.chave !== "-" && g.analisados > 0 && (g.dias === undefined || g.dias >= diasMinimos))
     .map(g => ({ ...g, acerto: arred(100 - g.taxa), nota: notaDesempenho(g.analisados, g.comErro) }));
   const comAmostra = validos.filter(g => g.analisados >= MINIMO_FICHAS);
   return {

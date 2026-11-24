@@ -15,7 +15,7 @@ const ALLOWED_PREFIXES = [
   "/clinux/atrasos-config",
   "/clinux/procedimentos", "/clinux/recepcoes-modalidades",
   "/clinux/salas", "/clinux/senhas", "/clinux/voice", "/clinux/admin", "/clinux/audit",
-  "/clinux/dashboard",
+  "/clinux/dashboard", "/clinux/diretoria", "/clinux/financeiro", "/clinux/dre", "/clinux/faturamento",
 ] as const;
 
 function pathAllowed(pathname: string) {
@@ -35,11 +35,12 @@ function requiresAdmin(pathname: string, method: string) {
   if (pathname.startsWith("/clinux/recepcoes-modalidades") && method !== "GET") return true;
   if (pathname.startsWith("/clinux/admin")) return true;
   if (pathname.startsWith("/clinux/dashboard")) return true;
+  if (pathname.startsWith("/clinux/diretoria") || pathname.startsWith("/clinux/financeiro") || pathname.startsWith("/clinux/dre") || pathname.startsWith("/clinux/faturamento")) return true;
   if (pathname.startsWith("/clinux/audit") && method === "GET") return true;
   return false;
 }
 
-function requiredPermission(pathname: string) {
+function requiredPermission(pathname: string, method = 'GET') {
   if (pathname.startsWith('/clinux/voice/dictionary')) return 'DICIONARIO'
   if (pathname.startsWith('/clinux/voice')) return 'VOZ'
   if (pathname.startsWith('/clinux/atencao')) return 'ATENCAO'
@@ -50,6 +51,16 @@ function requiredPermission(pathname: string) {
   if (pathname.startsWith('/clinux/admin/users')) return 'USUARIOS'
   if (pathname.startsWith('/clinux/audit')) return 'LOGS'
   if (pathname.startsWith('/clinux/dashboard')) return 'DASHBOARD'
+  if (pathname.startsWith('/clinux/diretoria')) return 'DIRETORIA'
+  if (pathname.startsWith('/clinux/financeiro')) return 'FINANCEIRO'
+  if (pathname.startsWith('/clinux/faturamento')) return 'FATURAMENTO'
+  // DRE: ver exige DRE; alterar a estrutura (associação das contas) exige DRE_CONFIG.
+  if (pathname.startsWith('/clinux/dre/estrutura') && method !== 'GET') return 'DRE_CONFIG'
+  if (pathname.startsWith('/clinux/dre/orcamento') && method !== 'GET') return 'DRE_CONFIG'
+  // Fechamento: aprovar, rejeitar e reabrir exigem DRE_APROVAR; fechar, ajustar e conciliar exigem DRE_FECHAR.
+  if (/^\/clinux\/dre\/fechamentos\/[^/]+\/(aprovar|rejeitar|reabrir)$/.test(pathname) && method !== 'GET') return 'DRE_APROVAR'
+  if (pathname.startsWith('/clinux/dre/fechamentos') && method !== 'GET') return 'DRE_FECHAR'
+  if (pathname.startsWith('/clinux/dre')) return 'DRE'
   return null
 }
 
@@ -102,7 +113,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
   if (requiresAdmin(pathname, request.method) && !adminSession) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   }
-  const permission = requiredPermission(pathname)
+  const permission = requiredPermission(pathname, request.method)
   if (requiresAdmin(pathname, request.method) && permission && !adminSession?.permissions.includes('*') && !adminSession?.permissions.includes(permission)) {
     return NextResponse.json({ error: 'Acesso não permitido.' }, { status: 403 })
   }

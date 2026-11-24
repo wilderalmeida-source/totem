@@ -36,6 +36,13 @@ import { errosRoutes } from "./routes/erros";
 import { atrasosPacientesRoutes } from "./routes/atrasos-pacientes";
 import { configAnalisesRoutes } from "./routes/config-analises";
 import { laudosRoutes } from "./routes/laudos";
+import { diretoriaRoutes } from "./routes/diretoria";
+import { financeiroRoutes } from "./routes/financeiro";
+import { dreRoutes } from "./routes/dre";
+import { fluxoCaixaRoutes } from "./routes/fluxo-caixa";
+import { faturamentoRoutes } from "./routes/faturamento";
+import { faturamentoAnalisesRoutes } from "./routes/faturamento-analises";
+import { faturamentoControleRoutes } from "./routes/faturamento-controle";
 import { limparLogsAntigos } from "./lib/privacidade";
 
 import { atendimentosTotemRoute } from './routes/atendimentos-totem';
@@ -112,6 +119,13 @@ async function bootstrap() {
   await fastify.register(atrasosPacientesRoutes)
   await fastify.register(configAnalisesRoutes)
   await fastify.register(laudosRoutes)
+  await fastify.register(diretoriaRoutes)
+  await fastify.register(financeiroRoutes)
+  await fastify.register(dreRoutes)
+  await fastify.register(fluxoCaixaRoutes)
+  await fastify.register(faturamentoRoutes)
+  await fastify.register(faturamentoAnalisesRoutes)
+  await fastify.register(faturamentoControleRoutes)
   await fastify.register(ws)
   await fastify.register(pgNotify, { channel: "db_atendimentos_senhas", logRawPayload: false, })
 

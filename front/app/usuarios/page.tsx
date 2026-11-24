@@ -5,7 +5,7 @@ import { FormEvent, useCallback, useEffect, useState } from 'react'
 const PERMISSIONS = [
   ['ATENCAO', 'Atenção'], ['VOZ', 'Voz e som'], ['DICIONARIO', 'Dicionário'],
   ['GUICHES', 'Guichês'], ['RECEPCOES', 'Recepções'], ['PAINEIS', 'Painéis'],
-  ['STATUS', 'Status'], ['LOGS', 'Logs'], ['USUARIOS', 'Usuários'], ['DASHBOARD', 'Dashboard'],
+  ['STATUS', 'Status'], ['LOGS', 'Logs'], ['USUARIOS', 'Usuários'], ['DASHBOARD', 'Dashboard'], ['DIRETORIA', 'Diretoria (financeiro)'], ['FINANCEIRO', 'Financeiro'], ['FATURAMENTO', 'Faturamento'], ['DRE', 'DRE (ver)'], ['DRE_CONFIG', 'DRE — editar estrutura e orçamento'], ['DRE_FECHAR', 'DRE — fechar mês e ajustes'], ['DRE_APROVAR', 'DRE — aprovar fechamento'],
 ] as const
 
 type User = { id: number; username: string; displayName: string; active: boolean; mustChangePassword: boolean; permissions: string[] }

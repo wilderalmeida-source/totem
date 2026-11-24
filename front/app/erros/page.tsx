@@ -11,7 +11,7 @@ import { DivergentesModal, type FichaDivergente } from "@/components/dashboard/d
 import { Podio } from "@/components/dashboard/podio";
 import { diasDoPeriodo } from "@/lib/desempenho";
 import {
-  MINIMO_FICHAS, ROTULO_DIM, ROTULO_ORIGEM, agruparErros, consolidarErros, filtrarErros, mapaCalorErros, podiosFuncionarios, resumirErros,
+  MINIMO_FICHAS, ROTULO_DIM, minimoDias, ROTULO_ORIGEM, agruparErros, consolidarErros, filtrarErros, mapaCalorErros, podiosFuncionarios, resumirErros,
   type Alteracao, type AtendimentoErro, type Colocado, type DimensaoErro, type Erro, type OrigemErro, type SelecaoErro,
 } from "@/lib/erros";
 import { AvisoCarregando } from "@/components/dashboard/carregando";
@@ -148,7 +148,11 @@ export default function ErrosPage() {
   const variacaoPct = (atual: number, antes?: number) => (rAnterior && antes ? Math.round(((atual - antes) / antes) * 1000) / 10 : null);
   const comparacao = rAnterior ? `vs ${formatarData(periodoAnterior.inicio, true)} a ${formatarData(periodoAnterior.fim, true)}` : buscandoAnterior ? "carregando comparação…" : "";
   const grupos = useCallback((d: DimensaoErro) => agruparErros(filtrarErros(base, sel, d), d), [base, sel]);
-  const porFuncionario = useMemo(() => grupos("funcionario"), [grupos]);
+  // Ranking e pódios de funcionários: só quem teve fichas em pelo menos MINIMO_DIAS dias diferentes no período.
+  const diasMin = minimoDias(diasDoPeriodo(inicio, fim).length);
+  const todosFuncionarios = useMemo(() => grupos("funcionario"), [grupos]);
+  const porFuncionario = useMemo(() => todosFuncionarios.filter(g => (g.dias ?? 0) >= diasMin), [todosFuncionarios, diasMin]);
+  const foraPorDias = todosFuncionarios.length - porFuncionario.length;
   const porConvenio = useMemo(() => grupos("convenio"), [grupos]);
   const porModalidade = useMemo(() => grupos("modalidade"), [grupos]);
   const porCampo = useMemo(() => grupos("campo"), [grupos]);
@@ -179,7 +183,7 @@ export default function ErrosPage() {
   const piorFuncionario = porFuncionario.filter(comAmostra).sort((a, b) => b.taxa - a.taxa)[0];
   const piorConvenio = porConvenio.filter(comAmostra).sort((a, b) => b.taxa - a.taxa)[0];
   // Pódios (regras em podiosFuncionarios): quem menos erra, quem mais atende e o melhor equilíbrio entre os dois.
-  const podios = podiosFuncionarios(porFuncionario);
+  const podios = podiosFuncionarios(porFuncionario, diasMin);
   const num = (n: number) => n.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
   const resumo = (g: Colocado) => `${num(g.acerto)}% de acerto em ${num(g.analisados)} fichas (${g.comErro} com erro).`;
   const podioMenosErra = podios.menosErra.map(g => ({ chave: g.chave, nome: g.nome, destaque: `${num(g.acerto)}% de acerto`, detalhe: `${num(g.analisados)} fichas · ${g.erros} erros`, dica: resumo(g) }));
@@ -330,18 +334,18 @@ export default function ErrosPage() {
             </Painel>
 
             <div className="grid gap-6 lg:grid-cols-3">
-              <Painel titulo="Pódio: quem menos erra" subtitulo={`Maior % de fichas sem nenhuma correção depois (mínimo de ${MINIMO_FICHAS} fichas).`} icone={Trophy}>
+              <Painel titulo="Pódio: quem menos erra" subtitulo={`Maior % de fichas sem nenhuma correção depois (mínimo de ${MINIMO_FICHAS} fichas em ${diasMin}+ dias).`} icone={Trophy}>
                 <Podio itens={podioMenosErra} descricao="Pódio dos funcionários que menos erram" selecionado={sel.funcionario} onSelecionar={alternar("funcionario")} />
               </Painel>
-              <Painel titulo="Pódio: quem mais atende" subtitulo="Quem fez mais fichas no período." icone={Users}>
+              <Painel titulo="Pódio: quem mais atende" subtitulo={`Quem fez mais fichas no período (atendeu em ${diasMin}+ dias).`} icone={Users}>
                 <Podio itens={podioMaisAtende} descricao="Pódio dos funcionários que mais atendem" vazio="Nenhuma ficha no período." selecionado={sel.funcionario} onSelecionar={alternar("funcionario")} />
               </Painel>
-              <Painel titulo="Pódio: melhor desempenho" subtitulo={`Muitas fichas com poucos erros: a nota é o acerto “garantido” pelo volume (mínimo de ${MINIMO_FICHAS} fichas).`} icone={Award}>
+              <Painel titulo="Pódio: melhor desempenho" subtitulo={`Muitas fichas com poucos erros: a nota é o acerto “garantido” pelo volume (mínimo de ${MINIMO_FICHAS} fichas em ${diasMin}+ dias).`} icone={Award}>
                 <Podio itens={podioDesempenho} descricao="Pódio dos funcionários com melhor desempenho" selecionado={sel.funcionario} onSelecionar={alternar("funcionario")} />
               </Painel>
             </div>
 
-            <Painel titulo="Funcionários" subtitulo="Quem concluiu a ficha (cd_funcionario_recepcao) que depois precisou ser corrigida. Clique em um pódio ou barra para filtrar." icone={UserCog}
+            <Painel titulo="Funcionários" subtitulo={`Quem concluiu a ficha (cd_funcionario_recepcao) que depois precisou ser corrigida. Só quem atendeu em ${diasMin}+ dias no período${foraPorDias ? ` (${foraPorDias} com menos dias ficaram de fora)` : ""}. Clique em um pódio ou barra para filtrar.`} icone={UserCog}
               acao={<Alternador valor={metricaFuncionario} onChange={v => setMetricaFuncionario(v as MetricaErro)} opcoes={[["taxa", "% fichas"], ["erros", "Qtd. erros"]]} />}>
               <RankingErros grupos={porFuncionario} metrica={metricaFuncionario} selecionado={sel.funcionario} onSelecionar={alternar("funcionario")} meta={meta} />
             </Painel>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
-import { ADMIN_AREAS, ADMIN_SECTIONS, areaOfPath, sectionsOfArea, type AdminSection, type AreaComPagina } from "@/lib/admin-sections";
+import { ADMIN_AREAS, ADMIN_SECTIONS, CATEGORIAS_ANALITICOS, ORDEM_CATEGORIAS, areaOfPath, categoriaOfPath, sectionsOfArea, type AdminSection, type AreaComPagina } from "@/lib/admin-sections";
 import { ReactNode, useEffect, useState } from "react";
 
 const adminPaths = new Set(ADMIN_SECTIONS.map((section) => section.href));
@@ -67,6 +67,7 @@ export default function AdminRouteFrame({ children }: { children: ReactNode }) {
   const hub = AREAS.find((id) => ADMIN_AREAS[id].href === pathname);
   const rotuloAtual = hub ? ADMIN_AREAS[hub].title : ADMIN_SECTIONS.find((s) => s.href === pathname)?.label;
   const fechar = () => setMenuOpen(false);
+  const categoriaAtual = categoriaOfPath(pathname);
 
   return (
     <div className="system-theme admin-theme min-h-screen bg-slate-100 text-slate-900">
@@ -83,6 +84,11 @@ export default function AdminRouteFrame({ children }: { children: ReactNode }) {
           {areaDaPagina && (
             <Link href={infoArea.href} className="hidden items-center gap-2 border-l border-slate-200 pl-4 text-sm font-semibold text-slate-500 transition hover:text-blue-700 sm:flex">
               <infoArea.icon size={17} />{infoArea.title}
+            </Link>
+          )}
+          {categoriaAtual && (
+            <Link href={CATEGORIAS_ANALITICOS[categoriaAtual].href} className="hidden items-center gap-2 border-l border-slate-200 pl-4 text-sm font-semibold text-slate-500 transition hover:text-blue-700 md:flex">
+              {CATEGORIAS_ANALITICOS[categoriaAtual].label}
             </Link>
           )}
           <div className="ml-auto flex items-center gap-3">
@@ -116,8 +122,27 @@ export default function AdminRouteFrame({ children }: { children: ReactNode }) {
               <p className="mb-2 mt-5 px-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{infoArea.title}</p>
               <nav className="space-y-1">
                 <ItemMenu section={{ ...visaoGeral, icon: LayoutGrid }} active={pathname === infoArea.href} onClick={fechar} />
-                {itensArea.map((section) => <ItemMenu key={section.href} section={section} active={pathname === section.href} onClick={fechar} />)}
+                {area !== "analiticos" && itensArea.map((section) => <ItemMenu key={section.href} section={section} active={pathname === section.href} onClick={fechar} />)}
               </nav>
+              {/* Analíticos: dashboards agrupados por categoria; configuração comum no fim. */}
+              {area === "analiticos" && ORDEM_CATEGORIAS.map((id) => {
+                const itens = itensArea.filter((s) => s.categoria === id);
+                if (!itens.length) return null;
+                const cat = CATEGORIAS_ANALITICOS[id];
+                return (
+                  <div key={id} className="mt-4">
+                    <Link href={cat.href} onClick={fechar} className={`mb-1 flex items-center gap-2 px-3 text-xs font-bold uppercase tracking-[0.14em] transition hover:text-blue-700 ${categoriaAtual === id ? "text-blue-700" : "text-slate-400"}`}>
+                      <cat.icon size={13} />{cat.label}
+                    </Link>
+                    <nav className="space-y-1">{itens.map((section) => <ItemMenu key={section.href} section={section} active={pathname === section.href} onClick={fechar} />)}</nav>
+                  </div>
+                );
+              })}
+              {area === "analiticos" && itensArea.some((s) => s.categoria === "config") && (
+                <nav className="mt-4 space-y-1 border-t border-slate-100 pt-3">
+                  {itensArea.filter((s) => s.categoria === "config").map((section) => <ItemMenu key={section.href} section={section} active={pathname === section.href} onClick={fechar} />)}
+                </nav>
+              )}
             </>
           )}
 

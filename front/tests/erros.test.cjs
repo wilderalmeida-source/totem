@@ -134,3 +134,14 @@ test('mapaCalorErros: dia da semana e hora da ficha, segunda a sábado', () => {
   assert.equal(seg8.taxa, 50);
   assert.equal(m.linhas[5].celulas[2].analisados, 1);
 });
+
+test('podiosFuncionarios: só quem atendeu em pelo menos N dias diferentes', () => {
+  const { podiosFuncionarios, minimoDias } = load();
+  const g = (chave, analisados, dias) => ({ chave, nome: chave, analisados, comErro: 0, taxa: 0, erros: 0, dias });
+  const grupos = [g('A', 50, 5), g('B', 80, 2), g('C', 30, 3)];
+  const p = podiosFuncionarios(grupos, 3);
+  assert.deepEqual([...p.maisAtende.map(x => x.chave)], ['A', 'C']);
+  assert.equal(minimoDias(30), 3);
+  assert.equal(minimoDias(2), 2);
+  assert.equal(minimoDias(1), 1);
+});

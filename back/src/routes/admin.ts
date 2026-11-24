@@ -33,7 +33,7 @@ const strongPassword = z.string().min(12).max(256)
   .regex(/[0-9]/, 'A senha precisa de um número.')
   .regex(/[^a-zA-Z0-9]/, 'A senha precisa de um símbolo.')
 
-const permission = z.enum(['ATENCAO', 'VOZ', 'DICIONARIO', 'GUICHES', 'RECEPCOES', 'PAINEIS', 'STATUS', 'LOGS', 'USUARIOS', 'DASHBOARD'])
+const permission = z.enum(['ATENCAO', 'VOZ', 'DICIONARIO', 'GUICHES', 'RECEPCOES', 'PAINEIS', 'STATUS', 'LOGS', 'USUARIOS', 'DASHBOARD', 'DIRETORIA', 'FINANCEIRO', 'DRE', 'DRE_CONFIG', 'DRE_FECHAR', 'DRE_APROVAR', 'FATURAMENTO'])
 
 const auditGroups = {
   EMISSAO: { OR: [

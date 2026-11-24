@@ -4,7 +4,7 @@ import { recordAudit } from './persistent-audit'
 // Only configuration endpoints: never inspect patient, authentication or token payloads.
 export function isAdminMutation(method: string, route: string) {
   return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) &&
-    /^\/clinux\/(?:admin\/users(?:\/:id|\/change-password)?|guiches(?:\/:id)?|paineis-config|recepcoes-modalidades(?:\/:id)?|atrasos-config|informativos-config|totem-access\/(?:settings|users(?:\/:id)?)|voice\/(?:override(?:\/:year\/:week)?|rate|volume|dictionary(?:\/:key)?)|atencao)$/.test(route)
+    /^\/clinux\/(?:admin\/users(?:\/:id|\/change-password)?|guiches(?:\/:id)?|paineis-config|recepcoes-modalidades(?:\/:id)?|atrasos-config|informativos-config|totem-access\/(?:settings|users(?:\/:id)?)|dre\/(?:estrutura|orcamento\/:ano|fechamentos\/:mes\/(?:fechar|aprovar|rejeitar|reabrir|ajustes|conciliacao))|voice\/(?:override(?:\/:year\/:week)?|rate|volume|dictionary(?:\/:key)?)|atencao)$/.test(route)
 }
 
 const fields = new Set(('id username displayName active mustChangePassword permissions numero nome ativo paineis cd_modalidade ds_modalidade servico recepcao localizacao toleranceMinutes timeBasis toleranciaMinutos baseHorario playlistAtivaId duracaoImagemSegundos playlists items enabled pinValidityDays sessionHours pinExpiresAt mustChangePin version year week voiceName rate volumeSound key value text ok createdAt updatedAt').split(' '))
