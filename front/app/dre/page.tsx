@@ -160,7 +160,7 @@ function Demonstrativo({ estrutura }: { estrutura: LinhaEstrutura[] }) {
   const nomes = useMemo(() => new Map((dados?.contas ?? []).map(c => [c.cdConta, c.conta])), [dados]);
   const principal = celulas.at(-1) ?? null;
   // Impacto: as duas últimas colunas de período (sem a coluna de total).
-  const periodos = colunas.map((c, i) => ({ c, cel: celulas[i] })).filter(x => !x.c.total);
+  const periodos = colunas.map((c, i) => ({ c, cel: celulas[i] })).filter(x => !x.c.total && x.cel);
   const impactos = periodos.length >= 2 ? maioresImpactos(periodos.at(-2)!.cel, periodos.at(-1)!.cel, nomes) : [];
   const evolucao = useMemo(() => {
     if (!dados) return [];
